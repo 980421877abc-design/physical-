@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>物理決鬥 Physics Duel</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+TC:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #05080f;
+  --arena: #0a1020;
+  --panel: #0d1828;
+  --border: #1a3a5c;
+  --glow-blue: #00d4ff;
+  --glow-orange: #ff6b00;
+  --glow-green: #00ff88;
+  --glow-purple: #cc44ff;
+  --glow-red: #ff2244;
+  --text: #c8e0ff;
+  --text-dim: #4a6a8a;
+  --card-w: 120px;
+  --card-h: 170px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Noto Sans TC', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background-image:
+    radial-gradient(ellipse at 20% 50%, rgba(0,80,160,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(0,200,255,0.05) 0%, transparent 50%);
+}
+
+/* ── SCREENS ── */
+.screen { display:none; width:100%; min-height:100vh; }
+.screen.active { display:flex; flex-direction:column; align-items:center; justify-content:center; }
+
+/* ── TITLE SCREEN ── */
+#title-screen {
+  background: radial-gradient(ellipse at center, #0a1a30 0%, #05080f 70%);
+  position: relative;
+  overflow: hidden;
+}
+#title-screen::before {
+  content:'';
+  position:absolute; inset:0;
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 39px,
+    rgba(0,212,255,0.04) 39px, rgba(0,212,255,0.04) 40px
+  ),
+  repeating-linear-gradient(
+    90deg, transparent, transparent 39px,
+    rgba(0,212,255,0.04) 39px, rgba(0,212,255,0.04) 40px
+  );
+}
+.title-logo {
+  text-align:center;
+  z-index:1;
+}
+.title-logo h1 {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(2rem, 6vw, 5rem);
+  font-weight: 900;
+  color: var(--glow-blue);
+  text-shadow: 0 0 20px rgba(0,212,255,0.8), 0 0 60px rgba(0,212,255,0.4);
+  letter-spacing: 0.1em;
+  animation: flicker 4s infinite;
+}
+.title-logo .subtitle {
+  font-size: 1.1rem;
+  color: var(--text-dim);
+  letter-spacing: 0.3em;
+  margin-top: 0.5rem;
+  font-family: 'Orbitron', monospace;
+}
+.title-logo .desc {
+  margin-top: 2rem;
+  font-size: 1rem;
+  color: var(--text);
+  max-width: 500px;
+  line-height: 1.8;
+  text-align:center;
+}
+.btn-primary {
+  margin-top: 2.5rem;
+  padding: 1rem 3rem;
+  background: transparent;
+  border: 2px solid var(--glow-blue);
+  color: var(--glow-blue);
+  font-family: 'Orbitron', monospace;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  cursor: pointer;
+  transition: all 0.3s;
+  clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+  position: relative;
+  overflow: hidden;
+}
+.btn-primary::before {
+  content:'';
+  position:absolute; inset:0;
+  background: var(--glow-blue);
+  opacity:0;
+  transition: opacity 0.3s;
+}
+.btn-primary:hover { color: #000; box-shadow: 0 0 30px rgba(0,212,255,0.5); }
+.btn-primary:hover::before { opacity:1; }
+.btn-primary span { position:relative; z-index:1; }
+
+@keyframes flicker {
+  0%,95%,100% { opacity:1; }
+  96% { opacity:0.8; }
+  97% { opacity:1; }
+  98% { opacity:0.6; }
+  99% { opacity:1; }
+}
+
+/* ── GAME SCREEN ── */
+#game-screen {
+  display:none;
+  flex-direction:column;
+  width:100%;
+  min-height:100vh;
+  padding: 8px;
+  gap: 6px;
+}
+#game-screen.active { display:flex; }
+
+/* Top bar */
+.top-bar {
+  display:flex; align-items:center; justify-content:space-between;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  padding: 6px 14px;
+  border-radius: 4px;
+}
+.turn-indicator {
+  font-family: 'Orbitron', monospace;
+  font-size: 0.8rem;
+  letter-spacing:0.2em;
+}
+.turn-indicator span { color: var(--glow-blue); }
+.phase-label {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  letter-spacing:0.1em;
+}
+.btn-end-turn {
+  padding: 6px 16px;
+  background: transparent;
+  border: 1px solid var(--glow-orange);
+  color: var(--glow-orange);
+  font-family: 'Orbitron', monospace;
+  font-size: 0.7rem;
+  letter-spacing:0.1em;
+  cursor:pointer;
+  transition: all 0.2s;
+}
+.btn-end-turn:hover { background: rgba(255,107,0,0.2); }
+.btn-end-turn:disabled { opacity:0.3; cursor:default; }
+
+/* Middle section */
+.middle {
+  display:flex; gap:8px; flex:1; min-height:0;
+}
+
+/* Opponent panel */
+.opponent-panel, .player-panel {
+  display:flex; flex-direction:column; gap:6px;
+}
+
+/* Arena */
+.arena-wrap {
+  flex:1;
+  display:flex; flex-direction:column; align-items:center; gap:6px;
+}
+.arena-container {
+  position:relative; flex:1;
+  display:flex; align-items:center; justify-content:center;
+}
+.arena-svg {
+  width:min(380px, 100%);
+  height:min(380px, 100%);
+  max-width: 380px;
+  max-height: 380px;
+}
+
+/* Status panels */
+.fighter-status {
+  width: 200px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 10px;
+}
+.fighter-name {
+  font-family: 'Orbitron', monospace;
+  font-size: 0.75rem;
+  letter-spacing:0.15em;
+  margin-bottom: 8px;
+}
+.fighter-name.enemy { color: var(--glow-red); }
+.fighter-name.player { color: var(--glow-green); }
+
+.stat-row {
+  display:flex; justify-content:space-between; align-items:center;
+  font-size: 0.72rem;
+  padding: 2px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.stat-label { color: var(--text-dim); }
+.stat-val { color: var(--text); font-weight:700; }
+.stat-val.changed {
+  animation: statpop 0.5s ease;
+}
+@keyframes statpop {
+  0% { transform:scale(1.5); color: var(--glow-orange); }
+  100% { transform:scale(1); }
+}
+
+/* Energy bar */
+.energy-bar-wrap { margin-top:8px; }
+.energy-label { font-size:0.68rem; color:var(--text-dim); margin-bottom:3px; display:flex; justify-content:space-between; }
+.energy-pips { display:flex; gap:3px; flex-wrap:wrap; }
+.energy-pip {
+  width:14px; height:14px;
+  border: 1px solid var(--glow-blue);
+  border-radius:2px;
+  transition: background 0.3s;
+}
+.energy-pip.filled { background: var(--glow-blue); box-shadow: 0 0 6px var(--glow-blue); }
+.energy-pip.enemy-pip { border-color: var(--glow-red); }
+.energy-pip.enemy-pip.filled { background: var(--glow-red); box-shadow: 0 0 6px var(--glow-red); }
+
+/* Hand area */
+.hand-area {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 8px;
+}
+.hand-label {
+  font-family:'Orbitron',monospace;
+  font-size:0.65rem;
+  color:var(--text-dim);
+  letter-spacing:0.2em;
+  margin-bottom:6px;
+}
+.hand-cards {
+  display:flex; gap:6px; flex-wrap:wrap; min-height:50px;
+}
+
+/* CARDS */
+.card {
+  width: var(--card-w);
+  height: var(--card-h);
+  border-radius: 6px;
+  border: 1.5px solid;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  position:relative;
+  overflow:hidden;
+  display:flex; flex-direction:column;
+  background: var(--arena);
+  flex-shrink:0;
+  user-select:none;
+}
+.card:hover:not(.disabled) {
+  transform: translateY(-8px) scale(1.05);
+}
+.card.selected {
+  transform: translateY(-12px) scale(1.07);
+  z-index:10;
+}
+.card.disabled { opacity:0.4; cursor:default; }
+
+.card.type-force { border-color: var(--glow-orange); }
+.card.type-mass { border-color: var(--glow-blue); }
+.card.type-field { border-color: var(--glow-purple); }
+.card.type-env { border-color: var(--glow-green); }
+.card.type-gravity { border-color: #ffcc00; }
+.card.type-angular { border-color: #ff88cc; }
+.card.type-reaction { border-color: #888; }
+
+.card-cost {
+  position:absolute; top:4px; right:4px;
+  width:22px; height:22px;
+  border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Orbitron',monospace;
+  font-size:0.75rem;
+  font-weight:900;
+}
+.type-force .card-cost { background:rgba(255,107,0,0.3); color:var(--glow-orange); border:1px solid var(--glow-orange); }
+.type-mass .card-cost { background:rgba(0,212,255,0.2); color:var(--glow-blue); border:1px solid var(--glow-blue); }
+.type-field .card-cost { background:rgba(204,68,255,0.2); color:var(--glow-purple); border:1px solid var(--glow-purple); }
+.type-env .card-cost { background:rgba(0,255,136,0.15); color:var(--glow-green); border:1px solid var(--glow-green); }
+.type-gravity .card-cost { background:rgba(255,204,0,0.2); color:#ffcc00; border:1px solid #ffcc00; }
+.type-angular .card-cost { background:rgba(255,136,204,0.2); color:#ff88cc; border:1px solid #ff88cc; }
+.type-reaction .card-cost { background:rgba(136,136,136,0.2); color:#aaa; border:1px solid #888; }
+
+.card-icon {
+  text-align:center;
+  font-size:1.8rem;
+  padding: 10px 0 4px;
+}
+.card-name {
+  font-size:0.62rem;
+  font-weight:700;
+  text-align:center;
+  padding: 0 4px;
+  line-height:1.2;
+  font-family:'Orbitron',monospace;
+  letter-spacing:0.05em;
+}
+.card-formula {
+  text-align:center;
+  font-size:0.58rem;
+  color: var(--text-dim);
+  padding: 2px 4px;
+  font-style:italic;
+  font-family: 'Courier New', monospace;
+}
+.card-desc {
+  font-size:0.58rem;
+  color:var(--text);
+  padding: 3px 5px;
+  line-height:1.4;
+  flex:1;
+}
+.card-tag {
+  position:absolute; bottom:0; left:0; right:0;
+  text-align:center;
+  font-size:0.52rem;
+  padding:2px;
+  font-family:'Orbitron',monospace;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+}
+.type-force .card-tag { background:rgba(255,107,0,0.3); color:var(--glow-orange); }
+.type-mass .card-tag { background:rgba(0,212,255,0.15); color:var(--glow-blue); }
+.type-field .card-tag { background:rgba(204,68,255,0.15); color:var(--glow-purple); }
+.type-env .card-tag { background:rgba(0,255,136,0.1); color:var(--glow-green); }
+.type-gravity .card-tag { background:rgba(255,204,0,0.15); color:#ffcc00; }
+.type-angular .card-tag { background:rgba(255,136,204,0.15); color:#ff88cc; }
+.type-reaction .card-tag { background:rgba(136,136,136,0.15); color:#aaa; }
+
+/* Card glow on type */
+.type-force { box-shadow: 0 0 8px rgba(255,107,0,0.2); }
+.type-field { box-shadow: 0 0 8px rgba(204,68,255,0.2); }
+.type-gravity { box-shadow: 0 0 8px rgba(255,204,0,0.2); }
+.type-angular { box-shadow: 0 0 8px rgba(255,136,204,0.2); }
+
+/* Log */
+.log-panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius:4px;
+  padding:8px;
+  height:130px;
+  overflow-y:auto;
+}
+.log-panel::-webkit-scrollbar { width:4px; }
+.log-panel::-webkit-scrollbar-thumb { background:var(--border); }
+.log-entry {
+  font-size:0.7rem;
+  padding:2px 0;
+  border-bottom:1px solid rgba(255,255,255,0.03);
+  line-height:1.4;
+}
+.log-entry.system { color:var(--glow-blue); }
+.log-entry.player-action { color:var(--glow-green); }
+.log-entry.enemy-action { color:var(--glow-red); }
+.log-entry.effect { color:var(--glow-orange); }
+.log-entry.win { color:#ffcc00; font-weight:700; font-size:0.8rem; }
+
+/* card info panel shown inline - no tooltip needed */
+
+/* Arena fighters */
+.fighter-dot {
+  transition: cx 0.5s cubic-bezier(.68,-0.55,.27,1.55), cy 0.5s cubic-bezier(.68,-0.55,.27,1.55), r 0.4s ease;
+  cursor: default;
+}
+.effect-text {
+  font-family:'Orbitron',monospace;
+  font-size:10px;
+  fill:var(--glow-orange);
+  animation: floatUp 1.2s ease forwards;
+  pointer-events:none;
+}
+@keyframes floatUp {
+  0% { opacity:1; transform:translateY(0); }
+  100% { opacity:0; transform:translateY(-30px); }
+}
+
+/* Win overlay */
+.win-overlay {
+  display:none;
+  position:fixed; inset:0;
+  background:rgba(0,0,0,0.85);
+  z-index:500;
+  align-items:center; justify-content:center;
+  flex-direction:column;
+  gap:20px;
+}
+.win-overlay.show { display:flex; }
+.win-title {
+  font-family:'Orbitron',monospace;
+  font-size:clamp(2rem,6vw,4rem);
+  font-weight:900;
+  text-shadow:0 0 40px currentColor;
+  text-align:center;
+}
+.win-title.victory { color:var(--glow-green); }
+.win-title.defeat { color:var(--glow-red); }
+.win-reason {
+  font-size:1rem;
+  color:var(--text-dim);
+  text-align:center;
+  max-width:400px;
+}
+
+/* Deck count badge */
+.deck-count {
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:4px;
+  padding:4px 10px;
+  font-family:'Orbitron',monospace;
+  font-size:0.65rem;
+  color:var(--text-dim);
+  text-align:center;
+}
+
+/* Effect animation on arena */
+.arena-effect {
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  border-radius:50%;
+  animation: pulse-effect 0.6s ease forwards;
+}
+@keyframes pulse-effect {
+  0% { box-shadow:inset 0 0 0px 0px rgba(0,212,255,0); }
+  50% { box-shadow:inset 0 0 40px 10px rgba(0,212,255,0.3); }
+  100% { box-shadow:inset 0 0 0px 0px rgba(0,212,255,0); }
+}
+
+/* Responsive */
+@media(max-width:700px) {
+  :root { --card-w:90px; --card-h:130px; }
+  .middle { flex-direction:column; }
+  .fighter-status { width:100%; }
+  .arena-svg { max-width:300px; max-height:300px; }
+}
+
+/* Card draw animation */
+@keyframes cardDeal {
+  from { transform: translateY(-40px) rotate(-8deg); opacity:0; }
+  to { transform: translateY(0) rotate(0); opacity:1; }
+}
+.card.dealing { animation: cardDeal 0.4s ease forwards; }
+
+/* Shimmer on selected card */
+.card.selected::after {
+  content:'';
+  position:absolute; inset:0;
+  background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.08) 50%, transparent 60%);
+  animation: shimmer 1.5s infinite;
+}
+@keyframes shimmer {
+  0% { transform:translateX(-100%); }
+  100% { transform:translateX(200%); }
+}
+
+.play-btn {
+  padding: 8px 20px;
+  background: transparent;
+  border: 1.5px solid var(--glow-green);
+  color: var(--glow-green);
+  font-family: 'Orbitron', monospace;
+  font-size: 0.75rem;
+  letter-spacing:0.1em;
+  cursor: pointer;
+  transition: all 0.2s;
+  clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+}
+.play-btn:hover { background: rgba(0,255,136,0.15); }
+.play-btn:disabled { opacity:0.3; cursor:default; }
+
+.env-status {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius:4px;
+  padding:6px 10px;
+  font-size:0.65rem;
+}
+.env-title {
+  font-family:'Orbitron',monospace;
+  font-size:0.6rem;
+  color:var(--text-dim);
+  letter-spacing:0.15em;
+  margin-bottom:4px;
+}
+.env-tag {
+  display:inline-block;
+  padding:1px 6px;
+  border-radius:2px;
+  margin:1px;
+  font-size:0.6rem;
+  background:rgba(0,255,136,0.1);
+  border:1px solid rgba(0,255,136,0.3);
+  color:var(--glow-green);
+}
+
+</style>
+</head>
+<body>
+
+<!-- TITLE SCREEN -->
+<div id="title-screen" class="screen active">
+  <div class="title-logo">
+    <h1>PHYSICS DUEL</h1>
+    <div class="subtitle">物 理 決 鬥</div>
+    <div class="desc">
+      運用高中物理知識進行卡牌對戰！<br>
+      用動量、電磁場、引力、角動量等<br>
+      將對手推出圓形競技場！
+    </div>
+    <button class="btn-primary" onclick="startGame()"><span>▶ 開始決鬥</span></button>
+    <div style="margin-top:1.5rem; font-size:0.8rem; color:var(--text-dim);">
+      ⚡ 點擊卡片查看科學知識 | 選擇卡片後點擊「出牌」
+    </div>
+  </div>
+</div>
+
+<!-- GAME SCREEN -->
+<div id="game-screen" class="screen">
+
+  <!-- Top bar -->
+  <div class="top-bar">
+    <div>
+      <div class="turn-indicator">回合 <span id="turn-num">1</span> | <span id="whose-turn">玩家回合</span></div>
+      <div class="phase-label" id="phase-label">選擇卡片出牌，每回合3點能量</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <div class="deck-count">牌庫 <span id="deck-count">0</span></div>
+      <button class="btn-end-turn" id="end-turn-btn" onclick="endTurn()">結束回合 ▶</button>
+    </div>
+  </div>
+
+  <!-- Middle -->
+  <div class="middle">
+
+    <!-- Enemy Status (left) -->
+    <div class="fighter-status">
+      <div class="fighter-name enemy">💀 對手</div>
+      <div class="stat-row"><span class="stat-label">質量 m</span><span class="stat-val" id="e-mass">1.0</span> kg</div>
+      <div class="stat-row"><span class="stat-label">位置 x</span><span class="stat-val" id="e-pos">0.0</span> m</div>
+      <div class="stat-row"><span class="stat-label">速度 v</span><span class="stat-val" id="e-vel">0.0</span> m</div>
+      <div class="stat-row"><span class="stat-label">摩擦 μ</span><span class="stat-val" id="e-fric">0.5</span></div>
+      <div class="stat-row"><span class="stat-label">電荷 q</span><span class="stat-val" id="e-charge">0</span> C</div>
+      <div class="stat-row"><span class="stat-label">角動量 L</span><span class="stat-val" id="e-angular">0.0</span></div>
+      <div class="energy-bar-wrap">
+        <div class="energy-label"><span>⚡ 能量</span><span id="e-energy-text">3/3</span></div>
+        <div class="energy-pips" id="e-energy-pips"></div>
+      </div>
+    </div>
+
+    <!-- Arena -->
+    <div class="arena-wrap">
+      <div class="arena-container">
+        <svg class="arena-svg" id="arena-svg" viewBox="0 0 400 400">
+          <defs>
+            <radialGradient id="arenaGrad" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#0a1828"/>
+              <stop offset="80%" stop-color="#060e1a"/>
+              <stop offset="100%" stop-color="#030710"/>
+            </radialGradient>
+            <filter id="glow-filter">
+              <feGaussianBlur stdDeviation="3" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+          <!-- Background -->
+          <circle cx="200" cy="200" r="198" fill="url(#arenaGrad)" stroke="#1a3a5c" stroke-width="2"/>
+          <!-- Grid lines -->
+          <line x1="200" y1="10" x2="200" y2="390" stroke="rgba(26,58,92,0.4)" stroke-width="1"/>
+          <line x1="10" y1="200" x2="390" y2="200" stroke="rgba(26,58,92,0.4)" stroke-width="1"/>
+          <circle cx="200" cy="200" r="60" fill="none" stroke="rgba(26,58,92,0.3)" stroke-width="1" stroke-dasharray="4,4"/>
+          <circle cx="200" cy="200" r="120" fill="none" stroke="rgba(26,58,92,0.25)" stroke-width="1" stroke-dasharray="6,6"/>
+          <!-- Warning ring -->
+          <circle cx="200" cy="200" r="170" fill="none" stroke="rgba(255,100,0,0.3)" stroke-width="2" stroke-dasharray="8,4"/>
+          <!-- Arena border -->
+          <circle cx="200" cy="200" r="188" fill="none" stroke="#00d4ff" stroke-width="2" opacity="0.6"/>
+          <!-- Center cross -->
+          <circle cx="200" cy="200" r="6" fill="rgba(0,212,255,0.3)" stroke="#00d4ff" stroke-width="1"/>
+          <!-- Labels -->
+          <text x="200" y="22" text-anchor="middle" fill="rgba(0,212,255,0.4)" font-size="9" font-family="Orbitron">N</text>
+          <text x="200" y="395" text-anchor="middle" fill="rgba(0,212,255,0.4)" font-size="9" font-family="Orbitron">S</text>
+          <text x="385" y="204" text-anchor="middle" fill="rgba(0,212,255,0.4)" font-size="9" font-family="Orbitron">E</text>
+          <text x="15" y="204" text-anchor="middle" fill="rgba(0,212,255,0.4)" font-size="9" font-family="Orbitron">W</text>
+          <!-- Fighters (placed by JS) -->
+          <circle id="enemy-dot" class="fighter-dot" cx="200" cy="80" r="18" fill="rgba(255,34,68,0.3)" stroke="#ff2244" stroke-width="2" filter="url(#glow-filter)"/>
+          <text id="enemy-label" x="200" y="75" text-anchor="middle" fill="#ff2244" font-size="9" font-family="Orbitron">敵</text>
+          <circle id="player-dot" class="fighter-dot" cx="200" cy="320" r="18" fill="rgba(0,255,136,0.3)" stroke="#00ff88" stroke-width="2" filter="url(#glow-filter)"/>
+          <text id="player-label" x="200" y="315" text-anchor="middle" fill="#00ff88" font-size="9" font-family="Orbitron">我</text>
+          <!-- Effect texts injected here -->
+          <g id="effect-layer"></g>
+        </svg>
+      </div>
+      <!-- Environment status -->
+      <div class="env-status" style="width:100%;">
+        <div class="env-title">🌍 環境狀態</div>
+        <div id="env-tags"><span class="env-tag">正常重力 g=9.8</span></div>
+      </div>
+    </div>
+
+    <!-- Player Status (right) -->
+    <div class="fighter-status">
+      <div class="fighter-name player">⚡ 玩家</div>
+      <div class="stat-row"><span class="stat-label">質量 m</span><span class="stat-val" id="p-mass">1.0</span> kg</div>
+      <div class="stat-row"><span class="stat-label">位置 x</span><span class="stat-val" id="p-pos">0.0</span> m</div>
+      <div class="stat-row"><span class="stat-label">速度 v</span><span class="stat-val" id="p-vel">0.0</span> m/s</div>
+      <div class="stat-row"><span class="stat-label">摩擦 μ</span><span class="stat-val" id="p-fric">0.5</span></div>
+      <div class="stat-row"><span class="stat-label">電荷 q</span><span class="stat-val" id="p-charge">0</span> C</div>
+      <div class="stat-row"><span class="stat-label">角動量 L</span><span class="stat-val" id="p-angular">0.0</span></div>
+      <div class="energy-bar-wrap">
+        <div class="energy-label"><span>⚡ 能量</span><span id="p-energy-text">3/3</span></div>
+        <div class="energy-pips" id="p-energy-pips"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Player hand -->
+  <div class="hand-area">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+      <div class="hand-label">🃏 手牌 <span style="color:var(--text-dim);font-size:0.6rem;font-family:sans-serif;">（點擊查看說明，再點出牌）</span></div>
+      <div style="display:flex;gap:6px;">
+        <button class="play-btn" id="play-btn" onclick="playSelectedCard()" disabled>⚡ 出牌</button>
+      </div>
+    </div>
+    <div class="hand-cards" id="hand-cards"></div>
+    <!-- Inline card info panel -->
+    <div id="card-info-panel" style="display:none; margin-top:8px; background:rgba(0,212,255,0.05); border:1px solid var(--border); border-radius:4px; padding:8px 12px; font-size:0.75rem; line-height:1.7;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+        <span id="ci-title" style="font-family:'Orbitron',monospace; font-size:0.72rem; font-weight:700;"></span>
+        <span id="ci-formula" style="font-family:'Courier New',monospace; font-size:0.68rem; color:var(--glow-blue);"></span>
+      </div>
+      <div id="ci-desc" style="color:var(--text); margin-bottom:4px;"></div>
+      <div id="ci-science" style="border-left:2px solid var(--glow-blue); padding-left:8px; color:var(--text-dim); font-size:0.7rem;">
+      </div>
+    </div>
+  </div>
+
+  <!-- Log -->
+  <div class="log-panel" id="log-panel"></div>
+
+</div>
+
+<!-- Win overlay -->
+<div class="win-overlay" id="win-overlay">
+  <div class="win-title" id="win-title">VICTORY!</div>
+  <div class="win-reason" id="win-reason"></div>
+  <button class="btn-primary" onclick="restartGame()"><span>🔄 再來一局</span></button>
+</div>
+
+
+
+<script>
+// ══════════════════════════════════════════
+//  CARD DATABASE
+// ══════════════════════════════════════════
+const CARDS = [
+  // ── FORCE CARDS ──
+  {id:'push', name:'衝量推力', type:'force', cost:2, icon:'💨',
+   formula:'F·Δt = Δp',
+   desc:'對敵施加衝量 Δp=3，根據動量定理將對方推離中心。',
+   science:'動量定理：F·Δt = Δp = m·Δv。施力時間越長，動量改變越大。',
+   effect:(g,target)=>{ applyPush(g,target,3); }},
+
+  {id:'bigpush', name:'強力衝擊', type:'force', cost:3, icon:'🌊',
+   formula:'J = Δp = 5',
+   desc:'施加大衝量5，讓對方大幅位移。衝量越大，速度改變越劇烈。',
+   science:'動量定理的應用：大衝量（大力或長時間）產生大速度變化。',
+   effect:(g,target)=>{ applyPush(g,target,5); }},
+
+  {id:'newton3', name:'反作用力', type:'force', cost:1, icon:'↩️',
+   formula:'F₁₂ = -F₂₁',
+   desc:'牛頓第三定律！立刻反彈對方當前速度，讓對方瞬間加速飛出。',
+   science:'牛頓第三定律：作用力與反作用力大小相等、方向相反，作用在不同物體上。',
+   effect:(g,target)=>{
+     // 直接把對方速度翻倍往外（反彈效果）
+     const dir = g[target].pos >= 0 ? 1 : -1;
+     const bounce = Math.abs(g[target].vel) + 2;
+     g[target].vel = dir * bounce;
+     addLog(`反作用力！${targetName(target)}速度反彈→${g[target].vel.toFixed(2)} m/s`,'effect');
+     showArenaEffect(g,target,'↩ BOUNCE');
+   }},
+
+  {id:'gravity_pull', name:'萬有引力', type:'gravity', cost:2, icon:'🪐',
+   formula:'F = GMm/r²',
+   desc:'啟動星體引力，將對方拉近中心（危險！靠近中心不容易被推出）。',
+   science:'萬有引力定律：F=GMm/r²，距離越近引力越強。用於解釋行星軌道與潮汐。',
+   effect:(g,target)=>{ pullToCenter(g,target,2); }},
+
+  {id:'tidal', name:'潮汐力', type:'gravity', cost:3, icon:'🌀',
+   formula:'ΔF ∝ Δr/r³',
+   desc:'差異引力！對方離中心越遠，潮汐力越大（距離×0.08 + 固定3）。',
+   science:'潮汐力是引力的梯度，是月球造成海洋潮汐的原因，也能撕裂進入洛希極限的天體。',
+   effect:(g,target)=>{ const bonus = Math.abs(g[target].pos)*0.08 + 3; applyPush(g,target,bonus); addLog(`潮汐力 = ${bonus.toFixed(2)} (位置${g[target].pos.toFixed(1)}m)`,'effect'); }},
+
+  {id:'repulse', name:'電斥力', type:'field', cost:2, icon:'⚡',
+   formula:'F = kq₁q₂/r²',
+   desc:'給對方充正電+2C，若自己也有正電則額外電斥推力+3。',
+   science:'庫侖定律：同種電荷相斥，異種電荷相吸。電場力F=kq₁q₂/r²。',
+   effect:(g,target)=>{
+     const self = target==='enemy' ? 'player' : 'enemy';
+     g[target].charge += 2;
+     applyPush(g,target,2);
+     if(g[self].charge > 0){
+       applyPush(g,target,3);
+       addLog(`同電相斥！額外推力+3`,'effect');
+     }
+   }},
+
+  {id:'magnet', name:'洛倫茲力', type:'field', cost:2, icon:'🧲',
+   formula:'F = qv×B',
+   desc:'施加磁場！對方的電荷×速度轉為推力，底線保底2。',
+   science:'洛倫茲力：帶電粒子在磁場中受F=qv×B的力，使粒子做圓周運動。',
+   effect:(g,target)=>{ const f = Math.max(2, Math.abs(g[target].vel)*0.8 + Math.abs(g[target].charge)*0.6); applyPush(g,target,f); addLog(`洛倫茲力 = ${f.toFixed(2)} N·s`,'effect'); }},
+
+  {id:'em_wave', name:'電磁波壓', type:'field', cost:3, icon:'📡',
+   formula:'P = E×B / μ₀',
+   desc:'強烈電磁輻射產生光壓，推對方+2，並降低其摩擦係數-0.15。',
+   science:'電磁波攜帶動量，打到物體時可施加輻射壓。太陽帆就利用此原理在太空中加速。',
+   effect:(g,target)=>{ applyPush(g,target,2); g[target].fric=Math.max(0.05,g[target].fric-0.15); addLog(`電磁波壓！${targetName(target)}摩擦降至${g[target].fric.toFixed(2)}`,'effect'); }},
+
+  // ── MASS / PROPERTY CARDS ──
+  {id:'add_mass', name:'質量增加', type:'mass', cost:1, icon:'⚖️',
+   formula:'Δv = Δp/m ↓',
+   desc:'給對方增加質量+0.8kg，同樣衝量下速度變化更小，更難被推走。',
+   science:'根據動量定理，相同衝量下質量越大，速度變化越小。但同時慣性也更大！',
+   effect:(g,target)=>{ g[target].mass+=0.8; addLog(`${targetName(target)}質量增至${g[target].mass.toFixed(1)}kg`,'effect'); showArenaEffect(g,target,'+m'); }},
+
+  {id:'reduce_mass', name:'質量削減', type:'mass', cost:2, icon:'🪶',
+   formula:'a = F/m ↑',
+   desc:'削減對方質量-0.7kg，同樣衝量讓對方飛得更遠！',
+   science:'牛頓第二定律 a=F/m，質量減小則加速度增大，相同衝量下位移更大。',
+   effect:(g,target)=>{ g[target].mass=Math.max(0.2,g[target].mass-0.7); addLog(`${targetName(target)}質量降至${g[target].mass.toFixed(1)}kg`,'effect'); showArenaEffect(g,target,'-m'); }},
+
+  {id:'friction_down', name:'超潤滑表面', type:'env', cost:1, icon:'🧊',
+   formula:'μ = 0.05',
+   desc:'場地摩擦降至μ=0.05！速度幾乎不衰減，雙方皆受影響。',
+   science:'摩擦力f=μN。超低摩擦如冰面，物體一旦被推動就難以停止。',
+   effect:(g,_)=>{ g.env.friction=0.05; g.env.zeroG=false; updateEnvTags(g); addLog('⚠ 場地超低摩擦 μ=0.05！','effect'); }},
+
+  {id:'friction_up', name:'高摩擦地形', type:'env', cost:1, icon:'🏔️',
+   formula:'μ = 0.9',
+   desc:'場地摩擦升至μ=0.9，速度快速衰減，雙方皆受影響。',
+   science:'高摩擦係數讓動能快速轉為熱能。泥地、沙地的μ可達0.8以上。',
+   effect:(g,_)=>{ g.env.friction=0.9; g.env.zeroG=false; updateEnvTags(g); addLog('⚠ 高摩擦地形 μ=0.9！','effect'); }},
+
+  {id:'zero_g', name:'零重力環境', type:'env', cost:3, icon:'🛸',
+   formula:'g = 0 m/s²',
+   desc:'太空零重力！摩擦歸零，速度永不衰減，雙方超級危險！',
+   science:'在太空中（如國際太空站），物體處於自由落體，表觀重力為零，沒有正向力也沒有摩擦力。',
+   effect:(g,_)=>{ g.env.friction=0; g.env.zeroG=true; g.env.strongG=false; updateEnvTags(g); addLog('🛸 零重力！速度永不衰減！','effect'); }},
+
+  {id:'strong_g', name:'強重力星球', type:'gravity', cost:2, icon:'🌍',
+   formula:'g = 25 m/s²',
+   desc:'模擬強重力星球，摩擦大幅增加，速度快速衰減，雙方皆受影響。',
+   science:'木星表面重力約為地球的2.5倍（g≈24.8 m/s²），正向力增大使摩擦力也增大。',
+   effect:(g,_)=>{ g.env.friction=0.85; g.env.strongG=true; g.env.zeroG=false; updateEnvTags(g); addLog('🌍 強重力星球！速度快速衰減','effect'); }},
+
+  {id:'angular_kick', name:'角動量踢擊', type:'angular', cost:2, icon:'🌀',
+   formula:'L = Iω',
+   desc:'對對方施加角動量+3並轉換為線衝量2.5，一舉兩得！',
+   science:'角動量守恆定律：封閉系統角動量守恆。花式溜冰者收手臂時轉得更快（I減小→ω增大）。',
+   effect:(g,target)=>{ g[target].angular+=3; applyPush(g,target,2.5); addLog(`${targetName(target)}角動量+3，並被推出2.5單位`,'effect'); }},
+
+  {id:'spin_convert', name:'角動量轉換', type:'angular', cost:2, icon:'💫',
+   formula:'v = L/(mr)',
+   desc:'將自身角動量轉為衝量推向對方。角動量越高效果越好！',
+   science:'當物體從圓周運動切出時，切線方向速度v=ωr，角動量轉化為線動量p=mv。',
+   effect:(g,target)=>{
+     const self = target==='enemy' ? 'player' : 'enemy';
+     if(g[self].angular <= 0){
+       addLog(`${targetName(self)}角動量為0，效果改為固定衝量1`,'effect');
+       applyPush(g,target,1);
+     } else {
+       const push = Math.max(1, g[self].angular / g[self].mass);
+       applyPush(g,target,push);
+       addLog(`角動量轉換！${targetName(self)}角動量${g[self].angular}→推力${push.toFixed(1)}`,'effect');
+       g[self].angular = 0;
+     }
+   }},
+
+  {id:'momentum_conserve', name:'動量守恆碰撞', type:'force', cost:2, icon:'🎯',
+   formula:'v₂\' = 2m₁/(m₁+m₂)·v₁',
+   desc:'彈性碰撞！用質量比計算，輕的對方飛得更遠（質量差越大越有利）。',
+   science:'動量守恆：碰撞前後總動量不變。質量差越大，輕物彈出速度越高（如撞球）。',
+   effect:(g,target)=>{
+     const self = target==='enemy' ? 'player' : 'enemy';
+     const ratio = 2*g[self].mass / (g[self].mass+g[target].mass);
+     const push = Math.max(1.5, 3*ratio);
+     applyPush(g,target,push);
+     addLog(`動量守恆推力：${push.toFixed(2)} (質量比=${ratio.toFixed(2)})`,'effect');
+   }},
+
+  {id:'charge_self', name:'自充電', type:'field', cost:1, icon:'🔋',
+   formula:'q += 3C',
+   desc:'給自己充電+3C！強化後續洛倫茲力和電斥力卡的效果。',
+   science:'庫侖定律與洛倫茲力都與電荷量有關，充電是增強電場類卡片效果的準備動作。',
+   effect:(g,target)=>{
+     // target is enemy, so self is player (or vice versa for AI)
+     const self = target==='enemy' ? 'player' : 'enemy';
+     g[self].charge += 3;
+     addLog(`${targetName(self)}自充電+3C → 電荷=${g[self].charge}C`,'effect');
+     showArenaEffect(g,self,'+3C');
+   }},
+
+  {id:'black_hole', name:'黑洞引力井', type:'gravity', cost:3, icon:'🕳️',
+   formula:'F→∞ as r→Rs',
+   desc:'中央出現黑洞！強力拉對方向中心+5，自己小幅被拉+1（高風險高回報）。',
+   science:'黑洞的施瓦茲希爾德半徑內，逃逸速度超過光速。潮汐力在視界附近趨近無限大。',
+   effect:(g,target)=>{
+     const self = target==='enemy' ? 'player' : 'enemy';
+     pullToCenter(g,target,5);
+     pullToCenter(g,self,1);
+     addLog(`🕳️ 黑洞！${targetName(target)}被拉向中心-5，${targetName(self)}也被拉-1`,'effect');
+   }},
+
+  {id:'supernova', name:'超新星爆炸', type:'force', cost:3, icon:'💥',
+   formula:'E = mc²',
+   desc:'質能轉換！巨大爆炸衝量+6，直接將對方轟飛！',
+   science:'愛因斯坦質能方程E=mc²。超新星爆炸釋放的能量可達10⁴⁴焦耳，足以照亮整個星系。',
+   effect:(g,target)=>{ applyPush(g,target,6); addLog('💥 超新星！衝量+6','effect'); }},
+];
+
+// ══════════════════════════════════════════
+//  GAME STATE
+// ══════════════════════════════════════════
+let G = null;
+
+function mkFighter(side){
+  return {
+    pos: side==='player'? 120 : -120, // pixels from center (positive = down/away from center)
+    vel: 0,
+    mass: 1.0,
+    fric: 0.5,
+    charge: 0,
+    angular: 0,
+    energy: 3,
+    maxEnergy: 3,
+  };
+}
+
+function newGame(){
+  G = {
+    turn: 1,
+    whose: 'player', // 'player' | 'enemy'
+    phase: 'action',
+    player: mkFighter('player'),
+    enemy: mkFighter('enemy'),
+    env: { friction: 0.5, zeroG: false, strongG: false, tags:['正常重力 g=9.8'] },
+    deck: shuffleDeck(),
+    hand: [],
+    discardPile: [],
+    selectedCard: null,
+    selectedIdx: null,
+    effects: { reflection: false },
+    over: false,
+  };
+  G.player.pos = 120;
+  G.enemy.pos = -120;
+  return G;
+}
+
+function shuffleDeck(){
+  // Build deck: 2 copies of each card
+  let deck = [];
+  CARDS.forEach(c=>{ deck.push(c.id); deck.push(c.id); });
+  // shuffle
+  for(let i=deck.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [deck[i],deck[j]]=[deck[j],deck[i]];
+  }
+  return deck;
+}
+
+function drawCard(count=1){
+  for(let i=0;i<count;i++){
+    if(G.deck.length===0){
+      G.deck = [...G.discardPile];
+      G.discardPile = [];
+      // shuffle
+      for(let j=G.deck.length-1;j>0;j--){
+        const k=Math.floor(Math.random()*(j+1));
+        [G.deck[j],G.deck[k]]=[G.deck[k],G.deck[j]];
+      }
+      addLog('牌庫重洗！','system');
+    }
+    if(G.deck.length>0){
+      G.hand.push(G.deck.shift());
+    }
+  }
+}
+
+// ══════════════════════════════════════════
+//  PHYSICS ENGINE
+// ══════════════════════════════════════════
+const ARENA_RADIUS = 188; // SVG units from center
+const CENTER = 200;
+
+function applyPush(g, target, amount){
+  // Push away from center
+  const dir = g[target].pos >= 0 ? 1 : -1;
+  const dv = amount / g[target].mass;
+  g[target].vel += dir * dv;
+  addLog(`${targetName(target)} 受衝量${amount.toFixed(2)}，Δv=${dv.toFixed(2)} m/s (m=${g[target].mass.toFixed(1)})`, 'effect');
+  showArenaEffect(g, target, `+${amount.toFixed(1)}`);
+}
+
+function pullToCenter(g, target, amount){
+  const dir = g[target].pos >= 0 ? -1 : 1; // toward center
+  const dv = amount / g[target].mass;
+  g[target].vel += dir * dv;
+  addLog(`${targetName(target)} 被引向中心，Δv=${dv.toFixed(2)}`, 'effect');
+}
+
+function physicsStep(g){
+  ['player','enemy'].forEach(who=>{
+    const f = g[who];
+    // Apply velocity
+    f.pos += f.vel;
+    // Apply friction (decelerates toward 0)
+    const friction = g.env.zeroG ? 0 : g.env.friction * 0.5;
+    if(Math.abs(f.vel) > 0.01){
+      const sign = f.vel > 0 ? 1 : -1;
+      f.vel -= sign * friction;
+      if(Math.abs(f.vel)<0.05) f.vel=0;
+    } else {
+      f.vel=0;
+    }
+  });
+}
+
+function checkWin(g){
+  // pos is distance from arena center in pixels (arena radius ~170 SVG units = 170 "meters")
+  const LIMIT = 170;
+  if(Math.abs(g.enemy.pos) >= LIMIT){ return 'player'; }
+  if(Math.abs(g.player.pos) >= LIMIT){ return 'enemy'; }
+  return null;
+}
+
+function targetName(t){ return t==='enemy'? '對手':'玩家'; }
+
+// ══════════════════════════════════════════
+//  ENEMY AI
+// ══════════════════════════════════════════
+function enemyTurn(){
+  addLog('── 對手回合 ──','system');
+  // Simple AI: play 1-2 affordable cards
+  let plays = 0;
+  const maxPlays = 2;
+  while(plays < maxPlays && G.hand.length>0 && G.enemy.energy>0){
+    // pick an affordable card at random, slightly preferring force/gravity
+    const affordable = G.hand.filter(id=>{
+      const c=cardById(id); return c&&c.cost<=G.enemy.energy;
+    });
+    if(affordable.length===0) break;
+    const pick = affordable[Math.floor(Math.random()*affordable.length)];
+    const card = cardById(pick);
+    if(!card) break;
+    G.enemy.energy -= card.cost;
+    G.hand.splice(G.hand.indexOf(pick),1);
+    G.discardPile.push(pick);
+    addLog(`對手出牌：${card.name}`, 'enemy-action');
+    // target is always the opponent (player); cards that need 'self' compute it internally via (target==='enemy' ? 'player' : 'enemy')
+    card.effect(G, 'player');
+    physicsStep(G);
+    updateUI();
+    plays++;
+  }
+  // Draw back to 5
+  while(G.hand.length<5) drawCard();
+  endEnemyTurn();
+}
+
+function endEnemyTurn(){
+  const winner = checkWin(G);
+  if(winner){ endGame(winner); return; }
+  // Start player turn
+  G.whose = 'player';
+  G.player.energy = G.player.maxEnergy;
+  G.turn++;
+  G.selectedCard = null;
+  G.selectedIdx = null;
+  addLog(`══ 回合 ${G.turn} 開始 ══`, 'system');
+  updateUI();
+}
+
+// ══════════════════════════════════════════
+//  GAME FLOW
+// ══════════════════════════════════════════
+function startGame(){
+  document.getElementById('title-screen').classList.remove('active');
+  document.getElementById('game-screen').classList.add('active');
+  newGame();
+  clearLog();
+  drawCard(5);
+  addLog('══ 物理決鬥開始！══', 'system');
+  addLog('將對手推出圓形競技場（>170m）即可獲勝！', 'system');
+  updateUI();
+}
+
+function restartGame(){
+  document.getElementById('win-overlay').classList.remove('show');
+  newGame();
+  clearLog();
+  drawCard(5);
+  addLog('══ 新局開始！══', 'system');
+  updateUI();
+}
+
+function endTurn(){
+  if(G.whose!=='player'||G.over) return;
+  G.selectedCard=null;
+  G.selectedIdx=null;
+  physicsStep(G);
+  updateUI();
+  const winner=checkWin(G);
+  if(winner){ endGame(winner); return; }
+  G.whose='enemy';
+  G.enemy.energy=G.enemy.maxEnergy;
+  // Draw for enemy (same hand)
+  while(G.hand.length<5) drawCard();
+  updateUI();
+  addLog('── 對手思考中... ──','system');
+  setTimeout(()=>enemyTurn(), 800);
+}
+
+function playSelectedCard(){
+  if(G.selectedIdx==null||G.whose!=='player'||G.over) return;
+  const card=cardById(G.selectedCard);
+  if(!card) return;
+  if(card.cost>G.player.energy){ addLog('能量不足！','system'); return; }
+  G.player.energy-=card.cost;
+  G.hand.splice(G.selectedIdx,1);
+  G.discardPile.push(G.selectedCard);
+  addLog(`你出牌：${card.name}`, 'player-action');
+  card.effect(G, 'enemy');
+  physicsStep(G);
+  G.selectedCard=null;
+  G.selectedIdx=null;
+  document.getElementById('card-info-panel').style.display='none';
+  updateUI();
+  const winner=checkWin(G);
+  if(winner){ endGame(winner); return; }
+  document.getElementById('play-btn').disabled=true;
+}
+
+function endGame(winner){
+  G.over=true;
+  const overlay=document.getElementById('win-overlay');
+  const title=document.getElementById('win-title');
+  const reason=document.getElementById('win-reason');
+  overlay.classList.add('show');
+  if(winner==='player'){
+    title.className='win-title victory'; title.textContent='VICTORY!';
+    const dist=Math.abs(G.enemy.pos).toFixed(1);
+    reason.textContent=`對手被推出競技場！最終位置：${dist}m\n你的物理知識取得了勝利！`;
+    addLog('🏆 玩家獲勝！','win');
+  } else {
+    title.className='win-title defeat'; title.textContent='DEFEAT...';
+    const dist=Math.abs(G.player.pos).toFixed(1);
+    reason.textContent=`你被推出競技場！最終位置：${dist}m\n研究更多物理知識再來挑戰吧！`;
+    addLog('💀 對手獲勝...','win');
+  }
+}
+
+function cardById(id){ return CARDS.find(c=>c.id===id); }
+
+// ══════════════════════════════════════════
+//  UI UPDATE
+// ══════════════════════════════════════════
+function updateUI(){
+  if(!G) return;
+  // Stats
+  setVal('p-mass', G.player.mass.toFixed(1));
+  setVal('p-pos', G.player.pos.toFixed(1));
+  setVal('p-vel', G.player.vel.toFixed(2));
+  setVal('p-fric', G.player.fric.toFixed(2));
+  setVal('p-charge', G.player.charge);
+  setVal('p-angular', G.player.angular.toFixed(1));
+  setVal('e-mass', G.enemy.mass.toFixed(1));
+  setVal('e-pos', G.enemy.pos.toFixed(1));
+  setVal('e-vel', G.enemy.vel.toFixed(2));
+  setVal('e-fric', G.enemy.fric.toFixed(2));
+  setVal('e-charge', G.enemy.charge);
+  setVal('e-angular', G.enemy.angular.toFixed(1));
+
+  // Turn
+  document.getElementById('turn-num').textContent=G.turn;
+  document.getElementById('whose-turn').textContent=G.whose==='player'?'⚡ 玩家回合':'💀 對手回合';
+
+  // Energy
+  renderEnergy('p-energy-pips','p-energy-text',G.player.energy,G.player.maxEnergy,false);
+  renderEnergy('e-energy-pips','e-energy-text',G.enemy.energy,G.enemy.maxEnergy,true);
+
+  // End turn btn
+  const etb=document.getElementById('end-turn-btn');
+  etb.disabled = G.whose!=='player'||G.over;
+
+  // Deck
+  document.getElementById('deck-count').textContent=G.deck.length;
+
+  // Hand
+  renderHand();
+
+  // Arena
+  renderArena();
+
+  // Play btn
+  const pb=document.getElementById('play-btn');
+  if(G.selectedIdx!=null){
+    const c=cardById(G.selectedCard);
+    pb.disabled = !c || c.cost>G.player.energy || G.whose!=='player';
+  } else {
+    pb.disabled=true;
+  }
+}
+
+function setVal(id, val){
+  const el=document.getElementById(id);
+  if(!el) return;
+  if(el.textContent!==String(val)){
+    el.textContent=val;
+    el.classList.remove('changed');
+    void el.offsetWidth;
+    el.classList.add('changed');
+  }
+}
+
+function renderEnergy(pipsId, textId, current, max, isEnemy){
+  const container=document.getElementById(pipsId);
+  container.innerHTML='';
+  for(let i=0;i<max;i++){
+    const pip=document.createElement('div');
+    pip.className='energy-pip'+(isEnemy?' enemy-pip':'')+(i<current?' filled':'');
+    container.appendChild(pip);
+  }
+  document.getElementById(textId).textContent=`${current}/${max}`;
+}
+
+function renderHand(){
+  const container=document.getElementById('hand-cards');
+  container.innerHTML='';
+  G.hand.forEach((id,idx)=>{
+    const card=cardById(id);
+    if(!card) return;
+    const el=createCardEl(card);
+    if(idx===G.selectedIdx) el.classList.add('selected');
+    const canAfford=card.cost<=G.player.energy;
+    if(!canAfford||G.whose!=='player') el.classList.add('disabled');
+    el.onclick=()=>selectCard(idx);
+    container.appendChild(el);
+  });
+}
+
+function selectCard(idx){
+  if(G.whose!=='player'||G.over) return;
+  const id=G.hand[idx];
+  const card=cardById(id);
+  if(!card) return;
+  if(G.selectedIdx===idx){
+    // 再點同一張 → 取消選取
+    G.selectedIdx=null;
+    G.selectedCard=null;
+    document.getElementById('card-info-panel').style.display='none';
+  } else {
+    G.selectedIdx=idx;
+    G.selectedCard=id;
+    // 更新 inline info panel
+    const panel=document.getElementById('card-info-panel');
+    document.getElementById('ci-title').textContent=`${card.icon} ${card.name}  (費用: ${card.cost})`;
+    document.getElementById('ci-formula').textContent=card.formula;
+    document.getElementById('ci-desc').textContent=card.desc;
+    document.getElementById('ci-science').textContent=`📚 ${card.science}`;
+    panel.style.display='block';
+    const colors={force:'var(--glow-orange)',mass:'var(--glow-blue)',field:'var(--glow-purple)',env:'var(--glow-green)',gravity:'#ffcc00',angular:'#ff88cc',reaction:'#888'};
+    panel.style.borderColor=colors[card.type]||'var(--border)';
+  }
+  // 更新 play 按鈕，不重繪整個 UI（避免無限觸發）
+  const pb=document.getElementById('play-btn');
+  if(G.selectedCard){
+    const c=cardById(G.selectedCard);
+    pb.disabled = !c || c.cost>G.player.energy || G.whose!=='player';
+  } else {
+    pb.disabled=true;
+  }
+  // 只重繪手牌區選取狀態
+  document.querySelectorAll('#hand-cards .card').forEach((el,i)=>{
+    el.classList.toggle('selected', i===G.selectedIdx);
+  });
+}
+
+function createCardEl(card){
+  const el=document.createElement('div');
+  el.className=`card type-${card.type}`;
+  el.innerHTML=`
+    <div class="card-cost">${card.cost}</div>
+    <div class="card-icon">${card.icon}</div>
+    <div class="card-name">${card.name}</div>
+    <div class="card-formula">${card.formula}</div>
+    <div class="card-desc">${card.desc.substring(0,40)}...</div>
+    <div class="card-tag">${typeLabel(card.type)}</div>
+  `;
+  return el;
+}
+
+function typeLabel(t){
+  const m={force:'外力',mass:'質量',field:'電磁場',env:'環境',gravity:'引力',angular:'角動量',reaction:'反應'};
+  return m[t]||t;
+}
+
+function renderArena(){
+  const svg=document.getElementById('arena-svg');
+  const pDot=document.getElementById('player-dot');
+  const eDot=document.getElementById('enemy-dot');
+  const pLabel=document.getElementById('player-label');
+  const eLabel=document.getElementById('enemy-label');
+
+  // Map pos (-170..170) to SVG (center=200, radius ~170)
+  function toSVG(pos){
+    const clamped=Math.max(-188,Math.min(188,pos));
+    return CENTER + clamped;
+  }
+
+  const py=toSVG(G.player.pos);
+  const ey=toSVG(G.enemy.pos);
+
+  pDot.setAttribute('cy',py);
+  pLabel.setAttribute('y',py-5);
+  eDot.setAttribute('cy',ey);
+  eLabel.setAttribute('y',ey-5);
+
+  // Size by mass
+  pDot.setAttribute('r',Math.min(28,14+G.player.mass*3));
+  eDot.setAttribute('r',Math.min(28,14+G.enemy.mass*3));
+
+  // Color intensity by speed
+  const pSpeed=Math.min(1,Math.abs(G.player.vel)/8);
+  const eSpeed=Math.min(1,Math.abs(G.enemy.vel)/8);
+  pDot.setAttribute('fill',`rgba(0,255,136,${0.2+pSpeed*0.5})`);
+  eDot.setAttribute('fill',`rgba(255,34,68,${0.2+eSpeed*0.5})`);
+
+  // Danger glow if near edge
+  const pDist=Math.abs(G.player.pos);
+  const eDist=Math.abs(G.enemy.pos);
+  if(pDist>140) pDot.setAttribute('stroke','#ff6600');
+  else pDot.setAttribute('stroke','#00ff88');
+  if(eDist>140) eDot.setAttribute('stroke','#ff6600');
+  else eDot.setAttribute('stroke','#ff2244');
+}
+
+function showArenaEffect(g, target, text){
+  const layer=document.getElementById('effect-layer');
+  const dot=document.getElementById(target+'-dot');
+  const cx=dot?dot.getAttribute('cx')||200:200;
+  const cy=dot?dot.getAttribute('cy')||200:200;
+  const t=document.createElementNS('http://www.w3.org/2000/svg','text');
+  t.setAttribute('x',cx);
+  t.setAttribute('y',cy);
+  t.setAttribute('text-anchor','middle');
+  t.setAttribute('fill',target==='player'?'#00ff88':'#ff6b00');
+  t.setAttribute('font-size','11');
+  t.setAttribute('font-family','Orbitron');
+  t.textContent=text;
+  layer.appendChild(t);
+  let yOff=0;
+  const anim=setInterval(()=>{
+    yOff-=1.5;
+    t.setAttribute('transform',`translate(0,${yOff})`);
+    t.setAttribute('opacity',String(Math.max(0,1+yOff/25)));
+    if(yOff<-25){ clearInterval(anim); t.remove(); }
+  },40);
+}
+
+function updateEnvTags(g){
+  const tags=[];
+  if(g.env.zeroG) tags.push('🛸 零重力');
+  else if(g.env.strongG) tags.push('🌍 強重力 g=25');
+  else tags.push('⬇ 正常重力 g=9.8');
+  if(g.env.friction<=0.05) tags.push('🧊 超低摩擦');
+  else if(g.env.friction>=0.85) tags.push('🏔 高摩擦');
+  else tags.push(`摩擦μ=${g.env.friction.toFixed(2)}`);
+  const container=document.getElementById('env-tags');
+  container.innerHTML=tags.map(t=>`<span class="env-tag">${t}</span>`).join('');
+}
+
+// ══════════════════════════════════════════
+//  LOG
+// ══════════════════════════════════════════
+function addLog(msg, type='system'){
+  const panel=document.getElementById('log-panel');
+  const el=document.createElement('div');
+  el.className=`log-entry ${type}`;
+  el.textContent=msg;
+  panel.appendChild(el);
+  panel.scrollTop=panel.scrollHeight;
+}
+function clearLog(){
+  document.getElementById('log-panel').innerHTML='';
+}
+
+// card info shown inline via selectCard()
+</script>
+</body>
+</html>
