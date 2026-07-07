@@ -81,12 +81,90 @@
 
   .select-row {
     display: flex;
-    gap: 0.8rem;
+    flex-wrap: wrap;
+    gap: 0.8rem 0.6rem;
     align-items: flex-start;
     width: 100%;
     max-width: 480px;
     justify-content: center;
     margin-bottom: 1.5rem;
+  }
+
+  .select-row.multi {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.3rem 1rem;
+    max-width: 480px;
+  }
+  .select-row.multi .vs-divider { display: none !important; }
+  .select-row.multi .player-slot {
+    flex: none;
+    max-width: none;
+    min-width: 0;
+    padding: 0.7rem 0.5rem;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    background: rgba(255,255,255,0.02);
+  }
+  .select-row.multi .player-label { font-size: 0.6rem; letter-spacing: 0.15em; }
+  .select-row.multi .char-desc { display: none; }
+  .select-row.multi .char-stat { display: none; }
+  .select-row.multi .random-btn { font-size: 0.7rem; padding: 4px 12px; }
+  .select-row.multi .char-card { padding: 0.6rem 0.7rem; }
+  .select-row.multi .char-emoji { font-size: 1.1rem; }
+  .select-row.multi .char-name { font-size: 0.78rem; }
+
+  .mode-select { display: flex; gap: 0.5rem; justify-content: center; margin-bottom: 1rem; }
+  .mode-btn {
+    padding: 6px 16px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 16px;
+    color: #ccc;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    font-family: 'Noto Serif TC', serif;
+  }
+  .mode-btn.active { color: var(--border-glow); border-color: var(--border-glow); background: rgba(240,200,74,0.12); box-shadow: 0 0 10px rgba(240,200,74,0.2); }
+
+  .pill-select-btn {
+    padding: 10px 22px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 20px;
+    color: #eee;
+    font-size: 0.85rem;
+    cursor: pointer;
+    letter-spacing: .05em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Noto Serif TC', serif;
+  }
+  .pill-select-btn.endless-pill {
+    background: linear-gradient(135deg, rgba(255,140,0,0.18), rgba(200,60,60,0.18));
+    border-color: rgba(255,140,0,0.5);
+    color: #ffaa44;
+  }
+
+  .char-card.locked {
+    opacity: 0.3;
+    filter: grayscale(1);
+    pointer-events: none;
+    position: relative;
+  }
+  .char-card.locked::after {
+    content: '🚫 三人以上停用';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    color: #ff8080;
+    background: rgba(0,0,0,0.4);
+    border-radius: inherit;
   }
 
   .player-slot {
@@ -362,6 +440,22 @@
 
   .hp-bar.p1 { background: linear-gradient(90deg, #c03030, #e84545); }
   .hp-bar.p2 { background: linear-gradient(90deg, #7b4cca, #a66dff); float: right; }
+  .hp-bar.p3 { background: linear-gradient(90deg, #1e8e4a, #2ecc71); }
+  .hp-bar.p4 { background: linear-gradient(90deg, #cc7a00, #f5b041); float: right; }
+
+  .hud.multi {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto auto;
+    column-gap: 14px;
+    row-gap: 3px;
+    width: min(300px, 100vw - 1rem);
+  }
+  .hud.multi .hud-center { grid-column: 1 / -1; order: -1; margin-bottom: 2px; }
+  .hud.multi .hp-block { flex: none; gap: 0.12rem; }
+  .hud.multi .hp-name { font-size: 0.6rem; letter-spacing: 0.04em; }
+  .hud.multi .hp-bar-wrap { height: 6px; }
+  .hud.multi .hp-num { font-size: 0.6rem; }
 
   .hp-num {
     font-size: 0.72rem;
@@ -416,6 +510,17 @@
   .bottom-bar span#p2-status {
     text-align: right;
   }
+
+  .bottom-bar.multi {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 14px;
+    row-gap: 2px;
+    width: min(300px, 100vw - 1rem);
+    opacity: 0.5;
+  }
+  .bottom-bar.multi .forfeit-btn { grid-column: 1 / -1; order: -1; justify-self: center; margin-bottom: 3px; }
+  .bottom-bar.multi span { flex: none; text-align: center !important; }
 
   .forfeit-btn {
     font-family: 'Oswald', sans-serif;
@@ -608,6 +713,10 @@
   .roster-target-btn.active { opacity: 1; }
   .roster-target-btn.p1.active { background: rgba(232,69,69,0.18); box-shadow: 0 0 12px rgba(232,69,69,0.25); }
   .roster-target-btn.p2.active { background: rgba(123,76,202,0.18); box-shadow: 0 0 12px rgba(123,76,202,0.25); }
+  .roster-target-btn.p3 { color: #2ecc71; border-color: rgba(46,204,113,0.4); }
+  .roster-target-btn.p4 { color: #f5b041; border-color: rgba(245,176,65,0.4); }
+  .roster-target-btn.p3.active { background: rgba(46,204,113,0.18); box-shadow: 0 0 12px rgba(46,204,113,0.25); }
+  .roster-target-btn.p4.active { background: rgba(245,176,65,0.18); box-shadow: 0 0 12px rgba(245,176,65,0.25); }
 
   /* 詳情面板 */
   .roster-detail {
@@ -729,7 +838,7 @@
   <p class="subtitle">ARENA · BATTLE · CHAMPIONSHIP</p>
   <button class="roster-btn" id="roster-btn">📖 角色圖鑑</button>
 
-  <div class="select-row">
+  <div class="select-row" id="select-row">
     <div class="player-slot">
       <div class="player-label">⚔ 玩家一</div>
       <div class="carousel-wrap" id="p1-carousel">
@@ -763,13 +872,56 @@
       <div class="selected-label" id="p2-selected-label">請選擇角色</div>
       <button class="random-btn" onclick="randomChar('p2')">🎲 隨機</button>
     </div>
+
+    <div class="vs-divider" id="vs-divider-3" style="display:none">VS</div>
+
+    <div class="player-slot" id="p3-slot" style="display:none">
+      <div class="player-label">⚔ 玩家三</div>
+      <div class="carousel-wrap" id="p3-carousel">
+        <div class="carousel-viewport">
+          <div class="carousel-track" id="p3-track"></div>
+        </div>
+        <div class="carousel-arrows">
+          <button class="arrow-btn" data-player="p3" data-dir="-1">◀</button>
+          <div class="carousel-dots" id="p3-dots"></div>
+          <button class="arrow-btn" data-player="p3" data-dir="1">▶</button>
+        </div>
+      </div>
+      <div class="selected-label" id="p3-selected-label">請選擇角色</div>
+      <button class="random-btn" onclick="randomChar('p3')">🎲 隨機</button>
+    </div>
+
+    <div class="vs-divider" id="vs-divider-4" style="display:none">VS</div>
+
+    <div class="player-slot" id="p4-slot" style="display:none">
+      <div class="player-label">玩家四 ⚔</div>
+      <div class="carousel-wrap" id="p4-carousel">
+        <div class="carousel-viewport">
+          <div class="carousel-track" id="p4-track"></div>
+        </div>
+        <div class="carousel-arrows">
+          <button class="arrow-btn" data-player="p4" data-dir="-1">◀</button>
+          <div class="carousel-dots" id="p4-dots"></div>
+          <button class="arrow-btn" data-player="p4" data-dir="1">▶</button>
+        </div>
+      </div>
+      <div class="selected-label" id="p4-selected-label">請選擇角色</div>
+      <button class="random-btn" onclick="randomChar('p4')">🎲 隨機</button>
+    </div>
   </div>
 
-  <div class="arena-select" style="flex-direction:column;align-items:center;gap:6px">
-    <div style="width:100%;text-align:center;font-size:0.75rem;color:#888;letter-spacing:.1em;margin-bottom:4px">⚔️ 選擇場地</div>
-    <button id="arena-pick-btn" type="button" style="padding:10px 26px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.18);border-radius:20px;color:#eee;font-size:0.9rem;cursor:pointer;letter-spacing:.06em;display:flex;align-items:center;gap:8px">
+  <div class="option-row" style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:6px">
+    <button id="mode-pick-btn" type="button" class="pill-select-btn">
+      <span id="mode-pick-emoji">⚔️</span>
+      <span id="mode-pick-name">2人對戰</span>
+    </button>
+    <button id="arena-pick-btn" type="button" class="pill-select-btn">
       <span id="arena-pick-emoji">🏟️</span>
       <span id="arena-pick-name">標準場地</span>
+    </button>
+    <button id="endless-btn" type="button" class="pill-select-btn endless-pill">
+      <span>🔥</span>
+      <span>模擬手札</span>
     </button>
   </div>
 
@@ -779,7 +931,15 @@
   </div>
 
   <button class="start-btn" id="start-btn" disabled>開始對決</button>
-  <button class="start-btn" id="endless-btn" style="margin-top:10px;background:linear-gradient(135deg,rgba(255,140,0,0.18),rgba(200,60,60,0.18));border-color:rgba(255,140,0,0.5);color:#ffaa44;">🔥 模擬手札</button>
+</div>
+
+<!-- ══ MODE MODAL ══ -->
+<div id="mode-modal" style="display:none;position:fixed;inset:0;background:rgba(5,3,2,0.95);z-index:300;flex-direction:column;align-items:center;justify-content:center;gap:18px;font-family:sans-serif;">
+  <div style="display:flex;align-items:center;gap:14px">
+    <div style="font-size:1.1rem;font-weight:800;color:#eee;letter-spacing:.12em">⚔️ 選擇對戰人數</div>
+    <button id="mode-modal-close" style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);color:#ccc;cursor:pointer;font-size:0.9rem">✕</button>
+  </div>
+  <div id="mode-modal-grid" style="display:flex;gap:16px;flex-wrap:wrap;justify-content:center;max-width:700px;padding:0 16px"></div>
 </div>
 
 <!-- ══ ROSTER MODAL ══ -->
@@ -793,6 +953,8 @@
     <span class="roster-target-label">選擇對象</span>
     <button class="roster-target-btn p1 active" id="roster-target-p1" data-target="p1">玩家一</button>
     <button class="roster-target-btn p2" id="roster-target-p2" data-target="p2">玩家二</button>
+    <button class="roster-target-btn p3" id="roster-target-p3" data-target="p3" style="display:none">玩家三</button>
+    <button class="roster-target-btn p4" id="roster-target-p4" data-target="p4" style="display:none">玩家四</button>
   </div>
 
   <div class="roster-detail" id="roster-detail">
@@ -843,7 +1005,7 @@
     <button class="speed-btn" data-speed="1.5">1.5x</button>
     <button class="speed-btn" data-speed="2">2x</button>
   </div>
-  <div class="hud">
+  <div class="hud" id="hud">
     <div class="hp-block">
       <div class="hp-name" id="p1-hud-name">─</div>
       <div class="hp-bar-wrap" style="position:relative"><div class="hp-bar p1" id="p1-bar" style="width:100%"></div><div id="p1-bleed-bar" style="position:absolute;top:0;height:100%;background:linear-gradient(90deg,#880000,#cc2200);opacity:0.7;border-radius:5px;width:0;left:100%"></div></div>
@@ -858,12 +1020,24 @@
       <div class="hp-bar-wrap" style="position:relative"><div class="hp-bar p2" id="p2-bar" style="width:100%"></div><div id="p2-bleed-bar" style="position:absolute;top:0;height:100%;background:linear-gradient(90deg,#cc2200,#880000);opacity:0.7;border-radius:5px;width:0;right:100%"></div></div>
       <div class="hp-num" id="p2-hp-num">1000 / 1000</div>
     </div>
+    <div class="hp-block" id="p3-block" style="display:none">
+      <div class="hp-name" id="p3-hud-name">─</div>
+      <div class="hp-bar-wrap" style="position:relative"><div class="hp-bar p3" id="p3-bar" style="width:100%"></div><div id="p3-bleed-bar" style="position:absolute;top:0;height:100%;background:linear-gradient(90deg,#004422,#006622);opacity:0.7;border-radius:5px;width:0;left:100%"></div></div>
+      <div class="hp-num" id="p3-hp-num">1000 / 1000</div>
+    </div>
+    <div class="hp-block right" id="p4-block" style="display:none">
+      <div class="hp-name" id="p4-hud-name" style="flex-direction:row-reverse">─</div>
+      <div class="hp-bar-wrap" style="position:relative"><div class="hp-bar p4" id="p4-bar" style="width:100%"></div><div id="p4-bleed-bar" style="position:absolute;top:0;height:100%;background:linear-gradient(90deg,#663300,#994400);opacity:0.7;border-radius:5px;width:0;right:100%"></div></div>
+      <div class="hp-num" id="p4-hp-num">1000 / 1000</div>
+    </div>
   </div>
   <canvas id="arena" width="350" height="350"></canvas>
-  <div class="bottom-bar">
+  <div class="bottom-bar" id="bottom-bar">
     <span id="p1-status">─</span>
     <button class="forfeit-btn" id="forfeit-btn">■ 結束</button>
     <span id="p2-status">─</span>
+    <span id="p3-status" style="display:none">─</span>
+    <span id="p4-status" style="display:none">─</span>
   </div>
 </div>
 
@@ -1160,7 +1334,7 @@ const CHARACTERS = [
     id: 'chef', emoji: '👨‍🍳', weapon: '🔪', name: '地獄廚神',
     desc: '刀鋒不只切開食材，也能切開勝負。真正的料理，足以改變戰局。',
     stats: ['飛刀'],
-    skills: ['飛刀：投擲菜刀穿透敵方，造成130傷害，冷卻2.0s。', '特性：手持雙刀，刀要回收才能再次丟擲'],
+    skills: ['飛刀：投擲菜刀穿透敵方，造成130傷害，CD2.0s。', '特性：手持雙刀，刀要回收才能再次丟擲'],
     color: '#e84545', glowColor: 'rgba(232,69,69,0.6)', type: 'chef',
   winQuote: '這肉生的我還聽到他在叫呢。'
   },
@@ -1168,7 +1342,7 @@ const CHARACTERS = [
     id: 'drunk', emoji: '🍺', weapon: '🍾', name: '酒鬼',
     desc: '將美酒化作力量，越是酩酊大醉，越能爆發驚人的戰鬥力。沒人知道他是真醉，還是假醉。',
     stats: ['拋酒', '喝茫'],
-    skills: ['拋酒：投擲酒瓶，造成150傷害，冷卻1.75s。', '喝茫：軌跡飄忽不定，移動方向隨機改變。'],
+    skills: ['拋酒：投擲酒瓶，造成150傷害，CD1.75s。', '喝茫：軌跡飄忽不定，移動方向隨機改變。'],
     color: '#7b4cca', glowColor: 'rgba(123,76,202,0.6)', type: 'drunk',
   winQuote: '阿爸了beer?'
   },
@@ -1184,7 +1358,7 @@ const CHARACTERS = [
     id: 'vampire', emoji: '🧛', weapon: '🦇', name: '暗夜領主',
     desc: '​「永生是份詛咒，而你們的鮮血，是唯一的解藥。」​隱匿於古老古堡中的暗夜領主。他視人類為螻蟻，卻又迷戀那流淌在血管中的溫熱與甘甜。優雅的禮服下，隱藏著撕裂黑夜的致命爪牙。',
     stats: ['咬擊 ', '蝙蝠狂襲'],
-    skills: ['咬擊：碰到敵人時鎖定撕咬，造成25傷害×4段並吸血22×4，敵人被咬期間無法移動。', '蝙蝠狂襲：高速衝向敵人，冷卻9秒。'],
+    skills: ['咬擊：碰到敵人時鎖定撕咬，造成25傷害×4段並吸血22×4，敵人被咬期間無法移動。', '蝙蝠狂襲：高速衝向敵人，CD9秒。'],
     color: '#8b1a8b', glowColor: 'rgba(139,26,139,0.6)', type: 'vampire',
   winQuote: '我跨越過時代，如獸般的姿態。'
   },
@@ -1192,7 +1366,7 @@ const CHARACTERS = [
   id: 'gojo', emoji: '😎', weapon: '🔵', name: '現代最強',
   desc: '​「放心吧，因為我是最強的。」​戰場上最令人絕望的對手。可一旦他拉下眼罩，迎來的便是敵人的末日。他能使用「無下限術式」將對手玩弄於股掌之間。',
   stats: ['蒼', '赫', '紫', ],
-  skills: ['順轉「蒼」：帶引力的術式，可穿透並造成持續傷害。冷卻2.0s', '反轉「赫」：帶斥力的術式，造成170傷害，冷卻2.0s。', '大招「虛式紫」：血量降至一定程度後蓄力1.5秒釋放，對碰到的敵人造成8傷/幀。'],
+  skills: ['順轉「蒼」：帶引力的術式，可穿透並造成持續傷害。CD2.0s', '反轉「赫」：帶斥力的術式，造成170傷害，CD2.0s。', '大招「虛式紫」：血量降至一定程度後蓄力1.5秒釋放，對碰到的敵人造成8傷害/幀。'],
   color: '#00cfff', glowColor: 'rgba(0,207,255,0.6)', type: 'gojo',
   winQuote: '沒錯，是五條贏了。',
   vsQuotes: { cursed: ['我的學生可都在身後看著呢。',
@@ -1205,7 +1379,7 @@ const CHARACTERS = [
   id: 'cursed', emoji: '💀', weapon: '⚔️', name: '詛咒之王',
   desc: '​「別自以為是了，雜碎。誰允許你抬頭看我的？」​千年前曾讓無數咒術師陷入絕望、擁有四隻手兩張臉的「詛咒之王」。他的存在本身就是天災，用他的術式「御廚子」將對手給切成碎片。',
   stats: ['解', '捌', '伏魔御廚子'],
-  skills: ['「解」：持續造成140傷害並緩速，冷卻4.25s。', '「捌」：碰觸敵方時觸發近戰斬擊，造成25傷×2s的持續傷害。', '領域展開「伏魔御廚子」：血量降至550展開，對領域內角色造成5傷/幀。'],
+  skills: ['「解」：持續造成140傷害並緩速，CD4.25s。', '「捌」：碰觸敵方時觸發近戰斬擊，造成25傷害×2s的持續傷害。', '領域展開「伏魔御廚子」：血量降至550展開，對領域內角色造成5傷害/幀。'],
   color: '#c0392b', glowColor: 'rgba(192,57,43,0.6)', type: 'cursed',
   winQuote: '不過是沒出生在我時代的凡夫罷了。',
    vsQuotes: {cannondad : '呦，身體比我想的還強些。' ,
@@ -1219,7 +1393,7 @@ tiger:['你那同情我的態度真是令人作嘔，這只顯得你很懦弱。
   id: 'trapper', emoji: '🪤', weapon: '⛓️', name: '陷阱大師',
   desc: '​「踩下去的那一刻，聲音是不是很清脆？哈哈哈！」​天才卻又瘋狂的機關發明家。比起拿刀劍互砍，他更喜歡躲在暗處，欣賞敵人踩中機關時驚恐與痛苦的表情。！',
   stats: ['尖刺', '鎖鏈'],
-  skills: ['被動：碰到邊界時放置尖刺陷阱，上限6個。', '尖刺：敵人觸碰尖刺造成60傷並中毒(45/s)。', '鎖鏈：每隔一段時間使尖刺射出鎖鏈，冷卻3s，強制將敵人拉向陷阱。'],
+  skills: ['被動：碰到邊界時放置尖刺陷阱，上限6個。', '尖刺：敵人觸碰尖刺造成60傷害並中毒(45/s)。', '鎖鏈：每隔一段時間使尖刺射出鎖鏈，CD3s，強制將敵人拉向陷阱。'],
   color: '#27ae60', glowColor: 'rgba(39,174,96,0.6)', type: 'trapper',
   winQuote: '你逃不出我的手掌心。'
   },
@@ -1227,7 +1401,7 @@ tiger:['你那同情我的態度真是令人作嘔，這只顯得你很懦弱。
   id: 'yi', emoji: '⚫', weapon: '⬜', name: '奕',
   desc: '​「天地為局，眾生為子。這一步，你待如何？」​驚才絕艷的曠世棋聖。在他眼中，世間萬物的運作、戰場的廝殺，都不過是縱橫十九道棋路線上的博弈。',
   stats: ['本手', '圍斃', '運籌帷幄',],
-  skills: ['本手：放置黑棋於對手位置，每顆50傷害，冷卻1.5s。', '圍斃：黑棋放滿四顆後於中心落白棋，引爆造成200傷害。', '「運籌帷幄」：血量降至600時，於敵方四周設下領域封鎖退路。'],
+  skills: ['本手：放置黑棋於對手位置，每顆50傷害，CD1.5s。', '圍斃：黑棋放滿四顆後於中心落白棋，引爆造成200傷害。', '「運籌帷幄」：血量降至600時，於敵方四周設下領域封鎖退路。'],
   color: '#e8e8e8', glowColor: 'rgba(232,232,232,0.6)', type: 'yi',
   winQuote: '神之一手！。'
   },
@@ -1235,7 +1409,7 @@ tiger:['你那同情我的態度真是令人作嘔，這只顯得你很懦弱。
   id: 'gunner', emoji: '🔫', weapon: '💥', name: '無名槍手',
   desc: '​「在我的槍口前，每個人都只有一秒的時間後悔。」​游走在法律與罪惡邊緣的頂尖槍手。沒有人知道他的真名，只知道當他的皮靴馬刺聲響起，就代表死神的腳步近了。',
   stats: [  '連射 8s', ' 閃光彈'],
-  skills: ['被動：每次撞牆裝彈兩發，上限6發。', '主動：累積足夠子彈後停下連射，每發45傷害。', '閃光彈：定時投擲閃光彈，持續8秒，造成80範圍傷害並封鎖對手攻擊或技能冷卻。'],
+  skills: ['被動：每次撞牆裝彈兩發，上限6發。', '主動：累積足夠子彈後停下連射，每發45傷害。', '閃光彈：定時投擲閃光彈，持續8秒，造成80範圍傷害並封鎖對手攻擊或技能CD。'],
   color: '#b8860b', glowColor: 'rgba(184,134,11,0.6)', type: 'gunner',
   winQuote: '顆秒！！！！！！。'
   },
@@ -1243,7 +1417,7 @@ tiger:['你那同情我的態度真是令人作嘔，這只顯得你很懦弱。
   id: 'samurai', emoji: '⚔️', weapon: '⚔️', name: '末代武士',
   desc: '​「櫻花落盡之日，亦是吾輩刀鋒折斷之時。」​舊時代最後的守護者。當火槍與鋼鐵席捲大地，他依舊手握著那把象徵武士靈魂的太刀。。',
   stats: ['招架 ', '居合', '識滅斬',],
-  skills: ['招架：定時進入「招架」狀態持續1s冷卻2s，可將部分飛來投射物反彈，反彈傷×1.2，招架時受傷減免70%。', '「居合」：招架中碰到敵方球即觸發穿透斬擊，造成120傷。', '「識滅斬」：使用4次居合居合後解鎖，造成140傷×4段。'],
+  skills: ['招架：定時進入「招架」狀態持續1sCD2s，可將部分飛來投射物反彈，反彈傷害×1.2，招架時受傷害減免70%。', '「居合」：招架中碰到敵方球即觸發穿透斬擊，造成120傷害。', '「識滅斬」：使用4次居合居合後解鎖，造成140傷害×4段。'],
   color: '#d4af37', glowColor: 'rgba(212,175,55,0.6)', type: 'samurai',
   winQuote: '此刻，識滅之時。'
   },
@@ -1251,7 +1425,7 @@ tiger:['你那同情我的態度真是令人作嘔，這只顯得你很懦弱。
   id: 'mage', emoji: '🎩', weapon: '🕊️', name: '魔術師',
   desc: '神出鬼沒的舞台魔術師。定時丟出鴿子造成傷害，丟出後瞬間消失在場地另一處。每命中一定次數，下一顆鴿子附帶隨機「魔術技巧」！',
   stats: ['鴿子', '瞬移','魔術技巧', ],
-  skills: ['鴿子：定時丟出鴿子，造成80傷，冷卻1.25s，丟出後瞬移至場地另一處。', '技能：每命中3次後，下一顆鴿子附帶隨機魔術技巧——回血／反彈／追蹤／定身其一。'],
+  skills: ['鴿子：定時丟出鴿子，造成80傷害，CD1.25s，丟出後瞬移至場地另一處。', '技能：每命中3次後，下一顆鴿子附帶隨機魔術技巧——回血／反彈／追蹤／定身其一。'],
   color: '#9b59b6', glowColor: 'rgba(155,89,182,0.6)', type: 'mage',
   winQuote: '好戲開演！！！！。'
   },
@@ -1259,7 +1433,7 @@ tiger:['你那同情我的態度真是令人作嘔，這只顯得你很懦弱。
   id: 'thunder', emoji: '⚡', weapon: '🌩️', name: '雷電法王',
   desc: '「凡人，見識過真正的『天罰』嗎？」​誕生於萬雷交加之夜的雷霆化身。他性格狂暴、傲慢，視世間萬物為導電的媒介。',
   stats: ['閃電柱', '麻痺', ],
-  skills: ['閃電柱：碰到牆壁時留下閃電柱，上限7柱。', '閃電：閃電柱間每1於不同牆面產生閃電冷卻1.8s，每道閃電造成20傷害。', '麻痺：被閃電擊中有15%機率麻痺，使敵人定身並中斷攻擊。'],
+  skills: ['閃電柱：碰到牆壁時留下閃電柱，上限7柱。', '閃電：閃電柱間每1於不同牆面產生閃電CD1.8s，每道閃電造成20傷害。', '麻痺：被閃電擊中有15%機率麻痺，使敵人定身並中斷攻擊。'],
   color: '#f1c40f', glowColor: 'rgba(241,196,15,0.6)', type: 'thunder',
   winQuote: '以雷霆擊碎黑暗！。'
   },
@@ -1267,7 +1441,7 @@ tiger:['你那同情我的態度真是令人作嘔，這只顯得你很懦弱。
   id: 'blacksmith', emoji: '🔨', weapon: '⚔️', name: '鍛造師',
   desc: '​「千錘百鍊始成鋼，我的傑作，能斬斷神明的骨頭。」​隱居於火山熔岩旁的傳奇鍛造大師。對他而言，每一次錘擊都是與鋼鐵的對話',
   stats: ['鍛造',  '劍擊' ],
-  skills: ['鍛造：平時持續鍛造武器，每次鍛造累積10點加傷並加快下次鍛造速度。', '劍擊：靠近敵人時拔劍砍擊，造成20+鍛造加傷；每次劍擊後重置鍛造速度。'],
+  skills: ['鍛造：平時持續鍛造武器，每次鍛造累積10點加傷害並加快下次鍛造速度。', '劍擊：靠近敵人時拔劍砍擊，造成20+鍛造加傷害；每次劍擊後重置鍛造速度。'],
   color: '#cd7f32', glowColor: 'rgba(205,127,50,0.6)', type: 'blacksmith',
   winQuote: '比蟑螂還不如。'
   },
@@ -1275,7 +1449,7 @@ tiger:['你那同情我的態度真是令人作嘔，這只顯得你很懦弱。
   id: 'naobito', emoji: '👤', weapon: '👊', name: '禪院直哉',
   desc: '​「別隨便碰我，雜魚的弱者臭味會傳染的。」​咒術界名門「禪院家」的嫡子。擁有極致的天賦與高傲的血統，唯我獨尊，視弱者與女性如草芥。除了心中崇拜的那位「暴君」外，他不把任何人放在眼裡。',
   stats: ['投射法術', '凶星軌跡'],
-  skills: ['投射法術：預定好行動軌跡時沿途留下殘影分身，上限6個；敵人碰到殘影造成15傷冷卻3s。', '「凶星軌跡」：累積3個殘影時自動觸發，所有殘影與本體同時衝向敵人，造成60+殘影20×N傷。'],
+  skills: ['投射法術：預定好行動軌跡時沿途留下殘影分身，上限6個；敵人碰到殘影造成15傷害CD3s。', '「凶星軌跡」：累積3個殘影時自動觸發，所有殘影與本體同時衝向敵人，造成60+殘影20×N傷害。'],
   color: '#e8e8f0', glowColor: 'rgba(220,220,255,0.6)', type: 'naobito',
   winQuote: '能跟上甚爾的人，只能是我。',
   vsQuotes: { yuta: '我可是真希的哥哥啊。',
@@ -1285,8 +1459,8 @@ tiger:'是宿儺的容器啊，順便殺了吧',
   {
   id: 'itachi', emoji: '🐦‍⬛', weapon: '🔥', name: '宇治波鼬',
   desc: '​「無論村子有多麼黑暗，我都是木葉的宇智波鼬。」​背負著背叛者之名，隱匿於陰影中的孤高忍者。他將一切情感與光明埋葬在血色之夜，只為在暗處守護心愛的弟弟與村子的和平。',
-  stats: ['天照 50 / 引爆120', '月讀', '須佐能乎 減傷50%', '烏鴉替身'],
-  skills: ['「天照」：發射黑炎並附加標記，命中50傷害，標記引爆改為造成120傷冷卻2s。', '「月讀」：使敵人定身2s冷卻7s。', '「須佐能乎」：血量降至500時自動觸發，攻擊改為近戰50傷並恢復30血，減傷50%。', '替身：瀕死時化作烏鴉逃離並回復150血量，每場一次。'],
+  stats: ['天照 50 / 引爆120', '月讀', '須佐能乎 減傷害50%', '烏鴉替身'],
+  skills: ['「天照」：發射黑炎並附加標記，命中50傷害，標記引爆改為造成120傷害CD2s。', '「月讀」：使敵人定身2sCD7s。', '「須佐能乎」：血量降至500時自動觸發，攻擊改為近戰50傷害並恢復30血，減傷害50%。', '替身：瀕死時化作烏鴉逃離並回復150血量，每場一次。'],
   color: '#8b0000', glowColor: 'rgba(139,0,0,0.6)', type: 'itachi',
   winQuote: '沉浸在幻術的海洋之中吧。'
   },
@@ -1294,7 +1468,7 @@ tiger:'是宿儺的容器啊，順便殺了吧',
   id: 'yuta', emoji: '💍', weapon: '👧', name: '純愛戰神',
   desc: '​「我們可是純愛啊。——來吧，里香！」​當代僅有的四位特級咒術師之一。背負著特級過咒怨靈「祈本里香」的少年。',
   stats: ['咒言', '咒力斬', '里香揮爪', '純愛砲'],
-  skills: ['「咒言」：發射定身敵人的咒言，造成50傷，冷卻2.5s，命中後定身1.5秒。', '「咒力斬」：靠近敵人時揮出斬擊，造成40傷，冷卻1s。', '咒靈完全顯現：咒力斬命中三次後里香完全顯現，定時揮爪(180傷/4s)並釋放純愛大砲(60傷害/s，持續6s)，同時增幅乙骨全部攻擊。'],
+  skills: ['「咒言」：發射定身敵人的咒言，造成50傷害，CD2.5s，命中後定身1.5秒。', '「咒力斬」：靠近敵人時揮出斬擊，造成40傷害，CD1s。', '咒靈完全顯現：咒力斬命中三次後里香完全顯現，定時揮爪(180傷害/4s)並釋放純愛大砲(60傷害/s，持續6s)，同時增幅乙骨全部攻擊。'],
   color: '#ff6fa5', glowColor: 'rgba(255,111,165,0.6)', type: 'yuta',
   winQuote: '里香，謝謝妳。',
   vsQuotes: {cannondad : '僅限一次喔。' ,
@@ -1309,7 +1483,7 @@ cursed:'我會親手殺了宿儺，為老師報仇。' ,
   id: 'engineer', emoji: '👷', weapon: '🔧', name: '工程師',
   desc: '​「真理只在我的砲台射程之內。——機甲，連線！」​智商高達 200 的頂尖機械天才。對他而言，戰場不過是一場大型的物理與火力實驗。。',
   stats: ['炮台', '電網', '機甲',],
-  skills: ['砲台：原地部署自動炮台，發射每發20傷的子彈。', '電網：定時於敵人周圍佈下電網，造成定身並持續20傷/s。', '機甲：放置5個炮台後啟動機甲模式，全身換上重裝甲(減傷10%)，改以35傷的雷射光束橫掃戰場。'],
+  skills: ['砲台：原地部署自動炮台，發射每發20傷害的子彈。', '電網：定時於敵人周圍佈下電網，造成定身並持續20傷害/s。', '機甲：放置5個炮台後啟動機甲模式，全身換上重裝甲(減傷害10%)，改以35傷害的雷射光束橫掃戰場。'],
   color: '#3a8fd6', glowColor: 'rgba(58,143,214,0.6)', type: 'engineer',
   winQuote: '在大量子彈中找到少量受害者。'
   },
@@ -1317,7 +1491,7 @@ cursed:'我會親手殺了宿儺，為老師報仇。' ,
   id: 'cannondad', emoji: '🚬', weapon: '💥', name: '砲爹',
   desc: '​「我的這生過得很充實，但……就是不夠甜啊！」​來自四百年前、咒術史上擁有「最高咒力輸出量」的狂熱戰士。他不為名利，只為了尋找能讓自己靈魂顫抖的「甜點」。',
   stats: ['追蹤光球', '光柱', '光砲 ', '拳擊'],
-  skills: ['咒術「冰砂衝擊波」：隨機發射追蹤光球(30傷×3/0.9s)、光柱(50傷/1.6s)或蓄力光砲(60傷×3/2.2s)。', '拳擊：近身時直接揮拳，造成20傷。'],
+  skills: ['咒術「冰砂衝擊波」：隨機發射追蹤光球(30傷害×3/0.9s)、光柱(50傷害/1.6s)或蓄力光砲(60傷害×3/2.2s)。', '拳擊：近身時直接揮拳，造成20傷害。'],
   color: '#bdbdbd', glowColor: 'rgba(189,189,189,0.6)', type: 'cannondad',
   winQuote: '就這點實力，根本填不飽我。',
 vsQuotes: { yuta: ['真的很甜美啊！！！！乙骨。','你就是我的甜點嘛！','謝謝你我吃飽了。'],
@@ -1327,7 +1501,7 @@ cursed:'格蘭尼達.... '}
   id: 'dio', emoji: '🧏', weapon: '🔪', name: 'DIO',
   desc: '​「貧弱，貧弱！人類的能力是有極限的……我不做人啦！」​跨越百年復活的惡之化身，站在替身頂點的帝王。擁有超越常理的怪力與吸血鬼不死之身，其替身「世界（The World）」更掌握了支配時間的至高力量。',
   stats: ['替身「世界」', '「The World」', '飛刀', 'HIGH狀態'],
-  skills: ['替身「世界」：貼身連打，10傷/0.2s。', '「The World」：使時間停止(持續3秒，冷卻10秒)，並在時停中丟刀，每刀25傷。', '麵包：吃下場上的麵包可回血並丟刀','「high狀態」吃滿一定數量麵包後進入HIGH狀態，時停延長至5秒，並在第一次時停時丟壓路機。'],
+  skills: ['替身「世界」：貼身連打，10傷害/0.2s。', '「The World」：使時間停止(持續3秒，CD10秒)，並在時停中丟刀，每刀25傷害。', '麵包：吃下場上的麵包可回血並丟刀','「high狀態」吃滿一定數量麵包後進入HIGH狀態，時停延長至5秒，並在第一次時停時丟壓路機。'],
   color: '#f5d020', glowColor: 'rgba(245,208,32,0.6)', type: 'dio',
   winQuote: '我現在真是high到不行！',
   vsQuotes:{ joseph :['如果說這個世界上還有誰配得上我正眼相看，那就只有你了','我不做人了，JOJO！']}
@@ -1336,7 +1510,7 @@ cursed:'格蘭尼達.... '}
   id: 'tiger', emoji: '🐯', weapon: '👊', name: '虎天帝',
   desc: '​「只要還能動，我就會一直詛咒你。——接招吧，宿儺！」​歷經無數絕望與摯友的逝去，那個曾經只會用肉身搏擊的少年，終於在戰場上徹底覺醒為支配宿命的「虎天帝」。',
   stats: ['徑庭拳 ', '超新星 ', '穿血' , '宿儺容器'],
-  skills: ['「徑庭拳」：延遲觸發二段傷害，有機率觸發「黑閃」造成額外傷害。', '宿儺容器：將部分受到的傷害轉為流血，緩慢扣除，如果觸發黑閃，可以將流血恢復。', '「穿血」：消耗自身血量攻擊，並在落點留下血球。', '「超新星」：累積足夠血球後觸發，範圍爆發傷害。'],
+  skills: ['「徑庭拳」：距離130內蓄力0.4秒揮拳，命中造成80傷，1秒後追加50傷並擊退；20%機率觸發「黑閃」，兩段傷害提升1.5倍並清除等量流血。（CD 2.6秒）', '被動「宿儺容器」：受到傷害的65%轉為流血，之後以18/秒扣除，流血上限600；觸發黑閃時可清除等同於1.5倍黑閃傷害量的流血。', '「穿血」：消耗自身50血量（不致命）發射血刃，造成60傷害，並在自身留下等量流血；命中處留下可存活12秒的血球。（CD 2.2秒）', '「超新星」：集滿3顆血球後，原地蓄力0.7秒引爆，射出14根血流針，每根30傷，射程140。（CD 至少4秒）'],
   color: '#cc2200', glowColor: 'rgba(204,34,0,0.6)', type: 'tiger',
   winQuote: '我只是個零件。就算我是個零件，也要盡可能地祓除詛咒。',
   vsQuotes: { yuta: '乙骨前輩，辛苦你了。',
@@ -1356,7 +1530,7 @@ geto:'在成為咒術師前，我們是人類。'}
   id: 'obito', emoji: '🌀', weapon: '🔥', name: '宇智波帶土',
   desc: '​「這個世界……已經沒有存在的價值了。就在虛幻的夢境中，重逢吧。」​曾是憧憬火影的善良少年，在目睹世界的殘酷與絕望後，化身為在黑暗中操縱歷史的面具男。！',
   stats: ['火球', '神威', '虛化'],
-  skills: ['「火球」：向敵人噴出火焰，60傷，冷卻s。', '「神威」：可將敵人或投射物抓入神威空間，也可主動進出，進出造成20傷。', '【虛化】：可主動開啟虛化躲避敵人攻擊。'],
+  skills: ['「「火球」：向敵人發射火焰球，造成60傷害，命中後延遲0.6秒衝刺將敵人抓進神威空間。（CD 10秒）。', '「神威」：可將敵人或投射物吸入神威空間，主動進出造成60傷害；抓住敵人甩飛造成40傷害。（CD 7秒）。', '「虛化」：每3秒自動進入虛化狀態，持續0.5秒，可躲避並吸收投射物（最多6顆），神威時一併釋放。'],
   color: '#ff6600', glowColor: 'rgba(255,102,0,0.6)', type: 'obito',
   winQuote: ['我沒有名字，也不以任何身份而活。','我要創造一個有琳的世界','不能守護該守護的人，這份力量又有什麼意義？'],
   vsQuotes: { itachi: ['宇智波的血脈，終究逃不過悲劇嗎。','你選擇守護，我選擇毀滅，僅此而已。'],
@@ -1366,7 +1540,7 @@ geto:'在成為咒術師前，我們是人類。'}
   id: 'fisherman', emoji: '🎣', weapon: '🪝', name: '釣魚佬',
   desc: '每隔一段時間向場地邊緣拋出魚鉤，依照釣上來的魚觸發效果，願者上鉤！',
   stats: ['釣魚', '魚', '鯊魚', '首領魚', '大海'],
-  skills: ['釣魚：每隔一段時間向場地邊緣拋出魚鉤。', '魚：造成延遲2段傷','鯊魚：造成傷害並附dot傷','首領魚：連續丟出大量魚','大海：由側邊出現幾道海浪，並衝向對手甩到牆上','機率：魚: 30, 鯊魚: 8, 空軍: 6, 首領魚:4 , 大海: 2'],
+  skills: ['釣魚：向場地邊緣拋出魚鉤釣魚（CD1.2秒）。', '魚：造成30點傷害，延遲1秒後再造成50點傷害','鯊魚：造成70傷害並附70點dot傷害','首領魚：連續丟出大量魚總共240點傷害','大海：由側邊連續出現7道海浪（每道70傷），並衝向對手甩到牆上','機率：魚: 30, 鯊魚: 8, 空軍: 6, 首領魚:4 , 大海: 2'],
   color: '#4a90d9', glowColor: 'rgba(74,144,217,0.6)', type: 'fisherman',
   winQuote: ['只要相信海，海就會幫你。','聽海哭的聲音。','他說風雨中這點痛算什麼。'],
     },
@@ -1374,7 +1548,7 @@ geto:'在成為咒術師前，我們是人類。'}
   id: 'geto', emoji: '🧘', weapon: '👻', name: '夏油條',
   desc: '「為了我們所堅信的『大義』，非術師們……請你們去死吧。」​曾是站在頂點的天才學生，如今則是創立宗教、操弄詛咒的特級詛咒師。他看透了保護弱者的虛偽與無趣，決定建立一個只有術士的純粹世界。',
   stats: ['咒靈', '特級咒靈', '極之番・漩渦', '游雲'],
-  skills: ['咒靈：每秒消耗咒靈化為小型咒靈作戰。', '特級咒靈：血量過半時召喚特級咒靈助陣，隨機釋放糾纏／定身／咒力奔流其一。', '「極之番・漩渦」：瀕死時發動，蓄力對敵方發射大光球。', '游雲：平時以游雲棍法貼身擊退敵人。'],
+  skills: ['被動「咒靈」：每秒消耗1點咒靈庫存（上限100）召喚小型咒靈，血量25，碰觸造成27傷害（同一隻咬擊冷卻1秒），咒靈咬人也會反震自身27傷害，存活上限14秒。', '「特級咒靈」：血量降至50%時召喚，血量300，承擔夏油條所受傷害的30%；隨機釋放：糾纏（枝條纏繞，每跳0.5秒共4跳，每跳22傷，造成傷害60%轉為回血，CD 5秒）／定身（範圍440內定身2秒，CD 5秒）／咒力奔流（蓄力1.4秒後造成95傷，蓄力中特級咒靈受傷提升50%，CD 6秒）。', '「極之番・漩渦」：血量降至25%時發動，蓄力2秒後射出光球，傷害250+庫存咒靈數×0.6', '被動「游雲」：貼身棍擊敵人，造成40傷害並擊退，冷卻2秒。'],
   color: '#5b3a8e', glowColor: 'rgba(91,58,142,0.6)', type: 'geto',
   winQuote: ['這個世界，只需要留下優秀的咒術師就好。','非術師不過是家畜罷了。',],
   vsQuotes: { gojo: ['悟，這可不像你會說的話阿。','因為你是五條悟所以你是最強，還是因為你是最強所以是五條悟？'],
@@ -1386,7 +1560,7 @@ geto:'在成為咒術師前，我們是人類。'}
   id: 'sakiko', emoji: '🎹', weapon: '🎼', name: 'Oblivionis',
   desc: '我，「無懼遺忘。」以鍵盤譜寫命運，以意志掌控舞台。凡踏入她所編織的劇場者，都將成為故事的一部分。你的掙扎，只是我劇本中的一段插曲',
   stats: ['頌樂音符 ', '鋼琴/管風琴', '新月甦醒', '殘月的餘韻'],
-  skills: ['「頌樂音符」：持續發射會自動追蹤敵人的音符投射物，音符在命中時會疊fever值，根據場上音符數量會提升傷害。', '「滿月舞會」：碰牆時切換鋼琴音色／管風琴音色，改變音符效果。', '「新月甦醒」：連續丟出8道當前音色音符，傷害會衰減。', '「殘月的餘韻」：Fever值滿時觸發，同時發射兩種音色的音符，且在「殘月的餘韻」中不會死亡。'],
+  skills: ['「頌樂音符」：持續發射會自動追蹤敵人的音符投射物，音符會根據不同的音色有不同屬性，音符在命中時會疊15點fever值（滿層450），根據場上音符數量每顆音符提升4%傷害（上限十個）。', '「滿月舞會」：碰牆時切換鋼琴音色／管風琴音色。','「鋼琴音色」：速度較慢，對敵人造成20傷害（CD1.1秒）','「風琴音色」：速度較快，對敵人造成10傷害（CD0.45秒）' ,'「新月甦醒」：連續丟出8道當前音色音符，基礎傷害60 從80%衰減到4%（CD10秒）。', '「殘月的餘韻」：Fever值滿時觸發，同時發射兩種音色的音符（CD0.26），且在「殘月的餘韻」中不會死亡，持續3秒。'],
   color: '#c9a4d1', glowColor: 'rgba(201,164,209,0.6)', type: 'sakiko',
   winQuote: ['現在正是復權的時代','歡迎來到Ave mujica的世界。','我將成為神'],
     },
@@ -1403,22 +1577,78 @@ geto:'在成為咒術師前，我們是人類。'}
   id: 'steve', emoji: '⛏️', weapon: '⚔️', name: '史蒂夫',
   desc: '​來自未知維度的最高造物主。他沒有台詞，甚至沒有表情，但他的存在本身就是對世界規則的嘲弄。',
   stats: ['劍 5→25', '斧 ', '弓/弩 ', '重錘 '],
-  skills: ['獲取升級：碰牆進行2秒資源收集可升級裝備一次，冷卻7秒，最高四階段。', '劍（碰撞傷害）：徒手10／木劍15／石劍20／鐵劍25。', '斧（主動劈砍）：木斧100(0.2s蓄力)／石斧125／鐵劍後石斧150／四階段雙持金斧175(高速小範圍)。', '弓／弩：二階段解鎖弓，50傷害(0.3s蓄力)，冷卻2s；三階段升級為弩，無蓄力50傷害；四階段升級煙花弩，100傷，1s瞄準。', '「重錘」：解鎖四階段後開始5秒冷卻，時間到衝向敵人造成傷害並擊退'],
+  skills: ['獲取升級：碰牆進行2秒資源收集可升級裝備一次，CD7秒，最高四階段。', '劍（碰撞傷害）：徒手10／木劍15／石劍20／鐵劍25。', '斧（主動劈砍）：木斧100(0.2s蓄力)／石斧125／鐵劍後石斧150／四階段雙持金斧175(高速小範圍)。', '弓／弩：二階段解鎖弓，50傷害(0.3s蓄力)，CD2s；三階段升級為弩，無蓄力50傷害；四階段升級煙花弩，100傷害，1s瞄準。', '「重錘」：解鎖四階段後開始5秒CD，時間到衝向敵人造成傷害並擊退'],
   color: '#4a8f3c', glowColor: 'rgba(74,143,60,0.6)', type: 'steve',
   winQuote: '讓我們，當個創世神吧。'
+  },
+  {
+  id: 'daji', emoji: '🦊', weapon: '🦊', name: '九尾妖狐 妲己',
+  desc: '媚骨天成，尾若九曳。以魅惑迷亂心智，以鬼火焚盡敵蹤——尾巴集滿之時，便是萬劫不復的狐嘯之刻。',
+  stats: ['尾巴', '鬼火', '魅惑', '法術球'],
+  skills: ['被動「九尾」：每次攻擊或釋放技能獲得一條尾巴，集滿9條時消耗全部尾巴，刷新兩個技能CD並強化下次施放的技能，強化技能命中/釋放時恢復100生命值。', '普攻「鬼火」：發射追蹤鬼火，命中造成50傷害並灼燒敵人，每秒造成1%最大生命值傷害(CD3秒)。', '技能一「魅惑」：魅惑敵人2秒使其朝自己靠近，並強化下次攻擊為近戰強擊，造成60傷害並擊退；被動強化後傷害提升為80並附加1.秒暈眩。（CD 6秒）', '技能二「狐火彈」：發射法術球，基礎傷害90，每有1條尾巴傷害+8（最高162），體積隨傷害增加；被動強化後原地蓄力1.5秒再高速射出，傷害與體積固定為最大值。（CD 9秒）'],
+  color: '#e08ac7', glowColor: 'rgba(224,138,199,0.6)', type: 'daji',
+  winQuote: ['九尾搖曳，魂為之傾倒。', '這就是……媚惑天下的力量。']
   }
 ];
 
 // ──────────────── CAROUSEL STATE ────────────────
 const carouselState = {
   p1: { index: 0, selected: null, dragging: false, startX: 0, currentX: 0 },
-  p2: { index: 0, selected: null, dragging: false, startX: 0, currentX: 0 }
+  p2: { index: 0, selected: null, dragging: false, startX: 0, currentX: 0 },
+  p3: { index: 0, selected: null, dragging: false, startX: 0, currentX: 0 },
+  p4: { index: 0, selected: null, dragging: false, startX: 0, currentX: 0 }
 };
 
-let p1Choice = null, p2Choice = null;
+let p1Choice = null, p2Choice = null, p3Choice = null, p4Choice = null;
+let playerModeCount = 2; // 對戰人數：2 / 3 / 4
+
+function setPlayerMode(count) {
+  playerModeCount = count;
+  const mode = MODES.find(m => m.count === count);
+  if (mode) {
+    document.getElementById('mode-pick-emoji').textContent = mode.emoji;
+    document.getElementById('mode-pick-name').textContent = mode.name;
+  }
+  document.getElementById('select-row').classList.toggle('multi', count > 2);
+  document.getElementById('p3-slot').style.display = count >= 3 ? 'flex' : 'none';
+  document.getElementById('vs-divider-3').style.display = count >= 3 ? 'flex' : 'none';
+  document.getElementById('p4-slot').style.display = count >= 4 ? 'flex' : 'none';
+  document.getElementById('vs-divider-4').style.display = count >= 4 ? 'flex' : 'none';
+  document.getElementById('roster-target-p3').style.display = count >= 3 ? 'inline-block' : 'none';
+  document.getElementById('roster-target-p4').style.display = count >= 4 ? 'inline-block' : 'none';
+  refreshOpmLock();
+  updateStartBtnState();
+}
+
+// 三人以上混戰時，機制在多人場面會失衡的角色停用選取：
+// 一拳超人（一擊必殺）、DIO（世界時停對多人影響過大）
+const LOCKED_IN_MULTI = ['opm', 'dio'];
+
+function refreshOpmLock() {
+  const locked = playerModeCount >= 3;
+  document.querySelectorAll('.char-card').forEach(card => {
+    card.classList.toggle('locked', locked && LOCKED_IN_MULTI.includes(card.dataset.charId));
+  });
+  if (!locked) return;
+  ['p1', 'p2', 'p3', 'p4'].forEach(p => {
+    if (!LOCKED_IN_MULTI.includes(carouselState[p].selected)) return;
+    carouselState[p].selected = null;
+    if (p === 'p1') p1Choice = null;
+    else if (p === 'p2') p2Choice = null;
+    else if (p === 'p3') p3Choice = null;
+    else if (p === 'p4') p4Choice = null;
+    document.querySelectorAll(`#${p}-track .char-card.selected`).forEach(c => c.classList.remove('selected', p));
+    document.getElementById(`${p}-selected-label`).textContent = '請選擇角色';
+  });
+}
+
+function updateStartBtnState() {
+  const choices = [p1Choice, p2Choice, p3Choice, p4Choice].slice(0, playerModeCount);
+  document.getElementById('start-btn').disabled = choices.some(c => !c);
+}
 
 function buildCarousels() {
-  ['p1', 'p2'].forEach(p => {
+  ['p1', 'p2', 'p3', 'p4'].forEach(p => {
     const track = document.getElementById(`${p}-track`);
     const dotsEl = document.getElementById(`${p}-dots`);
 
@@ -1522,14 +1752,17 @@ function randomChar(player) {
 }
 
 function selectChar(player, charId) {
+  if (LOCKED_IN_MULTI.includes(charId) && playerModeCount >= 3) return; // 三人以上禁用
   const cs = carouselState[player];
   cs.selected = charId;
   if (player === 'p1') p1Choice = charId;
-  else p2Choice = charId;
+  else if (player === 'p2') p2Choice = charId;
+  else if (player === 'p3') p3Choice = charId;
+  else if (player === 'p4') p4Choice = charId;
 
   const track = document.getElementById(`${player}-track`);
   track.querySelectorAll('.char-card').forEach(card => {
-    card.classList.remove('selected', 'p1', 'p2');
+    card.classList.remove('selected', 'p1', 'p2', 'p3', 'p4');
     if (card.dataset.charId === charId) {
       card.classList.add('selected', player);
     }
@@ -1539,10 +1772,47 @@ function selectChar(player, charId) {
   document.getElementById(`${player}-selected-label`).textContent =
     ch ? `✓ ${ch.emoji} ${ch.name}` : '請選擇角色';
 
-  document.getElementById('start-btn').disabled = !(p1Choice && p2Choice);
+  updateStartBtnState();
 }
 
+// 對戰人數選擇（彈窗，樣式與地圖選擇一致）
+function renderModeModal() {
+  const grid = document.getElementById('mode-modal-grid');
+  grid.innerHTML = '';
+  MODES.forEach(m => {
+    const card = document.createElement('div');
+    const isActive = playerModeCount === m.count;
+    card.style.cssText = `
+      width:170px;padding:16px 12px;border-radius:14px;cursor:pointer;
+      background:${isActive ? 'rgba(255,160,60,0.14)' : 'rgba(255,255,255,0.04)'};
+      border:1px solid ${isActive ? 'rgba(255,160,60,0.6)' : 'rgba(255,255,255,0.12)'};
+      text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px;
+      transition:all 0.15s;
+    `;
+    card.innerHTML = `
+      <div style="font-size:2.2rem">${m.emoji}</div>
+      <div style="font-size:0.92rem;font-weight:700;color:#eee">${m.name}</div>
+      <div style="font-size:0.65rem;color:#999;line-height:1.5">${m.desc}</div>
+    `;
+    card.onmouseover = () => { if (!isActive) card.style.background = 'rgba(255,255,255,0.08)'; };
+    card.onmouseout  = () => { if (!isActive) card.style.background = 'rgba(255,255,255,0.04)'; };
+    card.onclick = () => {
+      setPlayerMode(m.count);
+      document.getElementById('mode-modal').style.display = 'none';
+    };
+    grid.appendChild(card);
+  });
+}
+document.getElementById('mode-pick-btn').addEventListener('click', () => {
+  renderModeModal();
+  document.getElementById('mode-modal').style.display = 'flex';
+});
+document.getElementById('mode-modal-close').addEventListener('click', () => {
+  document.getElementById('mode-modal').style.display = 'none';
+});
+
 buildCarousels();
+refreshOpmLock();
 
 // ──────────────── ROSTER MODAL ────────────────
 function openRoster()  { document.getElementById('roster-modal').classList.add('show'); }
@@ -1558,7 +1828,7 @@ function closeRoster() { document.getElementById('roster-modal').classList.remov
   let rosterTarget = 'p1';
   let rosterSelectedId = null;
 
-  const targetLabel = { p1: '玩家一', p2: '玩家二' };
+  const targetLabel = { p1: '玩家一', p2: '玩家二', p3: '玩家三', p4: '玩家四' };
 
   // ── 建立方塊圖鑑 ──
   CHARACTERS.forEach(ch => {
@@ -1603,6 +1873,11 @@ function closeRoster() { document.getElementById('roster-modal').classList.remov
     const ch = CHARACTERS.find(c => c.id === charId);
     if (!ch) return;
 
+    if (LOCKED_IN_MULTI.includes(charId) && playerModeCount >= 3) {
+      renderDetail(ch); // 仍可預覽技能，但不能選取
+      return;
+    }
+
     if (rosterSelectedId === charId) {
       // 第二次點擊同一格 → 確認選擇
       const idx = CHARACTERS.findIndex(c => c.id === charId);
@@ -1622,15 +1897,17 @@ function closeRoster() { document.getElementById('roster-modal').classList.remov
   // ── 玩家目標切換 ──
   function setTarget(t) {
     rosterTarget = t;
-    document.getElementById('roster-target-p1').classList.toggle('active', t === 'p1');
-    document.getElementById('roster-target-p2').classList.toggle('active', t === 'p2');
+    ['p1','p2','p3','p4'].forEach(p => {
+      document.getElementById(`roster-target-${p}`).classList.toggle('active', t === p);
+    });
     if (rosterSelectedId) {
       const ch = CHARACTERS.find(c => c.id === rosterSelectedId);
       if (ch) renderDetail(ch);
     }
   }
-  document.getElementById('roster-target-p1').addEventListener('click', () => setTarget('p1'));
-  document.getElementById('roster-target-p2').addEventListener('click', () => setTarget('p2'));
+  ['p1','p2','p3','p4'].forEach(p => {
+    document.getElementById(`roster-target-${p}`).addEventListener('click', () => setTarget(p));
+  });
 
   // ── 自訂右側滑條 ──
   function updateThumb() {
@@ -1754,10 +2031,16 @@ let selectedArena = 'normal'; // 'normal' | 'lava' | 'snow' | 'grass' | 'sand' |
 const ARENAS = [
   { id: 'normal', emoji: '🏟️', name: '標準場地', desc: '純粹的對決。' },
   { id: 'lava',   emoji: '🌋', name: '熔岩場地', desc: '雙方每秒持續灼燒 20 血，考驗續戰能力。' },
-  { id: 'snow',   emoji: '❄️', name: '冰雪場地', desc: '每隔 7 秒吹一次暴風雪，雙方各有 50% 機率被凍結，凍結中無法移動，技能冷卻也會停止計算。' },
+  { id: 'snow',   emoji: '❄️', name: '冰雪場地', desc: '每隔 7 秒吹一次暴風雪，雙方各有 50% 機率被凍結，凍結中無法移動，技能CD也會停止計算。' },
   { id: 'grass',  emoji: '🌿', name: '青草場地', desc: '每隔 7 秒，雙方同時回復 150 滴血，考驗爆發輸出能力。' },
   { id: 'sand',   emoji: '🏜️', name: '流沙場地', desc: '場上會不定時出現流沙圈，站在裡面的角色會被大幅緩速。' },
   { id: 'beach',  emoji: '🏖️', name: '海灘場地', desc: '水域與沙灘各半。潮汐漲退間有暗流、螃蟹、海膽與寶箱出沒，雷電法王與釣魚佬在此另有特殊互動。' }
+];
+
+const MODES = [
+  { count: 2, emoji: '⚔️', name: '2人對戰', desc: '經典一對一對決。' },
+  { count: 3, emoji: '🔥', name: '3人混戰', desc: '三方混戰，一拳超人停用。' },
+  { count: 4, emoji: '💀', name: '4人混戰', desc: '四方混戰，一拳超人停用。' }
 ];
 let selectedBgColor = '#000000'; // 玩家自訂背景顏色
 const WALL               = 1;
@@ -1771,21 +2054,21 @@ const BOOST_MIN_MAGNITUDE = 25; // 最低加速合力，避免幾乎沒動
 
 //一拳超人常數
 const OPM_COUNTDOWN_START    = 45;   // 怒氣值上限
-const OPM_COLLISION_COOLDOWN = 0.3;  // 每次碰撞的內置冷卻（秒），防連觸
+const OPM_COLLISION_COOLDOWN = 0.3;  // 每次碰撞的內置CD（秒），防連觸
 const OPM_COLLISION_REDUCE   = 1.0;    // 每次碰撞時增加的怒氣值
 const OPM_RAGE_PARTICLE_THRESHOLD = 0.3; // 怒氣超過此比例才出現粒子
 const OPM_DMG_REDUCE          = 0.3;  // 全局減傷比例（受到的所有傷害降低）
 const OPM_WALL_REDUCE          = 0.5; // 撞牆時減少的怒氣值倒數秒數
 
 //廚師常數
-const CHEF_ATTACK_INTERVAL = 2.0; //攻擊冷卻
+const CHEF_ATTACK_INTERVAL = 2.0; //攻擊CD
 const KNIFE_SPEED          = 300; //刀子移動速度
 const KNIFE_DAMAGE         = 130; //刀子傷害
 const KNIFE_MAX_COUNT      = 2; //刀子上限
 const KNIFE_RECALL_SPEED = 300; // 回收速度（px/s）
 
 //酒鬼常數
-const DRUNK_ATTACK_INTERVAL   = 1.75; //攻擊冷卻
+const DRUNK_ATTACK_INTERVAL   = 1.75; //攻擊CD
 const DRUNK_DIR_CHANGE_MIN    = 0.3; //最小移動間隔
 const DRUNK_DIR_CHANGE_MAX    = 0.5; //最大移動間隔
 const BOTTLE_SPEED            = 280; //酒瓶移動速度
@@ -1796,7 +2079,7 @@ const VAMPIRE_BITE_DAMAGE     = 25;   // 每次咬擊傷害
 const VAMPIRE_BITE_HEAL       = 22;   // 每次咬擊回血
 const VAMPIRE_BITE_COUNT      = 4;    // 咬擊次數
 const VAMPIRE_BITE_INTERVAL   = 0.20; // 每次咬擊間隔（秒）
-const VAMPIRE_DASH_INTERVAL   = 9;   // 蝙蝠狂襲冷卻（秒）
+const VAMPIRE_DASH_INTERVAL   = 9;   // 蝙蝠狂襲CD（秒）
 const VAMPIRE_DASH_SPEED      = 750;  // 衝刺速度
 const VAMPIRE_DASH_DURATION   = 0.55; // 衝刺最長持續時間（秒）
 
@@ -1820,7 +2103,7 @@ const TRAP_MAX_COUNT       = 6;      // 最多同時存在幾個尖刺
 const TRAP_CHAIN_INTERVAL  = 3.0;    // 鎖鏈間隔（秒）
 const TRAP_CHAIN_PULL_SPD  = 200;    // 鎖鏈拉扯速度（px/s）
 const TRAP_CHAIN_PULL_DUR  = 0.7;    // 拉扯最長持續（秒）
-const TRAP_HIT_COOLDOWN    = 1.2;    // 同一個尖刺再次傷害的冷卻（秒）
+const TRAP_HIT_COOLDOWN    = 1.2;    // 同一個尖刺再次傷害的CD（秒）
 
 // 奕常數
 const YI_BLACK_DAMAGE       = 50;    // 黑棋傷害
@@ -1844,14 +2127,14 @@ const GUNNER_BULLET_SPEED      = 700;   // 子彈飛行速度（px/s）
 const GUNNER_BULLET_INTERVAL   = 0.09;   // 連射間隔（秒）
 const GUNNER_BULLET_KNOCKBACK  = 100;   // 子彈擊退力道（px/s）
 const GUNNER_STOP_DUR          = 0.08;  // 每發子彈射出前短暫停頓（秒，視覺用）
-const GUNNER_FLASH_INTERVAL    = 8.0;   // 閃光彈冷卻（秒）
+const GUNNER_FLASH_INTERVAL    = 8.0;   // 閃光彈CD（秒）
 const GUNNER_FLASH_DAMAGE      = 80;   // 閃光彈傷害
 const GUNNER_FLASH_RADIUS      = 110;   // 閃光彈爆炸半徑（px）
 const GUNNER_FLASH_STUN_DUR    = 2.5;   // 閃光彈封鎖攻擊持續時間（秒）
 const GUNNER_FLASH_SPEED       = 400;   // 閃光彈飛行速度（px/s）
 
 // 魔術師常數
-const MAGE_DOVE_INTERVAL       = 1.25;   // 丟鴿子冷卻（秒）
+const MAGE_DOVE_INTERVAL       = 1.25;   // 丟鴿子CD（秒）
 const MAGE_DOVE_DAMAGE         = 80;    // 鴿子傷害
 const MAGE_DOVE_SPEED          = 350;   // 鴿子飛行速度（px/s）
 const MAGE_TELEPORT_DELAY      = 0.15;  // 丟鴿子後瞬移延遲（秒）
@@ -1869,7 +2152,7 @@ const SMITH_FORGE_DMG_PER_STACK   = 10;     // 每層鍛造加傷（永久疊加
 const SMITH_FORGE_MAX_STACKS      = 40;    // 最大鍛造層數上限
 const SMITH_SWORD_BASE_DAMAGE     = 20;    // 劍擊基礎傷害（初期很低，靠鍛造層數疊加變強）
 const SMITH_SWORD_RANGE           = 100;   // 劍擊判定距離（px）
-const SMITH_SWORD_COOLDOWN        = 1.0;   // 劍擊冷卻（秒）
+const SMITH_SWORD_COOLDOWN        = 1.0;   // 劍擊CD（秒）
 const SMITH_SWORD_KNOCKBACK       = 250;   // 劍擊擊退力道（px/s）
 
 // 禪院直哉常數
@@ -1880,23 +2163,23 @@ const NAOBITO_SHADOW_LIFETIME     = 3;   // 殘影存活時間（秒）
 const NAOBITO_SHADOW_MAX          = 6;     // 最多同時存在殘影數
 const NAOBITO_SHADOW_DAMAGE       = 15;    // 殘影接觸傷害
 const NAOBITO_SHADOW_HIT_RADIUS   = 20;    // 殘影命中判定半徑（px）
-const NAOBITO_SHADOW_HIT_COOLDOWN = 0.5;   // 同一殘影再次傷害冷卻（秒）
+const NAOBITO_SHADOW_HIT_COOLDOWN = 0.5;   // 同一殘影再次傷害CD（秒）
 const NAOBITO_KYOUSEI_THRESHOLD   = 6;     // 凶星軌跡觸發所需殘影數
 const NAOBITO_KYOUSEI_PIERCE_DMG  = 60;    // 凶星軌跡本體穿刺傷害
 const NAOBITO_KYOUSEI_SHADOW_DMG  = 20;    // 凶星軌跡每殘影傷害
 const NAOBITO_KYOUSEI_SPEED       = 550;   // 凶星軌跡衝刺速度（px/s）
-const NAOBITO_KYOUSEI_COOLDOWN    = 5.0;   // 凶星軌跡觸發後冷卻（秒）
+const NAOBITO_KYOUSEI_COOLDOWN    = 5.0;   // 凶星軌跡觸發後CD（秒）
 const NAOBITO_PATH_DEVIATION      = 100;   // 路徑中繼點偏移量（px）
 const NAOBITO_RETREAT_DISTANCE    = 100;   // 接近敵人後，遠離的距離（px）
 const NAOBITO_DASH_MAX_DURATION   = 2.0;   // 單次衝刺最大持續時間（秒），超時強制結束避免卡住
 
 
 // 宇治波鼬常數
-const ITACHI_AMATERASU_INTERVAL = 2.0;   // 天照冷卻（秒）
+const ITACHI_AMATERASU_INTERVAL = 2.0;   // 天照CD（秒）
 const ITACHI_AMATERASU_SPEED    = 450;   // 黑炎飛行速度（px/s）
 const ITACHI_AMATERASU_DAMAGE   = 50;    // 天照命中傷害
 const ITACHI_AMATERASU_MARK_DMG = 120;   // 標記引爆傷害
-const ITACHI_TSUKUYOMI_INTERVAL = 6.0;   // 月讀冷卻（秒）
+const ITACHI_TSUKUYOMI_INTERVAL = 6.0;   // 月讀CD（秒）
 const ITACHI_TSUKUYOMI_PIN_DUR  = 2.0;   // 定身持續時間（秒）
 const ITACHI_CROW_HEAL          = 150;   // 烏鴉替身恢復血量
 const ITACHI_SUSANOO_HP_THRESHOLD = 500; // 須佐能乎觸發血量
@@ -1905,32 +2188,32 @@ const ITACHI_SUSANOO_DMG_REDUCE = 0.5;   // 須佐能乎減傷比例
 const ITACHI_SUSANOO_BITE_DAMAGE = 50;   // 須佐能乎近戰每擊傷害
 const ITACHI_SUSANOO_BITE_HEAL   = 30;   // 須佐能乎近戰每擊吸血
 const ITACHI_SUSANOO_BITE_COUNT  = 4;    // 近戰連擊次數
-const ITACHI_SUSANOO_BITE_INTERVAL = 0.3; // 刺擊冷卻（秒），避免擦身連續觸發過密
-const ITACHI_SUSANOO_BITE_COOLDOWN = 0.8;  // 近戰結束冷卻（秒）
+const ITACHI_SUSANOO_BITE_INTERVAL = 0.3; // 刺擊CD（秒），避免擦身連續觸發過密
+const ITACHI_SUSANOO_BITE_COOLDOWN = 0.8;  // 近戰結束CD（秒）
 const ITACHI_SUSANOO_BITE_RANGE  = RADIUS * 2 + 40; // 須佐能乎近戰判定距離（px）
 
 // 乙骨憂太常數
-const YUTA_CURSEWORD_INTERVAL    = 2.5;   // 咒言發射冷卻（秒）
+const YUTA_CURSEWORD_INTERVAL    = 2.5;   // 咒言發射CD（秒）
 const YUTA_CURSEWORD_DAMAGE      = 50;    // 咒言命中傷害
 const YUTA_CURSEWORD_SPEED       = 420;   // 咒言子彈飛行速度（px/s）
 const YUTA_BIND_DURATION         = 1.5;   // 咒言命中後的禁錮時間（秒）
-const YUTA_BIND_COOLDOWN         = 4.5;   // 禁錮效果自身冷卻（秒，避免無限連續禁錮）
+const YUTA_BIND_COOLDOWN         = 4.5;   // 禁錮效果自身CD（秒，避免無限連續禁錮）
 const YUTA_SLASH_RANGE           = 100;   // 咒力斬判定距離（px，佔位數值）
-const YUTA_SLASH_COOLDOWN        = 1.0;   // 咒力斬冷卻（秒，佔位數值）
+const YUTA_SLASH_COOLDOWN        = 1.0;   // 咒力斬CD（秒，佔位數值）
 const YUTA_SLASH_DAMAGE          = 40;    // 咒力斬固定傷害（無蓄力疊層）
 const YUTA_SLASH_HIT_THRESHOLD   = 3;     // 咒力斬累積命中幾次後永久召喚里香
 const YUTA_RIKA_FOLLOW_RADIUS    = 40;    // 里香跟隨乙骨的距離（px）
-const YUTA_RIKA_CLAW_INTERVAL    = 3.0;   // 里香揮爪冷卻（秒）
+const YUTA_RIKA_CLAW_INTERVAL    = 3.0;   // 里香揮爪CD（秒）
 const YUTA_RIKA_CLAW_WARN_DUR    = 0.3;   // 揮爪預警時間（秒，預警結束才造成傷害）
 const YUTA_RIKA_CLAW_DAMAGE      = 180;   // 里香揮爪傷害
 const YUTA_RIKA_CLAW_RANGE       = 120;   // 里香揮爪判定距離（px）
-const YUTA_RIKA_CANNON_INTERVAL  = 8.0;  // 純愛大砲冷卻（秒）
+const YUTA_RIKA_CANNON_INTERVAL  = 8.0;  // 純愛大砲CD（秒）
 const YUTA_RIKA_CANNON_WARN_DUR  = 0.5;   // 大砲預警時間（秒，預警結束才開始造成傷害）
 const YUTA_RIKA_CANNON_DURATION  = 6.0;  // 純愛大砲持續時間（秒）
 const YUTA_RIKA_CANNON_DPS       = 60;    // 純愛大砲每秒傷害
 const YUTA_RIKA_CANNON_RANGE     = 110;   // 純愛大砲判定距離（px，光柱寬度的判定半徑）
 const YUTA_RIKA_PASSIVE_DMG_MULT = 1.5;   // 里香在場時，乙骨非里香攻擊的傷害倍率（+50%）
-const YUTA_RIKA_PASSIVE_CD_CUT   = 0.5;   // 里香在場時，乙骨非里香攻擊的冷卻縮減（秒）
+const YUTA_RIKA_PASSIVE_CD_CUT   = 0.5;   // 里香在場時，乙骨非里香攻擊的CD縮減（秒）
 
 // 工程師常數
 const ENGINEER_TURRET_INTERVAL    = 2.4;   // 召喚炮台間隔（秒）
@@ -1954,11 +2237,11 @@ const ENGINEER_GRID_STUN_BUFFER   = 0.15;  // 每次重新施加暈眩的緩衝�
 
 // 砲爹常數
 const CANNON_MELEE_DAMAGE        = 20;    // 近戰拳頭傷害
-const CANNON_MELEE_COOLDOWN      = 0.6;   // 近戰拳頭冷卻（秒）
+const CANNON_MELEE_COOLDOWN      = 0.6;   // 近戰拳頭CD（秒）
 // 追蹤光球
 const CANNON_TRACK_COUNT         = 3;     // 追蹤光球數量
 const CANNON_TRACK_DAMAGE        = 30;    // 每顆追蹤光球傷害
-const CANNON_TRACK_COOLDOWN      = 0.9;   // 使用完追蹤後的冷卻（秒）
+const CANNON_TRACK_COOLDOWN      = 0.9;   // 使用完追蹤後的CD（秒）
 const CANNON_TRACK_SPEED         = 280;   // 追蹤光球飛行速度（px/s）
 const CANNON_TRACK_RADIUS        = 7;     // 追蹤光球半徑
 const CANNON_TRACK_TURN_RATE     = 1.6;   // 追蹤轉向速率（弧度/秒）
@@ -1966,7 +2249,7 @@ const CANNON_TRACK_SPREAD        = 0.45;  // 初始散射角度（弧度）
 const CANNON_TRACK_LIFESPAN      = 4.0;   // 追蹤光球存在時間（秒）
 // 光柱
 const CANNON_BEAM_DAMAGE         = 50;    // 光柱傷害
-const CANNON_BEAM_COOLDOWN       = 1.6;   // 光柱冷卻（秒）
+const CANNON_BEAM_COOLDOWN       = 1.6;   // 光柱CD（秒）
 const CANNON_BEAM_WIDTH          = 22;    // 光柱寬度（px）
 const CANNON_BEAM_RANGE          = 900;   // 光柱長度（px）
 const CANNON_BEAM_TRAVEL_TIME    = 0.18;  // 光柱視覺＋判定持續時間（秒）
@@ -1976,7 +2259,7 @@ const CANNON_BLAST_SHOT_TIME     = 0.2;   // 每次發射持續時間（秒）
 const CANNON_BLAST_SHOTS         = 3;     // 連射次數
 const CANNON_BLAST_DAMAGE        = 60;   // 每次發射傷害
 const CANNON_BLAST_HALFWIDTH     = 55;    // 光砲半寬（約乙骨純愛大砲的一半）
-const CANNON_BLAST_COOLDOWN      = 2.2;   // 光砲冷卻（秒）
+const CANNON_BLAST_COOLDOWN      = 2.2;   // 光砲CD（秒）
 // 砲爹 vs 乙骨 專屬決鬥終結
 const CANNON_DUEL_HP_THRESHOLD   = 300;   // 雙方血量都低於此值時觸發
 const CANNON_DUEL_CHARGE_TIME    = 2.5;   // 決鬥蓄力時間（秒）
@@ -1989,7 +2272,7 @@ const DIO_STAND_ORBIT_SPEED   = 2.0;   // 替身環繞角速度（弧度/秒）
 const DIO_STAND_HIT_RANGE     = RADIUS + 16; // 替身觸碰判定距離
 const DIO_STAND_PUNCH_INTERVAL = 0.2;  // 替身連打間隔（秒）
 const DIO_STAND_PUNCH_DAMAGE  = 10;    // 替身每拳傷害
-const DIO_WORLD_COOLDOWN      = 10;    // 世界冷卻（秒）
+const DIO_WORLD_COOLDOWN      = 10;    // 世界CD（秒）
 const DIO_WORLD_DURATION      = 3;     // 世界時停持續（秒）
 const DIO_WORLD_HIGH_DURATION = 5;     // HIGH狀態時停持續（秒）
 const DIO_WORLD_KNIFE_COUNT   = 3;     // 時停中布刀數量
@@ -2011,7 +2294,7 @@ const DIO_RUSH_PUNCH_INTERVAL = 0.15;  // 衝刺連打間隔（秒）
 const DIO_RUSH_PUNCH_DAMAGE   = 15;    // 衝刺連打每拳傷害
 
 // 星星女孩常數
-const STAR_BIG_COOLDOWN         = 6.0;   // 大星星冷卻（秒）
+const STAR_BIG_COOLDOWN         = 6.0;   // 大星星CD（秒）
 const STAR_BIG_SPEED            = 250;   // 大星星飛行速度（px/s）
 const STAR_BIG_DAMAGE           = 60;    // 大星星碰到敵人傷害
 const STAR_BIG_RADIUS           = 14;    // 大星星半徑（px）
@@ -2025,7 +2308,7 @@ const STAR_SMALL_RADIUS         = 8;     // 小星星半徑（px）
 const STAR_SMALL_LIFETIME       = 10.0;  // 小星星存活時間（秒）
 const STAR_EXPLODE_DAMAGE       = 80;    // 小星星接觸爆炸傷害（碰小星星/大星星/女孩）
 const STAR_METEOR_DURATION      = 3.0;   // 星隕持續時間（秒）
-const STAR_METEOR_COOLDOWN      = 12.0;  // 星隕冷卻時間（秒）
+const STAR_METEOR_COOLDOWN      = 12.0;  // 星隕CD時間（秒）
 const STAR_METEOR_INTERVAL      = 0.25;  // 星隕每次生成間隔（秒）
 const STAR_METEOR_DAMAGE        = 40;    // 星隕每顆傷害
 const STAR_METEOR_RADIUS        = 10;    // 星隕彈半徑（px）
@@ -2033,7 +2316,7 @@ const STAR_METEOR_SPEED         = 420;   // 星隕飛行速度（px/s）
 const STAR_METEOR_WARNING_TIME  = 0.4;   // 落點預警時間（秒）
 
 // 帶土（宇智波帶土）常數
-const OBITO_FIREBALL_COOLDOWN    = 10.0;  // 火球冷卻（秒）
+const OBITO_FIREBALL_COOLDOWN    = 10.0;  // 火球CD（秒）
 const OBITO_FIREBALL_SPEED       = 300;   // 火球速度（px/s）
 const OBITO_FIREBALL_DAMAGE      = 60;    // 火球傷害
 const OBITO_FIREBALL_RADIUS      = 14;    // 火球半徑
@@ -2041,7 +2324,7 @@ const OBITO_DASH_SPEED           = 700;   // 衝刺速度（px/s）
 const OBITO_DASH_DURATION        = 0.5;   // 衝刺持續時間（秒）
 const OBITO_DASH_DELAY           = 0.6;   // 丟火球後延遲多久才衝刺（秒）
 const OBITO_SPACE_ENTRY_DAMAGE   = 60;    // 進出神威空間傷害
-const OBITO_KAMUI_COOLDOWN       = 7.0;   // 神威冷卻（秒）
+const OBITO_KAMUI_COOLDOWN       = 7.0;   // 神威CD（秒）
 const OBITO_KAMUI_GHOST_TIME     = 1.2;   // 虛影存在時間（秒，等待攻擊判定）
 const OBITO_KAMUI_TELEPORT_DELAY = 1.0;   // 從虛影消失到轉移完成的延遲（秒）
 const OBITO_KAMUI_CHAIN_DAMAGE   = 6;    // 鐵鏈揮舞每幀傷害（主場轉移版）
@@ -2060,7 +2343,7 @@ const OBITO_PHASE_DURATION       = 0.5;  // 虛化態持續時間（秒）
 const OBITO_PHANTOM_DAMAGE       = 40;   // 假想子彈碰到對手傷害
 
 // 虎天帝常數
-const TIGER_PUNCH_INTERVAL      = 2.6;   // 徑庭拳冷卻（秒）
+const TIGER_PUNCH_INTERVAL      = 2.6;   // 徑庭拳CD（秒）
 const TIGER_PUNCH_CHARGE_TIME   = 0.4;   // 蓄力時間（秒）
 const TIGER_PUNCH_RANGE         = 130;   // 徑庭拳判定範圍（px）
 const TIGER_PUNCH_DMG1          = 80;    // 徑庭拳第一段傷害
@@ -2073,11 +2356,11 @@ const TIGER_BLACK_FLASH_MUL2    = 1.5;   // 黑閃第二段倍率
 const TIGER_BLOODSHOT_COST      = 50;    // 穿血自耗血量
 const TIGER_BLOODSHOT_DMG       = 60;    // 穿血傷害
 const TIGER_BLOODSHOT_SPEED     = 600;   // 穿血速度
-const TIGER_BLOODSHOT_COOLDOWN  = 2.2;   // 穿血冷卻（秒）
+const TIGER_BLOODSHOT_COOLDOWN  = 2.2;   // 穿血CD（秒）
 const TIGER_BLOOD_ORB_RADIUS    = 10;    // 血球半徑
 const TIGER_BLOOD_ORB_LIFETIME  = 12.0;  // 血球存活時間（秒）
 const TIGER_NOVA_THRESHOLD      = 3;     // 超新星觸發所需血球數
-const TIGER_NOVA_COOLDOWN       = 4.0;   // 超新星最少冷卻（秒）：兩次引爆間至少間隔這麼久
+const TIGER_NOVA_COOLDOWN       = 4.0;   // 超新星最少CD（秒）：兩次引爆間至少間隔這麼久
 const TIGER_NOVA_CHARGE_TIME    = 0.7;   // 超新星發動前在原地蓄力的時間（秒）
 const TIGER_NOVA_NEEDLE_COUNT   = 14;    // 超新星血流針數量
 const TIGER_NOVA_NEEDLE_SPEED   = 400;   // 血流針飛行速度
@@ -2107,7 +2390,7 @@ const THUNDER_SPAWN_FX_R          = 24;       // 放置柱子閃光半徑
 
 //武士常數
 
-const SAMURAI_PARRY_INTERVAL   = 2.0;  // 招架冷卻（秒）
+const SAMURAI_PARRY_INTERVAL   = 2.0;  // 招架CD（秒）
 const SAMURAI_PARRY_DURATION   = 1.0;   // 招架持續時間（秒）
 const SAMURAI_PARRY_REFLECT_MUL = 1.2;  // 反彈傷害倍率
 const SAMURAI_PARRY_BUMP_DMG   = 100;   // 招架中碰到敵人球的傷害
@@ -2123,7 +2406,7 @@ const SAMURAI_IAIDO_MAX        = 4;     // 累積幾次居合觸發識滅斬
 
 //現代最強
 
-const GOJO_COOLDOWN        = 2.0;   // 蒼/赫冷卻（秒）
+const GOJO_COOLDOWN        = 2.0;   // 蒼/赫CD（秒）
 const GOJO_BLUE_FRAMEDMG   = 6;    // 蒼每幀傷害（穿透持續）
 const GOJO_RED_DAMAGE      = 170;   // 赫傷害
 const GOJO_RED_KNOCKBACK   = 320;   // 赫球命中時的擊退強度（直接設定速度，效果明顯）
@@ -2144,7 +2427,7 @@ const GOJO_HP_THRESHOLD    = 850;   // 觸發虛式的血量門檻
 const GOJO_PURPLE_CHANCE   = 0.10;  // 解鎖後紫出現機率
 
 // 釣魚佬
-const FISHER_CAST_COOLDOWN   = 1.2;   // 釣魚冷卻
+const FISHER_CAST_COOLDOWN   = 1.2;   // 釣魚CD
 const FISHER_CAST_TIME       = 0.3;   // 拋竿到邊緣耗時
 const FISHER_BITE_TIME       = 0.2;  // 咬鉤停頓
 const FISHER_REEL_TIME       = 0.2;   // 收線耗時
@@ -2203,11 +2486,11 @@ const GETO_ENTANGLE_BRANCH_MAX   = 6;     // 糾纏：身上最多同時存在�
 const GETO_ENTANGLE_BRANCH_GROW  = 0.3;   // 糾纏：單根枝條長成所需時間
 const GETO_ENTANGLE_BRANCH_FADE  = 1.2;   // 糾纏：DoT結束後枝條凋零所需時間
 
-const GETO_BIND_COOLDOWN         = 5.0;   // 定身：冷卻（雙方解除硬直後才開始計算）
+const GETO_BIND_COOLDOWN         = 5.0;   // 定身：CD（雙方解除硬直後才開始計算）
 const GETO_BIND_RANGE            = 440;   // 定身：發動距離
 const GETO_BIND_DURATION         = 2.0;   // 定身：硬直時間
 
-const GETO_SURGE_COOLDOWN        = 6.0;   // 咒力奔流：冷卻
+const GETO_SURGE_COOLDOWN        = 6.0;   // 咒力奔流：CD
 const GETO_SURGE_RANGE           = 480;   // 咒力奔流：發動距離
 const GETO_SURGE_CHARGE_TIME     = 1.4;   // 咒力奔流：蓄力時間
 const GETO_SURGE_DAMAGE          = 95;    // 咒力奔流：傷害
@@ -2221,7 +2504,7 @@ const GETO_ULTIMATE_SPEED         = 400;  // 極之番•漩渦：光球飛行�
 const GETO_ULTIMATE_RADIUS        = 30;
 
 const GETO_CANE_DAMAGE           = 40;    // 游雲（被動）：貼身棍擊傷害
-const GETO_CANE_COOLDOWN         = 2.0;   // 游雲：冷卻
+const GETO_CANE_COOLDOWN         = 2.0;   // 游雲：CD
 const GETO_CANE_KNOCKBACK        = 200;   // 游雲：擊退速度
 
 // ── Oblivionis（豐川祥子）專屬常數 ──
@@ -2240,7 +2523,7 @@ const SAKIKO_NOTE_LIFESPAN       = 6.0;   // 音符最長存在時間（秒）
 const SAKIKO_FEVER_MAX           = 450;   // Fever值上限
 const SAKIKO_FEVER_PER_HIT       = 15;     // 音符命中敵人時，Fever增加量
 
-const SAKIKO_NOVA_COOLDOWN       = 10.0;   // 新月甦醒：冷卻
+const SAKIKO_NOVA_COOLDOWN       = 10.0;   // 新月甦醒：CD
 const SAKIKO_NOVA_COUNT          = 8;     // 新月甦醒：連續釋放音符數
 const SAKIKO_NOVA_GAP            = 0.09;  // 新月甦醒：每發間隔
 const SAKIKO_NOVA_SPEED          = 340;   // 新月甦醒：音符飛行速度
@@ -2260,21 +2543,21 @@ const JOSEPH_RETRY_DELAY         = 5.0;   // 蓄力中斷後，再次嘗試的�
 const JOSEPH_ATTEMPT_DEADLINE    = 60.0;  // 開局後嘗試進入波紋呼吸法的總時限（超過則放棄，維持素體狀態）
 const JOSEPH_CONTACT_DMG_RIPPLE  = 15;    // 波紋呼吸法期間，碰觸傷害
 const JOSEPH_CONTACT_DMG_BASE    = 5;     // 未開啟波紋呼吸法，碰觸傷害
-const JOSEPH_CONTACT_CD          = 0.45;  // 碰觸觸發冷卻（避免同一次貼身重複計算）
+const JOSEPH_CONTACT_CD          = 0.45;  // 碰觸觸發CD（避免同一次貼身重複計算）
 const JOSEPH_HP_REGEN_INTERVAL   = 1.0;   // 波紋呼吸法：定時回血間隔
 const JOSEPH_HP_REGEN_AMOUNT     = 5;     // 定時回血量
 const JOSEPH_HP_REGEN_ON_HIT     = 25;     // 每次造成傷害，額外回血量
-const JOSEPH_DASH_COOLDOWN       = 4.0;   // 波紋疾走冷卻
+const JOSEPH_DASH_COOLDOWN       = 4.0;   // 波紋疾走CD
 const JOSEPH_DASH_RANGE          = 150;   // 波紋疾走觸發距離
 const JOSEPH_DASH_DAMAGE         = 30;    // 波紋疾走傷害
 const JOSEPH_DASH_STACK          = 1;     // 波紋疾走附加波紋層數
-const JOSEPH_SPRING_COOLDOWN     = 7.0;   // 彈簧拳冷卻
+const JOSEPH_SPRING_COOLDOWN     = 7.0;   // 彈簧拳CD
 const JOSEPH_SPRING_RANGE        = 300;   // 彈簧拳觸發距離（中距離，大於波紋疾走）
 const JOSEPH_SPRING_DAMAGE       = 50;    // 彈簧拳傷害
 const JOSEPH_SPRING_STACK        = 2;     // 彈簧拳附加波紋層數
 const JOSEPH_ULTIMATE_UNLOCK     = 35.0;  // 進入波紋呼吸法後，經過多久解鎖SYO
 const JOSEPH_ULTIMATE_RANGE      = 140;   // SYO 第一拳觸發距離
-const JOSEPH_ULTIMATE_COOLDOWN   = 14.0;  // SYO 每次發動（不論命中與否）後的冷卻
+const JOSEPH_ULTIMATE_COOLDOWN   = 14.0;  // SYO 每次發動（不論命中與否）後的CD
 const JOSEPH_ULTIMATE_FIRST_DMG  = 20;    // SYO 第一拳傷害
 const JOSEPH_ULTIMATE_COMBO_HITS = 8;     // SYO 連續痛擊次數（共100傷害，均分）
 const JOSEPH_ULTIMATE_COMBO_DMG  = 100;   // SYO 連續痛擊總傷害
@@ -2294,27 +2577,57 @@ const RIPPLE_BURST_DAMAGE        = 30;    // 波紋層數：爆裂傷害
 // 史蒂夫常數
 const STEVE_MAX_PHASE        = 4;     // 最高裝備階段
 const STEVE_GATHER_DURATION  = 1;   // 資源收集持續時間（秒）
-const STEVE_GATHER_COOLDOWN  = 4;   // 升級後，下次可再收集的冷卻（秒）
+const STEVE_GATHER_COOLDOWN  = 4;   // 升級後，下次可再收集的CD（秒）
 const STEVE_SWORD_DMG   = [10, 15, 20, 25, 30];      // 各階段「劍」碰撞傷害（索引=階段）
 const STEVE_AXE_DMG     = [0, 100, 125, 150, 175];      // 各階段「斧」主動劈砍傷害
 const STEVE_AXE_CHARGE  = [0, 0.2, 0.2, 0.2, 0.1];  // 斧蓄力時間（秒）
-const STEVE_AXE_COOLDOWN= [0, 2.0, 1.7, 1.5, 1.0];  // 斧攻擊冷卻（秒）
+const STEVE_AXE_COOLDOWN= [0, 2.0, 1.7, 1.5, 1.0];  // 斧攻擊CD（秒）
 const STEVE_AXE_RANGE   = [0, 140, 140, 140, 100];      // 斧觸發距離（px，四階段雙金斧範圍縮小）
 const STEVE_AXE_KNOCKBACK = 200;
 const STEVE_BOW_DMG     = [0, 0, 50, 50, 100];       // 各階段弓/弩/煙花弩傷害
 const STEVE_BOW_CHARGE  = [0, 0, 0.3, 0, 1.0];      // 弓蓄力／瞄準時間（秒）
-const STEVE_BOW_COOLDOWN = 1.5;                     // 弓/弩/煙花弩共用冷卻
+const STEVE_BOW_COOLDOWN = 1.5;                     // 弓/弩/煙花弩共用CD
 const STEVE_BOW_SPEED   = 620;
-const STEVE_HAMMER_COOLDOWN_BASE  = 7;  // 重錘基礎冷卻（秒）
-const STEVE_HAMMER_COOLDOWN_COMBO = 7;  // 觸發鞘翅連擊後的重錘冷卻（秒）
+const STEVE_HAMMER_COOLDOWN_BASE  = 7;  // 重錘基礎CD（秒）
+const STEVE_HAMMER_COOLDOWN_COMBO = 7;  // 觸發鞘翅連擊後的重錘CD（秒）
 const STEVE_HAMMER_DMG        = 60;
 const STEVE_HAMMER_KNOCKBACK  = 260;
 const STEVE_HAMMER_DASH_SPEED = 600;
 const STEVE_HAMMER_DASH_DURATION = 0.45;
-const STEVE_ELYTRA_BOW_COOLDOWN = 5;   // 觸發鞘翅連擊時，煙花弩改進入的冷卻
+const STEVE_ELYTRA_BOW_COOLDOWN = 5;   // 觸發鞘翅連擊時，煙花弩改進入的CD
 const STEVE_ELYTRA_STEP_DURATION = 0.32; // 鞘翅每個步驟(衝刺/後退)的持續時間
 const STEVE_ELYTRA_DASH_DMG   = 20;      // 鞘翅前兩次衝刺攻擊傷害
 const STEVE_ELYTRA_THRUST_DMG = 100; // 鞘翅第三擊：茅穿刺傷害
+
+// 妲己（九尾妖狐）
+const DAJI_TAIL_MAX          = 9;      // 尾巴上限，集滿觸發被動
+const DAJI_FIRE_INTERVAL     = 3.0;    // 鬼火（普攻）發射間隔
+const DAJI_FIRE_DAMAGE       = 40;     // 鬼火傷害
+const DAJI_FIRE_SPEED        = 200;    // 鬼火飛行速度
+const DAJI_FIRE_RADIUS       = 8;      // 鬼火判定半徑
+const DAJI_FIRE_TURN_RATE    = 2.4;    // 鬼火追蹤轉向速率（弧度/秒）
+const DAJI_FIRE_LIFESPAN     = 5.0;    // 鬼火存在時間（秒）
+const DAJI_BURN_DURATION     = 3.0;    // 灼燒持續時間（秒）
+const DAJI_BURN_PCT          = 0.01;   // 灼燒每秒造成目標最大生命值的百分比
+const DAJI_SKILL1_CD         = 6.0;    // 技能一CD
+const DAJI_CHARM_DURATION    = 2.0;    // 魅惑持續時間
+const DAJI_CHARM_PULL_SPEED  = 160;    // 魅惑拉近速度（px/s）
+const DAJI_MELEE_DMG         = 60;    // 強化普攻（一般）傷害
+const DAJI_MELEE_DMG_ENH     = 100;    // 強化普攻（被動強化後）傷害
+const DAJI_MELEE_STUN_ENH    = 1.0;    // 被動強化後的暈眩時間（秒）
+const DAJI_MELEE_KNOCKBACK   = 240;    // 強化普攻擊退力道
+const DAJI_MELEE_RANGE       = RADIUS * 2 + 4; // 魅惑近戰可攻擊距離（需大於球球碰撞分離距離 RADIUS*2，否則永遠碰不到）
+const DAJI_TAILSWING_DUR     = 0.35;   // 揮尾巴特效持續時間
+const DAJI_SKILL2_CD         = 9.0;    // 技能二CD
+const DAJI_BALL_BASE_DMG     = 90;     // 法術球基礎傷害
+const DAJI_BALL_DMG_PER_TAIL = 8;     // 每條尾巴額外傷害
+const DAJI_BALL_MAX_DMG      = 162;    // 法術球最高傷害
+const DAJI_BALL_BASE_RADIUS  = 8;      // 法術球基礎半徑
+const DAJI_BALL_MAX_RADIUS   = 20;     // 法術球最大半徑（強化/滿尾巴）
+const DAJI_BALL_SPEED        = 260;    // 法術球飛行速度
+const DAJI_ENH_CHANNEL_TIME  = 1.5;    // 強化技能二：原地蓄力時間
+const DAJI_ENH_HEAL          = 10;    // 釋放強化技能時恢復生命值
+
 
 let gameLoop = null;
 let lastTime = 0;
@@ -2399,8 +2712,8 @@ function forfeitGame() {
   overlay.classList.add('show');
 }
 
-const P1_COLORS ={ chef:'#e84545',drunk:'#7b4cca', opm:'#f5f5f5', vampire:'#8b1a8b', gojo:'#00cfff', cursed:'#c0392b', trapper:'#27ae60', yi:'#e8e8e8', gunner:'#b8860b', samurai:'#d4af37', mage:'#9b59b6', thunder:'#f1c40f', blacksmith:'#cd7f32', naobito:'#c8c8e8', itachi:'#8b0000', yuta:'#ff6fa5', engineer:'#3a8fd6', cannondad:'#bdbdbd', dio:'#f5d020', tiger:'#cc2200', stargirl:'#ffe066', obito:'#ff6600', fisherman:'#4a90d9', geto:'#5b3a8e', sakiko:'#c9a4d1', joseph:'#2f7dc0', steve:'#4a8f3c' };
-const P2_COLORS = { chef:'#ff9f43', drunk:'#48dbfb', opm:'#aaaaaa', vampire:'#cc44cc', gojo:'#7ff8ff', cursed:'#e74c3c', trapper:'#2ecc71', yi:'#cccccc', gunner:'#f0c040', samurai:'#ffe88a', mage:'#d7aefb', thunder:'#ffe066', blacksmith:'#e8a840', naobito:'#aaaacc', itachi:'#ff3333', yuta:'#ffa3c8', engineer:'#7ec8ff', cannondad:'#787878', dio:'#fff066', tiger:'#ff4422', stargirl:'#fff5aa', obito:'#ffaa44', fisherman:'#8ec6ff', geto:'#a678e0', sakiko:'#e8cdf0', joseph:'#6fb8ee', steve:'#8fd96b' };
+const P1_COLORS ={ chef:'#e84545',drunk:'#7b4cca', opm:'#f5f5f5', vampire:'#8b1a8b', gojo:'#00cfff', cursed:'#c0392b', trapper:'#27ae60', yi:'#e8e8e8', gunner:'#b8860b', samurai:'#d4af37', mage:'#9b59b6', thunder:'#f1c40f', blacksmith:'#cd7f32', naobito:'#c8c8e8', itachi:'#8b0000', yuta:'#ff6fa5', engineer:'#3a8fd6', cannondad:'#bdbdbd', dio:'#f5d020', tiger:'#cc2200', stargirl:'#ffe066', obito:'#ff6600', fisherman:'#4a90d9', geto:'#5b3a8e', sakiko:'#c9a4d1', joseph:'#2f7dc0', steve:'#4a8f3c',daji:'#e08ac7', };
+const P2_COLORS = { chef:'#ff9f43', drunk:'#48dbfb', opm:'#aaaaaa', vampire:'#cc44cc', gojo:'#7ff8ff', cursed:'#e74c3c', trapper:'#2ecc71', yi:'#cccccc', gunner:'#f0c040', samurai:'#ffe88a', mage:'#d7aefb', thunder:'#ffe066', blacksmith:'#e8a840', naobito:'#aaaacc', itachi:'#ff3333', yuta:'#ffa3c8', engineer:'#7ec8ff', cannondad:'#787878', dio:'#fff066', tiger:'#ff4422', stargirl:'#fff5aa', obito:'#ffaa44', fisherman:'#8ec6ff', geto:'#a678e0', sakiko:'#e8cdf0', joseph:'#6fb8ee', steve:'#8fd96b',daji:'#e8cdf8' };
 
 // 玩家 1、2 用既有的兩張色表；玩家 3 以上（多人混戰用）用同一顏色做色調偏移，避免撞色。
 // 之後若要幫玩家 3/4 手動指定色表，只要新增 P3_COLORS / P4_COLORS 並在這裡優先讀取即可。
@@ -2549,7 +2862,7 @@ const PROGRESS_HANDLERS = {
       const dur = b.dioHighActive ? DIO_WORLD_HIGH_DURATION : DIO_WORLD_DURATION;
       return { atFrac: Math.max(0, Math.min(1, b.dioWorldTimer / dur)), barColor: '#ffe566' };
     }
-    // 冷卻中：顯示冷卻進度（滿格=可發動）
+    // CD中：顯示CD進度（滿格=可發動）
     const frac = Math.max(0, Math.min(1, 1 - (b.dioWorldCooldownTimer || 0) / DIO_WORLD_COOLDOWN));
     return { atFrac: frac, barColor: frac >= 1 ? '#ffe566' : b.char.color };
   },
@@ -2598,7 +2911,7 @@ const PROGRESS_HANDLERS = {
         return { atFrac: 1 - Math.max(0, b.getoEntangleTimer) / GETO_ENTANGLE_INTERVAL, barColor: '#6b8e3d' };
       }
       if (b.getoSpecialSkill === 'bind') {
-        const enemy = state.balls.find(x => x.player !== b.player);
+        const enemy = getNearestEnemyTo(b.x, b.y, b.player);
         if (enemy && enemy.getoBoundTimer > 0) return { atFrac: 1, barColor: '#8e6fd9' };
         return { atFrac: 1 - Math.max(0, b.getoBindTimer) / GETO_BIND_COOLDOWN, barColor: '#8e6fd9' };
       }
@@ -2668,10 +2981,9 @@ function startGame() {
   document.getElementById('game-screen').style.display = 'flex';
   document.getElementById('result-stats').innerHTML = '';
 
-  // playerChoices：目前選人畫面只會填兩位（p1Choice / p2Choice）。
-  // 之後要做 3 人以上混戰時，只要讓選人畫面把更多角色 id push 進這個陣列，
+  // playerChoices：依照選角畫面上選擇的對戰人數（2/3/4）組成陣列。
   // 下面的顏色配置、出生點分配、state.balls 建立都已經是依人數自動算，不用再改這段。
-  const playerChoices = [p1Choice, p2Choice];
+  const playerChoices = [p1Choice, p2Choice, p3Choice, p4Choice].slice(0, playerModeCount);
   const playerCount = playerChoices.length;
 
   const idCounts = {};
@@ -2713,7 +3025,7 @@ function startGame() {
       opmCollisionCooldown: ch.type === 'opm' ? 0 : null,
       opmWallTouching: ch.type === 'opm' ? false : null,
       // 詛咒之王專屬狀態
-      curseSlashTimer: ch.type === 'cursed' ? CURSE_SLASH_INTERVAL : null, // 解冷卻
+      curseSlashTimer: ch.type === 'cursed' ? CURSE_SLASH_INTERVAL : null, // 解CD
       curseDomainActive: ch.type === 'cursed' ? false : null,               // 伏魔是否展開
       curseDomainUsed: ch.type === 'cursed' ? false : null,                 // 伏魔是否已用過
       curseDomainFreezeTimer: ch.type === 'cursed' ? 0 : null,              // 伏魔原地倒數
@@ -2725,8 +3037,8 @@ function startGame() {
       vampireBiting: ch.type === 'vampire' ? false : null,       // 是否正在咬擊
       vampireBiteStep: ch.type === 'vampire' ? 0 : null,         // 第幾次咬擊（0-2）
       vampireBiteTimer: ch.type === 'vampire' ? 0 : null,        // 下次咬擊倒數
-      vampireBiteCooldown: ch.type === 'vampire' ? 0 : null,     // 咬擊結束後冷卻（防立即重觸發）
-      vampireDashTimer: ch.type === 'vampire' ? VAMPIRE_DASH_INTERVAL : null, // 衝刺冷卻
+      vampireBiteCooldown: ch.type === 'vampire' ? 0 : null,     // 咬擊結束後CD（防立即重觸發）
+      vampireDashTimer: ch.type === 'vampire' ? VAMPIRE_DASH_INTERVAL : null, // 衝刺CD
       vampireDashing: ch.type === 'vampire' ? false : null,  // 是否正在衝刺
       vampireDashElapsed: ch.type === 'vampire' ? 0 : null,  // 衝刺已持續時間
       // 被暗夜領主鎖定而停止移動
@@ -2740,10 +3052,11 @@ gojoBalls: ch.type === 'gojo' ? [] : null,
 gojoChargingVisual: ch.type === 'gojo' ? false : null,
       frozenByVampire: false,     
       frozenTimer: 0,
+      dajiCharmedTimer: 0,      // 被妲己魅惑拉近時，暫停自身移動的剩餘時間（任何角色都可能被魅惑）
       boostTimer: randBetween(BOOST_INTERVAL_MIN, BOOST_INTERVAL_MAX),
       trail: [],
       // 陷阱大師專屬狀態
-      trapChainTimer: ch.type === 'trapper' ? TRAP_CHAIN_INTERVAL : null,  // 鎖鏈冷卻
+      trapChainTimer: ch.type === 'trapper' ? TRAP_CHAIN_INTERVAL : null,  // 鎖鏈CD
       trapChainActive: ch.type === 'trapper' ? false : null,               // 鎖鏈是否正在拉扯
       trapChainTimer2: ch.type === 'trapper' ? 0 : null,                   // 拉扯已持續時間
       trapChainTargetTrap: ch.type === 'trapper' ? null : null,            // 觸發的尖刺物件參考
@@ -2751,7 +3064,7 @@ gojoChargingVisual: ch.type === 'gojo' ? false : null,
       trapDotTimer: 0,
       trapDotDps: 0,
       // 奕專屬狀態
-      yiBlackTimer: ch.type === 'yi' ? YI_BLACK_INTERVAL : null,  // 落黑棋冷卻
+      yiBlackTimer: ch.type === 'yi' ? YI_BLACK_INTERVAL : null,  // 落黑棋CD
       yiBlackCount: ch.type === 'yi' ? 0 : null,                   // 當前黑棋計數（累積到4觸發白旗）
       yiArenaUsed: ch.type === 'yi' ? false : null,                 // 小競技場是否已使用
       yiArenaActive: ch.type === 'yi' ? false : null,               // 小競技場是否生效中
@@ -2763,7 +3076,7 @@ gojoChargingVisual: ch.type === 'gojo' ? false : null,
       gunnerFiring: ch.type === 'gunner' ? false : null,      // 是否正在連射
       gunnerFireTimer: ch.type === 'gunner' ? 0 : null,       // 連射間隔計時
       gunnerAmmoFired: ch.type === 'gunner' ? 0 : null,       // 本輪已射出幾發
-      gunnerFlashTimer: ch.type === 'gunner' ? GUNNER_FLASH_INTERVAL : null, // 閃光彈冷卻
+      gunnerFlashTimer: ch.type === 'gunner' ? GUNNER_FLASH_INTERVAL : null, // 閃光彈CD
       // 被閃光彈命中的狀態（任何角色）
       gunnerStunTimer: 0,
       // 魔術師專屬狀態
@@ -2775,7 +3088,7 @@ gojoChargingVisual: ch.type === 'gojo' ? false : null,
       // 被魔術師技巧影響（任何角色）
       mageFreezeTimer: 0,   // 定身剩餘時間
       // 末代武士專屬狀態
-      samuraiParryTimer: ch.type === 'samurai' ? SAMURAI_PARRY_INTERVAL : null,  // 招架冷卻
+      samuraiParryTimer: ch.type === 'samurai' ? SAMURAI_PARRY_INTERVAL : null,  // 招架CD
       samuraiParrying: ch.type === 'samurai' ? false : null,                      // 是否招架中
       samuraiParryElapsed: ch.type === 'samurai' ? 0 : null,                     // 招架已持續
       samuraiParryHit: ch.type === 'samurai' ? false : null,                     // 招架期間有效（反彈或碰撞）
@@ -2788,7 +3101,7 @@ gojoChargingVisual: ch.type === 'gojo' ? false : null,
       samuraiNextIsShimetsu: ch.type === 'samurai' ? false : null,               // 下次招架改為識滅斬
       // 被招架反彈不記 owner（靠投射物 owner 判斷）
       // 雷電法王專屬狀態
-      thunderStrikeTimer: ch.type === 'thunder' ? THUNDER_STRIKE_INTERVAL : null, // 閃電發射冷卻
+      thunderStrikeTimer: ch.type === 'thunder' ? THUNDER_STRIKE_INTERVAL : null, // 閃電發射CD
       thunderParalyzed: 0,           // 麻痺剩餘時間（秒），>0 表示麻痺中
       thunderStunTimer: 0,           // 打斷定身剩餘時間（秒）
       thunderParalyzeWasHit: false, // 上次是否已被麻痺（防連續）
@@ -2796,7 +3109,7 @@ gojoChargingVisual: ch.type === 'gojo' ? false : null,
       smithForgeTimer: ch.type === 'blacksmith' ? SMITH_FORGE_INTERVAL_BASE : null, // 下次鍛造倒數
       smithForgeInterval: ch.type === 'blacksmith' ? SMITH_FORGE_INTERVAL_BASE : null, // 當前鍛造間隔
       smithForgeStacks: ch.type === 'blacksmith' ? 0 : null,  // 累積鍛造層數
-      smithSwordTimer: ch.type === 'blacksmith' ? 0 : null,   // 劍擊冷卻倒數
+      smithSwordTimer: ch.type === 'blacksmith' ? 0 : null,   // 劍擊CD倒數
       smithSwordSwinging: ch.type === 'blacksmith' ? false : null, // 是否正在揮劍
       smithSwordSwingTimer: ch.type === 'blacksmith' ? 0 : null,   // 揮劍動畫計時
       // 禪院直哉專屬狀態
@@ -2804,12 +3117,12 @@ gojoChargingVisual: ch.type === 'gojo' ? false : null,
       naoWaypoints: ch.type === 'naobito' ? [] : null,         // 當前路徑中繼點列表
       naoWaypointIdx: ch.type === 'naobito' ? 0 : null,        // 當前目標中繼點索引
       naoDashing: ch.type === 'naobito' ? false : null,        // 是否正在衝刺路徑中
-      naoKyouseiTimer: ch.type === 'naobito' ? 0 : null,       // 凶星軌跡冷卻
+      naoKyouseiTimer: ch.type === 'naobito' ? 0 : null,       // 凶星軌跡CD
       naoKyouseiFiring: ch.type === 'naobito' ? false : null,  // 凶星軌跡發動中
       naoKyouseiTimer2: ch.type === 'naobito' ? 0 : null,      // 凶星軌跡動畫計時
       // 宇治波鼬專屬狀態
-      itachiAmaterasuTimer: ch.type === 'itachi' ? ITACHI_AMATERASU_INTERVAL * 0.5 : null, // 天照冷卻
-      itachiTsukuyomiTimer: ch.type === 'itachi' ? ITACHI_TSUKUYOMI_INTERVAL * 0.6 : null, // 月讀冷卻
+      itachiAmaterasuTimer: ch.type === 'itachi' ? ITACHI_AMATERASU_INTERVAL * 0.5 : null, // 天照CD
+      itachiTsukuyomiTimer: ch.type === 'itachi' ? ITACHI_TSUKUYOMI_INTERVAL * 0.6 : null, // 月讀CD
       itachiCrowUsed: ch.type === 'itachi' ? false : null,        // 烏鴉替身是否已用
       itachiSusanooUsed: ch.type === 'itachi' ? false : null,     // 須佐能乎是否已用
       itachiSusanooActive: ch.type === 'itachi' ? false : null,   // 須佐能乎是否啟動中
@@ -2823,20 +3136,20 @@ gojoChargingVisual: ch.type === 'gojo' ? false : null,
       itachiMarked: false,
       itachiPinnedTimer: 0,
       // 乙骨憂太專屬狀態
-      yutaCurseWordTimer: ch.type === 'yuta' ? YUTA_CURSEWORD_INTERVAL : null, // 咒言發射冷卻
-      yutaBindCooldown: ch.type === 'yuta' ? 0 : null,                        // 禁錮效果冷卻（避免連續禁錮）
-      yutaSlashTimer: ch.type === 'yuta' ? 0 : null,                          // 咒力斬冷卻倒數
+      yutaCurseWordTimer: ch.type === 'yuta' ? YUTA_CURSEWORD_INTERVAL : null, // 咒言發射CD
+      yutaBindCooldown: ch.type === 'yuta' ? 0 : null,                        // 禁錮效果CD（避免連續禁錮）
+      yutaSlashTimer: ch.type === 'yuta' ? 0 : null,                          // 咒力斬CD倒數
       yutaSlashSwinging: ch.type === 'yuta' ? false : null,                   // 揮砍動畫中
       yutaSlashSwingTimer: ch.type === 'yuta' ? 0 : null,                     // 揮砍動畫計時
       yutaSlashHits: ch.type === 'yuta' ? 0 : null,                           // 咒力斬累積命中次數
       yutaRikaActive: ch.type === 'yuta' ? false : null,                      // 里香是否已永久顯形
       yutaRikaAngle: ch.type === 'yuta' ? 0 : null,                           // 里香繞乙骨的角度（跟隨用）
-      yutaRikaClawTimer: ch.type === 'yuta' ? YUTA_RIKA_CLAW_INTERVAL : null, // 里香揮爪冷卻
+      yutaRikaClawTimer: ch.type === 'yuta' ? YUTA_RIKA_CLAW_INTERVAL : null, // 里香揮爪CD
       yutaRikaClawWarning: ch.type === 'yuta' ? false : null,                // 揮爪是否在預警中
       yutaRikaClawWarnTimer: ch.type === 'yuta' ? 0 : null,                  // 揮爪預警倒數
       yutaRikaClawWarnX: ch.type === 'yuta' ? 0 : null,                      // 預警鎖定的圓心X（避免里香旋轉導致範圍偏移）
       yutaRikaClawWarnY: ch.type === 'yuta' ? 0 : null,                      // 預警鎖定的圓心Y
-      yutaRikaCannonTimer: ch.type === 'yuta' ? YUTA_RIKA_CANNON_INTERVAL : null, // 純愛大砲冷卻
+      yutaRikaCannonTimer: ch.type === 'yuta' ? YUTA_RIKA_CANNON_INTERVAL : null, // 純愛大砲CD
       yutaRikaCannonWarning: ch.type === 'yuta' ? false : null,              // 大砲是否在預警中
       yutaRikaCannonWarnTimer: ch.type === 'yuta' ? 0 : null,                // 大砲預警倒數
       yutaRikaCannonFiring: ch.type === 'yuta' ? false : null,                // 純愛大砲是否發射中
@@ -2844,16 +3157,16 @@ gojoChargingVisual: ch.type === 'gojo' ? false : null,
       yutaRikaCannonAngle: ch.type === 'yuta' ? 0 : null,                     // 大砲發射瞬間鎖定的方向（固定不轉向）
       // 註：咒言禁錮直接重用 itachiPinnedTimer（通用定身欄位），不另開欄位
       // 工程師專屬狀態
-      engTurretTimer: ch.type === 'engineer' ? ENGINEER_TURRET_INTERVAL : null, // 召喚炮台冷卻
+      engTurretTimer: ch.type === 'engineer' ? ENGINEER_TURRET_INTERVAL : null, // 召喚炮台CD
       engTurretTotalSummoned: ch.type === 'engineer' ? 0 : null,               // 累積召喚總數（觸發機甲用）
       engMechActive: ch.type === 'engineer' ? false : null,                    // 機甲模式是否啟動中
       engMechTimer: ch.type === 'engineer' ? 0 : null,                        // 機甲模式剩餘時間
-      engLaserTimer: ch.type === 'engineer' ? ENGINEER_LASER_INTERVAL : null,  // 雷射發射冷卻
-      engGridTimer: ch.type === 'engineer' ? ENGINEER_GRID_INTERVAL : null,    // 電網部署冷卻
+      engLaserTimer: ch.type === 'engineer' ? ENGINEER_LASER_INTERVAL : null,  // 雷射發射CD
+      engGridTimer: ch.type === 'engineer' ? ENGINEER_GRID_INTERVAL : null,    // 電網部署CD
       // 砲爹專屬狀態
-      cannonSkillTimer: ch.type === 'cannondad' ? 0 : null,                    // 技能冷卻計時
-      cannonSkillCooldown: ch.type === 'cannondad' ? CANNON_BEAM_COOLDOWN : null, // 當前冷卻長度（依上次技能決定）
-      cannonMeleeCooldown: ch.type === 'cannondad' ? 0 : null,                 // 近戰拳頭冷卻
+      cannonSkillTimer: ch.type === 'cannondad' ? 0 : null,                    // 技能CD計時
+      cannonSkillCooldown: ch.type === 'cannondad' ? CANNON_BEAM_COOLDOWN : null, // 當前CD長度（依上次技能決定）
+      cannonMeleeCooldown: ch.type === 'cannondad' ? 0 : null,                 // 近戰拳頭CD
       cannonBalls: ch.type === 'cannondad' ? [] : null,                       // 追蹤光球列表
       cannonBlastShotsLeft: ch.type === 'cannondad' ? 0 : null,                // 光砲剩餘連射次數
       cannonBlastTimer: ch.type === 'cannondad' ? 0 : null,                    // 光砲單次發射計時
@@ -2864,10 +3177,10 @@ gojoChargingVisual: ch.type === 'gojo' ? false : null,
       dioStandAngle: ch.type === 'dio' ? Math.random() * Math.PI * 2 : null,  // 替身環繞角度
       dioStandX: ch.type === 'dio' ? x : null,
       dioStandY: ch.type === 'dio' ? y : null,
-      dioStandPunchTimer: ch.type === 'dio' ? 0 : null,        // 替身連打冷卻
+      dioStandPunchTimer: ch.type === 'dio' ? 0 : null,        // 替身連打CD
       dioWorldActive: ch.type === 'dio' ? false : null,        // 世界是否啟動中
       dioWorldTimer: ch.type === 'dio' ? 0 : null,             // 時停剩餘時間
-      dioWorldCooldownTimer: ch.type === 'dio' ? 3 : null,     // 世界冷卻倒數
+      dioWorldCooldownTimer: ch.type === 'dio' ? 3 : null,     // 世界CD倒數
       dioWorldKnifeTimer: ch.type === 'dio' ? 0 : null,         // 時停中持續布刀的間隔計時
       dioBreadSpawnTimer: ch.type === 'dio' ? randBetween(DIO_BREAD_SPAWN_MIN, DIO_BREAD_SPAWN_MAX) : null, // 麵包生成倒數
       dioBreadEaten: ch.type === 'dio' ? 0 : null,             // 已吃麵包數
@@ -2876,9 +3189,9 @@ gojoChargingVisual: ch.type === 'gojo' ? false : null,
       dioSteamrollerThrown: ch.type === 'dio' ? false : null,  // 壓路機是否已使用過（僅一次）
       dioRushing: ch.type === 'dio' ? false : null,            // 是否在HIGH結束衝刺連打中
       dioRushTimer: ch.type === 'dio' ? 0 : null,              // 衝刺連打剩餘時間
-      dioRushPunchTimer: ch.type === 'dio' ? 0 : null,         // 衝刺連打冷卻
+      dioRushPunchTimer: ch.type === 'dio' ? 0 : null,         // 衝刺連打CD
       // 虎天帝專屬狀態
-      tigerPunchTimer: ch.type === 'tiger' ? TIGER_PUNCH_INTERVAL * 0.5 : null, // 徑庭拳冷卻
+      tigerPunchTimer: ch.type === 'tiger' ? TIGER_PUNCH_INTERVAL * 0.5 : null, // 徑庭拳CD
       tigerCharging: ch.type === 'tiger' ? false : null,        // 是否蓄力中
       tigerChargeTimer: ch.type === 'tiger' ? 0 : null,         // 蓄力計時
       tigerBlackFlash: ch.type === 'tiger' ? false : null,      // 本次是否黑閃
@@ -2886,26 +3199,26 @@ gojoChargingVisual: ch.type === 'gojo' ? false : null,
       tigerPendingTimer: ch.type === 'tiger' ? 0 : null,        // 二段傷害倒數
       tigerPendingDmg: ch.type === 'tiger' ? 0 : null,          // 二段傷害量
       tigerPendingTarget: ch.type === 'tiger' ? null : null,    // 二段傷害目標
-      tigerBloodCooldown: ch.type === 'tiger' ? 0 : null,       // 穿血冷卻
+      tigerBloodCooldown: ch.type === 'tiger' ? 0 : null,       // 穿血CD
       tigerNovaActive: ch.type === 'tiger' ? false : null,      // 超新星是否發動中
-      tigerNovaCooldown: ch.type === 'tiger' ? 0 : null,        // 超新星最少冷卻倒數
+      tigerNovaCooldown: ch.type === 'tiger' ? 0 : null,        // 超新星最少CD倒數
       tigerNovaCharging: ch.type === 'tiger' ? false : null,    // 是否在原地蓄力準備引爆超新星
       tigerNovaChargeTimer: ch.type === 'tiger' ? 0 : null,     // 超新星蓄力計時
       tigerBleedPool: 0,   // 流血池（任何角色都可能被流血，虎天帝也有自己的）
       // 星星女孩專屬狀態
-      starBigTimer: ch.type === 'stargirl' ? 0 : null,               // 大星星冷卻倒數
+      starBigTimer: ch.type === 'stargirl' ? 0 : null,               // 大星星CD倒數
       starMeteorActive: ch.type === 'stargirl' ? false : null,        // 星隕是否啟動中
       starMeteorTimer: ch.type === 'stargirl' ? 0 : null,             // 星隕剩餘時間
       starMeteorSpawnTimer: ch.type === 'stargirl' ? 0 : null,        // 下次生成流星倒數
-      starMeteorCooldown: ch.type === 'stargirl' ? 0 : null,          // 星隕冷卻（0=可發動）
+      starMeteorCooldown: ch.type === 'stargirl' ? 0 : null,          // 星隕CD（0=可發動）
       // 宇智波帶土專屬狀態
-      obitoFireballTimer: ch.type === 'obito' ? 0 : null,          // 火球冷卻倒數
+      obitoFireballTimer: ch.type === 'obito' ? 0 : null,          // 火球CD倒數
       obitoFireballDashing: ch.type === 'obito' ? false : null,     // 火球後衝刺中
       obitoFireballDashDelay: ch.type === 'obito' ? 0 : null,       // 火球後延遲衝刺倒數
       obitoFireballDashTimer: ch.type === 'obito' ? 0 : null,       // 衝刺計時
       obitoFireballDashAngle: ch.type === 'obito' ? 0 : null,       // 衝刺方向
       obitoKamuiPhase: ch.type === 'obito' ? 'idle' : null,         // 'idle'|'ghost'|'teleporting'|'in_space'|'grabbing'|'returning'
-      obitoKamuiCooldown: ch.type === 'obito' ? 0 : null,           // 神威冷卻倒數
+      obitoKamuiCooldown: ch.type === 'obito' ? 0 : null,           // 神威CD倒數
       obitoGhostTimer: ch.type === 'obito' ? 0 : null,              // 虛影存在倒數
       obitoGhostX: ch.type === 'obito' ? 0 : null,                  // 虛影位置X（神威空間座標）
       obitoGhostY: ch.type === 'obito' ? 0 : null,                  // 虛影位置Y（神威空間座標）
@@ -2924,7 +3237,7 @@ gojoChargingVisual: ch.type === 'gojo' ? false : null,
       obitoPhasing: ch.type === 'obito' ? false : null,             // 是否正在虛化態
       obitoAbsorbStored: ch.type === 'obito' ? [] : null,           // 儲存的投射物（虛化態吸收，神威時釋放）
       // 釣魚佬專屬狀態
-      fisherTimer:        ch.type === 'fisherman' ? 0 : null,          // 釣魚冷卻計時（累加至 FISHER_CAST_COOLDOWN）
+      fisherTimer:        ch.type === 'fisherman' ? 0 : null,          // 釣魚CD計時（累加至 FISHER_CAST_COOLDOWN）
       fisherPhase:         ch.type === 'fisherman' ? 'idle' : null,     // 'idle'|'casting'|'waiting'|'reeling'
       fisherPhaseTimer:    ch.type === 'fisherman' ? 0 : null,          // 當前階段剩餘時間
       fisherHookX:         ch.type === 'fisherman' ? 0 : null,          // 魚鉤目前位置X
@@ -2952,7 +3265,7 @@ gojoChargingVisual: ch.type === 'gojo' ? false : null,
       getoSpecialAngle:     ch.type === 'geto' ? 0 : null,                     // 特級咒靈跟隨繞行角度
       getoSpecialSkill:     ch.type === 'geto' ? null : null,                  // 'entangle' | 'bind' | 'surge'
       getoEntangleTimer:    ch.type === 'geto' ? GETO_ENTANGLE_INTERVAL * 0.4 : null,
-      getoBindTimer:        ch.type === 'geto' ? GETO_BIND_COOLDOWN * 0.4 : null,   // 定身冷卻倒數（僅在雙方解除硬直後才遞減）
+      getoBindTimer:        ch.type === 'geto' ? GETO_BIND_COOLDOWN * 0.4 : null,   // 定身CD倒數（僅在雙方解除硬直後才遞減）
       getoBoundTimer:       0,    // 被定身硬直剩餘時間（任何角色都可能被定身）
       getoSpecialBoundTimer: ch.type === 'geto' ? 0 : null,                    // 特級咒靈自己的定身剩餘時間（純跟隨動畫暫停，不影響夏油條本體）
       getoSurgeTimer:       ch.type === 'geto' ? GETO_SURGE_COOLDOWN * 0.5 : null,
@@ -2963,7 +3276,7 @@ gojoChargingVisual: ch.type === 'gojo' ? false : null,
       getoDotDmg:           0,    // 糾纏：每跳傷害
       getoDotOwnerPlayer:   null, // 糾纏：施放者玩家編號（用於回血）
       getoBranches:         [],  // 糾纏：長在身上的枝條列表（任何角色都可能中招）
-      getoCaneCooldown:     ch.type === 'geto' ? 0 : null,                     // 游雲被動冷卻
+      getoCaneCooldown:     ch.type === 'geto' ? 0 : null,                     // 游雲被動CD
       getoUltimateTriggered:ch.type === 'geto' ? false : null,                 // 極之番•漩渦是否已觸發（一次性）
       getoUltimateCharging: ch.type === 'geto' ? false : null,
       getoUltimateChargeTimer: ch.type === 'geto' ? 0 : null,
@@ -2974,13 +3287,30 @@ gojoChargingVisual: ch.type === 'gojo' ? false : null,
       sakikoOrganTimer:     ch.type === 'sakiko' ? 0 : null,                 // 管風琴音色發射計時
       sakikoNotes:          ch.type === 'sakiko' ? [] : null,                // 場上所有音符（含新月甦醒音符）
       sakikoFever:          ch.type === 'sakiko' ? 0 : null,                 // Fever值
-      sakikoNovaTimer:      ch.type === 'sakiko' ? SAKIKO_NOVA_COOLDOWN * 0.4 : null, // 新月甦醒冷卻倒數
+      sakikoNovaTimer:      ch.type === 'sakiko' ? SAKIKO_NOVA_COOLDOWN * 0.4 : null, // 新月甦醒CD倒數
       sakikoNovaFiring:     ch.type === 'sakiko' ? false : null,             // 新月甦醒是否正在連發
       sakikoNovaShotsLeft:  ch.type === 'sakiko' ? 0 : null,                 // 新月甦醒剩餘發數
       sakikoNovaShotTimer:  ch.type === 'sakiko' ? 0 : null,                 // 新月甦醒單發間隔計時
       sakikoDualActive:     ch.type === 'sakiko' ? false : null,             // 殘月的餘韻是否啟動中
       sakikoDualTimer:      ch.type === 'sakiko' ? 0 : null,                 // 殘月的餘韻剩餘時間
       sakikoShadowHp:       ch.type === 'sakiko' ? null : null,              // 殘月的餘韻期間的真實血量（可低於0）
+      // 妲己（九尾妖狐）專屬狀態
+      dajiTails:            ch.type === 'daji' ? 0 : null,                   // 目前尾巴數（0~9）
+      dajiEnhanceReady:     ch.type === 'daji' ? false : null,               // 尾巴集滿：下次技能強化
+      dajiAtkTimer:         ch.type === 'daji' ? 0 : null,                   // 鬼火發射計時
+      dajiSkill1Cd:         ch.type === 'daji' ? 0 : null,                   // 技能一（魅惑）CD
+      dajiSkill2Cd:         ch.type === 'daji' ? 0 : null,                   // 技能二（狐火彈）CD
+      dajiCharmTimer:       ch.type === 'daji' ? 0 : null,                   // 魅惑剩餘時間
+      dajiCharmTarget:      ch.type === 'daji' ? null : null,                // 被魅惑的目標
+      dajiCharmDmg:         ch.type === 'daji' ? 0 : null,                   // 魅惑結束後的強化普攻傷害
+      dajiCharmStun:        ch.type === 'daji' ? 0 : null,                   // 魅惑結束後的暈眩時間
+      dajiFireballs:        ch.type === 'daji' ? [] : null,                  // 場上鬼火列表
+      dajiBalls:            ch.type === 'daji' ? [] : null,                  // 場上狐火彈列表
+      dajiSkill2Channel:    ch.type === 'daji' ? 0 : null,                   // 強化技二蓄力剩餘時間
+      dajiTailSwing:        ch.type === 'daji' ? null : null,                // 近戰揮尾巴特效 {t, dur, ang}
+      // 妲己灼燒（任何角色都可能被灼燒）
+      dajiBurnTimer:        0,
+      dajiBurnTick:         0,
       // 大喬（波紋使者）專屬狀態
       josephState:          ch.type === 'joseph' ? 'charging' : null,       // 'charging' | 'waiting' | 'breathing' | 'failed'
       josephChargeTimer:    ch.type === 'joseph' ? 0 : null,                // 蓄力計時
@@ -2988,15 +3318,15 @@ gojoChargingVisual: ch.type === 'gojo' ? false : null,
       josephAttemptClock:   ch.type === 'joseph' ? 0 : null,                // 開局至今經過秒數（判斷60秒時限）
       josephBreathingTimer: ch.type === 'joseph' ? 0 : null,                // 進入波紋呼吸法後經過秒數
       josephRegenTimer:     ch.type === 'joseph' ? 0 : null,                // 定時回血倒數
-      josephDashTimer:      ch.type === 'joseph' ? JOSEPH_DASH_COOLDOWN * 0.5 : null,   // 波紋疾走冷卻
-      josephSpringTimer:    ch.type === 'joseph' ? JOSEPH_SPRING_COOLDOWN * 0.5 : null, // 彈簧拳冷卻
+      josephDashTimer:      ch.type === 'joseph' ? JOSEPH_DASH_COOLDOWN * 0.5 : null,   // 波紋疾走CD
+      josephSpringTimer:    ch.type === 'joseph' ? JOSEPH_SPRING_COOLDOWN * 0.5 : null, // 彈簧拳CD
       josephUltimateReady:  ch.type === 'joseph' ? false : null,            // SYO 是否已解鎖可用
-      josephUltimateCooldown: ch.type === 'joseph' ? 0 : null,              // SYO 冷卻倒數
+      josephUltimateCooldown: ch.type === 'joseph' ? 0 : null,              // SYO CD倒數
       josephUltimateActive: ch.type === 'joseph' ? false : null,            // SYO 是否進行中
       josephUltimateStep:   ch.type === 'joseph' ? 0 : null,                // SYO 連續痛擊已打第幾下
       josephUltimateTimer:  ch.type === 'joseph' ? 0 : null,                // SYO 下一下倒數
       josephUltimateTarget: ch.type === 'joseph' ? null : null,             // SYO 鎖定目標參考
-      josephContactCd:      ch.type === 'joseph' ? 0 : null,                // 碰觸傷害冷卻
+      josephContactCd:      ch.type === 'joseph' ? 0 : null,                // 碰觸傷害CD
       josephDioHpCostDone:  ch.type === 'joseph' ? false : null,            // 對上DIO的開局扣血是否已執行
       // 波紋層數（任何角色都可能被大喬施加）
       rippleStacks: 0,
@@ -3008,16 +3338,16 @@ gojoChargingVisual: ch.type === 'gojo' ? false : null,
       stevePhase:            ch.type === 'steve' ? 0 : null,           // 目前裝備階段 0~4
       steveGathering:        ch.type === 'steve' ? false : null,       // 是否正在資源收集
       steveGatherTimer:      ch.type === 'steve' ? 0 : null,           // 收集剩餘時間
-      steveGatherCooldown:   ch.type === 'steve' ? 0 : null,           // 升級後的冷卻倒數
+      steveGatherCooldown:   ch.type === 'steve' ? 0 : null,           // 升級後的CD倒數
       steveAxeCharging:      ch.type === 'steve' ? false : null,       // 斧是否蓄力中
       steveAxeChargeTimer:   ch.type === 'steve' ? 0 : null,
-      steveAxeTimer:         ch.type === 'steve' ? 0 : null,           // 斧冷卻倒數
-      steveBowTimer:         ch.type === 'steve' ? STEVE_BOW_COOLDOWN : null, // 弓/弩冷卻倒數
+      steveAxeTimer:         ch.type === 'steve' ? 0 : null,           // 斧CD倒數
+      steveBowTimer:         ch.type === 'steve' ? STEVE_BOW_COOLDOWN : null, // 弓/弩CD倒數
       steveBowAiming:        ch.type === 'steve' ? false : null,       // 弓/弩蓄力(瞄準)中
       steveBowAimTimer:      ch.type === 'steve' ? 0 : null,
       steveHammerUnlocked:   ch.type === 'steve' ? false : null,       // 重錘是否已解鎖
-      steveHammerTimer:      ch.type === 'steve' ? 0 : null,           // 重錘冷卻倒數
-      steveHammerCooldownLen:ch.type === 'steve' ? STEVE_HAMMER_COOLDOWN_BASE : null, // 目前一輪的冷卻長度(15或23)
+      steveHammerTimer:      ch.type === 'steve' ? 0 : null,           // 重錘CD倒數
+      steveHammerCooldownLen:ch.type === 'steve' ? STEVE_HAMMER_COOLDOWN_BASE : null, // 目前一輪的CD長度(15或23)
       steveHammerDashing:    ch.type === 'steve' ? false : null,       // 重錘衝刺中
       steveHammerDashTimer:  ch.type === 'steve' ? 0 : null,
       steveHammerDashHit:    ch.type === 'steve' ? false : null,
@@ -3026,7 +3356,7 @@ gojoChargingVisual: ch.type === 'gojo' ? false : null,
       steveElytraPhaseIn:    ch.type === 'steve' ? true : null,        // 目前是衝刺(true)還是後退(false)
       steveElytraTimer:      ch.type === 'steve' ? 0 : null,
       steveElytraHit:        ch.type === 'steve' ? false : null,
-      steveContactCooldown:  ch.type === 'steve' ? 0 : null,           // 劍碰撞傷害的內置冷卻
+      steveContactCooldown:  ch.type === 'steve' ? 0 : null,           // 劍碰撞傷害的內置CD
     };
   }
 
@@ -3094,11 +3424,30 @@ gojoChargingVisual: ch.type === 'gojo' ? false : null,
     rippleStackFX: [],        // 波紋層數：爆裂特效列表
   };
 
+  // HUD 版面：2人維持原本左右對戰排版，3/4人切換為可換行的多人排版
+  const isMulti = playerCount > 2;
+  document.getElementById('hud').classList.toggle('multi', isMulti);
+  document.getElementById('bottom-bar').classList.toggle('multi', isMulti);
+  for (let i = 0; i < 4; i++) {
+    const n = i + 1;
+    const show = i < playerCount;
+    const block = document.getElementById(`p${n}-block`);
+    if (block) block.style.display = show ? 'flex' : (n <= 2 ? 'flex' : 'none');
+    const statusEl = document.getElementById(`p${n}-status`);
+    if (statusEl && n > 2) statusEl.style.display = show ? 'inline' : 'none';
+  }
+  chs.forEach((ch, i) => {
+    const n = i + 1;
+    const nameEl = document.getElementById(`p${n}-hud-name`);
+    if (n % 2 === 1) {
+      nameEl.innerHTML = `<span>${ch.emoji}</span> ${ch.displayName}`;
+    } else {
+      nameEl.innerHTML = `${ch.displayName} <span>${ch.emoji}</span>`;
+    }
+    document.getElementById(`p${n}-bar`).style.background = `linear-gradient(90deg, ${ch.color}aa, ${ch.color})`;
+  });
+
   updateHUD();
-  document.getElementById('p1-bar').style.background = `linear-gradient(90deg, ${ch1.color}aa, ${ch1.color})`;
-  document.getElementById('p2-bar').style.background = `linear-gradient(90deg, ${ch2.color}aa, ${ch2.color})`;
-  document.getElementById('p1-hud-name').innerHTML = `<span>${ch1.emoji}</span> ${ch1.displayName}`;
-  document.getElementById('p2-hud-name').innerHTML = `${ch2.displayName} <span>${ch2.emoji}</span>`;
 
   if (gameLoop) cancelAnimationFrame(gameLoop);
   lastTime = performance.now();
@@ -3110,6 +3459,18 @@ gojoChargingVisual: ch.type === 'gojo' ? false : null,
 function randBetween(min, max) { return min + Math.random() * (max - min); }
 
 // Oblivionis：生成一顆追蹤音符（一般攻擊或新月甦醒共用）
+// 妲己：每次攻擊/技能疊一條尾巴，集滿9條消耗全部並強化下個技能
+function dajiGainTail(b) {
+  b.dajiTails = (b.dajiTails || 0) + 1;
+  if (b.dajiTails >= DAJI_TAIL_MAX) {
+    b.dajiTails = 0;
+    b.dajiEnhanceReady = true;
+    b.dajiSkill1Cd = 0;
+    b.dajiSkill2Cd = 0;
+    state.hitFlashes.push({ x: b.x, y: b.y, r: 34, alpha: 1.0, color: '#ff8ad1', t: 0.45 });
+  }
+}
+
 function spawnSakikoNote(b, enemy, tone, overrides = {}) {
   const isPiano = tone === 'piano';
   const baseDamage = isPiano ? SAKIKO_PIANO_DAMAGE : SAKIKO_ORGAN_DAMAGE;
@@ -3422,7 +3783,7 @@ function dealDamage(target, dmg, options = {}) {
 }
 
 // ── 多人混戰（FFA）目標選擇工具函式 ──
-// 目前所有角色技能仍大量使用 state.balls.find(x => x.player !== b.player) 這種
+// 目前所有角色技能仍大量使用 getNearestEnemyTo(b.x, b.y, b.player) 這種
 // 「場上只有我跟一個對手」的寫法。在只有兩人對戰時，下面幾個函式的結果跟舊寫法完全一樣，
 // 之後要把某個角色技能改成「打最近的敵人」時，把舊寫法換成 getNearestEnemy(b) 即可，
 // 不需要一次全部替換、也不會影響尚未替換角色的現有平衡。
@@ -3711,6 +4072,7 @@ function update(dt) {
   // ── 場地效果 ──
   if (state.arena === 'lava') {
     for (const b of state.balls) {
+      if (b.hp <= 0) continue; // 已死亡不再有任何行為
       dealDamage(b, ARENA_LAVA_DMG_PER_SEC * dt);
     }
   }
@@ -3722,6 +4084,7 @@ function update(dt) {
       state.arenaSnowTimer = ARENA_SNOW_INTERVAL;
       state.arenaBlizzardFX = { life: 1.4, maxLife: 1.4 };
       for (const b of state.balls) {
+        if (b.hp <= 0) continue; // 已死亡不再有任何行為
         if (Math.random() < ARENA_SNOW_FREEZE_CHANCE) {
           b.arenaFrozen = ARENA_SNOW_FREEZE_DURATION;
           b.vx = 0; b.vy = 0;
@@ -3733,6 +4096,7 @@ function update(dt) {
   // 凍結倒數
   if (state.arenaSnowFreezeTick == null) state.arenaSnowFreezeTick = true;
   for (const b of state.balls) {
+    if (b.hp <= 0) continue; // 已死亡不再有任何行為
     if (b.arenaFrozen > 0) {
       b.arenaFrozen -= dt;
       if (b.arenaFrozen < 0) b.arenaFrozen = 0;
@@ -3746,6 +4110,7 @@ function update(dt) {
     if (state.arenaGrassTimer <= 0) {
       state.arenaGrassTimer = ARENA_GRASS_INTERVAL;
       for (const b of state.balls) {
+        if (b.hp <= 0) continue; // 已死亡不再有任何行為
         b.hp = Math.min(MAX_HP, b.hp + ARENA_GRASS_HEAL);
         state.hitFlashes.push({ x: b.x, y: b.y, r: 30, alpha: 1, color: '#66ff88', t: 0.5 });
       }
@@ -3771,6 +4136,7 @@ function update(dt) {
     }
     // 判斷角色是否在流沙圈內
     for (const b of state.balls) {
+      if (b.hp <= 0) continue; // 已死亡不再有任何行為
       b.inSandZone = state.arenaSandZones.some(z => Math.hypot(b.x - z.x, b.y - z.y) < z.radius || Math.hypot(b.x - z.x, b.y - z.y) < ARENA_SAND_RADIUS);
     }
   } else {
@@ -3793,7 +4159,9 @@ function update(dt) {
   }
 
   for (const b of state.balls) {
-    // 被帶土抓進神威空間：完全時停（不能攻擊、冷卻不流動、不移動、不受牆壁判定）
+    // 已死亡：不再有任何行動（攻擊、技能CD、移動判定全部跳過）
+    if (b.hp <= 0) continue;
+    // 被帶土抓進神威空間：完全時停（不能攻擊、CD不流動、不移動、不受牆壁判定）
     if (b.obitoInSpace) continue;
     b.trail.push({ x: b.x, y: b.y });
     if (b.trail.length > 18) b.trail.shift();
@@ -3830,12 +4198,12 @@ function update(dt) {
 
     // 暗夜領主：衝刺計時
     if (b.char.type === 'vampire') {
-      // 咬擊後冷卻倒數
+      // 咬擊後CD倒數
       if (b.vampireBiteCooldown > 0) {
         b.vampireBiteCooldown -= dt;
         if (b.vampireBiteCooldown < 0) b.vampireBiteCooldown = 0;
       }
-      // 蝙蝠狂襲冷卻倒數
+      // 蝙蝠狂襲CD倒數
       if (!b.vampireDashing) {
         b.vampireDashTimer -= dt;
       }
@@ -3843,7 +4211,7 @@ function update(dt) {
       // 衝刺中：持續追蹤敵人方向
       if (b.vampireDashing) {
         b.vampireDashElapsed += dt;
-        const enemy = state.balls.find(x => x.player !== b.player);
+        const enemy = getNearestEnemyTo(b.x, b.y, b.player);
         if (enemy) {
           const ddx = enemy.x - b.x, ddy = enemy.y - b.y;
           const dd = Math.sqrt(ddx*ddx + ddy*ddy);
@@ -3884,7 +4252,7 @@ function update(dt) {
       b.vampireBiteTimer -= dt;
       if (b.vampireBiteTimer <= 0 && b.vampireBiteStep < VAMPIRE_BITE_COUNT) {
         // 執行本次咬擊
-        const enemy = state.balls.find(x => x.player !== b.player);
+        const enemy = getNearestEnemyTo(b.x, b.y, b.player);
         if (enemy) {
           dealDamage(enemy, VAMPIRE_BITE_DAMAGE);
           b.hp = Math.min(MAX_HP, b.hp + VAMPIRE_BITE_HEAL);
@@ -3903,7 +4271,7 @@ function update(dt) {
           b.vampireBiting = false;
           b.vampireBiteStep = 0;
           b.vampireBiteTimer = 0;
-          b.vampireBiteCooldown = 1.0;  // 1.0秒冷卻，讓雙方有時間分開再說
+          b.vampireBiteCooldown = 1.0;  // 1.0秒CD，讓雙方有時間分開再說
           // 解凍敵人
           if (enemy) {
             enemy.frozenByVampire = false;
@@ -3930,6 +4298,11 @@ function update(dt) {
       if (b.frozenTimer <= 0) {
         b.frozenByVampire = false;
       }
+    }
+    // 被妲己魅惑拉近的凍結計時器（保險用：即使施法者中途死亡或被中斷也會自然解除）
+    if (b.dajiCharmedTimer > 0) {
+      b.dajiCharmedTimer -= dt;
+      if (b.dajiCharmedTimer < 0) b.dajiCharmedTimer = 0;
     }
     if (b.frozenByJoseph) {
       b.frozenByJosephTimer -= dt;
@@ -3976,7 +4349,7 @@ function update(dt) {
       }
     }
 
-    // 捌冷卻倒數
+    // 捌CD倒數
     if (b.hachiCooldown > 0) b.hachiCooldown -= dt;
 
     // 緩速計時器
@@ -3999,15 +4372,15 @@ function update(dt) {
       b.vx = 0; b.vy = 0;
     }
 
-    // 夏油條特級咒靈「定身」硬直倒數（被定身的敵人在此期間完全無法行動；冷卻計算見夏油條主邏輯）
+    // 夏油條特級咒靈「定身」硬直倒數（被定身的敵人在此期間完全無法行動；CD計算見夏油條主邏輯）
     if (b.getoBoundTimer > 0) {
       b.getoBoundTimer -= dt;
       b.vx = 0; b.vy = 0;
       if (b.getoBoundTimer < 0) b.getoBoundTimer = 0;
     }
 
-    // 移動（凍結則不移動；虎天帝超新星蓄力視為被束縛定身，完全不動；被帶土抓進神威空間者完全凍結；冰雪場地凍結同樣完全不動）
-    if (!b.frozenByVampire && !b.obitoInSpace && !(b.char.type === 'vampire' && b.vampireBiting) && !(b.mageFreezeTimer > 0) && !(b.itachiPinnedTimer > 0) && !b.itachiBiting && !b.tigerNovaCharging && !(b.thunderStunTimer > 0) && !(b.arenaFrozen > 0) && !(b.getoBoundTimer > 0) && !b.getoUltimateCharging && !(b.beachCurrentSuckTimer > 0) && !b.frozenByJoseph && !(b.char.type === 'joseph' && (b.josephState === 'charging' || b.josephUltimateActive))) {
+    // 移動（凍結則不移動；虎天帝超新星蓄力視為被束縛定身，完全不動；被帶土抓進神威空間者完全凍結；冰雪場地凍結同樣完全不動；被妲己魅惑拉近時也暫停自身移動，避免抵銷拉近效果）
+    if (!b.frozenByVampire && !b.obitoInSpace && !(b.char.type === 'vampire' && b.vampireBiting) && !(b.mageFreezeTimer > 0) && !(b.itachiPinnedTimer > 0) && !b.itachiBiting && !b.tigerNovaCharging && !(b.thunderStunTimer > 0) && !(b.arenaFrozen > 0) && !(b.getoBoundTimer > 0) && !b.getoUltimateCharging && !(b.beachCurrentSuckTimer > 0) && !b.frozenByJoseph && !(b.char.type === 'joseph' && (b.josephState === 'charging' || b.josephUltimateActive)) && !(b.dajiCharmedTimer > 0)) {
       const speedMul = (b.curseSlowTimer > 0 ? CURSE_SLASH_SLOW_FACTOR : 1.0) * (b.inSandZone ? ARENA_SAND_SLOW_FACTOR : 1.0);
 
       // 最低速度保證（排除技能主動停止的情況）
@@ -4121,6 +4494,7 @@ function update(dt) {
   // 海灘場地：角色與暗流／螃蟹／海膽／寶箱碰撞判定（位置已於本幀移動完成後）
   if (state.arena === 'beach') {
     for (const b of state.balls) {
+      if (b.hp <= 0) continue; // 已死亡不再有任何行為
       if (b.obitoInSpace) continue;
 
       // 暗流：吸入中，固定在暗流位置，倒數結束後從另一個暗流拋出並造成傷害
@@ -4201,6 +4575,7 @@ function update(dt) {
   if (state.dioWorldGlobalActive) continue; // 時停中：碰球傷害不觸發
   const b0 = state.balls[_ci], b1 = state.balls[_cj];
   if (b0.player === b1.player) continue;
+  if (b0.hp <= 0 || b1.hp <= 0) continue; // 已死亡的球不參與物理碰撞，避免卡位
   // 帶土虛影/轉移/空間/虛化階段：不觸發球球碰撞；被抓入空間的敵人也不參與；火球衝刺中也排除（避免抓人前被物理碰撞彈開）
   if ((b0.char.type === 'obito' && (['ghost','teleporting','in_space','grabbing','returning'].includes(b0.obitoKamuiPhase) || b0.obitoFireballDashing || b0.obitoPhasing)) ||
       (b1.char.type === 'obito' && (['ghost','teleporting','in_space','grabbing','returning'].includes(b1.obitoKamuiPhase) || b1.obitoFireballDashing || b1.obitoPhasing)) ||
@@ -4212,7 +4587,8 @@ function update(dt) {
     for (let bi = 0; bi < state.balls.length; bi++) {
       const vamp = state.balls[bi];
       const vamp_me = state.balls[bi];
-      const target = state.balls.find(x => x.player !== vamp_me.player);
+      if (vamp.hp <= 0) continue;
+      const target = getNearestEnemyTo(vamp_me.x, vamp_me.y, vamp_me.player);
       if (!target) continue;
       if (vamp.char.type === 'vampire' && !vamp.vampireBiting && !target.frozenByVampire && vamp.vampireBiteCooldown <= 0) {
         // 停止衝刺並開始咬擊
@@ -4252,9 +4628,10 @@ function update(dt) {
       if (!eitherVamp) {
         state.hitFlashes.push({ x:(b0.x+b1.x)/2, y:(b0.y+b1.y)/2, r:20, alpha:0.7, color:'#ffffff', t:0.2 });
       }
-      // 一拳超人：每次碰撞減少1秒攻擊冷卻
+      // 一拳超人：每次碰撞減少1秒攻擊CD
       for (let bi = 0; bi < state.balls.length; bi++) {
         const opm = state.balls[bi];
+        if (opm.hp <= 0) continue;
         if (opm.char.type === 'opm' && !opm.opmPunched && opm.opmCollisionCooldown <= 0) {
           opm.opmCountdown = Math.max(0, opm.opmCountdown - OPM_COLLISION_REDUCE);
           opm.opmCollisionCooldown = OPM_COLLISION_COOLDOWN;
@@ -4264,10 +4641,11 @@ function update(dt) {
       for (let bi = 0; bi < state.balls.length; bi++) {
         const curser = state.balls[bi];
         const vamp_me = state.balls[bi];
-      const target = state.balls.find(x => x.player !== vamp_me.player);
+        if (curser.hp <= 0) continue;
+      const target = getNearestEnemyTo(vamp_me.x, vamp_me.y, vamp_me.player);
       if (!target) continue;
         if (curser.char.type === 'cursed') {
-          // 捌小冷卻：避免持續碰觸重複觸發
+          // 捌小CD：避免持續碰觸重複觸發
           if (!curser.hachiCooldown || curser.hachiCooldown <= 0) {
             curser.hachiCooldown = 0.55;
             target.curseDotTimer = CURSE_DOT_DURATION;
@@ -4294,7 +4672,7 @@ function update(dt) {
       for (let si = 0; si < state.balls.length; si++) {
         const stv = state.balls[si];
         if (stv.char.type !== 'steve' || stv.steveGathering) continue;
-        const target = state.balls.find(x => x.player !== stv.player);
+        const target = getNearestEnemyTo(stv.x, stv.y, stv.player);
         if (!target) continue;
         if (!stv.steveContactCooldown || stv.steveContactCooldown <= 0) {
           stv.steveContactCooldown = 0.4;
@@ -4308,7 +4686,7 @@ function update(dt) {
       for (let gi = 0; gi < state.balls.length; gi++) {
         const geto = state.balls[gi];
         if (geto.char.type !== 'geto') continue;
-        const target = state.balls.find(x => x.player !== geto.player);
+        const target = getNearestEnemyTo(geto.x, geto.y, geto.player);
         if (!target || target.getoBoundTimer > 0) continue;
         if (!(geto.getoCaneCooldown > 0)) {
           geto.getoCaneCooldown = GETO_CANE_COOLDOWN;
@@ -4333,11 +4711,11 @@ function update(dt) {
         }
       }
 
-      // 大喬：碰觸傷害（波紋呼吸法期間15傷害，未開啟則5傷害；每次判定後短暫冷卻避免重複觸發）
+      // 大喬：碰觸傷害（波紋呼吸法期間15傷害，未開啟則5傷害；每次判定後短暫CD避免重複觸發）
       for (let ji = 0; ji < state.balls.length; ji++) {
         const jo = state.balls[ji];
         if (jo.char.type !== 'joseph') continue;
-        const target = state.balls.find(x => x.player !== jo.player);
+        const target = getNearestEnemyTo(jo.x, jo.y, jo.player);
         if (!target) continue;
         if (!(jo.josephContactCd > 0)) {
           jo.josephContactCd = JOSEPH_CONTACT_CD;
@@ -4362,6 +4740,7 @@ function update(dt) {
   } // _ci
 // 廚師：回收插牆的刀（只要 knifeRecalling 就持續吸）
   for (const b of state.balls) {
+    if (b.hp <= 0) continue; // 已死亡不再有任何行為
     if (b.char.type !== 'chef') continue;
     if (!b.knifeRecalling) continue; // 沒在回收中就跳過
     for (let i = state.wallKnives.length-1; i >= 0; i--) {
@@ -4388,8 +4767,9 @@ function update(dt) {
   }
   // 攻擊計時
 for (let bi = 0; bi < state.balls.length; bi++) {
-    const b = state.balls[bi], enemy = state.balls.find(x => x.player !== b.player);
-    // 時停中：敵方（非DIO）攻擊計時器凍結，避免時停結束後瞬間觸發堆積的攻擊；冰雪場地凍結期間技能冷卻也不會減少
+    const b = state.balls[bi], enemy = getNearestEnemyTo(b.x, b.y, b.player);
+    if (b.hp <= 0) continue;
+    // 時停中：敵方（非DIO）攻擊計時器凍結，避免時停結束後瞬間觸發堆積的攻擊；冰雪場地凍結期間技能CD也不會減少
     if ((state.dioWorldGlobalActive && b !== state.dioWorldCaster) || b.obitoInSpace || (b.arenaFrozen > 0)) {
       // 不累積 attackTimer；各技能計時器也凍結
       continue;
@@ -4507,7 +4887,7 @@ for (let bi = 0; bi < state.balls.length; bi++) {
         b.vx = 0; b.vy = 0;
         state.thunderStunFX = state.thunderStunFX || [];
         state.thunderStunFX.push({ x: b.x, y: b.y, life: 0.5, maxLife: 0.5 });
-        b.opmCountdown = OPM_COUNTDOWN_START * 0.5; // 延遲半個冷卻
+        b.opmCountdown = OPM_COUNTDOWN_START * 0.5; // 延遲半個CD
         state.hitFlashes.push({ x: b.x, y: b.y, r: 22, alpha: 0.8, color: '#f1c40f', t: 0.4 });
       } else {
       b.opmPunched = true;
@@ -4623,22 +5003,25 @@ for (let bi = 0; bi < state.balls.length; bi++) {
           b.vx = Math.cos(ang) * BASE_SPEED;
           b.vy = Math.sin(ang) * BASE_SPEED;
         } else {
-          // 還在倒數中才造成傷害
-          const ddx = enemy.x - b.x, ddy = enemy.y - b.y;
-          const dd = Math.sqrt(ddx*ddx + ddy*ddy);
-          if (dd <= CURSE_DOMAIN_RADIUS) {
-            dealDamage(enemy, CURSE_DOMAIN_FRAMEDMG);
-            // 伏魔持續斬擊特效
-            if (Math.random() < 0.12) {
-              const sAngle = Math.random() * Math.PI * 2;
-              state.slashMarks.push({
-                x: enemy.x + randBetween(-18, 18),
-                y: enemy.y + randBetween(-18, 18),
-                angle: sAngle,
-                life: 0.4, maxLife: 0.4,
-                hit: false, owner: b.player,
-                style: 'domain_burst'
-              });
+          // 還在倒數中才造成傷害：領域是範圍效果，範圍內「所有」敵人都會受到傷害，不只鎖定最近的一位
+          for (const foe of state.balls) {
+            if (foe.player === b.player || foe.hp <= 0) continue;
+            const ddx = foe.x - b.x, ddy = foe.y - b.y;
+            const dd = Math.sqrt(ddx*ddx + ddy*ddy);
+            if (dd <= CURSE_DOMAIN_RADIUS) {
+              dealDamage(foe, CURSE_DOMAIN_FRAMEDMG);
+              // 伏魔持續斬擊特效
+              if (Math.random() < 0.12) {
+                const sAngle = Math.random() * Math.PI * 2;
+                state.slashMarks.push({
+                  x: foe.x + randBetween(-18, 18),
+                  y: foe.y + randBetween(-18, 18),
+                  angle: sAngle,
+                  life: 0.4, maxLife: 0.4,
+                  hit: false, owner: b.player,
+                  style: 'domain_burst'
+                });
+              }
             }
           }
         }
@@ -4648,7 +5031,8 @@ for (let bi = 0; bi < state.balls.length; bi++) {
 // ── GOJO 術式更新 ──
   for (let bi = 0; bi < state.balls.length; bi++) {
     const b = state.balls[bi];
-    const enemy = state.balls.find(x => x.player !== b.player);
+    if (b.hp <= 0) continue;
+    const enemy = getNearestEnemyTo(b.x, b.y, b.player);
     if (b.char.type !== 'gojo') continue;
     if (!enemy) continue;
     if ((state.dioWorldGlobalActive && b !== state.dioWorldCaster) || b.obitoInSpace) {
@@ -4683,7 +5067,7 @@ for (let bi = 0; bi < state.balls.length; bi++) {
       }
     }
 
-    // 技能冷卻 → 發蒼/赫/紫
+    // 技能CD → 發蒼/赫/紫
     if (!b.gojoCharging) {
       b.gojoTimer += dt;
       if (b.gojoTimer >= b.gojoCooldown) {
@@ -4796,7 +5180,8 @@ for (let bi = 0; bi < state.balls.length; bi++) {
   // ── 奕邏輯 ──
   for (let bi = 0; bi < state.balls.length; bi++) {
     const b = state.balls[bi];
-    const enemy = state.balls.find(x => x.player !== b.player);
+    if (b.hp <= 0) continue;
+    const enemy = getNearestEnemyTo(b.x, b.y, b.player);
     if (!enemy) continue;
     if (b.char.type !== 'yi') continue;
     if ((state.dioWorldGlobalActive && b !== state.dioWorldCaster) || b.obitoInSpace) continue;
@@ -4927,7 +5312,8 @@ for (let bi = 0; bi < state.balls.length; bi++) {
   // ── 無名槍手邏輯 ──
   for (let bi = 0; bi < state.balls.length; bi++) {
     const b = state.balls[bi];
-    const enemy = state.balls.find(x => x.player !== b.player);
+    if (b.hp <= 0) continue;
+    const enemy = getNearestEnemyTo(b.x, b.y, b.player);
     if (!enemy) continue;
     if (b.char.type !== 'gunner') continue;
     if ((state.dioWorldGlobalActive && b !== state.dioWorldCaster) || b.obitoInSpace) continue;
@@ -4966,7 +5352,7 @@ for (let bi = 0; bi < state.balls.length; bi++) {
       }
     }
 
-    // 閃光彈冷卻 & 投擲
+    // 閃光彈CD & 投擲
     b.gunnerFlashTimer -= dt;
     if (b.gunnerFlashTimer <= 0) {
       b.gunnerFlashTimer = GUNNER_FLASH_INTERVAL;
@@ -4995,8 +5381,9 @@ for (let bi = 0; bi < state.balls.length; bi++) {
   // ── 史蒂夫邏輯 ──
   for (let bi = 0; bi < state.balls.length; bi++) {
     const b = state.balls[bi];
+    if (b.hp <= 0) continue;
     if (b.char.type !== 'steve') continue;
-    const enemy = state.balls.find(x => x.player !== b.player);
+    const enemy = getNearestEnemyTo(b.x, b.y, b.player);
     if (!enemy) continue;
     if ((state.dioWorldGlobalActive && b !== state.dioWorldCaster) || b.obitoInSpace) continue;
 
@@ -5098,12 +5485,12 @@ for (let bi = 0; bi < state.balls.length; bi++) {
       continue; // 重錘衝刺期間不執行斧/弓
     }
 
-    // ── 重錘冷卻／觸發判定（四階段解鎖後才開始跑）──
+    // ── 重錘CD／觸發判定（四階段解鎖後才開始跑）──
     if (b.steveHammerUnlocked) {
       b.steveHammerTimer -= dt;
       if (b.steveHammerTimer <= 0) {
         if (b.steveBowAiming) {
-          // 煙花弩正在瞄準：改為鞘翅三連擊，弩改進入17秒冷卻
+          // 煙花弩正在瞄準：改為鞘翅三連擊，弩改進入17秒CD
           b.steveBowAiming = false;
           b.steveBowTimer = STEVE_ELYTRA_BOW_COOLDOWN;
           b.steveElytraActive = true;
@@ -5208,12 +5595,13 @@ for (let bi = 0; bi < state.balls.length; bi++) {
   // ── 陷阱大師邏輯 ──
   for (let bi = 0; bi < state.balls.length; bi++) {
     const b = state.balls[bi];
-    const enemy = state.balls.find(x => x.player !== b.player);
+    if (b.hp <= 0) continue;
+    const enemy = getNearestEnemyTo(b.x, b.y, b.player);
     if (!enemy) continue;
     if (b.char.type !== 'trapper') continue;
     if ((state.dioWorldGlobalActive && b !== state.dioWorldCaster) || b.obitoInSpace) continue;
 
-    // 鎖鏈冷卻計時
+    // 鎖鏈CD計時
     if (!b.trapChainActive) {
       b.trapChainTimer -= dt;
       if (b.trapChainTimer <= 0 && state.traps.filter(t => t.owner === b.player).length > 0) {
@@ -5286,6 +5674,7 @@ for (let bi = 0; bi < state.balls.length; bi++) {
     // 對敵方球判定
     for (let bi = 0; bi < state.balls.length; bi++) {
       const ball = state.balls[bi];
+      if (ball.hp <= 0) continue;
       if (ball.player === trap.owner) continue;
       const dd = Math.hypot(ball.x - trap.x, ball.y - trap.y);
       if (dd < RADIUS + 10 && (!trap.hitCooldown || trap.hitCooldown <= 0)) {
@@ -5301,6 +5690,7 @@ for (let bi = 0; bi < state.balls.length; bi++) {
 
   // 尖刺 dot 傷害
   for (const b of state.balls) {
+    if (b.hp <= 0) continue; // 已死亡不再有任何行為
     if (b.trapDotTimer > 0) {
       b.trapDotTimer -= dt;
       dealDamage(b, b.trapDotDps * dt);
@@ -5314,7 +5704,8 @@ for (let bi = 0; bi < state.balls.length; bi++) {
   // ── 工程師邏輯 ──
   for (let bi = 0; bi < state.balls.length; bi++) {
     const b = state.balls[bi];
-    const enemy = state.balls.find(x => x.player !== b.player);
+    if (b.hp <= 0) continue;
+    const enemy = getNearestEnemyTo(b.x, b.y, b.player);
     if (!enemy) continue;
     if (b.char.type !== 'engineer') continue;
     if ((state.dioWorldGlobalActive && b !== state.dioWorldCaster) || b.obitoInSpace) continue;
@@ -5418,8 +5809,9 @@ for (let bi = 0; bi < state.balls.length; bi++) {
   // ── 砲爹邏輯 ──
   for (let bi = 0; bi < state.balls.length; bi++) {
     const b = state.balls[bi];
+    if (b.hp <= 0) continue;
     if (b.char.type !== 'cannondad') continue;
-    const enemy = state.balls.find(x => x.player !== b.player);
+    const enemy = getNearestEnemyTo(b.x, b.y, b.player);
     if (!enemy) continue;
     if ((state.dioWorldGlobalActive && b !== state.dioWorldCaster) || b.obitoInSpace) continue;
 
@@ -5484,7 +5876,7 @@ for (let bi = 0; bi < state.balls.length; bi++) {
           length: CANNON_BLAST_HALFWIDTH*2 + 700, halfWidth: CANNON_BLAST_HALFWIDTH });
       }
     } else {
-      // 技能冷卻：到時隨機選一招（追蹤／光柱／光砲）
+      // 技能CD：到時隨機選一招（追蹤／光柱／光砲）
       if (!(b.gunnerStunTimer > 0)) b.cannonSkillTimer += dt;
       if (b.cannonSkillTimer >= b.cannonSkillCooldown) {
         b.cannonSkillTimer = 0;
@@ -5532,7 +5924,7 @@ for (let bi = 0; bi < state.balls.length; bi++) {
               state.thunderStunFX = state.thunderStunFX || [];
               state.thunderStunFX.push({ x: b.x, y: b.y, life: 0.5, maxLife: 0.5 });
               state.hitFlashes.push({ x: b.x, y: b.y, r: 24, alpha: 0.8, color: '#f1c40f', t: 0.4 });
-              b.cannonSkillCooldown = CANNON_BLAST_CHARGE_TIME; // 打斷：短暫冷卻
+              b.cannonSkillCooldown = CANNON_BLAST_CHARGE_TIME; // 打斷：短暫CD
             } else {
             b.cannonBlastCharging = true;
             b.cannonBlastChargeTimer = CANNON_BLAST_CHARGE_TIME;
@@ -5578,7 +5970,7 @@ for (let bi = 0; bi < state.balls.length; bi++) {
     lz.life -= dt;
     if (lz.life <= 0) { state.cannonBeamFX.splice(i, 1); continue; }
     if (!lz.hit) {
-      const target = state.balls.find(x => x.player !== lz.owner);
+      const target = getNearestEnemyTo(lz.x, lz.y, lz.owner);
       if (target) {
         const dx = target.x - lz.x, dy = target.y - lz.y;
         const cos = Math.cos(lz.angle), sin = Math.sin(lz.angle);
@@ -5609,7 +6001,7 @@ for (let bi = 0; bi < state.balls.length; bi++) {
     t.fireTimer -= dt;
     if (t.fireTimer <= 0) {
       t.fireTimer = ENGINEER_TURRET_FIRE_INTERVAL;
-      const target = state.balls.find(x => x.player !== t.owner);
+      const target = getNearestEnemyTo(t.x, t.y, t.owner);
       if (target) {
         const angle = Math.atan2(target.y - t.y, target.x - t.x);
         state.projectiles.push({
@@ -5651,7 +6043,7 @@ for (let bi = 0; bi < state.balls.length; bi++) {
     lz.life -= dt;
     if (lz.life <= 0) { state.engLaserFX.splice(i, 1); continue; }
     if (!lz.hit) {
-      const target = state.balls.find(x => x.player !== lz.owner);
+      const target = getNearestEnemyTo(lz.x, lz.y, lz.owner);
       if (target) {
         // 將目標投影到雷射方向上的局部座標，檢查是否落在光束矩形內
         const dx = target.x - lz.x, dy = target.y - lz.y;
@@ -5672,7 +6064,8 @@ for (let bi = 0; bi < state.balls.length; bi++) {
   // ── 雷電法王邏輯 ──
   for (let bi = 0; bi < state.balls.length; bi++) {
     const b = state.balls[bi];
-    const enemy = state.balls.find(x => x.player !== b.player);
+    if (b.hp <= 0) continue;
+    const enemy = getNearestEnemyTo(b.x, b.y, b.player);
     if (!enemy) continue;
     if (b.char.type !== 'thunder') continue;
     if ((state.dioWorldGlobalActive && b !== state.dioWorldCaster) || b.obitoInSpace) {
@@ -5781,7 +6174,8 @@ for (let bi = 0; bi < state.balls.length; bi++) {
 
   for (let bi = 0; bi < state.balls.length; bi++) {
     const b = state.balls[bi];
-    const enemy = state.balls.find(x => x.player !== b.player);
+    if (b.hp <= 0) continue;
+    const enemy = getNearestEnemyTo(b.x, b.y, b.player);
     if (!enemy) continue;
     if (b.char.type !== 'blacksmith') continue;
     if ((state.dioWorldGlobalActive && b !== state.dioWorldCaster) || b.obitoInSpace) continue;
@@ -5792,7 +6186,7 @@ for (let bi = 0; bi < state.balls.length; bi++) {
       if (b.smithSwordSwingTimer <= 0) b.smithSwordSwinging = false;
     }
 
-    // 劍擊冷卻
+    // 劍擊CD
     if (b.smithSwordTimer > 0) b.smithSwordTimer -= dt;
 
     const distToEnemy = Math.hypot(enemy.x - b.x, enemy.y - b.y);
@@ -5903,7 +6297,7 @@ for (let bi = 0; bi < state.balls.length; bi++) {
       if (sh.hitCooldown > 0) sh.hitCooldown -= dt;
       if (sh.life <= 0) { state.naoShadows.splice(i, 1); continue; }
       // 接觸判定：碰到敵人
-      const enemy = state.balls.find(b => b.player !== sh.owner);
+      const enemy = getNearestEnemyTo(sh.x, sh.y, sh.owner);
       if (enemy && sh.hitCooldown <= 0 && !state.dioWorldGlobalActive) {
         const dist = Math.hypot(enemy.x - sh.x, enemy.y - sh.y);
         if (dist < NAOBITO_SHADOW_HIT_RADIUS + RADIUS) {
@@ -5923,12 +6317,13 @@ for (let bi = 0; bi < state.balls.length; bi++) {
 
   for (let bi = 0; bi < state.balls.length; bi++) {
     const b = state.balls[bi];
+    if (b.hp <= 0) continue;
     if (b.char.type !== 'naobito') continue;
-    const enemy = state.balls.find(x => x.player !== b.player);
+    const enemy = getNearestEnemyTo(b.x, b.y, b.player);
     if (!enemy) continue;
     if ((state.dioWorldGlobalActive && b !== state.dioWorldCaster) || b.obitoInSpace) continue;
 
-    // 凶星軌跡冷卻倒數
+    // 凶星軌跡CD倒數
     if (b.naoKyouseiTimer > 0) b.naoKyouseiTimer -= dt;
 
     // 凶星軌跡動畫計時
@@ -5947,7 +6342,7 @@ for (let bi = 0; bi < state.balls.length; bi++) {
         state.thunderStunFX = state.thunderStunFX || [];
         state.thunderStunFX.push({ x: b.x, y: b.y, life: 0.5, maxLife: 0.5 });
         state.hitFlashes.push({ x: b.x, y: b.y, r: 24, alpha: 0.8, color: '#f1c40f', t: 0.4 });
-        b.naoKyouseiTimer = NAOBITO_KYOUSEI_COOLDOWN * 0.5; // 打斷：短暫冷卻
+        b.naoKyouseiTimer = NAOBITO_KYOUSEI_COOLDOWN * 0.5; // 打斷：短暫CD
         // 殘影保留，只是這次發動被打斷
       } else {
       const ex = enemy.x - b.x, ey = enemy.y - b.y;
@@ -6099,7 +6494,7 @@ waypoints.push({
       if (p.life <= 0 || p.hit) { state.projectiles.splice(i, 1); continue; }
       p.x += p.vx * dt;
       p.y += p.vy * dt;
-      const enemy = state.balls.find(b => b.player !== p.owner);
+      const enemy = getNearestEnemyTo(p.x, p.y, p.owner);
       if (enemy) {
         const dist = Math.hypot(enemy.x - p.x, enemy.y - p.y);
         if (dist < RADIUS + p.r) {
@@ -6119,6 +6514,7 @@ waypoints.push({
 
   // 麻痺消耗：在attackTimer到達間隔時若麻痺，重置計時器並取消麻痺
   for (const b of state.balls) {
+    if (b.hp <= 0) continue; // 已死亡不再有任何行為
     if (b.thunderParalyzed && b.attackTimer != null) {
       // 麻痺：阻止下一次攻擊（重置計時器讓它再等一輪）
       // 標記會在attackTimer到達時被消耗（在各角色攻擊邏輯前檢查）
@@ -6136,12 +6532,13 @@ waypoints.push({
   // ── 魔術師邏輯 ──
   for (let bi = 0; bi < state.balls.length; bi++) {
     const b = state.balls[bi];
-    const enemy = state.balls.find(x => x.player !== b.player);
+    if (b.hp <= 0) continue;
+    const enemy = getNearestEnemyTo(b.x, b.y, b.player);
     if (!enemy) continue;
     if (b.char.type !== 'mage') continue;
     if ((state.dioWorldGlobalActive && b !== state.dioWorldCaster) || b.obitoInSpace) continue;
 
-    // 鴿子冷卻
+    // 鴿子CD
     if (b.mageDoveTimer > 0) b.mageDoveTimer -= dt;
 
     // 瞬移倒數
@@ -6205,6 +6602,7 @@ waypoints.push({
 
   // 魔術師定身計時器更新
   for (const b of state.balls) {
+    if (b.hp <= 0) continue; // 已死亡不再有任何行為
     if (b.mageFreezeTimer > 0) {
       b.mageFreezeTimer -= dt;
       if (b.mageFreezeTimer <= 0) b.mageFreezeTimer = 0;
@@ -6219,7 +6617,8 @@ waypoints.push({
   // ── 末代武士邏輯 ──
   for (let bi = 0; bi < state.balls.length; bi++) {
     const b = state.balls[bi];
-    const enemy = state.balls.find(x => x.player !== b.player);
+    if (b.hp <= 0) continue;
+    const enemy = getNearestEnemyTo(b.x, b.y, b.player);
     if (!enemy) continue;
     if (b.char.type !== 'samurai') continue;
     if ((state.dioWorldGlobalActive && b !== state.dioWorldCaster) || b.obitoInSpace) continue;
@@ -6305,7 +6704,7 @@ waypoints.push({
       }
     }
 
-    // 招架冷卻計時
+    // 招架CD計時
     if (!b.samuraiParrying) {
       b.samuraiParryTimer -= dt;
       if (b.samuraiParryTimer <= 0) {
@@ -6435,7 +6834,7 @@ waypoints.push({
     if (state.dioWorldGlobalActive) continue;
     // 技巧3：追蹤鴿子 — 稍微轉向敵方球
     if (p.type === 'dove' && Number(p.mageTrick) === 3) {
-      const target = state.balls.find(b => b.player !== p.owner);
+      const target = getNearestEnemyTo(p.x, p.y, p.owner);
       if (target) {
         const tdx = target.x - p.x, tdy = target.y - p.y;
         const td = Math.sqrt(tdx*tdx + tdy*tdy) || 1;
@@ -6456,6 +6855,7 @@ waypoints.push({
       const skipPlayer = p.reflected ? p.reflectedBy : p.owner;
       if (state.balls[bi].player === skipPlayer) continue;
       const b = state.balls[bi];
+      if (b.hp <= 0) continue;
       // 帶土虛影/轉移/空間階段：投射物穿透；被抓進空間的敵人也穿透
       if ((b.char && b.char.type === 'obito' &&
           ['ghost','teleporting','in_space','grabbing','returning'].includes(b.obitoKamuiPhase)) ||
@@ -6523,7 +6923,7 @@ waypoints.push({
           removed = true; break;
         } else if (p.type === 'curseword') {
           dealDamage(b, p.damage);
-          // 禁錮：重用通用定身欄位（itachiPinnedTimer），但乙骨自身需冷卻才能再次造成禁錮
+          // 禁錮：重用通用定身欄位（itachiPinnedTimer），但乙骨自身需CD才能再次造成禁錮
           const yuta = state.balls.find(x => x.player === p.owner);
           if (yuta && yuta.yutaBindCooldown <= 0) {
             b.itachiPinnedTimer = YUTA_BIND_DURATION;
@@ -6703,8 +7103,9 @@ waypoints.push({
 
   // ── 宇治波鼬邏輯 ──
   for (const b of state.balls) {
+    if (b.hp <= 0) continue; // 已死亡不再有任何行為
     if (b.char.type !== 'itachi') continue;
-    const enemy = state.balls.find(x => x.player !== b.player);
+    const enemy = getNearestEnemyTo(b.x, b.y, b.player);
     if (!enemy) continue;
     if ((state.dioWorldGlobalActive && b !== state.dioWorldCaster) || b.obitoInSpace) continue;
 
@@ -6748,7 +7149,7 @@ waypoints.push({
       }
     }
 
-    // 須佐能乎：刺擊冷卻倒數
+    // 須佐能乎：刺擊CD倒數
     if (b.itachiBiteCooldown > 0) {
       b.itachiBiteCooldown -= dt;
       if (b.itachiBiteCooldown < 0) b.itachiBiteCooldown = 0;
@@ -6787,7 +7188,7 @@ waypoints.push({
     // 須佐能乎啟動中：跳過天照/月讀施放（純近戰）
     if (b.itachiSusanooActive) continue;
 
-    // 天照冷卻倒數與發射
+    // 天照CD倒數與發射
     b.itachiAmaterasuTimer -= dt;
     if (b.itachiAmaterasuTimer <= 0) {
       b.itachiAmaterasuTimer = ITACHI_AMATERASU_INTERVAL;
@@ -6812,7 +7213,7 @@ waypoints.push({
       }
     }
 
-    // 月讀冷卻倒數與發射
+    // 月讀CD倒數與發射
     b.itachiTsukuyomiTimer -= dt;
     if (b.itachiTsukuyomiTimer <= 0) {
       b.itachiTsukuyomiTimer = ITACHI_TSUKUYOMI_INTERVAL;
@@ -6843,18 +7244,19 @@ waypoints.push({
 
   // ── 乙骨憂太邏輯 ──
   for (const b of state.balls) {
+    if (b.hp <= 0) continue; // 已死亡不再有任何行為
     if (b.char.type !== 'yuta') continue;
-    const enemy = state.balls.find(x => x.player !== b.player);
+    const enemy = getNearestEnemyTo(b.x, b.y, b.player);
     if (!enemy) continue;
     if ((state.dioWorldGlobalActive && b !== state.dioWorldCaster) || b.obitoInSpace) continue;
 
-    // 禁錮自身冷卻倒數
+    // 禁錮自身CD倒數
     if (b.yutaBindCooldown > 0) {
       b.yutaBindCooldown -= dt;
       if (b.yutaBindCooldown < 0) b.yutaBindCooldown = 0;
     }
 
-    // 里香在場時的攻速加成（被動：冷卻-0.5秒，套用在咒言與咒力斬上）
+    // 里香在場時的攻速加成（被動：CD-0.5秒，套用在咒言與咒力斬上）
     const rikaCdCut = b.yutaRikaActive ? YUTA_RIKA_PASSIVE_CD_CUT : 0;
 
     // 咒言：定時發射投射物（不受距離限制）
@@ -6867,7 +7269,7 @@ waypoints.push({
         state.thunderStunFX = state.thunderStunFX || [];
         state.thunderStunFX.push({ x: b.x, y: b.y, life: 0.5, maxLife: 0.5 });
         state.hitFlashes.push({ x: b.x, y: b.y, r: 20, alpha: 0.8, color: '#f1c40f', t: 0.4 });
-        b.yutaCurseWordTimer = Math.max(0.5, YUTA_CURSEWORD_INTERVAL - rikaCdCut); // 打斷：重置冷卻
+        b.yutaCurseWordTimer = Math.max(0.5, YUTA_CURSEWORD_INTERVAL - rikaCdCut); // 打斷：重置CD
       } else {
         const angle = Math.atan2(enemy.y - b.y, enemy.x - b.x);
         const dmgMul = b.yutaRikaActive ? YUTA_RIKA_PASSIVE_DMG_MULT : 1;
@@ -7001,7 +7403,7 @@ waypoints.push({
       } else {
         b.yutaRikaCannonTimer -= dt;
         if (b.yutaRikaCannonTimer <= 0) {
-          b.yutaRikaCannonTimer = YUTA_RIKA_CANNON_INTERVAL; // 防止預警期間冷卻計時器持續觸發
+          b.yutaRikaCannonTimer = YUTA_RIKA_CANNON_INTERVAL; // 防止預警期間CD計時器持續觸發
           b.yutaRikaCannonWarning = true;
           b.yutaRikaCannonWarnTimer = YUTA_RIKA_CANNON_WARN_DUR;
           // 預警階段就鎖定方向，期間不再轉向
@@ -7032,8 +7434,9 @@ waypoints.push({
 
   // ── DIO 邏輯 ──
   for (const b of state.balls) {
+    if (b.hp <= 0) continue; // 已死亡不再有任何行為
     if (b.char.type !== 'dio') continue;
-    const enemy = state.balls.find(x => x.player !== b.player);
+    const enemy = getNearestEnemyTo(b.x, b.y, b.player);
     if (!enemy) continue;
 
     // 替身：環繞跟隨本體
@@ -7076,7 +7479,7 @@ waypoints.push({
     }
     } // end !obitoInSpace (替身)
 
-    // 世界：冷卻倒數（時停中不倒數）
+    // 世界：CD倒數（時停中不倒數）
     if (!b.dioWorldActive && b.dioWorldCooldownTimer > 0) {
       b.dioWorldCooldownTimer -= dt;
     }
@@ -7127,7 +7530,7 @@ waypoints.push({
       }
     }
 
-    // 世界：自動施放（冷卻完成時觸發，非HIGH狀態）
+    // 世界：自動施放（CD完成時觸發，非HIGH狀態）
     if (!b.dioWorldActive && b.dioWorldCooldownTimer <= 0) {
       if (b.thunderParalyzed > 0) {
         b.thunderParalyzed = 0;
@@ -7225,7 +7628,7 @@ waypoints.push({
     if (!state.dioWorldGlobalActive) {
       sr.x += sr.vx * dt; sr.y += sr.vy * dt;
       sr.life = (sr.life || 0) + dt;
-      const srEnemy = state.balls.find(x => x.player !== sr.owner);
+      const srEnemy = getNearestEnemyTo(sr.x, sr.y, sr.owner);
       if (srEnemy && !sr.hitTargets.has(srEnemy.player)) {
         const d = Math.hypot(srEnemy.x - sr.x, srEnemy.y - sr.y);
         if (d < RADIUS + DIO_STEAMROLLER_RADIUS) {
@@ -7253,12 +7656,13 @@ waypoints.push({
 
   // ── 星星女孩邏輯 ──
   for (const b of state.balls) {
+    if (b.hp <= 0) continue; // 已死亡不再有任何行為
     if (b.char.type !== 'stargirl') continue;
-    const enemy = state.balls.find(x => x.player !== b.player);
+    const enemy = getNearestEnemyTo(b.x, b.y, b.player);
     if (!enemy) continue;
     if ((state.dioWorldGlobalActive && b !== state.dioWorldCaster) || b.obitoInSpace) continue;
 
-    // 技能一：大星星冷卻倒數，冷卻完自動發射（場上不超過3顆）
+    // 技能一：大星星CD倒數，CD完自動發射（場上不超過3顆）
     if (b.starBigTimer > 0) b.starBigTimer -= dt;
     if (b.starBigTimer <= 0) {
       const bigCount = state.starBigStars.filter(s => s.owner === b.player).length;
@@ -7292,7 +7696,7 @@ waypoints.push({
       }
     }
 
-    // 技能二（星隕）：常駐冷卻技能
+    // 技能二（星隕）：常駐CD技能
     if (b.starMeteorCooldown > 0) {
       b.starMeteorCooldown -= dt;
     }
@@ -7311,7 +7715,7 @@ waypoints.push({
         b.starMeteorCooldown = STAR_METEOR_COOLDOWN;
       }
     } else if (b.starMeteorCooldown <= 0) {
-      // 冷卻結束，自動觸發
+      // CD結束，自動觸發
       b.starMeteorActive = true;
       b.starMeteorTimer = STAR_METEOR_DURATION;
       b.starMeteorSpawnTimer = 0;
@@ -7360,8 +7764,9 @@ waypoints.push({
       s.scatterCooldown = 1.5;
     }
 
-    // 碰到敵人：傷害60，穿透（有命中冷卻）
+    // 碰到敵人：傷害60，穿透（有命中CD）
     for (const b of state.balls) {
+      if (b.hp <= 0) continue; // 已死亡不再有任何行為
       if (b.player === s.owner) continue;
       const dx = b.x - s.x, dy = b.y - s.y;
       if (Math.sqrt(dx*dx+dy*dy) < RADIUS + STAR_BIG_RADIUS && s.hitCooldown <= 0) {
@@ -7398,6 +7803,7 @@ waypoints.push({
     // 碰到敵人：30傷後消失
     let hit = false;
     for (const b of state.balls) {
+      if (b.hp <= 0) continue; // 已死亡不再有任何行為
       if (b.player === s.owner) continue;
       const dx = b.x - s.x, dy = b.y - s.y;
       if (Math.sqrt(dx*dx+dy*dy) < RADIUS + STAR_SMALL_RADIUS) {
@@ -7429,6 +7835,7 @@ waypoints.push({
       if (Math.sqrt(dx*dx+dy*dy) < STAR_SMALL_RADIUS * 2) {
         const ex = (s.x + s2.x) / 2, ey = (s.y + s2.y) / 2;
         for (const b of state.balls) {
+          if (b.hp <= 0) continue; // 已死亡不再有任何行為
           if (b.player === s.owner) continue;
           const dbx = b.x - ex, dby = b.y - ey;
           if (Math.sqrt(dbx*dbx+dby*dby) < RADIUS + 32) dealDamage(b, STAR_EXPLODE_DAMAGE);
@@ -7445,6 +7852,7 @@ waypoints.push({
       const dx = bs.x - s.x, dy = bs.y - s.y;
       if (Math.sqrt(dx*dx+dy*dy) < STAR_BIG_RADIUS + STAR_SMALL_RADIUS) {
         for (const b of state.balls) {
+          if (b.hp <= 0) continue; // 已死亡不再有任何行為
           if (b.player === s.owner) continue;
           const dbx = b.x - s.x, dby = b.y - s.y;
           if (Math.sqrt(dbx*dbx+dby*dby) < RADIUS + 35) dealDamage(b, STAR_EXPLODE_DAMAGE);
@@ -7471,6 +7879,7 @@ waypoints.push({
     m.life -= dt;
     if (m.life <= 0 || m.y > H + 30) { state.starMeteors.splice(i, 1); continue; }
     for (const b of state.balls) {
+      if (b.hp <= 0) continue; // 已死亡不再有任何行為
       if (b.player === m.owner) continue;
       const dx = b.x - m.x, dy = b.y - m.y;
       if (Math.sqrt(dx*dx+dy*dy) < RADIUS + STAR_METEOR_RADIUS) {
@@ -7484,14 +7893,15 @@ waypoints.push({
 
   // ── 宇智波帶土邏輯 ──
   for (const b of state.balls) {
+    if (b.hp <= 0) continue; // 已死亡不再有任何行為
     if (b.char.type !== 'obito') continue;
-    const enemy = state.balls.find(x => x.player !== b.player);
+    const enemy = getNearestEnemyTo(b.x, b.y, b.player);
     if (!enemy) continue;
     if ((state.dioWorldGlobalActive && b !== state.dioWorldCaster) || b.obitoInSpace) continue;
 
     const phase = b.obitoKamuiPhase;
 
-    // 火球冷卻計時（虛化期間暫停）
+    // 火球CD計時（虛化期間暫停）
     if (b.obitoFireballTimer > 0 && !b.obitoPhasing) b.obitoFireballTimer -= dt;
 
     // ── 被動技：虛化態 ──
@@ -7632,10 +8042,10 @@ waypoints.push({
       }
     }
 
-    // 神威冷卻計時
+    // 神威CD計時
     if (b.obitoKamuiCooldown > 0 && !b.obitoPhasing) b.obitoKamuiCooldown -= dt;
 
-    // 技能二：神威 - 發動（idle且冷卻完成；火球延遲蓄力/衝刺中不可同時觸發）
+    // 技能二：神威 - 發動（idle且CD完成；火球延遲蓄力/衝刺中不可同時觸發）
     if (!b.obitoPhasing && phase === 'idle' && b.obitoKamuiCooldown <= 0 && !b.obitoFireballDashing && !b.obitoFireballDashDelay &&
         b.gunnerStunTimer <= 0 && b.thunderParalyzed <= 0) {
       if (b.thunderParalyzed > 0) {
@@ -7762,7 +8172,7 @@ waypoints.push({
         b.obitoKamuiPhase = 'returning';
         b.obitoTeleportTimer = 0.3;
         // 預警點：出現在敵人旁
-        const eRef = state.balls.find(x => x.player !== b.player);
+        const eRef = getNearestEnemyTo(b.x, b.y, b.player);
         if (eRef) {
           const ang0 = Math.random() * Math.PI * 2;
           b.obitoExitX = Math.max(RADIUS+5, Math.min(W-RADIUS-5, eRef.x + Math.cos(ang0)*45));
@@ -7795,7 +8205,7 @@ waypoints.push({
         if (b.obitoGrabTimer <= 0) {
           b.obitoKamuiPhase = 'returning';
           b.obitoTeleportTimer = 0.3;
-          const eRef2 = state.balls.find(x => x.player !== b.player);
+          const eRef2 = getNearestEnemyTo(b.x, b.y, b.player);
           if (eRef2) {
             const ang2 = Math.random() * Math.PI * 2;
             b.obitoExitX = Math.max(RADIUS+5, Math.min(W-RADIUS-5, eRef2.x + Math.cos(ang2)*45));
@@ -7816,7 +8226,7 @@ waypoints.push({
           // 帶著敵人回來：在帶土旁邊位置
           const exitAng = Math.atan2(enemy.y - b.y, enemy.x - b.x);
           // 找敵人ball
-          const enemyBall = state.balls.find(x => x.player !== b.player);
+          const enemyBall = getNearestEnemyTo(b.x, b.y, b.player);
           if (enemyBall) {
             enemyBall.x = b.x + Math.cos(exitAng) * (RADIUS * 2 + 10);
             enemyBall.y = b.y + Math.sin(exitAng) * (RADIUS * 2 + 10);
@@ -7864,7 +8274,7 @@ waypoints.push({
             }
           }
         }
-        const enemyBall = state.balls.find(x => x.player !== b.player);
+        const enemyBall = getNearestEnemyTo(b.x, b.y, b.player);
         if (enemyBall && enemyBall.obitoInSpace) {
           enemyBall.obitoInSpace = false;
           enemyBall.obitoInSpaceTimer = 0;
@@ -7920,6 +8330,7 @@ waypoints.push({
 
   // 帶土：被抓入神威空間的敵人定身計時
   for (const b of state.balls) {
+    if (b.hp <= 0) continue; // 已死亡不再有任何行為
     if (b.obitoInSpace) {
       b.obitoInSpaceTimer -= dt;
       if (b.obitoInSpaceTimer <= 0) {
@@ -7957,6 +8368,7 @@ waypoints.push({
       }
       // 碰敵人
       for (const b of state.balls) {
+        if (b.hp <= 0) continue; // 已死亡不再有任何行為
         if (b.player === fb.owner) continue;
         const dx = b.x - fb.x, dy = b.y - fb.y;
         if (Math.hypot(dx, dy) < RADIUS + fb.r) {
@@ -8104,8 +8516,9 @@ waypoints.push({
 
   // ── 虎天帝邏輯 ──
   for (const b of state.balls) {
+    if (b.hp <= 0) continue; // 已死亡不再有任何行為
     if (b.char.type !== 'tiger') continue;
-    const enemy = state.balls.find(x => x.player !== b.player);
+    const enemy = getNearestEnemyTo(b.x, b.y, b.player);
     if (!enemy) continue;
     if ((state.dioWorldGlobalActive && b !== state.dioWorldCaster) || b.obitoInSpace) continue;
 
@@ -8113,6 +8526,7 @@ waypoints.push({
   }
   // 流血池對所有角色生效
   for (const b of state.balls) {
+    if (b.hp <= 0) continue; // 已死亡不再有任何行為
     if ((b.tigerBleedPool || 0) > 0) {
       const bleedTick = Math.min(b.tigerBleedPool, TIGER_BLEED_DPS * dt);
       b.hp = Math.max(0, b.hp - bleedTick);
@@ -8134,8 +8548,9 @@ waypoints.push({
   }
 
   for (const b of state.balls) {
+    if (b.hp <= 0) continue; // 已死亡不再有任何行為
     if (b.char.type !== 'tiger') continue;
-    const enemy = state.balls.find(x => x.player !== b.player);
+    const enemy = getNearestEnemyTo(b.x, b.y, b.player);
     if (!enemy) continue;
     if ((state.dioWorldGlobalActive && b !== state.dioWorldCaster) || b.obitoInSpace) continue;
 
@@ -8151,7 +8566,7 @@ waypoints.push({
         state.thunderStunFX = state.thunderStunFX || [];
         state.thunderStunFX.push({ x: b.x, y: b.y, life: 0.5, maxLife: 0.5 });
         state.hitFlashes.push({ x: b.x, y: b.y, r: 24, alpha: 0.8, color: '#f1c40f', t: 0.4 });
-        b.tigerPunchTimer = TIGER_PUNCH_INTERVAL * 0.5; // 打斷：短暫冷卻
+        b.tigerPunchTimer = TIGER_PUNCH_INTERVAL * 0.5; // 打斷：短暫CD
       } else {
       // 開始蓄力：停下來
       b.tigerCharging = true;
@@ -8336,7 +8751,7 @@ waypoints.push({
           playHitSound('vampire_dash');
           setTimeout(() => { b.tigerNovaActive = false; }, 200);
         } else {
-          // 蓄力期間血球被清空，視為冷卻浪費一半時間，避免無限重試
+          // 蓄力期間血球被清空，視為CD浪費一半時間，避免無限重試
           b.tigerNovaCooldown = TIGER_NOVA_COOLDOWN * 0.5;
         }
       }
@@ -8345,8 +8760,9 @@ waypoints.push({
 
   // 大喬（波紋使者）：波紋呼吸法狀態機、波紋疾走／彈簧拳／Sunlight Yellow Overdrive
   for (const b of state.balls) {
+    if (b.hp <= 0) continue; // 已死亡不再有任何行為
     if (b.char.type !== 'joseph') continue;
-    const enemy = state.balls.find(x => x.player !== b.player);
+    const enemy = getNearestEnemyTo(b.x, b.y, b.player);
     if (!enemy) continue;
     if ((state.dioWorldGlobalActive && b !== state.dioWorldCaster) || b.obitoInSpace || (b.arenaFrozen > 0)) continue;
     if (b.gunnerStunTimer > 0) continue; // 被閃光彈暈眩：暫停波紋呼吸法與所有技能判定
@@ -8504,7 +8920,7 @@ waypoints.push({
       needle.life -= dt;
       if (!needle.active || needle.life <= 0) { state.tigerNovaNeedles.splice(i, 1); continue; }
       // 命中判定
-      const needleEnemy = state.balls.find(x => x.player !== needle.owner);
+      const needleEnemy = getNearestEnemyTo(needle.x, needle.y, needle.owner);
       if (needleEnemy && Math.hypot(needleEnemy.x - needle.x, needleEnemy.y - needle.y) < RADIUS + needle.r) {
         dealDamage(needleEnemy, needle.damage);
         if (!state.tigerCurseFX) state.tigerCurseFX = [];
@@ -8543,8 +8959,9 @@ waypoints.push({
 
   // ══════════════ 釣魚佬邏輯 ══════════════
   for (const b of state.balls) {
+    if (b.hp <= 0) continue; // 已死亡不再有任何行為
     if (b.char.type !== 'fisherman') continue;
-    const enemy = state.balls.find(x => x.player !== b.player);
+    const enemy = getNearestEnemyTo(b.x, b.y, b.player);
     if (!enemy) continue;
     if ((state.dioWorldGlobalActive && b !== state.dioWorldCaster) || b.obitoInSpace) continue;
 
@@ -8674,7 +9091,7 @@ waypoints.push({
     q.timer -= dt;
     if (q.timer <= 0) {
       const caster = state.balls.find(x => x.player === q.owner);
-      const target = state.balls.find(x => x.player !== q.owner);
+      const target = getNearestEnemyTo(q.x, q.y, q.owner);
       if (caster && target) {
         const ang = Math.atan2(target.y - caster.y, target.x - caster.x) + randBetween(-0.15, 0.15);
         state.projectiles.push({
@@ -8690,7 +9107,7 @@ waypoints.push({
   for (let i = state.fisherOceanWaves.length - 1; i >= 0; i--) {
     const wv = state.fisherOceanWaves[i];
     wv.x += FISHER_OCEAN_WAVE_SPEED * dt;
-    const target = state.balls.find(x => x.player !== wv.owner);
+    const target = getNearestEnemyTo(wv.x, wv.y, wv.owner);
     if (target && !wv.hit && Math.abs(target.x - wv.x) < FISHER_OCEAN_WAVE_WIDTH / 2) {
       wv.hit = true;
       dealDamage(target, FISHER_OCEAN_WAVE_DMG);
@@ -8731,12 +9148,13 @@ waypoints.push({
 
   // ══════════════ 夏油條邏輯 ══════════════
   for (const b of state.balls) {
+    if (b.hp <= 0) continue; // 已死亡不再有任何行為
     if (b.char.type !== 'geto') continue;
-    const enemy = state.balls.find(x => x.player !== b.player);
+    const enemy = getNearestEnemyTo(b.x, b.y, b.player);
     if (!enemy) continue;
     if ((state.dioWorldGlobalActive && b !== state.dioWorldCaster) || b.obitoInSpace) continue;
 
-    // 游雲被動冷卻遞減
+    // 游雲被動CD遞減
     if (b.getoCaneCooldown > 0) b.getoCaneCooldown -= dt;
 
     // 技能一：咒靈操術 — 庫存每秒消耗一隻召喚小型咒靈
@@ -8803,7 +9221,7 @@ waypoints.push({
           if (b.getoBindTimer <= 0 && distToEnemy < GETO_BIND_RANGE) {
             enemy.getoBoundTimer = GETO_BIND_DURATION;
             b.getoSpecialBoundTimer = GETO_BIND_DURATION; // 特級咒靈自己定在原地（不影響夏油條本體移動）
-            b.getoBindTimer = GETO_BIND_COOLDOWN;  // 冷卻已重置，但因敵方硬直中會暫停遞減，實際從硬直解除那刻才開始倒數
+            b.getoBindTimer = GETO_BIND_COOLDOWN;  // CD已重置，但因敵方硬直中會暫停遞減，實際從硬直解除那刻才開始倒數
             state.getoBindFX.push({ x: (b.getoSpecialX + enemy.x) / 2, y: (b.getoSpecialY + enemy.y) / 2, life: GETO_BIND_DURATION, maxLife: GETO_BIND_DURATION });
             state.hitFlashes.push({ x: enemy.x, y: enemy.y, r: 30, alpha: 0.9, color: '#8e6fd9', t: 0.4 });
             playHitSound('trap_chain');
@@ -8869,6 +9287,7 @@ waypoints.push({
 
   // 夏油條：糾纏持續傷害跳動處理（掛在受傷方身上，任何角色都可能中招）
   for (const b of state.balls) {
+    if (b.hp <= 0) continue; // 已死亡不再有任何行為
     if (b.getoDotTimer > 0) {
       b.getoDotTickTimer -= dt;
       if (b.getoDotTickTimer <= 0) {
@@ -8914,7 +9333,7 @@ waypoints.push({
       state.getoSpirits.splice(i, 1);
       continue;
     }
-    const enemy = state.balls.find(x => x.player !== s.owner);
+    const enemy = getNearestEnemyTo(s.x, s.y, s.owner);
     if (!enemy || (state.dioWorldGlobalActive && state.dioWorldCaster && state.dioWorldCaster.player !== s.owner)) continue;
     const dx = enemy.x - s.x, dy = enemy.y - s.y;
     const dist = Math.hypot(dx, dy) || 1;
@@ -8936,7 +9355,7 @@ waypoints.push({
     const p = state.getoUltimateProjectiles[i];
     p.x += p.vx * dt; p.y += p.vy * dt; p.life -= dt;
     if (p.life <= 0 || p.x < -50 || p.x > W + 50 || p.y < -50 || p.y > H + 50) { state.getoUltimateProjectiles.splice(i, 1); continue; }
-    const target = state.balls.find(x => x.player !== p.owner);
+    const target = getNearestEnemyTo(p.x, p.y, p.owner);
     if (target) {
       const dd = Math.hypot(target.x - p.x, target.y - p.y);
       if (dd < RADIUS + p.r) {
@@ -8960,8 +9379,9 @@ waypoints.push({
 
   // ══════════════ Oblivionis（豐川祥子）邏輯 ══════════════
   for (const b of state.balls) {
+    if (b.hp <= 0) continue; // 已死亡不再有任何行為
     if (b.char.type !== 'sakiko') continue;
-    const enemy = state.balls.find(x => x.player !== b.player);
+    const enemy = getNearestEnemyTo(b.x, b.y, b.player);
     if (!enemy) continue;
     if ((state.dioWorldGlobalActive && b !== state.dioWorldCaster) || b.obitoInSpace) continue;
 
@@ -8988,7 +9408,7 @@ waypoints.push({
       }
     }
 
-    // 新月甦醒：連發推進 / 冷卻計時
+    // 新月甦醒：連發推進 / CD計時
     if (b.sakikoNovaFiring) {
       b.sakikoNovaShotTimer -= dt;
       if (b.sakikoNovaShotTimer <= 0) {
@@ -9068,6 +9488,205 @@ if (!b.sakikoDualActive) {
         state.hitFlashes.push({ x: n.x, y: n.y, r: 16, alpha: 0.85, color: n.color, t: 0.25 });
         playHitSound('knife');
       }
+    }
+  }
+
+  // ── 妲己（九尾妖狐）邏輯 ──
+  for (const b of state.balls) {
+    if (b.hp <= 0) continue; // 已死亡不再有任何行為
+    if (b.char.type !== 'daji') continue;
+    if ((state.dioWorldGlobalActive && b !== state.dioWorldCaster) || b.obitoInSpace) continue;
+    const enemy = getNearestEnemyTo(b.x, b.y, b.player);
+
+    if (b.dajiSkill1Cd > 0) b.dajiSkill1Cd -= dt;
+    if (b.dajiSkill2Cd > 0) b.dajiSkill2Cd -= dt;
+    const stunned = b.thunderParalyzed > 0 || b.gunnerStunTimer > 0;
+
+    // 魅惑倒數中：持續拉近目標，一旦到達可攻擊距離立刻結束魅惑並近戰（不必等到計時結束）
+    if (b.dajiCharmTimer > 0) {
+      b.dajiCharmTimer -= dt;
+      const t = b.dajiCharmTarget;
+      let reachedRange = false;
+      if (t && t.hp > 0) {
+        t.dajiCharmedTimer = Math.max(t.dajiCharmedTimer || 0, b.dajiCharmTimer); // 凍結至魅惑結束為止
+        const dx = b.x - t.x, dy = b.y - t.y;
+        const d = Math.hypot(dx, dy) || 1;
+        const move = Math.min(Math.max(d - DAJI_MELEE_RANGE, 0), DAJI_CHARM_PULL_SPEED * dt);
+        if (move > 0) { t.x += (dx / d) * move; t.y += (dy / d) * move; }
+        if (d - move <= DAJI_MELEE_RANGE + 0.5) reachedRange = true;
+      }
+      if (b.dajiCharmTimer <= 0 || reachedRange) {
+        b.dajiCharmTimer = 0;
+        if (t && t.hp > 0) {
+          t.dajiCharmedTimer = 0;
+          dealDamage(t, b.dajiCharmDmg);
+          const kx = t.x - b.x, ky = t.y - b.y;
+          const kd = Math.hypot(kx, ky) || 1;
+          t.vx += (kx / kd) * DAJI_MELEE_KNOCKBACK;
+          t.vy += (ky / kd) * DAJI_MELEE_KNOCKBACK;
+          if (b.dajiCharmStun > 0) t.thunderParalyzed = Math.max(t.thunderParalyzed || 0, b.dajiCharmStun);
+          dajiGainTail(b);
+          state.hitFlashes.push({ x: t.x, y: t.y, r: 20, alpha: 0.9, color: '#ff4fa3', t: 0.3 });
+          playHitSound('knife');
+          // 揮尾巴動畫特效（朝目標方向揮出）
+          b.dajiTailSwing = { t: DAJI_TAILSWING_DUR, dur: DAJI_TAILSWING_DUR, ang: Math.atan2(ky, kx) };
+        }
+        b.dajiCharmTarget = null;
+      }
+    }
+    // 揮尾巴特效倒數
+    if (b.dajiTailSwing) {
+      b.dajiTailSwing.t -= dt;
+      if (b.dajiTailSwing.t <= 0) b.dajiTailSwing = null;
+    }
+
+    // 強化技二蓄力中：時間到後射出最大威力狐火彈
+    if (b.dajiSkill2Channel > 0) {
+      b.dajiSkill2Channel -= dt;
+      if (b.dajiSkill2Channel <= 0 && enemy) {
+        b.dajiSkill2Channel = 0;
+        const ang = Math.atan2(enemy.y - b.y, enemy.x - b.x);
+        b.dajiBalls.push({
+          x: b.x, y: b.y,
+          vx: Math.cos(ang) * DAJI_BALL_SPEED, vy: Math.sin(ang) * DAJI_BALL_SPEED,
+          r: DAJI_BALL_MAX_RADIUS, damage: DAJI_BALL_MAX_DMG, life: 3.0, active: true
+        });
+        state.hitFlashes.push({ x: b.x, y: b.y, r: 26, alpha: 1, color: '#ff4fa3', t: 0.3 });
+        playHitSound('thunder');
+      }
+    }
+
+    if (!enemy || stunned) continue;
+
+    // 普攻「鬼火」：每2秒發射一枚追蹤鬼火（魅惑蓄力中暫停，避免混亂）
+    if (b.dajiCharmTimer <= 0) {
+      b.dajiAtkTimer += dt;
+      if (b.dajiAtkTimer >= DAJI_FIRE_INTERVAL) {
+        b.dajiAtkTimer -= DAJI_FIRE_INTERVAL;
+        const ang = Math.atan2(enemy.y - b.y, enemy.x - b.x);
+        b.dajiFireballs.push({
+          x: b.x, y: b.y,
+          vx: Math.cos(ang) * DAJI_FIRE_SPEED, vy: Math.sin(ang) * DAJI_FIRE_SPEED,
+          r: DAJI_FIRE_RADIUS, life: DAJI_FIRE_LIFESPAN, active: true
+        });
+        dajiGainTail(b);
+      }
+    }
+
+    // 技能一「魅惑」
+    if (b.dajiSkill1Cd <= 0 && b.dajiCharmTimer <= 0) {
+      const enhanced = b.dajiEnhanceReady;
+      b.dajiSkill1Cd = DAJI_SKILL1_CD;
+      b.dajiCharmTimer = DAJI_CHARM_DURATION;
+      b.dajiCharmTarget = enemy;
+      enemy.dajiCharmedTimer = DAJI_CHARM_DURATION;
+      b.dajiCharmDmg = enhanced ? DAJI_MELEE_DMG_ENH : DAJI_MELEE_DMG;
+      b.dajiCharmStun = enhanced ? DAJI_MELEE_STUN_ENH : 0;
+      if (enhanced) {
+        b.dajiEnhanceReady = false;
+        b.hp = Math.min(MAX_HP, b.hp + DAJI_ENH_HEAL);
+      }
+      dajiGainTail(b);
+      state.hitFlashes.push({ x: enemy.x, y: enemy.y, r: 18, alpha: 0.8, color: '#ff8ad1', t: 0.35 });
+      playHitSound('trap_place');
+    }
+
+    // 技能二「狐火彈」
+    if (b.dajiSkill2Cd <= 0 && b.dajiSkill2Channel <= 0) {
+      const enhanced = b.dajiEnhanceReady;
+      b.dajiSkill2Cd = DAJI_SKILL2_CD;
+      if (enhanced) {
+        b.dajiEnhanceReady = false;
+        b.hp = Math.min(MAX_HP, b.hp + DAJI_ENH_HEAL);
+        b.dajiSkill2Channel = DAJI_ENH_CHANNEL_TIME;
+        state.hitFlashes.push({ x: b.x, y: b.y, r: 22, alpha: 0.9, color: '#ff4fa3', t: 0.4 });
+      } else {
+        const tails = b.dajiTails || 0;
+        const dmg = Math.min(DAJI_BALL_MAX_DMG, DAJI_BALL_BASE_DMG + tails * DAJI_BALL_DMG_PER_TAIL);
+        const rad = DAJI_BALL_BASE_RADIUS + (dmg - DAJI_BALL_BASE_DMG) / (DAJI_BALL_MAX_DMG - DAJI_BALL_BASE_DMG || 1) * (DAJI_BALL_MAX_RADIUS - DAJI_BALL_BASE_RADIUS);
+        const ang = Math.atan2(enemy.y - b.y, enemy.x - b.x);
+        b.dajiBalls.push({
+          x: b.x, y: b.y,
+          vx: Math.cos(ang) * DAJI_BALL_SPEED, vy: Math.sin(ang) * DAJI_BALL_SPEED,
+          r: rad, damage: dmg, life: 3.0, active: true
+        });
+        playHitSound('thunder');
+      }
+      dajiGainTail(b);
+    }
+  }
+
+  // 妲己：鬼火（追蹤）移動與命中判定
+  for (const b of state.balls) {
+    if (b.hp <= 0) continue;
+    if (b.char.type !== 'daji' || !b.dajiFireballs) continue;
+    const enemy = getNearestEnemyTo(b.x, b.y, b.player);
+    b.dajiFireballs = b.dajiFireballs.filter(f => f.active);
+    for (const f of b.dajiFireballs) {
+      if (enemy) {
+        const desiredAng = Math.atan2(enemy.y - f.y, enemy.x - f.x);
+        const curAng = Math.atan2(f.vy, f.vx);
+        let diff = desiredAng - curAng;
+        while (diff > Math.PI) diff -= Math.PI * 2;
+        while (diff < -Math.PI) diff += Math.PI * 2;
+        const maxTurn = DAJI_FIRE_TURN_RATE * dt;
+        const turn = Math.max(-maxTurn, Math.min(maxTurn, diff));
+        const newAng = curAng + turn;
+        const spd = Math.hypot(f.vx, f.vy);
+        f.vx = Math.cos(newAng) * spd; f.vy = Math.sin(newAng) * spd;
+      }
+      f.x += f.vx * dt; f.y += f.vy * dt;
+      f.life -= dt;
+      if (f.life <= 0 || f.x < f.r || f.x > W - f.r || f.y < f.r || f.y > H - f.r) { f.active = false; continue; }
+      if (enemy) {
+        const dd = Math.hypot(enemy.x - f.x, enemy.y - f.y);
+        if (dd < RADIUS + f.r) {
+          dealDamage(enemy, DAJI_FIRE_DAMAGE);
+          enemy.dajiBurnTimer = DAJI_BURN_DURATION;
+          enemy.dajiBurnTick = Math.min(enemy.dajiBurnTick || 1, 1);
+          f.active = false;
+          state.hitFlashes.push({ x: f.x, y: f.y, r: 14, alpha: 0.85, color: '#7cff8a', t: 0.25 });
+          playHitSound('knife');
+        }
+      }
+    }
+  }
+
+  // 妲己：狐火彈（直線飛行）移動與命中判定
+  for (const b of state.balls) {
+    if (b.hp <= 0) continue;
+    if (b.char.type !== 'daji' || !b.dajiBalls) continue;
+    b.dajiBalls = b.dajiBalls.filter(s => s.active);
+    for (const s of b.dajiBalls) {
+      s.x += s.vx * dt; s.y += s.vy * dt;
+      s.life -= dt;
+      if (s.life <= 0 || s.x < s.r || s.x > W - s.r || s.y < s.r || s.y > H - s.r) { s.active = false; continue; }
+      for (const target of state.balls) {
+        if (target.player === b.player || target.hp <= 0) continue;
+        const dd = Math.hypot(target.x - s.x, target.y - s.y);
+        if (dd < RADIUS + s.r) {
+          dealDamage(target, s.damage);
+          s.active = false;
+          state.hitFlashes.push({ x: s.x, y: s.y, r: s.r * 1.8, alpha: 0.9, color: '#ff4fa3', t: 0.3 });
+          playHitSound('knife');
+          break;
+        }
+      }
+    }
+  }
+
+  // 妲己灼燒對所有角色生效
+  for (const b of state.balls) {
+    if (b.hp <= 0) continue;
+    if ((b.dajiBurnTimer || 0) > 0) {
+      b.dajiBurnTimer -= dt;
+      b.dajiBurnTick = (b.dajiBurnTick || 0) - dt;
+      if (b.dajiBurnTick <= 0) {
+        b.dajiBurnTick += 1;
+        b.hp = Math.max(0, b.hp - MAX_HP * DAJI_BURN_PCT);
+        state.hitFlashes.push({ x: b.x, y: b.y, r: 12, alpha: 0.6, color: '#7cff8a', t: 0.2 });
+      }
+      if (b.dajiBurnTimer < 0) b.dajiBurnTimer = 0;
     }
   }
 
@@ -9535,7 +10154,7 @@ function render() {
   for (const b of state.balls) {
     if (b.char.type !== 'trapper' || !b.trapChainActive) continue;
     const trap = b.trapChainTargetTrap;
-    const enemy = state.balls.find(x => x.player !== b.player);
+    const enemy = getNearestEnemyTo(b.x, b.y, b.player);
     if (!trap || !enemy) continue;
     ctx.save();
     const chainAlpha = 0.55 + 0.35 * Math.sin(elapsed * 25);
@@ -9580,7 +10199,7 @@ function render() {
     ctx.strokeStyle = '#ffffff';
     ctx.lineWidth = 1;
     ctx.stroke();
-    // 冷卻後亮點
+    // CD後亮點
     if (trap.chainPulling) {
       ctx.beginPath(); ctx.arc(0, 0, 5, 0, Math.PI * 2);
       ctx.fillStyle = '#f1c40f'; ctx.fill();
@@ -9603,7 +10222,7 @@ function render() {
     ctx.globalAlpha = Math.min(1, 0.6 + lifeRatio * 0.4 + flashBoost) * dyingFlicker;
 
     // 瞄準方向：朝向當前敵人（與實際開火方向一致）
-    const target = state.balls.find(x => x.player !== t.owner);
+    const target = getNearestEnemyTo(t.x, t.y, t.owner);
     const aimAngle = target ? Math.atan2(target.y - t.y, target.x - t.x) : 0;
 
     // 底座（圓形機座 + 螺栓裝飾）
@@ -10285,6 +10904,149 @@ function render() {
     ctx.restore();
   }
 
+  // 妲己：鬼火（追蹤火焰）
+  for (const b of state.balls) {
+    if (b.char.type !== 'daji' || !b.dajiFireballs) continue;
+    for (const f of b.dajiFireballs) {
+      ctx.save();
+      ctx.translate(f.x, f.y);
+      ctx.shadowColor = '#7cff8a';
+      ctx.shadowBlur = 14;
+      ctx.globalAlpha = 0.9;
+      ctx.beginPath();
+      ctx.arc(0, 0, f.r, 0, Math.PI * 2);
+      const gf = ctx.createRadialGradient(0, 0, 1, 0, 0, f.r);
+      gf.addColorStop(0, '#ffffff');
+      gf.addColorStop(0.5, '#9dffb0');
+      gf.addColorStop(1, '#2e8f3f');
+      ctx.fillStyle = gf;
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  // 妲己：狐火彈（法術球）
+  for (const b of state.balls) {
+    if (b.char.type !== 'daji' || !b.dajiBalls) continue;
+    for (const s of b.dajiBalls) {
+      ctx.save();
+      ctx.translate(s.x, s.y);
+      ctx.shadowColor = '#ff4fa3';
+      ctx.shadowBlur = 18;
+      ctx.globalAlpha = 0.92;
+      ctx.beginPath();
+      ctx.arc(0, 0, s.r, 0, Math.PI * 2);
+      const gs = ctx.createRadialGradient(0, 0, 1, 0, 0, s.r);
+      gs.addColorStop(0, '#ffffff');
+      gs.addColorStop(0.5, '#ff9ad4');
+      gs.addColorStop(1, '#a3226b');
+      ctx.fillStyle = gs;
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  // 妲己：被魅惑期間的連結特效
+  for (const b of state.balls) {
+    if (b.char.type !== 'daji' || !(b.dajiCharmTimer > 0) || !b.dajiCharmTarget || b.dajiCharmTarget.hp <= 0) continue;
+    const t = b.dajiCharmTarget;
+    ctx.save();
+    ctx.strokeStyle = 'rgba(255,138,209,0.55)';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([4, 5]);
+    ctx.beginPath();
+    ctx.moveTo(b.x, b.y);
+    ctx.lineTo(t.x, t.y);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
+  }
+
+  // 妲己：尾巴疊層視覺化（依尾巴數畫出蘿蔔造型的小尾巴）
+  for (const b of state.balls) {
+    if (b.char.type !== 'daji' || b.hp <= 0) continue;
+    const tailCount = Math.floor(b.dajiTails || 0);
+    if (tailCount <= 0) continue;
+    ctx.save();
+    ctx.translate(b.x, b.y);
+    const facing = Math.atan2(b.vy || 0, b.vx || 0) || Math.PI / 2;
+    const backAngle = facing + Math.PI; // 尾巴長在移動方向的反方向
+    const spread = Math.min(Math.PI * 0.9, 0.25 + tailCount * 0.09);
+    for (let i = 0; i < tailCount; i++) {
+      const frac = tailCount === 1 ? 0.5 : i / (tailCount - 1);
+      const ang = backAngle - spread / 2 + spread * frac;
+      const sway = Math.sin(elapsed * 2.2 + i * 0.7) * 0.12;
+      const a2 = ang + sway;
+      const isNewest = i === tailCount - 1;
+      const stemLen = RADIUS * 0.55;
+      const bulbLen = RADIUS * (isNewest ? 1.05 : 0.95);
+      const baseX = Math.cos(a2) * RADIUS * 0.55, baseY = Math.sin(a2) * RADIUS * 0.55;
+      const midX = Math.cos(a2) * (RADIUS * 0.55 + stemLen), midY = Math.sin(a2) * (RADIUS * 0.55 + stemLen);
+      const cx = midX + Math.cos(a2) * (bulbLen / 2), cy = midY + Math.sin(a2) * (bulbLen / 2);
+      // 細莖（連接身體與蘿蔔身）
+      ctx.beginPath();
+      ctx.moveTo(baseX, baseY);
+      ctx.lineTo(midX, midY);
+      ctx.strokeStyle = 'rgba(196,232,182,0.9)';
+      ctx.lineWidth = 2.5;
+      ctx.lineCap = 'round';
+      ctx.stroke();
+      // 一小撮蘿蔔葉（莖與蘿蔔身交界處）
+      ctx.save();
+      ctx.translate(midX, midY);
+      ctx.rotate(a2);
+      ctx.fillStyle = 'rgba(120,200,120,0.9)';
+      ctx.beginPath(); ctx.ellipse(0, -4, 5, 2.4, 0.5, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(0, 4, 5, 2.4, -0.5, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+      // 蘿蔔身（橢圓，肩部偏粉、尾端偏白）
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(a2);
+      const bulbW = isNewest ? 8 : 7, bulbH = bulbLen / 2;
+      const grad = ctx.createLinearGradient(-bulbH, 0, bulbH, 0);
+      grad.addColorStop(0, 'rgba(255,163,186,0.95)');
+      grad.addColorStop(0.4, 'rgba(255,232,238,0.95)');
+      grad.addColorStop(1, 'rgba(255,255,255,0.97)');
+      ctx.beginPath();
+      ctx.ellipse(0, 0, bulbH, bulbW, 0, 0, Math.PI * 2);
+      ctx.fillStyle = grad;
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(224,138,199,0.4)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      ctx.restore();
+    }
+    ctx.restore();
+  }
+
+  // 妲己：近戰揮尾巴動畫特效
+  for (const b of state.balls) {
+    if (b.char.type !== 'daji' || !b.dajiTailSwing) continue;
+    const sw = b.dajiTailSwing;
+    const prog = 1 - Math.max(0, sw.t) / sw.dur; // 0 → 1
+    const alpha = Math.max(0, 1 - prog) * 0.9;
+    ctx.save();
+    ctx.translate(b.x, b.y);
+    ctx.rotate(sw.ang);
+    const sweepAngle = -0.9 + prog * 1.8; // 由後往前掃過
+    const r1 = RADIUS * 1.1, r2 = RADIUS * 2.1;
+    ctx.beginPath();
+    ctx.arc(0, 0, r2, sweepAngle - 0.5, sweepAngle + 0.15);
+    ctx.arc(0, 0, r1, sweepAngle + 0.15, sweepAngle - 0.5, true);
+    ctx.closePath();
+    ctx.fillStyle = `rgba(255,138,209,${alpha * 0.55})`;
+    ctx.shadowColor = '#ff8ad1';
+    ctx.shadowBlur = 14;
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(0, 0, r2, sweepAngle - 0.1, sweepAngle + 0.15);
+    ctx.strokeStyle = `rgba(255,255,255,${alpha})`;
+    ctx.lineWidth = 3;
+    ctx.stroke();
+    ctx.restore();
+  }
+
   // Oblivionis：頌樂音符
   for (const b of state.balls) {
     if (b.char.type !== 'sakiko' || !b.sakikoNotes) continue;
@@ -10738,7 +11500,7 @@ function render() {
   // 暗夜領主：吸血特效
   for (const b of state.balls) {
     if (b.char.type !== 'vampire' || !b.vampireBiting) continue;
-    const enemy = state.balls.find(x => x.player !== b.player);
+    const enemy = getNearestEnemyTo(b.x, b.y, b.player);
     if (!enemy) continue;
 
     const dx = b.x - enemy.x, dy = b.y - enemy.y;
@@ -11677,7 +12439,7 @@ function render() {
     }
     ctx.restore();
   }
-  // 帶土被動：虛化態等待圓圈（閒置時顯示虛化冷卻進度）
+  // 帶土被動：虛化態等待圓圈（閒置時顯示虛化CD進度）
   if (obitoB && obitoB.obitoKamuiPhase === 'idle' && !obitoB.obitoFireballDashing && !obitoB.obitoFireballDashDelay && !obitoB.obitoPhasing) {
     ctx.save();
     const stored = (obitoB.obitoAbsorbStored && obitoB.obitoAbsorbStored.length) || 0;
@@ -11744,6 +12506,8 @@ function render() {
 
   // 繪製球
   for (const b of state.balls) {
+    // 已死亡：直接從戰場消失，不再繪製本體（也不佔位）
+    if (b.hp <= 0) continue;
     // 詛咒橫切動畫中：隱藏被擊殺角色本體（由特效自己畫兩半）
     if (state.curseSliceKillFX && b.player === state.curseSliceKillFX.targetPlayer) continue;
     // 帶土在神威空間中：在主場地隱形
@@ -12124,7 +12888,7 @@ function render() {
       }
 
       // 鍛造倒數進度條（在球下方）
-      const nearEnemy3 = (() => { const e = state.balls.find(x => x.player !== b.player); return e && Math.hypot(e.x - b.x, e.y - b.y) < SMITH_SWORD_RANGE; })();
+      const nearEnemy3 = (() => { const e = getNearestEnemyTo(b.x, b.y, b.player); return e && Math.hypot(e.x - b.x, e.y - b.y) < SMITH_SWORD_RANGE; })();
       if (!nearEnemy3) {
         const barW = RADIUS * 2;
         const barH = 4;
@@ -12145,7 +12909,7 @@ function render() {
       // 揮劍弧線（加強版）
       if (b.smithSwordSwinging) {
         const swingProg = 1 - (b.smithSwordSwingTimer || 0) / 0.25;
-        const enemy2 = state.balls.find(x => x.player !== b.player);
+        const enemy2 = getNearestEnemyTo(b.x, b.y, b.player);
         const sDir = enemy2 ? Math.atan2(enemy2.y - b.y, enemy2.x - b.x) : 0;
         ctx.save();
         ctx.translate(b.x, b.y);
@@ -12303,7 +13067,7 @@ function render() {
       if (b.steveAxeCharging) {
         const chargeMax = STEVE_AXE_CHARGE[b.stevePhase] || 0.1;
         const chargeProg = 1 - Math.max(0, b.steveAxeChargeTimer) / chargeMax; // 0→1
-        const enemy2 = state.balls.find(x => x.player !== b.player);
+        const enemy2 = getNearestEnemyTo(b.x, b.y, b.player);
         const aimAngle = enemy2 ? Math.atan2(enemy2.y - b.y, enemy2.x - b.x) : 0;
         ctx.save();
         ctx.translate(b.x, b.y);
@@ -13013,22 +13777,23 @@ function render() {
 
 function updateHUD() {
   if (!state.balls) return;
-  const [b0,b1] = state.balls;
-  const hp0 = Math.max(0,b0.hp), hp1 = Math.max(0,b1.hp);
-  const bleed0 = Math.min(b0.tigerBleedPool||0, MAX_HP - hp0);
-  const bleed1 = Math.min(b1.tigerBleedPool||0, MAX_HP - hp1);
-  // 主血條
-  document.getElementById('p1-bar').style.width = (hp0/MAX_HP*100)+'%';
-  document.getElementById('p2-bar').style.width = (hp1/MAX_HP*100)+'%';
-  // 流血池（在主血條後方用不同顏色顯示，用 box-shadow 模擬）
-  const p1BleedWidth = (bleed0/MAX_HP*100).toFixed(1)+'%';
-  const p2BleedWidth = (bleed1/MAX_HP*100).toFixed(1)+'%';
-  const p1BleedEl = document.getElementById('p1-bleed-bar');
-  const p2BleedEl = document.getElementById('p2-bleed-bar');
-  if (p1BleedEl) { p1BleedEl.style.width = p1BleedWidth; p1BleedEl.style.left = (hp0/MAX_HP*100).toFixed(1)+'%'; }
-  if (p2BleedEl) { p2BleedEl.style.width = p2BleedWidth; p2BleedEl.style.right = (hp1/MAX_HP*100).toFixed(1)+'%'; }
-  document.getElementById('p1-hp-num').textContent = `${Math.ceil(hp0)} / ${MAX_HP}`;
-  document.getElementById('p2-hp-num').textContent = `${Math.ceil(hp1)} / ${MAX_HP}`;
+  state.balls.forEach((b, i) => {
+    const n = i + 1;
+    if (n > 4) return; // HUD 目前最多顯示4位
+    const hp = Math.max(0, b.hp);
+    const bleed = Math.min(b.tigerBleedPool || 0, MAX_HP - hp);
+    const barEl = document.getElementById(`p${n}-bar`);
+    if (barEl) barEl.style.width = (hp/MAX_HP*100)+'%';
+    const bleedEl = document.getElementById(`p${n}-bleed-bar`);
+    if (bleedEl) {
+      const bleedWidth = (bleed/MAX_HP*100).toFixed(1)+'%';
+      const pos = (hp/MAX_HP*100).toFixed(1)+'%';
+      bleedEl.style.width = bleedWidth;
+      if (n % 2 === 1) bleedEl.style.left = pos; else bleedEl.style.right = pos;
+    }
+    const numEl = document.getElementById(`p${n}-hp-num`);
+    if (numEl) numEl.textContent = `${Math.ceil(hp)} / ${MAX_HP}`;
+  });
   document.getElementById('timer-display').textContent =
     ({lava:'🌋 ', snow:'❄️ ', grass:'🌿 ', sand:'🏜️ ', beach:'🏖️ '}[state.arena] || '') + Math.floor(elapsed) + 's';
 
@@ -13091,7 +13856,7 @@ function updateHUD() {
       const swordCD = Math.max(0, b.smithSwordTimer || 0).toFixed(1);
       if (b.smithSwordSwinging) return `⚔️ 斬擊！(鍛造×${b.smithForgeStacks})`;
       const nearEnemy = (() => {
-        const enemy2 = state.balls.find(x => x.player !== b.player);
+        const enemy2 = getNearestEnemyTo(b.x, b.y, b.player);
         return enemy2 && Math.hypot(enemy2.x - b.x, enemy2.y - b.y) < SMITH_SWORD_RANGE;
       })();
       if (nearEnemy) return `⚔️ 劍擊 CD:${swordCD}s (鍛造×${b.smithForgeStacks})`;
@@ -13150,7 +13915,7 @@ function updateHUD() {
       if (b.tigerCharging) return `🐯 蓄力中⚡ 血球${orbCount}/${TIGER_NOVA_THRESHOLD}`;
       if (b.tigerNovaCharging) return `🐯 ☄️超新星蓄力中！`;
       if (orbCount >= TIGER_NOVA_THRESHOLD && (b.tigerNovaCooldown || 0) <= 0) return `🐯 ☄️超新星就緒！血條${bleedPool}`;
-      if (orbCount >= TIGER_NOVA_THRESHOLD) return `🐯 ☄️冷卻中${Math.ceil(b.tigerNovaCooldown)}s 球${orbCount}/${TIGER_NOVA_THRESHOLD}`;
+      if (orbCount >= TIGER_NOVA_THRESHOLD) return `🐯 ☄️CD中${Math.ceil(b.tigerNovaCooldown)}s 球${orbCount}/${TIGER_NOVA_THRESHOLD}`;
       return `🐯 徑庭拳:${punchLeft}s 球${orbCount}/${TIGER_NOVA_THRESHOLD}${bleedPool>0?' 💉'+bleedPool:''}`;
     } else if (b.char.type === 'stargirl') {
       const bigCount = state.starBigStars ? state.starBigStars.filter(s => s.owner === b.player).length : 0;
@@ -13179,7 +13944,7 @@ function updateHUD() {
         let extra = '';
         if (b.getoSpecialSkill === 'surge' && b.getoSurgeCharging) extra = '蓄力中⚠️';
         else if (b.getoSpecialSkill === 'bind') {
-          const enemy = state.balls.find(x => x.player !== b.player);
+          const enemy = getNearestEnemyTo(b.x, b.y, b.player);
           extra = (enemy && enemy.getoBoundTimer > 0) ? '鎖定中！' : `CD:${Math.max(0, b.getoBindTimer || 0).toFixed(1)}s`;
         } else if (b.getoSpecialSkill === 'entangle') extra = `${Math.max(0, b.getoEntangleTimer || 0).toFixed(1)}s`;
         else if (b.getoSpecialSkill === 'surge') extra = `CD:${Math.max(0, b.getoSurgeTimer || 0).toFixed(1)}s`;
@@ -13205,12 +13970,24 @@ function updateHUD() {
       const dashCd = Math.max(0, b.josephDashTimer||0).toFixed(1);
       const springCd = Math.max(0, b.josephSpringTimer||0).toFixed(1);
       return `🌊波紋呼吸法 疾走${dashCd}s 彈簧${springCd}s ${syoStr}${stackStr}`;
+    } else if (b.char.type === 'daji') {
+      const tails = b.dajiTails || 0;
+      const enh = b.dajiEnhanceReady ? '✨強化就緒！' : '';
+      if (b.dajiCharmTimer > 0) return `💗 魅惑中 ${b.dajiCharmTimer.toFixed(1)}s ${enh}`;
+      if (b.dajiSkill2Channel > 0) return `🔮 蓄力中 ${b.dajiSkill2Channel.toFixed(1)}s ${enh}`;
+      const cd1 = Math.max(0, b.dajiSkill1Cd || 0).toFixed(1);
+      const cd2 = Math.max(0, b.dajiSkill2Cd || 0).toFixed(1);
+      return `🦊 尾${tails}/${DAJI_TAIL_MAX} 💗${cd1}s 🔮${cd2}s ${enh}`;
     } else {
       return '';
     }
   }
-  document.getElementById('p1-status').textContent = statusText(b0);
-  document.getElementById('p2-status').textContent = statusText(b1);
+  state.balls.forEach((b, i) => {
+    const n = i + 1;
+    if (n > 4) return;
+    const statusEl = document.getElementById(`p${n}-status`);
+    if (statusEl) statusEl.textContent = statusText(b);
+  });
 }
 
 function showResult(deadBalls) {
@@ -13218,11 +13995,14 @@ function showResult(deadBalls) {
   const titleEl = document.getElementById('result-title');
   const subEl   = document.getElementById('result-sub');
   const statsEl = document.getElementById('result-stats');
-  if (deadBalls.length === 2) {
-    titleEl.textContent = '平局！'; titleEl.style.color = '#c8a84b'; subEl.textContent = '兩位勇士同歸於盡';
+  const winnerBall = state.balls.find(b => b.hp > 0);
+  if (!winnerBall) {
+    titleEl.textContent = '平局！'; titleEl.style.color = '#c8a84b';
+    subEl.textContent = state.balls.length > 2 ? '所有戰士同歸於盡' : '兩位勇士同歸於盡';
   } else {
-    const winner = state.balls.find(b => b.player !== deadBalls[0].player);
-    const loser  = deadBalls[0];
+    const winner = winnerBall;
+    // 多人混戰時，loser 僅用於特定勝利台詞查詢，取最後一位倒下的對手
+    const loser  = deadBalls[deadBalls.length - 1] || deadBalls[0];
     titleEl.textContent = `${winner.char.emoji} 勝利！`;
     titleEl.style.color = winner.char.color;
     // 特定對手專屬勝利台詞：若 winner.char.vsQuotes[loser角色id] 有設定，優先使用；否則用一般 winQuote
