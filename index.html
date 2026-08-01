@@ -969,7 +969,14 @@
     <div style="font-size:1.1rem;font-weight:800;color:#eee;letter-spacing:.12em">🏆 角色勝率榜</div>
     <button id="winrate-modal-close" style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);color:#ccc;cursor:pointer;font-size:0.9rem">✕</button>
   </div>
-  <div id="winrate-modal-list" style="display:flex;flex-direction:column;gap:8px;width:min(92vw,420px);max-height:min(60vh,500px);overflow-y:auto;padding:4px 6px 16px;"></div>
+  <div class="roster-scroll-area" style="flex:none;height:min(60vh,500px);max-width:min(92vw,420px)">
+    <div class="roster-grid-wrap" id="winrate-modal-list-wrap">
+      <div id="winrate-modal-list" style="display:flex;flex-direction:column;gap:8px;padding:4px 6px 16px;"></div>
+    </div>
+    <div class="roster-scrollbar" id="winrate-modal-scrollbar">
+      <div class="roster-scrollbar-thumb" id="winrate-modal-scrollbar-thumb"></div>
+    </div>
+  </div>
 </div>
 
 <!-- ══ ROSTER MODAL ══ -->
@@ -3296,12 +3303,14 @@ function openWinRateBoard() {
   document.getElementById('winrate-modal').style.display = 'flex';
   if (!winRateDB) {
     listEl.innerHTML = `<div style="text-align:center;color:#888;font-size:0.85rem;padding:20px 0">尚未設定勝率榜服務，敬請期待。</div>`;
+    setTimeout(() => window.updateWinRateThumb && window.updateWinRateThumb(), 30);
     return;
   }
   listEl.innerHTML = `<div style="text-align:center;color:#888;font-size:0.85rem;padding:20px 0">讀取中...</div>`;
   fetchWinRateBoard(rows => {
     if (rows.length === 0) {
       listEl.innerHTML = `<div style="text-align:center;color:#888;font-size:0.85rem;padding:20px 0">目前還沒有對戰紀錄，去打一場吧！</div>`;
+      setTimeout(() => window.updateWinRateThumb && window.updateWinRateThumb(), 30);
       return;
     }
     listEl.innerHTML = rows.map((r, i) => {
@@ -3317,11 +3326,62 @@ function openWinRateBoard() {
         <div style="text-align:right;font-size:0.68rem;color:#888;min-width:56px">${r.wins}勝${r.losses}敗</div>
       </div>`;
     }).join('');
+    setTimeout(() => window.updateWinRateThumb && window.updateWinRateThumb(), 30);
   });
 }
 document.getElementById('winrate-modal-close').addEventListener('click', () => {
   document.getElementById('winrate-modal').style.display = 'none';
 });
+
+// ── 勝率榜：自訂垂直滑條（跟場地選擇同一套邏輯）──
+(function () {
+  const gridWrap = document.getElementById('winrate-modal-list-wrap');
+  const sbar     = document.getElementById('winrate-modal-scrollbar');
+  const sthumb   = document.getElementById('winrate-modal-scrollbar-thumb');
+  if (!gridWrap || !sbar || !sthumb) return;
+
+  window.updateWinRateThumb = function () {
+    const trackH = sbar.clientHeight;
+    const ratio  = gridWrap.clientHeight / gridWrap.scrollHeight;
+    if (!isFinite(ratio) || ratio >= 1) { sthumb.style.display = 'none'; return; }
+    sthumb.style.display = 'block';
+    const thumbH = Math.max(28, trackH * ratio);
+    const maxScroll = gridWrap.scrollHeight - gridWrap.clientHeight;
+    const scrollRatio = maxScroll > 0 ? gridWrap.scrollTop / maxScroll : 0;
+    sthumb.style.height = thumbH + 'px';
+    sthumb.style.top = (scrollRatio * (trackH - thumbH)) + 'px';
+  };
+
+  gridWrap.addEventListener('scroll', updateWinRateThumb);
+  window.addEventListener('resize', updateWinRateThumb);
+
+  let dragging = false, dragStartY = 0, dragStartScroll = 0;
+  function onDragMove(clientY) {
+    const trackH = sbar.clientHeight;
+    const thumbH = sthumb.offsetHeight;
+    const maxScroll = gridWrap.scrollHeight - gridWrap.clientHeight;
+    const deltaY = clientY - dragStartY;
+    const deltaRatio = deltaY / (trackH - thumbH);
+    gridWrap.scrollTop = dragStartScroll + deltaRatio * maxScroll;
+  }
+  sthumb.addEventListener('pointerdown', e => {
+    dragging = true;
+    dragStartY = e.clientY;
+    dragStartScroll = gridWrap.scrollTop;
+    sthumb.setPointerCapture(e.pointerId);
+  });
+  sthumb.addEventListener('pointermove', e => { if (dragging) onDragMove(e.clientY); });
+  sthumb.addEventListener('pointerup', () => { dragging = false; });
+  sthumb.addEventListener('pointercancel', () => { dragging = false; });
+
+  sbar.addEventListener('pointerdown', e => {
+    if (e.target === sthumb) return;
+    const rect = sbar.getBoundingClientRect();
+    const clickRatio = (e.clientY - rect.top) / rect.height;
+    const maxScroll = gridWrap.scrollHeight - gridWrap.clientHeight;
+    gridWrap.scrollTop = clickRatio * maxScroll;
+  });
+})();
 
 buildCarousels();
 refreshOpmLock();
@@ -20902,14 +20962,22 @@ function showResult(deadBalls) {
     subEl.textContent = state.balls.length > 2 ? '所有戰士同歸於盡' : '兩位勇士同歸於盡';
   } else {
     const winner = winnerBall;
-    // 寫入勝率榜：排除組裝機器人、沙盒隊伍戰、木偶訓練（角色組合不固定或非正式對戰）
-    if (!assembleMode && !sandboxMode && !dummyPracticeMode) {
+    // 寫入勝率榜：只算 1v1（場上剛好兩位玩家），排除 3-4 人混戰、車輪戰、
+    // 組裝機器人、沙盒隊伍戰、木偶訓練，以及「內戰」（雙方角色相同，贏的是操作不是角色強度）
+    if (!assembleMode && !sandboxMode && !dummyPracticeMode && !wheelState) {
       const recordedPlayers = new Set();
+      const perPlayerChar = [];
       state.balls.forEach(b => {
         if (recordedPlayers.has(b.player) || !b.char || !b.char.id) return;
         recordedPlayers.add(b.player);
-        recordCharacterResult(b.char.id, b.player === winner.player);
+        perPlayerChar.push({ player: b.player, charId: b.char.id });
       });
+      const distinctChars = new Set(perPlayerChar.map(p => p.charId));
+      if (perPlayerChar.length === 2 && distinctChars.size > 1) {
+        perPlayerChar.forEach(p => {
+          recordCharacterResult(p.charId, p.player === winner.player);
+        });
+      }
     }
     // 多人混戰時，loser 僅用於特定勝利台詞查詢，取最後一位倒下的對手
     const loser  = deadBalls[deadBalls.length - 1] || deadBalls[0];
