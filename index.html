@@ -142,12 +142,6 @@
     gap: 8px;
     font-family: 'Noto Serif TC', serif;
   }
-  .pill-select-btn.endless-pill {
-    background: linear-gradient(135deg, rgba(255,140,0,0.18), rgba(200,60,60,0.18));
-    border-color: rgba(255,140,0,0.5);
-    color: #ffaa44;
-  }
-
   .char-card.locked {
     opacity: 0.3;
     filter: grayscale(1);
@@ -853,6 +847,9 @@
   }
   .roster-scrollbar-thumb:active { cursor: grabbing; background: rgba(200,168,75,0.8); }
 </style>
+<!-- 勝率榜用：Firebase（免費雲端資料庫，讓所有玩家的對戰結果匯總到同一個地方） -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 </head>
 <body>
 
@@ -943,6 +940,10 @@
       <span id="arena-pick-emoji">🏟️</span>
       <span id="arena-pick-name">標準場地</span>
     </button>
+    <button id="winrate-pick-btn" type="button" class="pill-select-btn" onclick="openWinRateBoard()">
+      <span>🏆</span>
+      <span>勝率榜</span>
+    </button>
   </div>
 
   <div class="bg-color-select" style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:10px">
@@ -960,6 +961,15 @@
     <button id="mode-modal-close" style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);color:#ccc;cursor:pointer;font-size:0.9rem">✕</button>
   </div>
   <div id="mode-modal-grid" style="display:flex;gap:16px;flex-wrap:wrap;justify-content:center;max-width:700px;max-height:min(60vh,500px);overflow-y:auto;padding:4px 16px 16px;"></div>
+</div>
+
+<!-- ══ 勝率榜 MODAL ══ -->
+<div id="winrate-modal" style="display:none;position:fixed;inset:0;background:rgba(5,3,2,0.95);z-index:300;flex-direction:column;align-items:center;justify-content:center;gap:18px;font-family:sans-serif;">
+  <div style="display:flex;align-items:center;gap:14px">
+    <div style="font-size:1.1rem;font-weight:800;color:#eee;letter-spacing:.12em">🏆 角色勝率榜</div>
+    <button id="winrate-modal-close" style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);color:#ccc;cursor:pointer;font-size:0.9rem">✕</button>
+  </div>
+  <div id="winrate-modal-list" style="display:flex;flex-direction:column;gap:8px;width:min(92vw,420px);max-height:min(60vh,500px);overflow-y:auto;padding:4px 6px 16px;"></div>
 </div>
 
 <!-- ══ ROSTER MODAL ══ -->
@@ -1032,22 +1042,6 @@
 </div>
 
 <!-- ══ GAME SCREEN ══ -->
-<div id="endless-pick-screen" style="display:none;position:fixed;inset:0;background:#0a0008;z-index:200;flex-direction:column;align-items:center;justify-content:center;gap:0;font-family:sans-serif;color:#eee;">
-  <div id="ep-stage" style="font-size:1.5rem;font-weight:900;letter-spacing:.15em;color:#ffaa44;text-shadow:0 0 18px #ff6600;margin-bottom:4px">第 1 關</div>
-  <div id="ep-next-label" style="font-size:0.75rem;color:#888;letter-spacing:.12em;margin-bottom:2px">下一位對手</div>
-  <div id="ep-next-enemy" style="font-size:1.6rem;font-weight:700;margin-bottom:18px">─</div>
-  <div style="font-size:0.75rem;color:#aaa;letter-spacing:.1em;margin-bottom:10px">選擇你的角色（三選一）</div>
-  <div id="ep-cards" style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;"></div>
-  <div id="ep-best" style="margin-top:22px;font-size:0.78rem;color:#666;letter-spacing:.1em"></div>
-</div>
-
-<div id="endless-result-screen" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:201;flex-direction:column;align-items:center;justify-content:center;gap:12px;font-family:sans-serif;color:#eee;">
-  <div id="er-title" style="font-size:2rem;font-weight:900;color:#ff4444;text-shadow:0 0 24px #ff2200">💀 挑戰失敗</div>
-  <div id="er-stage" style="font-size:1.1rem;color:#ffaa44;font-weight:700"></div>
-  <div id="er-best" style="font-size:0.9rem;color:#888"></div>
-  <button onclick="startEndless()" style="margin-top:16px;padding:12px 36px;background:rgba(255,140,0,0.2);border:1px solid rgba(255,140,0,0.5);border-radius:24px;color:#ffaa44;font-size:1rem;font-weight:700;cursor:pointer;letter-spacing:.1em">🔥 再次挑戰</button>
-  <button onclick="backToSelect()" style="padding:8px 28px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:20px;color:#aaa;font-size:0.85rem;cursor:pointer">回到選角</button>
-</div>
 
 <!-- ══ 組裝模式：零件挑選畫面 ══ -->
 <div id="assemble-pick-screen" style="display:none;position:fixed;inset:0;background:#04070a;z-index:200;flex-direction:column;align-items:center;justify-content:flex-start;gap:0;font-family:sans-serif;color:#eee;overflow-y:auto;padding:24px 16px 40px;">
@@ -1103,7 +1097,6 @@
     </div>
     <div class="hud-center">
       <div class="round-num" id="timer-display">0s</div>
-      <button id="endless-stop-btn" onclick="endlessQuit()" style="display:none;margin-top:4px;padding:2px 10px;background:rgba(255,60,60,0.15);border:1px solid rgba(255,80,80,0.4);border-radius:12px;color:#ff7070;font-size:0.65rem;cursor:pointer;letter-spacing:.08em;">✕ 放棄闖關</button>
       <button id="assemble-stop-btn" onclick="assembleQuit()" style="display:none;margin-top:4px;padding:2px 10px;background:rgba(255,60,60,0.15);border:1px solid rgba(255,80,80,0.4);border-radius:12px;color:#ff7070;font-size:0.65rem;cursor:pointer;letter-spacing:.08em;">✕ 放棄闖關</button>
     </div>
     <div class="hp-block right">
@@ -1145,6 +1138,48 @@
 </div>
 
 <script>
+// ──────────────── 勝率榜（Firebase） ────────────────
+// ⚠️ 把下面換成你自己 Firebase 專案的設定值（Firebase Console → 專案設定 → 你的應用程式）
+// 還沒設定好之前，這裡先留空值，勝率功能會自動停用（不影響遊戲本身）。
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyBy0wl78hCpaNzD4W047cyXqA_D0Tg7g7o",   
+  databaseURL: "https://test-c6c79-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "test-c6c79"
+};
+
+let winRateDB = null;
+if (FIREBASE_CONFIG.databaseURL) {
+  try {
+    firebase.initializeApp(FIREBASE_CONFIG);
+    winRateDB = firebase.database();
+  } catch (e) { console.warn('勝率榜初始化失敗', e); }
+}
+
+// 對戰結束時呼叫：把這場戰鬥裡每個角色的勝/敗各 +1 寫回雲端
+function recordCharacterResult(charId, won) {
+  if (!winRateDB || !charId) return;
+  const ref = winRateDB.ref(`charStats/${charId}/${won ? 'wins' : 'losses'}`);
+  ref.transaction(cur => (cur || 0) + 1);
+}
+
+// 讀取所有角色的勝率榜，callback(rows) 其中 rows = [{id, wins, losses, total, rate}], 依勝率高→低排序
+function fetchWinRateBoard(callback) {
+  if (!winRateDB) { callback([]); return; }
+  winRateDB.ref('charStats').once('value')
+    .then(snap => {
+      const data = snap.val() || {};
+      const rows = Object.keys(data).map(id => {
+        const wins = data[id].wins || 0;
+        const losses = data[id].losses || 0;
+        const total = wins + losses;
+        return { id, wins, losses, total, rate: total > 0 ? wins / total : 0 };
+      }).filter(r => r.total > 0);
+      rows.sort((a, b) => b.rate - a.rate || b.total - a.total);
+      callback(rows);
+    })
+    .catch(e => { console.warn('讀取勝率榜失敗', e); callback([]); });
+}
+
 // ──────────────── AUDIO ────────────────
 let audioCtx = null;
 function getAudioCtx() {
@@ -1513,11 +1548,161 @@ const MODES = [
   { count: 2, emoji: '⚔️', name: '2人對戰', desc: '經典一對一對決。' },
   { count: 3, emoji: '🔥', name: '3人混戰', desc: '三方混戰，一拳超人停用。' },
   { count: 4, emoji: '💀', name: '4人混戰', desc: '四方混戰，一拳超人停用。' },
-  { special: 'endless', emoji: '🔥', name: '模擬手札', desc: '無盡闖關，逐關強化。' },
   { special: 'assemble', emoji: '🤖', name: '組裝模式', desc: '自組零件，闖關對決。' },
   { special: 'wheel', emoji: '🔁', name: '車輪戰', desc: '3v3接力，一拳超人停用。' },
-  { special: 'sandbox', emoji: '🧪', name: '沙盒模式', desc: '不限隊伍與人數，自訂場地大小與地圖。' }
+  { special: 'sandbox', emoji: '🧪', name: '沙盒模式', desc: '不限隊伍與人數，自訂場地大小與地圖。' },
+  { special: 'dummy', emoji: '🎯', name: '木偶訓練', desc: '木偶站在場地正中央，不會反擊，即時顯示總傷害與秒傷。' }
 ];
+
+// ══════════════ 木偶訓練模式 ══════════════
+// 木偶不是CHARACTERS陣列裡的正式角色，只在木偶訓練模式建立戰鬥時，
+// 直接塞給 startGame() 的角色解析流程使用（見 startGame 內 chs 的 base 判斷），
+// 不會出現在一般選角輪播、圖鑑、沙盒、車輪戰、組裝模式等任何角色清單裡。
+const DUMMY_CHARACTER = {
+  id: 'dummy_target', emoji: '🎯', weapon: '🎯', name: '木偶',
+  desc: '固定站在場地正中央的訓練木偶，不會反擊、不會移動、血量永遠不會歸零。',
+  stats: ['木偶'],
+  skills: ['被動：不會攻擊、不會移動，血量永遠維持滿血，用來測試角色的總傷害與秒傷輸出。'],
+  color: '#8a8a8a', glowColor: 'rgba(138,138,138,0.6)', type: 'dummy'
+};
+let dummyPracticeMode = false;   // 是否正處於木偶訓練模式
+let dummyTotalDamage  = 0;       // 累計總傷害
+let dummyDpsHistory   = [];      // 秒傷計算用的近期命中紀錄 {t, dmg}
+
+function startDummyPractice() {
+  setPlayerMode(2); // 固定單挑，避免殘留3-4人混戰設定（含UI顯示）混進來
+  p3Choice = null; p4Choice = null;
+  showDummyPick();
+}
+
+function showDummyPick() {
+  document.getElementById('select-screen').style.display = 'none';
+  document.getElementById('game-screen').style.display = 'none';
+  document.getElementById('overlay').classList.remove('show');
+
+  let modal = document.getElementById('dummy-pick-screen');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'dummy-pick-screen';
+    modal.style.cssText = `
+      position:fixed;inset:0;background:#0a0008;z-index:200;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+      font-family:inherit;color:#eee;padding:20px;
+    `;
+    modal.innerHTML = `
+      <div style="font-size:1.3rem;font-weight:700;">🎯 木偶訓練：選擇角色</div>
+      <div style="font-size:0.75rem;color:#999;text-align:center;max-width:600px;">木偶會固定站在場地正中央，不會反擊、不會移動，畫面上方即時顯示總傷害與秒傷。</div>
+      <div id="dummy-pick-grid" style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;max-width:900px;max-height:60vh;overflow-y:auto;padding:6px;"></div>
+      <button id="dummy-pick-cancel" style="margin-top:4px;padding:6px 20px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);border-radius:14px;color:#ccc;cursor:pointer;">取消</button>
+    `;
+    document.body.appendChild(modal);
+    document.getElementById('dummy-pick-cancel').onclick = () => {
+      modal.style.display = 'none';
+      document.getElementById('select-screen').style.display = 'flex';
+    };
+  }
+  modal.style.display = 'flex';
+
+  const grid = document.getElementById('dummy-pick-grid');
+  grid.innerHTML = '';
+  CHARACTERS.forEach(ch => {
+    const btn = document.createElement('div');
+    btn.className = 'sb-char-btn';
+    btn.innerHTML = `<div style="font-size:1.6rem">${charIconHTML(ch, '1.6rem')}</div><div>${ch.name}</div>`;
+    btn.onclick = () => {
+      modal.style.display = 'none';
+      launchDummyPractice(ch.id);
+    };
+    grid.appendChild(btn);
+  });
+}
+
+function launchDummyPractice(charId) {
+  selectedArena = 'normal'; // 固定使用一般場地，避免熔岩/冰雪等場地效果干擾傷害測試
+  p1Choice = charId;
+  p2Choice = DUMMY_CHARACTER.id;
+  startGame();
+}
+
+function recordDummyDamage(amount) {
+  if (!(amount > 0)) return;
+  dummyTotalDamage += amount;
+  dummyDpsHistory.push({ t: elapsed, dmg: amount });
+}
+
+function getDummyDps() {
+  const windowSec = 1.5;
+  const cutoff = elapsed - windowSec;
+  while (dummyDpsHistory.length && dummyDpsHistory[0].t < cutoff) dummyDpsHistory.shift();
+  if (!dummyDpsHistory.length) return 0;
+  const sum = dummyDpsHistory.reduce((s, e) => s + e.dmg, 0);
+  return sum / windowSec;
+}
+
+// 有些技能要自己血量夠低才會觸發（例如瀕死反擊、殘血爆發等），
+// 木偶又完全不會反擊，自然打不到那個血量區間。這裡提供手動調整自身血量的按鈕，
+// 純粹直接改 hp（不經過 dealDamage），不會被木偶的傷害統計記錄到，也不會觸發死亡判定（下限鎖在1，不會真的歸零）。
+function getBallMaxHp(b) {
+  return b.char.type === 'sans' ? SANS_MAX_HP : b.char.type === 'rsqjs' ? RSQJS_MAX_HP : MAX_HP;
+}
+
+function dummySetOwnHp(fraction) {
+  if (!dummyPracticeMode || !state.balls) return;
+  state.balls.forEach(b => {
+    if (b.isDummy) return;
+    const cap = getBallMaxHp(b);
+    b.hp = Math.max(1, Math.min(cap, Math.round(cap * fraction)));
+  });
+}
+
+function dummyControlsShow(show) {
+  let panel = document.getElementById('dummy-hud-panel');
+  if (!panel) {
+    const hudCenter = document.querySelector('#hud .hud-center');
+    if (!hudCenter) return;
+    panel = document.createElement('div');
+    panel.id = 'dummy-hud-panel';
+    panel.style.cssText = `
+      margin-top:4px;display:flex;flex-direction:column;align-items:center;gap:3px;
+    `;
+    panel.innerHTML = `
+      <div style="font-size:0.68rem;line-height:1.3;">
+        <span style="color:#ffd76a;">總傷害：<span id="dummy-dmg-val">0</span></span>
+        　
+        <span style="color:#7fd0ff;">秒傷：<span id="dummy-dps-val">0</span>/s</span>
+      </div>
+      <div id="dummy-hp-btns" style="display:flex;gap:3px;flex-wrap:wrap;justify-content:center;"></div>
+    `;
+    hudCenter.appendChild(panel);
+
+    const btnRow = panel.querySelector('#dummy-hp-btns');
+    const items = [
+      { label: '滿血', frac: 1 },
+      { label: '50%', frac: 0.5 },
+      { label: '25%', frac: 0.25 },
+      { label: '10%', frac: 0.10 },
+      { label: '1血', frac: 0.001 }
+    ];
+    items.forEach(it => {
+      const btn = document.createElement('button');
+      btn.textContent = it.label;
+      btn.style.cssText = `
+        padding:1px 8px;font-size:0.6rem;border-radius:8px;cursor:pointer;
+        background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.25);color:#ccc;
+      `;
+      btn.onclick = () => dummySetOwnHp(it.frac);
+      btnRow.appendChild(btn);
+    });
+  }
+  panel.style.display = show ? 'flex' : 'none';
+}
+
+function dummyUpdateStatsDisplay() {
+  const dmgEl = document.getElementById('dummy-dmg-val');
+  const dpsEl = document.getElementById('dummy-dps-val');
+  if (dmgEl) dmgEl.textContent = Math.round(dummyTotalDamage).toLocaleString();
+  if (dpsEl) dpsEl.textContent = Math.round(getDummyDps()).toLocaleString();
+}
 let selectedBgColor = '#000000'; // 玩家自訂背景顏色
 const WALL               = 1;
 const MAX_HP             = 1200;
@@ -2237,8 +2422,67 @@ const RSQJS_ENCHANT_DMG_PER_LV     = 50;   // 「傷害」每級：+50最高傷�
 const RSQJS_ENCHANT_MAX_LV         = 5;    // 附魔等級上限（避免無限疊加失控）
 const RSQJS_STEALTH_DURATION = 2.0;    // 復仇後「迅捷潛行」無敵時間
 const RSQJS_STEALTH_CD       = 6.0;    // 迅捷潛行冷卻
+// ══════════════ 四天之龍：次元融合（四球共享血量角色） ══════════════
+const DRAGON4_DMG_REDUCE       = 0.25;  // 被動：受到傷害減免25%
+const DRAGON4_ENRAGE_HP        = 600;   // 血量低於此值進入強化狀態
+const DRAGON4_ENRAGE_CD_MUL    = 0.5;   // 強化狀態：技能冷卻減半
 
+// 🟨擺弧噴射
+const DRAGON4_PENDULUM_CD        = 4;
+const DRAGON4_PENDULUM_DURATION  = 2;
+const DRAGON4_PENDULUM_DPS       = 100;
+const DRAGON4_PENDULUM_RANGE     = 34;   // 判定半寬（類似純愛砲的射線寬度）
 
+// 🟪猛毒控制
+const DRAGON4_VENOM_CD           = 6;
+const DRAGON4_VENOM_DASH_SPEED   = 820;
+const DRAGON4_VENOM_DAMAGE       = 40;
+const DRAGON4_VENOM_STUN         = 2;
+const DRAGON4_VENOM_POISON_DUR   = 5;
+const DRAGON4_VENOM_POISON_DPS   = 20;
+
+// ⬜淨翼白光
+const DRAGON4_WING_CD            = 6;
+const DRAGON4_WING_BUFF_DURATION = 6;
+const DRAGON4_WING_BUFF_MULT     = 0.20;
+const DRAGON4_WING_DAMAGE        = 50;
+const DRAGON4_WING_PARALYZE_DUR  = 1.5;
+
+// ⬛叛逆吸取
+const DRAGON4_REBEL_CD           = 6;
+const DRAGON4_REBEL_DAMAGE       = 50;
+const DRAGON4_REBEL_WEAKEN_DUR   = 4;
+const DRAGON4_REBEL_WEAKEN_MULT  = 0.5;  // 對手傷害輸出減半
+
+// 娜娜明（七海建人）專屬常數 ────────────────
+const NANAMI_SLASH_DMG            = 40;   // 「劈砍」基礎傷害
+const NANAMI_SLASH_INTERVAL       = 0.8;  // 「劈砍」攻擊間隔（CD）
+const NANAMI_SLASH_RANGE          = 130;  // 「劈砍」觸發距離
+const NANAMI_SLASH_CHARGE         = 0.10; // 「劈砍」揮刀前搖時間
+const NANAMI_ANALYSIS_MAX_STACKS  = 10;   // 「情報解析」最高層數
+const NANAMI_ANALYSIS_TICK        = 0.8;  // 每幾秒累積一層
+const NANAMI_ANALYSIS_ATK_PER_STK = 0.10; // 每層增傷
+const NANAMI_ANALYSIS_DEF_PER_STK = 0.10; // 每層減傷
+const NANAMI_MARK_FLASH_DURATION   = 0.45; // 「十劃咒法」觸發瞬間，命中處裂痕特效顯示時間
+const NANAMI_MARK_TRIGGER_CHANCE  = 0.30; // 「十劃咒法」攻擊命中時觸發標記的機率
+const NANAMI_MARK_DMG_MULT        = 2.0;  // 弱點標記期間「劈砍」傷害倍率
+const NANAMI_BLACKFLASH_BASE      = 0.10; // 「黑閃紀錄保持人」基礎觸發機率
+const NANAMI_BLACKFLASH_STEP      = 0.10; // 每次連續觸發後機率增幅
+const NANAMI_BLACKFLASH_MAX_CHAIN = 4;    // 最多連續觸發次數
+const NANAMI_BLACKFLASH_DMG_MULT  = 2.0;  // 黑閃傷害倍率
+const NANAMI_WALL_COOLDOWN        = 10.0; // 「十劃咒法・瓦落瓦落」CD
+const NANAMI_WALL_ROCK_COUNT      = 5;    // 落石總數（對應持續5秒）
+const NANAMI_WALL_ROCK_INTERVAL   = 1.0;  // 落石間隔
+const NANAMI_WALL_ROCK_DMG        = 50;   // 每塊落石傷害
+const NANAMI_WALL_ROCK_FALL_TIME  = 0.35; // 落石預警到砸落所需時間
+const NANAMI_WALL_ROCK_HIT_RADIUS = 30;   // 落石命中判定半徑
+const NANAMI_WALL_SHAKE_DUR       = 0.45; // 攻擊牆壁瞬間畫面晃動時間
+const NANAMI_WALL_SHAKE_MAG       = 10;   // 攻擊牆壁瞬間畫面晃動幅度
+const NANAMI_WALL_ROCK_SHAKE_MAG  = 6;    // 每塊落石砸落時的小幅晃動
+const NANAMI_OVERTIME_TRIGGER     = 20.0; // 「加班時間」開戰後幾秒觸發
+const NANAMI_OVERTIME_DMG_MULT    = 1.5;  // 加班時間傷害倍率
+const NANAMI_OVERTIME_BLACKFLASH  = 0.20; // 加班時間期間黑閃基礎機率下限
+const NANAMI_OVERTIME_SPEED_MULT  = 1.3;  // 加班時間移速倍率
 
 const MIN_SPEED          = 100;   // 最低移動速度（技能停止中除外）
 const BOOST_INTERVAL_MIN = 3;
@@ -2279,6 +2523,8 @@ const CUSTOM_SAMURAI_IAIDO_DAMAGE    = 120; // 居合：斬擊傷害
 const CUSTOM_SAMURAI_ZENMETSU_HITS   = 4;   // 識滅斬：段數
 const CUSTOM_SAMURAI_ZENMETSU_DMG    = 140; // 識滅斬：每段傷害
 
+
+
 const CUSTOM_PARTS = {
   passive: [
     { id: 'p_drunk',   name: '喝茫',     emoji: '🍺', from: '酒鬼',   desc: '移動方向不定時隨機改變，難以預測、難以命中。' },
@@ -2318,37 +2564,6 @@ const CUSTOM_PART_CFG = {
   s1_cursed:    { engine: 'debuff', interval: 4.25, damage: 140, kind: 'root', duration: 0.6, color: '#c0392b' },
 };
 
-// ══════════════ 四天之龍：次元融合（四球共享血量角色） ══════════════
-const DRAGON4_DMG_REDUCE       = 0.25;  // 被動：受到傷害減免25%
-const DRAGON4_ENRAGE_HP        = 600;   // 血量低於此值進入強化狀態
-const DRAGON4_ENRAGE_CD_MUL    = 0.5;   // 強化狀態：技能冷卻減半
-
-// 🟨擺弧噴射
-const DRAGON4_PENDULUM_CD        = 4;
-const DRAGON4_PENDULUM_DURATION  = 2;
-const DRAGON4_PENDULUM_DPS       = 100;
-const DRAGON4_PENDULUM_RANGE     = 34;   // 判定半寬（類似純愛砲的射線寬度）
-
-// 🟪猛毒控制
-const DRAGON4_VENOM_CD           = 6;
-const DRAGON4_VENOM_DASH_SPEED   = 820;
-const DRAGON4_VENOM_DAMAGE       = 40;
-const DRAGON4_VENOM_STUN         = 2;
-const DRAGON4_VENOM_POISON_DUR   = 5;
-const DRAGON4_VENOM_POISON_DPS   = 20;
-
-// ⬜淨翼白光
-const DRAGON4_WING_CD            = 6;
-const DRAGON4_WING_BUFF_DURATION = 6;
-const DRAGON4_WING_BUFF_MULT     = 0.20;
-const DRAGON4_WING_DAMAGE        = 50;
-const DRAGON4_WING_PARALYZE_DUR  = 1.5;
-
-// ⬛叛逆吸取
-const DRAGON4_REBEL_CD           = 6;
-const DRAGON4_REBEL_DAMAGE       = 50;
-const DRAGON4_REBEL_WEAKEN_DUR   = 4;
-const DRAGON4_REBEL_WEAKEN_MULT  = 0.5;  // 對手傷害輸出減半
 
 // 四龍各自的外觀（共用同一個角色本體，僅顯示用配色不同）
 const DRAGON4_ROLES = [
@@ -2773,6 +2988,22 @@ yuki:'這是對我哥哥重要的人來說，她的理想'
     color: '#e8c93d', glowColor: 'rgba(232,201,61,0.6)', type: 'dragon4', isQuad: true,
     winQuote: '四龍歸一，天地為之退避。',
     loseQuote: '融合……終究還是崩解了嗎。'
+  },
+  {
+    id: 'nanami', emoji: '👔', weapon: '🔪', name: '娜娜明',
+    desc: '「這不是義務，是我自己選的。」原型：七海建人。手持鈍刀的社畜咒術師，平時冷靜分析戰局，一旦加班時間到了，便會卯足全力把帳算清楚。',
+    stats: ['劈砍', '情報解析', '瓦落瓦落', '加班時間'],
+    skills: [
+      `「劈砍」：揮動鈍刀進行主動攻擊，碰觸敵人造成${NANAMI_SLASH_DMG}傷害，攻擊間隔${NANAMI_SLASH_INTERVAL}s。`,
+      `被動「情報解析」：沒有觸發攻擊時，每${NANAMI_ANALYSIS_TICK}秒獲得一層增益（最多${NANAMI_ANALYSIS_MAX_STACKS}層），每層增加${Math.round(NANAMI_ANALYSIS_ATK_PER_STK*100)}%攻擊傷害與${Math.round(NANAMI_ANALYSIS_DEF_PER_STK*100)}%受擊減傷，一旦攻擊命中就會清空重新累積。`,
+      `被動「十劃咒法」：每次「劈砍」攻擊有${Math.round(NANAMI_MARK_TRIGGER_CHANCE*100)}%機率讓這一刀直接就是十劃咒法，傷害變為${NANAMI_MARK_DMG_MULT}倍；觸發黑閃後，下一刀必定是十劃咒法。`,
+      `被動「黑閃紀錄保持人」：每次近戰攻擊有${Math.round(NANAMI_BLACKFLASH_BASE*100)}%機率觸發黑閃，傷害變為${NANAMI_BLACKFLASH_DMG_MULT}倍（可與十劃咒法疊加）；觸發後下一刀必定是十劃咒法，且下次黑閃觸發機率增加${Math.round(NANAMI_BLACKFLASH_STEP*100)}%，最多連續觸發${NANAMI_BLACKFLASH_MAX_CHAIN}次，第五次攻擊必定不會觸發並重置。`,
+      `「十劃咒法・瓦落瓦落」：每${NANAMI_WALL_COOLDOWN}秒對牆壁發動攻擊，牆壁沿直線持續掉落石塊，共${NANAMI_WALL_ROCK_COUNT}塊，每塊造成${NANAMI_WALL_ROCK_DMG}傷害。`,
+      `「加班時間」：戰鬥開始${NANAMI_OVERTIME_TRIGGER}秒後發動，所有攻擊傷害提升至${Math.round(NANAMI_OVERTIME_DMG_MULT*100)}%，黑閃基礎觸發率提升至${Math.round(NANAMI_OVERTIME_BLACKFLASH*100)}%，移動速度提升，身上開始冒藍色咒力。`
+    ],
+    color: '#3d5a80', glowColor: 'rgba(61,90,128,0.6)', type: 'nanami',
+    winQuote: '加班費，記得算給我。',
+    loseQuote: '……看來今天，還是得繼續加班。'
   }
 ];
 
@@ -3043,10 +3274,10 @@ function renderModeModal() {
     card.onmouseout  = () => { if (!isActive) card.style.background = 'rgba(255,255,255,0.04)'; };
     card.onclick = () => {
       document.getElementById('mode-modal').style.display = 'none';
-      if (m.special === 'endless') { startEndless(); return; }
       if (m.special === 'assemble') { startAssembleMode(); return; }
       if (m.special === 'wheel') { window.openWheelPick(); return; }
       if (m.special === 'sandbox') { sandboxOpenSetup(); return; }
+      if (m.special === 'dummy') { startDummyPractice(); return; }
       setPlayerMode(m.count);
     };
     grid.appendChild(card);
@@ -3058,6 +3289,38 @@ document.getElementById('mode-pick-btn').addEventListener('click', () => {
 });
 document.getElementById('mode-modal-close').addEventListener('click', () => {
   document.getElementById('mode-modal').style.display = 'none';
+});
+
+function openWinRateBoard() {
+  const listEl = document.getElementById('winrate-modal-list');
+  document.getElementById('winrate-modal').style.display = 'flex';
+  if (!winRateDB) {
+    listEl.innerHTML = `<div style="text-align:center;color:#888;font-size:0.85rem;padding:20px 0">尚未設定勝率榜服務，敬請期待。</div>`;
+    return;
+  }
+  listEl.innerHTML = `<div style="text-align:center;color:#888;font-size:0.85rem;padding:20px 0">讀取中...</div>`;
+  fetchWinRateBoard(rows => {
+    if (rows.length === 0) {
+      listEl.innerHTML = `<div style="text-align:center;color:#888;font-size:0.85rem;padding:20px 0">目前還沒有對戰紀錄，去打一場吧！</div>`;
+      return;
+    }
+    listEl.innerHTML = rows.map((r, i) => {
+      const ch = CHARACTERS.find(c => c.id === r.id);
+      const name = ch ? ch.displayName : r.id;
+      const icon = ch ? charIconHTML(ch, '1.3rem') : '❓';
+      const pct = (r.rate * 100).toFixed(1);
+      return `<div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:8px 12px">
+        <div style="width:1.6rem;text-align:center;font-weight:800;color:${i < 3 ? '#ffd166' : '#888'}">${i + 1}</div>
+        <div style="font-size:1.3rem">${icon}</div>
+        <div style="flex:1;font-size:0.88rem;color:#eee;font-weight:600">${name}</div>
+        <div style="text-align:right;font-size:0.85rem;color:#8fd6ff;font-weight:700">${pct}%</div>
+        <div style="text-align:right;font-size:0.68rem;color:#888;min-width:56px">${r.wins}勝${r.losses}敗</div>
+      </div>`;
+    }).join('');
+  });
+}
+document.getElementById('winrate-modal-close').addEventListener('click', () => {
+  document.getElementById('winrate-modal').style.display = 'none';
 });
 
 buildCarousels();
@@ -3758,6 +4021,7 @@ let gameLoop = null;
 let lastTime = 0;
 let elapsed  = 0;
 let gameSpeed = 1;
+let hitStopTimer = 0; // 全域打擊感凍結計時器：>0 時大幅放慢遊戲邏輯更新（黑閃／弱點擊破用）
 let state    = {};
 let updateWuxingFn = null; // 無形的變身更新邏輯，稍後在下面賦值一次（不綁在 startGame 裡，一般對戰跟沙盒模式都能用到）
 
@@ -3897,8 +4161,8 @@ function forfeitGame() {
   overlay.classList.add('show');
 }
 
-const P1_COLORS ={ chef:'#e84545',drunk:'#7b4cca', opm:'#f5f5f5', vampire:'#8b1a8b', gojo:'#00cfff', cursed:'#c0392b', trapper:'#27ae60', yi:'#e8e8e8', gunner:'#b8860b', samurai:'#d4af37', mage:'#9b59b6', thunder:'#f1c40f', blacksmith:'#cd7f32', naoya:'#c8c8e8', itachi:'#8b0000', yuta:'#ff6fa5', engineer:'#3a8fd6', cannondad:'#bdbdbd', dio:'#f5d020', tiger:'#cc2200', stargirl:'#ffe066', obito:'#ff6600', fisherman:'#4a90d9', geto:'#5b3a8e', sakiko:'#c9a4d1', joseph:'#2f7dc0', steve:'#4a8f3c',daji:'#e08ac7',yuki:'#b8860b',wuxing:'#9b8cce',sans:'#e8e8e8',pucci:'#8e6bbf',baie:'#e8c840',rsqjs:'#e84b4b',dragon4:'#c9a959' };
-const P2_COLORS = { chef:'#ff9f43', drunk:'#48dbfb', opm:'#aaaaaa', vampire:'#cc44cc', gojo:'#7ff8ff', cursed:'#e74c3c', trapper:'#2ecc71', yi:'#cccccc', gunner:'#f0c040', samurai:'#ffe88a', mage:'#d7aefb', thunder:'#ffe066', blacksmith:'#e8a840', naoya:'#aaaacc', itachi:'#ff3333', yuta:'#ffa3c8', engineer:'#7ec8ff', cannondad:'#787878', dio:'#fff066', tiger:'#ff4422', stargirl:'#fff5aa', obito:'#ffaa44', fisherman:'#8ec6ff', geto:'#a678e0', sakiko:'#e8cdf0', joseph:'#6fb8ee', steve:'#8fd96b',daji:'#e8cdf8' ,yuki:'#b8960b',wuxing:'#c3b8e8',sans:'#a8d8f0',pucci:'#c9a8e8',baie:'#a86fe0',rsqjs:'#3fa9e8',dragon4:'#e8d38f'};
+const P1_COLORS ={ chef:'#e84545',drunk:'#7b4cca', opm:'#f5f5f5', vampire:'#8b1a8b', gojo:'#00cfff', cursed:'#c0392b', trapper:'#27ae60', yi:'#e8e8e8', gunner:'#b8860b', samurai:'#d4af37', mage:'#9b59b6', thunder:'#f1c40f', blacksmith:'#cd7f32', naoya:'#c8c8e8', itachi:'#8b0000', yuta:'#ff6fa5', engineer:'#3a8fd6', cannondad:'#bdbdbd', dio:'#f5d020', tiger:'#cc2200', stargirl:'#ffe066', obito:'#ff6600', fisherman:'#4a90d9', geto:'#5b3a8e', sakiko:'#c9a4d1', joseph:'#2f7dc0', steve:'#4a8f3c',daji:'#e08ac7',yuki:'#b8860b',wuxing:'#9b8cce',sans:'#e8e8e8',pucci:'#8e6bbf',baie:'#e8c840',rsqjs:'#e84b4b',dragon4:'#c9a959',nanami:'#3d5a80' };
+const P2_COLORS = { chef:'#ff9f43', drunk:'#48dbfb', opm:'#aaaaaa', vampire:'#cc44cc', gojo:'#7ff8ff', cursed:'#e74c3c', trapper:'#2ecc71', yi:'#cccccc', gunner:'#f0c040', samurai:'#ffe88a', mage:'#d7aefb', thunder:'#ffe066', blacksmith:'#e8a840', naoya:'#aaaacc', itachi:'#ff3333', yuta:'#ffa3c8', engineer:'#7ec8ff', cannondad:'#787878', dio:'#fff066', tiger:'#ff4422', stargirl:'#fff5aa', obito:'#ffaa44', fisherman:'#8ec6ff', geto:'#a678e0', sakiko:'#e8cdf0', joseph:'#6fb8ee', steve:'#8fd96b',daji:'#e8cdf8' ,yuki:'#b8960b',wuxing:'#c3b8e8',sans:'#a8d8f0',pucci:'#c9a8e8',baie:'#a86fe0',rsqjs:'#3fa9e8',dragon4:'#e8d38f',nanami:'#7e9cc4'};
 
 // 玩家 1、2 用既有的兩張色表；玩家 3 以上（多人混戰用）用同一顏色做色調偏移，避免撞色。
 // 之後若要幫玩家 3/4 手動指定色表，只要新增 P3_COLORS / P4_COLORS 並在這裡優先讀取即可。
@@ -4159,6 +4423,13 @@ const PROGRESS_HANDLERS = {
     const dashFrac = Math.max(0, 1 - (b.josephDashTimer||0) / JOSEPH_DASH_COOLDOWN);
     return { atFrac: dashFrac, barColor: '#2f7dc0' };
   },
+  nanami(b) {
+    if (b.nanamiAttackCharging) return { atFrac: 1, barColor: '#ffffff' };
+    return {
+      atFrac: 1 - Math.max(0, b.nanamiAttackCd) / NANAMI_SLASH_INTERVAL,
+      barColor: b.char.color
+    };
+  },
   steve(b) {
     if (b.steveGathering) {
       return { atFrac: 1 - Math.max(0, b.steveGatherTimer) / STEVE_GATHER_DURATION, barColor: '#ffe066' };
@@ -4345,6 +4616,7 @@ function makeBall(x, y, vx, vy, ch, player, twinRole) {
     x, y, vx, vy,
     hp: ch.type === 'sans' ? SANS_MAX_HP : ch.type === 'rsqjs' ? RSQJS_MAX_HP : MAX_HP,
     char: ch, player,
+    isDummy: ch.type === 'dummy', // 木偶訓練模式：固定不動、不會反擊、血量永遠回滿
     twinRole: ch.type === 'rsqjs' ? twinRole : null,          // 'stop'(🛑紅石) 或 'diamond'(🔷青金石)
     twinPartnerId: null,                                       // 執行期指向搭檔球（見 startGame 連結）
     // ══════ 四天之龍（dragon4）專屬狀態 ══════
@@ -4716,6 +4988,23 @@ gojoChargingVisual: ch.type === 'gojo' ? false : null,
     steveElytraTimer:      ch.type === 'steve' ? 0 : null,
     steveElytraHit:        ch.type === 'steve' ? false : null,
     steveContactCooldown:  ch.type === 'steve' ? 0 : null,           // 劍碰撞傷害的內置CD
+    // 娜娜明專屬狀態
+    nanamiAttackCd:        ch.type === 'nanami' ? 0 : null,          // 「劈砍」CD
+    nanamiAttackCharging:  ch.type === 'nanami' ? false : null,      // 「劈砍」揮刀前搖中
+    nanamiAttackChargeTimer: ch.type === 'nanami' ? 0 : null,
+    nanamiAnalysisStacks:  ch.type === 'nanami' ? 0 : null,          // 「情報解析」目前層數
+    nanamiAnalysisTimer:   ch.type === 'nanami' ? 0 : null,          // 「情報解析」累積計時
+    nanamiForceNextMark:   ch.type === 'nanami' ? false : null, // 觸發黑閃後設為true，下一刀必定是十劃咒法
+    nanamiBlackFlashChain: ch.type === 'nanami' ? 0 : null,          // 「黑閃紀錄保持人」連續觸發次數
+    nanamiWallCd:          ch.type === 'nanami' ? NANAMI_WALL_COOLDOWN : null, // 「瓦落瓦落」CD
+    nanamiWallJob:         ch.type === 'nanami' ? null : null,       // 落石技能進行中的排程 {ticksLeft, timer}
+    nanamiSwinging:        ch.type === 'nanami' ? false : null,      // 揮刀動畫中
+    nanamiSwingTimer:      ch.type === 'nanami' ? 0 : null,
+    nanamiSwingAngle:      ch.type === 'nanami' ? 0 : null,
+    nanamiOvertimeTimer:   ch.type === 'nanami' ? 0 : null,          // 「加班時間」開戰計時
+    nanamiOvertimeActive:  ch.type === 'nanami' ? false : null,      // 「加班時間」是否已發動
+    nanamiMarkTimer:       0,                                        // 通用欄位：被「十劃咒法」標記弱點剩餘時間（任何角色都可能被標記）
+    nanamiMarkOwnerPlayer: null,                                     // 通用欄位：標記者玩家編號
     // 九十九由基專屬狀態
     yukiCollisionCd:       ch.type === 'yuki' ? 0 : null,            // 碰撞觸發鳳輪的內置CD
     yukiPhoenixTimer:      ch.type === 'yuki' ? 0 : null,            // 碰撞後延遲觸發鳳輪倒數（>0 表示等待中）
@@ -4846,6 +5135,17 @@ gojoChargingVisual: ch.type === 'gojo' ? false : null,
 }
 
 function startGame() {
+  // 一般開局預設視為離開木偶訓練模式；但若p2Choice仍是木偶（例如按「再戰一局」重新開打同一場木偶訓練），
+  // 則視為木偶模式的重新開始，重置統計並保持控制面板顯示，而不是直接關閉。
+  const isDummyRestart = (p2Choice === DUMMY_CHARACTER.id);
+  dummyPracticeMode = isDummyRestart;
+  if (isDummyRestart) {
+    dummyTotalDamage = 0;
+    dummyDpsHistory = [];
+    dummyControlsShow(true);
+  } else {
+    dummyControlsShow(false);
+  }
   sandboxMode = false; // 一般開局一律視為離開沙盒模式，還原成標準1v1~4人HUD
   const sbHudEl = document.getElementById('sandbox-hud');
   if (sbHudEl) sbHudEl.style.display = 'none';
@@ -4872,12 +5172,12 @@ function startGame() {
   const idSeenSoFar = {};
 
   const chs = playerChoices.map((id, i) => {
-    const base = CHARACTERS.find(c => c.id === id);
+    const base = id === DUMMY_CHARACTER.id ? DUMMY_CHARACTER : CHARACTERS.find(c => c.id === id);
     const dupTotal = idCounts[id];
     idSeenSoFar[id] = (idSeenSoFar[id] || 0) + 1;
     return {
       ...base,
-      color: colorForPlayer(i + 1, base.type),
+      color: base.type === 'dummy' ? base.color : colorForPlayer(i + 1, base.type),
       displayName: dupTotal > 1 ? base.name + ' ' + idSeenSoFar[id] : base.name
     };
   });
@@ -4887,6 +5187,7 @@ function startGame() {
   const spawnBaseAngle = Math.random() * Math.PI * 2;
   // 出生點：依玩家人數平均分配在一個圓上（2人時等同原本「對角出生」的效果）
   const spawnPositions = chs.map((ch, i) => {
+    if (ch.type === 'dummy') return { x: cx, y: cy }; // 木偶訓練模式：木偶固定站在場地正中央
     const angle = spawnBaseAngle + (i / playerCount) * Math.PI * 2;
     return { x: cx + Math.cos(angle) * offset, y: cy + Math.sin(angle) * offset };
   });
@@ -4904,7 +5205,13 @@ function startGame() {
   // 只有「HUD顯示」與「淘汰/勝負判定」是以 state.balls 陣列索引或數量為準，需要另外處理（見 updateHUD 與 tick/update 內的存活判定）。
   const twinBallGroups = chs.map((ch, i) => {
     const px = spawnPositions[i].x, py = spawnPositions[i].y;
-    const vx = Math.cos(moveAngles[i]) * BASE_SPEED, vy = Math.sin(moveAngles[i]) * BASE_SPEED;
+    const vx = ch.type === 'dummy' ? 0 : Math.cos(moveAngles[i]) * BASE_SPEED;
+    const vy = ch.type === 'dummy' ? 0 : Math.sin(moveAngles[i]) * BASE_SPEED;
+    if (ch.type === 'dummy') {
+      const dummyBall = makeBall(px, py, 0, 0, ch, i + 1);
+      dummyBall.isDummy = true;
+      return [dummyBall];
+    }
     if (ch.isTwin && ch.type === 'rsqjs') {
       const stopBall = makeBall(px - 14, py, vx, vy, ch, i + 1, 'stop');
       const diamondBall = makeBall(px + 14, py, -vx, -vy, ch, i + 1, 'diamond');
@@ -4954,6 +5261,15 @@ function startGame() {
     baieReflectFX: [],
     steveAxeFX: [],
     yutaSlashFX: [],
+    nanamiSlashFX: [],
+    nanamiRockFX: [],
+    nanamiWallHitFX: [],
+    nanamiBlackFlashFX: [],
+    nanamiMarkBreakFX: [],
+    nanamiCineFX: null,      // 娜娜明黑閃／弱點擊破：全螢幕黑屏→白閃打擊感特效
+    nanamiWallShakeTimer: 0,
+    nanamiWallShakeDur: NANAMI_WALL_SHAKE_DUR,
+    nanamiWallShakeMag: 0,
     turrets: [],        // 工程師：炮台列表
     engGrids: [],        // 工程師：電網列表
     engLaserFX: [],        // 工程師：雷射視覺特效列表
@@ -5328,6 +5644,10 @@ function dealDamage(target, dmg, options = {}) {
   if (target.char && target.char.type === 'dragon4' && !options.bypassParry) mul *= (1 - DRAGON4_DMG_REDUCE);
   // 工程師：機甲模式減傷
   if (target.char && target.char.type === 'engineer' && target.engMechActive && !options.bypassParry) mul *= (1 - ENGINEER_MECH_DMG_REDUCE);
+  // 娜娜明：「情報解析」層數受擊減傷
+  if (target.char && target.char.type === 'nanami' && (target.nanamiAnalysisStacks || 0) > 0 && !options.bypassParry) {
+    mul *= (1 - NANAMI_ANALYSIS_DEF_PER_STK * target.nanamiAnalysisStacks);
+  }
   // 組裝機器人（超人體魄零件）：全局減傷
   if (target.char && target.char.type === 'custom' && target.customParts && target.customParts.passive === 'p_opm' && !options.bypassParry) mul *= (1 - CUSTOM_OPM_DMG_REDUCE);
   // 組裝機器人（招架零件）：招架狀態中減傷
@@ -5419,6 +5739,11 @@ function dealDamage(target, dmg, options = {}) {
     target.hp = Math.max(1, target.hp - actual);
   } else {
     target.hp = Math.max(0, target.hp - actual);
+  }
+  // 木偶訓練模式：記錄總傷害／秒傷統計，並讓木偶血量立即回滿，永遠不會真正被擊倒
+  if (target.isDummy) {
+    recordDummyDamage(actual);
+    target.hp = MAX_HP;
   }
   // 白厄被動「不滅的英雄」：結算引爆與回血
   if (baieRevivePending) {
@@ -5837,10 +6162,23 @@ function yukiTriggerPhoenix(b) {
   playHitSound('trap_chain');
 }
 
+// 娜娜明專用：觸發「先黑屏、再白閃」的打擊感特效（黑閃／十劃咒法弱點擊破共用）
+// big=true 用於黑閃（黑屏＋白閃時間都較長，感覺更重），big=false 用於一般弱點擊破（較短促）
+function triggerNanamiCine(big) {
+  const blackDur = big ? 0.11 : 0.07;
+  const flashDur = big ? 0.28 : 0.16;
+  state.nanamiCineFX = { t: 0, blackDur, flashDur, big };
+  hitStopTimer = Math.max(hitStopTimer, blackDur);
+}
+
 function tick(now) {
   const rawDt = Math.min((now - lastTime) / 1000, 0.05);
   lastTime = now;
-  const dt = rawDt * gameSpeed;
+  let dt = rawDt * gameSpeed;
+  if (hitStopTimer > 0) {
+    hitStopTimer -= rawDt;
+    dt *= 0.04; // 打擊感凍結期間：遊戲邏輯幾乎停止，只留一點微動作，畫面靠特效層繼續播放
+  }
   elapsed += dt;
   state.elapsed = elapsed;
   if (state.stats) state.stats.duration = elapsed;
@@ -5951,6 +6289,24 @@ function tick(now) {
         return;
       }
     }
+  }
+
+  // 娜娜明「黑閃／十劃咒法弱點擊破」全螢幕黑屏→白閃打擊感特效：以真實時間播放（不受凍結/遊戲速度影響）
+  if (state.nanamiCineFX) {
+    const fx = state.nanamiCineFX;
+    fx.t += rawDt;
+    if (fx.t >= fx.blackDur + fx.flashDur) {
+      state.nanamiCineFX = null;
+    }
+  }
+
+  // 娜娜明「瓦落瓦落」攻牆震動：以 CSS transform 晃動整個畫布
+  if (state.nanamiWallShakeTimer > 0) {
+    const shakeFalloff = state.nanamiWallShakeTimer / NANAMI_WALL_SHAKE_DUR;
+    const mag = state.nanamiWallShakeMag * shakeFalloff;
+    canvas.style.transform = `translate(${(Math.random() - 0.5) * mag}px, ${(Math.random() - 0.5) * mag}px)`;
+  } else if (canvas.style.transform) {
+    canvas.style.transform = '';
   }
 
   render();
@@ -6085,6 +6441,12 @@ function tick(now) {
 }
 
 function update(dt) {
+  // 娜娜明「瓦落瓦落」攻牆震動倒數
+  if (state.nanamiWallShakeTimer > 0) {
+    state.nanamiWallShakeTimer -= dt;
+    if (state.nanamiWallShakeTimer < 0) state.nanamiWallShakeTimer = 0;
+  }
+
   const [b0, b1] = state.balls; // Note: used only for ball-ball collision of opposing first balls
 
   // 無量空處播放中：只更新特效，跳過所有遊戲邏輯
@@ -6239,6 +6601,8 @@ function update(dt) {
     if (b.hp <= 0) continue;
     // 被帶土抓進神威空間：完全時停（不能攻擊、CD不流動、不移動、不受牆壁判定）
     if (b.obitoInSpace) continue;
+    // 木偶訓練模式：木偶固定不動，不會有任何主動行為
+    if (b.isDummy) { b.vx = 0; b.vy = 0; continue; }
     b.trail.push({ x: b.x, y: b.y });
     if (b.trail.length > 18) b.trail.shift();
 
@@ -6630,6 +6994,201 @@ function update(dt) {
     // 捌CD倒數
     if (b.hachiCooldown > 0) b.hachiCooldown -= dt;
 
+    // 「十劃咒法」弱點標記倒數（通用欄位，任何角色都可能被娜娜明標記）
+    if (b.nanamiMarkTimer > 0) {
+      b.nanamiMarkTimer -= dt;
+      if (b.nanamiMarkTimer < 0) b.nanamiMarkTimer = 0;
+    }
+
+    // ══════════════ 娜娜明專屬邏輯 ══════════════
+    if (b.char.type === 'nanami' && !b.pucciDiscFrozen) {
+      // 揮刀動畫倒數
+      if (b.nanamiSwinging) {
+        b.nanamiSwingTimer -= dt;
+        if (b.nanamiSwingTimer <= 0) b.nanamiSwinging = false;
+      }
+
+      // 「劈砍」：主動攻擊（比照史蒂夫斧頭，進入距離內蓄力後揮砍，非碰撞觸發）
+      if (b.nanamiAttackCd > 0) b.nanamiAttackCd -= dt;
+      if (b.nanamiAttackCharging) {
+        b.nanamiAttackChargeTimer -= dt;
+        if (b.nanamiAttackChargeTimer <= 0) {
+          b.nanamiAttackCharging = false;
+          b.nanamiAttackCd = NANAMI_SLASH_INTERVAL;
+          const target = getNearestEnemy(b);
+          if (target && target.hp > 0 && Math.hypot(target.x - b.x, target.y - b.y) < NANAMI_SLASH_RANGE * 1.3) {
+            let dmg = NANAMI_SLASH_DMG;
+            // 情報解析：攻擊命中即清空層數
+            dmg *= 1 + NANAMI_ANALYSIS_ATK_PER_STK * (b.nanamiAnalysisStacks || 0);
+            b.nanamiAnalysisStacks = 0;
+            b.nanamiAnalysisTimer = 0;
+
+            // 「十劃咒法」：這一刀是否直接是十劃咒法（機率觸發；若上一刀觸發了黑閃，這一刀必定觸發）
+            const forcedTenCuts = b.nanamiForceNextMark;
+            b.nanamiForceNextMark = false;
+            const tenCuts = forcedTenCuts || (Math.random() < NANAMI_MARK_TRIGGER_CHANCE);
+            if (tenCuts) {
+              dmg *= NANAMI_MARK_DMG_MULT;
+
+              // 十劃咒法反饋：大噴血（與黑閃的全螢幕閃屏做出區隔，改為更誇張的噴血量）
+              state.nanamiMarkBreakFX = state.nanamiMarkBreakFX || [];
+              const dropCount = 32;
+              for (let sk = 0; sk < dropCount; sk++) {
+                const shAng = (sk / dropCount) * Math.PI * 2 + Math.random() * 0.4;
+                const spd = 110 + Math.random() * 220;
+                state.nanamiMarkBreakFX.push({
+                  x: target.x, y: target.y,
+                  vx: Math.cos(shAng) * spd, vy: Math.sin(shAng) * spd - 60,
+                  r: 2.2 + Math.random() * 3.4,
+                  delay: 0, // 命中瞬間立即噴血
+                  life: 0.75, maxLife: 0.75
+                });
+              }
+              state.hitFlashes.push({ x: target.x, y: target.y, r: 26, alpha: 0.9, color: '#c81c1c', t: 0.18 });
+              // 命中瞬間短暫的裂痕特效，標示這一刀是十劃咒法
+              target.nanamiMarkTimer = NANAMI_MARK_FLASH_DURATION;
+              target.nanamiMarkOwnerPlayer = b.player;
+            }
+
+            if (b.nanamiOvertimeActive) dmg *= NANAMI_OVERTIME_DMG_MULT;
+
+
+            // 黑閃紀錄保持人：連續觸發次數決定機率，滿4次後第5次必定不觸發並重置
+            let blackFlash = false;
+            if ((b.nanamiBlackFlashChain || 0) >= NANAMI_BLACKFLASH_MAX_CHAIN) {
+              b.nanamiBlackFlashChain = 0;
+            } else {
+              const baseChance = b.nanamiOvertimeActive
+                ? Math.max(NANAMI_OVERTIME_BLACKFLASH, NANAMI_BLACKFLASH_BASE + NANAMI_BLACKFLASH_STEP * b.nanamiBlackFlashChain)
+                : (NANAMI_BLACKFLASH_BASE + NANAMI_BLACKFLASH_STEP * b.nanamiBlackFlashChain);
+              if (Math.random() < baseChance) {
+                blackFlash = true;
+                dmg *= NANAMI_BLACKFLASH_DMG_MULT;
+                b.nanamiBlackFlashChain += 1;
+                // 觸發黑閃後，下一刀必定是十劃咒法
+                b.nanamiForceNextMark = true;
+              }
+            }
+
+            dealDamage(target, dmg, { attackerPlayer: b.player });
+
+            // 揮刀動畫：從娜娜明本體噴出的刀光弧，命中處留下斬擊殘影
+            const sdx = target.x - b.x, sdy = target.y - b.y;
+            const sAngle = Math.atan2(sdy, sdx);
+            b.nanamiSwinging = true;
+            b.nanamiSwingTimer = 0.22;
+            b.nanamiSwingAngle = sAngle;
+            state.nanamiSlashFX.push({ x: b.x, y: b.y, angle: sAngle, life: 0.22, maxLife: 0.22, big: blackFlash });
+            state.slashMarks.push({ x: target.x, y: target.y, angle: sAngle + (Math.random() - 0.5) * 0.4, life: 0.35, maxLife: 0.35, hit: true, owner: b.player, style: blackFlash ? 'hachi' : 'sword' });
+
+            if (blackFlash) {
+              state.hitFlashes.push({ x: target.x, y: target.y, r: 34, alpha: 1, color: '#0a0a0a', t: 0.35 });
+              state.hitFlashes.push({ x: target.x, y: target.y, r: 20, alpha: 1, color: '#ff1a1a', t: 0.22 });
+              // 黑閃：撞擊處炸開黑色鋸齒閃電裂痕（黑紅配色）
+              state.nanamiBlackFlashFX = state.nanamiBlackFlashFX || [];
+              const bfBoltCount = 8;
+              for (let bk = 0; bk < bfBoltCount; bk++) {
+                const bfAng = (bk / bfBoltCount) * Math.PI * 2 + Math.random() * 0.3;
+                state.nanamiBlackFlashFX.push({
+                  x: target.x, y: target.y, angle: bfAng, len: 26 + Math.random() * 34,
+                  life: 0.45, maxLife: 0.45
+                });
+              }
+              if (!state.standCryFX) state.standCryFX = [];
+              state.standCryFX.push({ text: '黑閃！', x: target.x, y: target.y - 30, life: 0.9, maxLife: 0.9, color: '#0a0a0a', player: b.player });
+              triggerNanamiCine(true); // 黑閃：先黑屏、再白閃的打擊感（比弱點擊破更強烈）
+              playHitSound('opm');
+            } else {
+              state.hitFlashes.push({ x: target.x, y: target.y, r: 16, alpha: 0.7, color: b.char.color, t: 0.2 });
+              playHitSound('knife');
+            }
+          }
+        }
+      } else if (b.nanamiAttackCd <= 0) {
+        const target = getNearestEnemy(b);
+        if (target && target.hp > 0 && Math.hypot(target.x - b.x, target.y - b.y) < NANAMI_SLASH_RANGE) {
+          b.nanamiAttackCharging = true;
+          b.nanamiAttackChargeTimer = NANAMI_SLASH_CHARGE;
+        }
+      }
+
+      // 「情報解析」：沒有觸發攻擊時每1秒累積一層，最高10層
+      b.nanamiAnalysisTimer += dt;
+      if (b.nanamiAnalysisTimer >= NANAMI_ANALYSIS_TICK) {
+        b.nanamiAnalysisTimer -= NANAMI_ANALYSIS_TICK;
+        b.nanamiAnalysisStacks = Math.min(NANAMI_ANALYSIS_MAX_STACKS, (b.nanamiAnalysisStacks || 0) + 1);
+      }
+
+      // 「加班時間」：開戰20秒後發動
+      if (!b.nanamiOvertimeActive) {
+        b.nanamiOvertimeTimer += dt;
+        if (b.nanamiOvertimeTimer >= NANAMI_OVERTIME_TRIGGER) {
+          b.nanamiOvertimeActive = true;
+          if (!state.standCryFX) state.standCryFX = [];
+          state.standCryFX.push({ text: '加班時間', x: b.x, y: b.y, life: 1.6, maxLife: 1.6, color: '#3d5a80', player: b.player });
+        }
+      } else if (Math.random() < 0.3) {
+        // 冒藍色咒力：加班時間期間持續飄出藍色粒子
+        state.hitFlashes.push({ x: b.x + randBetween(-14, 14), y: b.y + randBetween(-14, 14), r: 7, alpha: 0.6, color: '#3d8bff', t: 0.35 });
+      }
+
+      // 「十劃咒法・瓦落瓦落」：CD結束時鎖定最近敵人所在牆面，開始落石
+      if (b.nanamiWallCd > 0) b.nanamiWallCd -= dt;
+      if (b.nanamiWallCd <= 0 && !b.nanamiWallJob) {
+        b.nanamiWallJob = { ticksLeft: NANAMI_WALL_ROCK_COUNT, timer: 0 };
+        b.nanamiWallCd = NANAMI_WALL_COOLDOWN;
+
+        // 鎖定敵人所在最近牆面，先攻擊牆壁：牆面出現斬痕裂紋＋畫面強烈晃動
+        const wallFoe = getNearestEnemy(b);
+        if (wallFoe) {
+          const distL = wallFoe.x, distR = W - wallFoe.x, distT = wallFoe.y, distB = H - wallFoe.y;
+          const minWallDist = Math.min(distL, distR, distT, distB);
+          let wallX, wallY, wallSide;
+          if (minWallDist === distL)      { wallX = 0; wallY = wallFoe.y; wallSide = 'left'; }
+          else if (minWallDist === distR) { wallX = W; wallY = wallFoe.y; wallSide = 'right'; }
+          else if (minWallDist === distT) { wallX = wallFoe.x; wallY = 0; wallSide = 'top'; }
+          else                             { wallX = wallFoe.x; wallY = H; wallSide = 'bottom'; }
+
+          state.nanamiWallHitFX = state.nanamiWallHitFX || [];
+          const crackBaseAng = wallSide === 'left' ? 0 : wallSide === 'right' ? Math.PI
+                              : wallSide === 'top'  ? Math.PI/2 : -Math.PI/2;
+          const wallCracks = [];
+          const crackCount = 7;
+          for (let ck = 0; ck < crackCount; ck++) {
+            const crackAng = crackBaseAng + (ck / (crackCount - 1) - 0.5) * Math.PI * 1.4 + randBetween(-0.15, 0.15);
+            wallCracks.push({
+              ang: crackAng,
+              len: 34 + Math.random() * 46,
+              jag: 0.35 + Math.random() * 0.3
+            });
+          }
+          state.nanamiWallHitFX.push({
+            x: wallX, y: wallY, side: wallSide, life: 0.6, maxLife: 0.6, cracks: wallCracks
+          });
+          state.hitFlashes.push({ x: wallX, y: wallY, r: 34, alpha: 0.9, color: '#c9c2b4', t: 0.3 });
+          state.nanamiWallShakeTimer = NANAMI_WALL_SHAKE_DUR;
+          state.nanamiWallShakeMag = NANAMI_WALL_SHAKE_MAG;
+          playHitSound('opm');
+        }
+      }
+      if (b.nanamiWallJob) {
+        b.nanamiWallJob.timer -= dt;
+        if (b.nanamiWallJob.timer <= 0) {
+          const foe = getNearestEnemy(b);
+          if (foe) {
+            state.nanamiRockFX = state.nanamiRockFX || [];
+            state.nanamiRockFX.push({
+              x: foe.x, y: foe.y, life: NANAMI_WALL_ROCK_FALL_TIME, maxLife: NANAMI_WALL_ROCK_FALL_TIME,
+              dealt: false, casterPlayer: b.player, targetRef: foe
+            });
+          }
+          b.nanamiWallJob.ticksLeft -= 1;
+          b.nanamiWallJob.timer = NANAMI_WALL_ROCK_INTERVAL;
+          if (b.nanamiWallJob.ticksLeft <= 0) b.nanamiWallJob = null;
+        }
+      }
+    }
+
     // 緩速計時器
     if (b.curseSlowTimer > 0) b.curseSlowTimer -= dt;
 
@@ -6661,7 +7220,8 @@ function update(dt) {
     if (!b.frozenByVampire && !b.obitoInSpace && !(b.char.type === 'vampire' && b.vampireBiting) && !(b.mageFreezeTimer > 0) && !(b.itachiPinnedTimer > 0) && !b.itachiBiting && !b.tigerNovaCharging && !(b.thunderStunTimer > 0) && !(b.arenaFrozen > 0) && !(b.getoBoundTimer > 0) && !b.getoUltimateCharging && !(b.beachCurrentSuckTimer > 0) && !b.frozenByJoseph && !(b.char.type === 'joseph' && (b.josephState === 'charging' || b.josephUltimateActive)) && !(b.dajiCharmedTimer > 0) && !(b.sansGravityTimer > 0) && !b.sansUltActive && !(b.pucciGravityTimer > 0)) {
       const speedMul = (b.curseSlowTimer > 0 ? CURSE_SLASH_SLOW_FACTOR : 1.0) * (b.inSandZone ? ARENA_SAND_SLOW_FACTOR : 1.0) *
         (b.char.type === 'pucci' && b.pucciHeavenActive ? b.pucciSpeedMult : 1.0) *
-        (b.pucciWallClingTimer > 0 ? PUCCI_MOON_WALLCLING_SLOW : 1.0);
+        (b.pucciWallClingTimer > 0 ? PUCCI_MOON_WALLCLING_SLOW : 1.0) *
+        (b.char.type === 'nanami' && b.nanamiOvertimeActive ? NANAMI_OVERTIME_SPEED_MULT : 1.0);
 
       // 最低速度保證（排除技能主動停止的情況）
       const intentionalStop = (b.char.type === 'gunner' && b.gunnerFiring) ||
@@ -11159,6 +11719,59 @@ waypoints.push({
       if (mfx.life <= 0) state.baieMeteorFX.splice(i, 1);
     }
   }
+  // 娜娜明「十劃咒法・瓦落瓦落」落石特效：生命倒數，砸落瞬間才結算傷害（實際繪製在 render() 裡）
+  if (state.nanamiRockFX) {
+    for (let i = state.nanamiRockFX.length - 1; i >= 0; i--) {
+      const rfx = state.nanamiRockFX[i];
+      rfx.life -= dt;
+      const prog = 1 - rfx.life / rfx.maxLife;
+      if (!rfx.dealt && prog >= 0.75) {
+        rfx.dealt = true;
+        if (rfx.targetRef && rfx.targetRef.hp > 0) {
+          const distToImpact = Math.hypot(rfx.targetRef.x - rfx.x, rfx.targetRef.y - rfx.y);
+          if (distToImpact < NANAMI_WALL_ROCK_HIT_RADIUS) {
+            dealDamage(rfx.targetRef, NANAMI_WALL_ROCK_DMG, { attackerPlayer: rfx.casterPlayer });
+            state.hitFlashes.push({ x: rfx.targetRef.x, y: rfx.targetRef.y, r: 26, alpha: 0.9, color: '#8a7355', t: 0.3 });
+          }
+        }
+        // 落石砸地瞬間追加一次小幅晃動，呼應牆壁持續崩塌的震動感
+        state.nanamiWallShakeTimer = Math.max(state.nanamiWallShakeTimer, NANAMI_WALL_SHAKE_DUR * 0.5);
+        state.nanamiWallShakeMag = Math.max(state.nanamiWallShakeMag, NANAMI_WALL_ROCK_SHAKE_MAG);
+        playHitSound('opm');
+      }
+      if (rfx.life <= 0) state.nanamiRockFX.splice(i, 1);
+    }
+  }
+  // 娜娜明「十劃咒法・瓦落瓦落」攻牆裂痕特效：生命倒數（實際繪製在 render() 裡）
+  if (state.nanamiWallHitFX) {
+    for (let i = state.nanamiWallHitFX.length - 1; i >= 0; i--) {
+      state.nanamiWallHitFX[i].life -= dt;
+      if (state.nanamiWallHitFX[i].life <= 0) state.nanamiWallHitFX.splice(i, 1);
+    }
+  }
+  // 娜娜明「黑閃」撞擊裂痕特效：生命倒數（實際繪製在 render() 裡）
+  if (state.nanamiBlackFlashFX) {
+    for (let i = state.nanamiBlackFlashFX.length - 1; i >= 0; i--) {
+      state.nanamiBlackFlashFX[i].life -= dt;
+      if (state.nanamiBlackFlashFX[i].life <= 0) state.nanamiBlackFlashFX.splice(i, 1);
+    }
+  }
+  // 娜娜明「弱點擊破」噴血特效：白閃過後延遲噴出，帶重力落下（實際繪製在 render() 裡）
+  if (state.nanamiMarkBreakFX) {
+    for (let i = state.nanamiMarkBreakFX.length - 1; i >= 0; i--) {
+      const mfx = state.nanamiMarkBreakFX[i];
+      mfx.life -= dt;
+      if (mfx.delay > 0) {
+        mfx.delay -= dt;
+      } else {
+        mfx.x += mfx.vx * dt;
+        mfx.y += mfx.vy * dt;
+        mfx.vy += 260 * dt; // 重力
+        mfx.vx *= 0.96;
+      }
+      if (mfx.life <= 0) state.nanamiMarkBreakFX.splice(i, 1);
+    }
+  }
   // 白厄「灾厄」反傷彈道：生命倒數，命中瞬間才結算傷害＋衝擊特效
   if (state.baieReflectFX) {
     for (let i = state.baieReflectFX.length - 1; i >= 0; i--) {
@@ -11405,6 +12018,12 @@ waypoints.push({
     for (let i = state.yutaSlashFX.length - 1; i >= 0; i--) {
       state.yutaSlashFX[i].life -= dt;
       if (state.yutaSlashFX[i].life <= 0) state.yutaSlashFX.splice(i, 1);
+    }
+  }
+  if (state.nanamiSlashFX) {
+    for (let i = state.nanamiSlashFX.length - 1; i >= 0; i--) {
+      state.nanamiSlashFX[i].life -= dt;
+      if (state.nanamiSlashFX[i].life <= 0) state.nanamiSlashFX.splice(i, 1);
     }
   }
 
@@ -13793,6 +14412,14 @@ if (!b.sakikoDualActive) {
       }
       Object.assign(entry.ball, entry.snapshot);
       entry.ball.hp = survivedHp;
+    }
+  }
+
+  // 木偶訓練模式：保險機制——不論本幀有沒有被任何技能（例如釣魚佬的鉤拉/拋摔）直接改動位置，
+  // 統一在每幀結尾把木偶拉回場地正中央並清空速度，確保木偶永遠固定不動。
+  if (dummyPracticeMode) {
+    for (const b of state.balls) {
+      if (b.isDummy) { b.x = W / 2; b.y = H / 2; b.vx = 0; b.vy = 0; }
     }
   }
 }
@@ -17095,6 +17722,68 @@ function render() {
     }
   }
 
+  // 娜娜明「劈砍」：鈍刀揮砍刀光（黑閃觸發時放大＋轉為黑白配色）
+  if (state.nanamiSlashFX) {
+    for (const fx of state.nanamiSlashFX) {
+      const prog = fx.life / fx.maxLife; // 1→0
+      const swingProg = Math.min(1, (1 - prog) * 2.6);
+      const reach3 = RADIUS * (fx.big ? 3.2 : 2.6);
+      const halfArc3 = fx.big ? 1.3 : 0.95;
+      const alpha3 = prog;
+      const mainCol = fx.big ? '20,20,20' : '176,196,222';
+      const glowCol = fx.big ? '#ff2020' : '#3d5a80';
+
+      const sweepAngle3 = -halfArc3 + swingProg * (halfArc3 * 2);
+
+      ctx.save();
+      ctx.translate(fx.x, fx.y);
+      ctx.rotate(fx.angle);
+      ctx.globalAlpha = alpha3;
+
+      // 刀光殘影：已掃過的弧形範圍
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.arc(0, 0, reach3, -halfArc3, sweepAngle3);
+      ctx.closePath();
+      ctx.fillStyle = `rgba(${mainCol},${0.26*alpha3})`;
+      ctx.fill();
+
+      // 弧形邊緣亮線
+      ctx.beginPath();
+      ctx.arc(0, 0, reach3, -halfArc3, sweepAngle3);
+      ctx.strokeStyle = `rgba(255,255,255,${0.85*alpha3})`;
+      ctx.lineWidth = fx.big ? 4 : 3;
+      ctx.shadowColor = glowCol;
+      ctx.shadowBlur = fx.big ? 22 : 12;
+      ctx.stroke();
+
+      // 鈍刀刀身：揮到的角度上一把厚重的方頭刀
+      ctx.save();
+      ctx.rotate(sweepAngle3);
+      const bladeW3 = fx.big ? 10 : 7;
+      ctx.beginPath();
+      ctx.moveTo(RADIUS * 0.3, -bladeW3 * 0.5);
+      ctx.lineTo(reach3 * 0.92, -bladeW3);
+      ctx.lineTo(reach3, -bladeW3 * 0.3);
+      ctx.lineTo(reach3, bladeW3 * 0.3);
+      ctx.lineTo(reach3 * 0.92, bladeW3);
+      ctx.lineTo(RADIUS * 0.3, bladeW3 * 0.5);
+      ctx.closePath();
+      ctx.fillStyle = fx.big ? '#1a1a1a' : '#c8d4e0';
+      ctx.shadowColor = glowCol; ctx.shadowBlur = fx.big ? 18 : 10;
+      ctx.fill();
+      ctx.strokeStyle = fx.big ? '#ff2020' : '#3d5a80';
+      ctx.lineWidth = 1.5;
+      ctx.shadowBlur = 0;
+      ctx.stroke();
+      ctx.restore();
+
+      ctx.globalAlpha = 1;
+      ctx.shadowBlur = 0;
+      ctx.restore();
+    }
+  }
+
   // 宇治波鼬：烏鴉替身飛散特效
   if (state.itachiCrowFX) {
     const fx = state.itachiCrowFX;
@@ -18573,6 +19262,29 @@ function render() {
       for (let k = 0; k < b.knives; k++) ctx.fillText('🔪',b.x+RADIUS+4,b.y-6+k*13);
     }
 
+    // 娜娜明「情報解析」層數顯示：層數越高，藍色分析環越亮越粗，並在頭頂標示數字
+    if (b.char.type === 'nanami' && (b.nanamiAnalysisStacks || 0) > 0) {
+      const stk = b.nanamiAnalysisStacks;
+      const stkFrac = stk / NANAMI_ANALYSIS_MAX_STACKS;
+      const full = stk >= NANAMI_ANALYSIS_MAX_STACKS;
+      const ringPulse = 0.7 + 0.3 * Math.sin(elapsed * (full ? 10 : 4));
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(b.x, b.y, RADIUS + 5, -Math.PI/2, -Math.PI/2 + Math.PI * 2 * stkFrac);
+      ctx.strokeStyle = full ? `rgba(255,210,80,${ringPulse})` : `rgba(61,139,255,${0.55 + 0.35 * stkFrac})`;
+      ctx.lineWidth = 2 + stkFrac * 2.5;
+      ctx.shadowColor = full ? '#ffd250' : '#3d8bff';
+      ctx.shadowBlur = 6 + stkFrac * 10;
+      ctx.lineCap = 'round';
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+      ctx.font = 'bold 11px sans-serif';
+      ctx.fillStyle = full ? '#ffd250' : '#8fc4ff';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(`📊${stk}`, b.x, b.y - RADIUS - 14);
+      ctx.restore();
+    }
+
     // 史蒂夫裝備階段圖示
     if (b.char.type === 'steve') {
       const steveIcons = ['✊','🗡️','⚔️','🗡️','🪓'];
@@ -18598,6 +19310,22 @@ function render() {
         ctx.globalAlpha = 1;
         ctx.restore();
       }
+    }
+
+    // 娜娜明蓄力中：鈍刀後拉並隨蓄力進度發亮，提示即將劈砍
+    if (b.char.type === 'nanami' && b.nanamiAttackCharging) {
+      const chargeProg = 1 - Math.max(0, b.nanamiAttackChargeTimer) / NANAMI_SLASH_CHARGE;
+      const enemy3 = getNearestEnemyTo(b.x, b.y, b.player);
+      const aimAngle3 = enemy3 ? Math.atan2(enemy3.y - b.y, enemy3.x - b.x) : 0;
+      ctx.save();
+      ctx.translate(b.x, b.y);
+      ctx.rotate(aimAngle3);
+      const pullBack3 = RADIUS * (0.9 - chargeProg * 0.5);
+      ctx.globalAlpha = 0.6 + chargeProg * 0.4;
+      ctx.font = `${14 + chargeProg * 6}px serif`;
+      ctx.fillText('🔪', -pullBack3, -RADIUS * 0.7);
+      ctx.globalAlpha = 1;
+      ctx.restore();
     }
 
     // 攻擊/技能進度條
@@ -18703,6 +19431,129 @@ function render() {
       ctx.fillRect(b.x - RADIUS, b.y + RADIUS + 12, RADIUS * 2, 3);
       ctx.fillStyle = '#cc44ff';
       ctx.fillRect(b.x - RADIUS, b.y + RADIUS + 12, RADIUS * 2 * phFrac, 3);
+      ctx.restore();
+    }
+  }
+
+  // 娜娜明「十劃咒法」弱點標記：在被標記的角色身上畫出放射狀紅色裂痕（畫在角色本體之上，任何角色都可能被標記）
+  for (const b of state.balls) {
+    if (!(b.nanamiMarkTimer > 0) || b.hp <= 0) continue;
+    const markProg = 1 - b.nanamiMarkTimer / NANAMI_MARK_FLASH_DURATION; // 0→1
+    const nearExpire = b.nanamiMarkTimer < 0.8;
+    const blink = nearExpire ? (0.5 + 0.5 * Math.sin(elapsed * 22)) : 1;
+    const growIn = Math.min(1, markProg / 0.04); // 標記出現幾乎瞬間完整顯示，避免被打掉前都還沒淡入
+    const pulse = 0.75 + 0.25 * Math.sin(elapsed * 9);
+
+    ctx.save();
+    ctx.translate(b.x, b.y);
+    ctx.globalAlpha = blink;
+
+    // 中心核心紅光
+    const coreR = RADIUS * 0.32 * growIn * pulse;
+    const coreGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, coreR * 2.6);
+    coreGrad.addColorStop(0, 'rgba(255,90,70,0.98)');
+    coreGrad.addColorStop(0.5, 'rgba(220,30,30,0.6)');
+    coreGrad.addColorStop(1, 'rgba(220,30,30,0)');
+    ctx.fillStyle = coreGrad;
+    ctx.beginPath(); ctx.arc(0, 0, coreR * 2.6, 0, Math.PI * 2); ctx.fill();
+
+    // 放射狀裂痕線條（仿玻璃碎裂／弱點爆裂造型）
+    const spikeCount = 10;
+    ctx.strokeStyle = `rgba(255,30,30,0.95)`;
+    ctx.lineWidth = 2.2;
+    ctx.shadowColor = '#ff2b2b';
+    ctx.shadowBlur = 10;
+    for (let k = 0; k < spikeCount; k++) {
+      const seedAng = (k / spikeCount) * Math.PI * 2 + (k % 2 === 0 ? 0.12 : -0.1);
+      const baseLen = (RADIUS * 0.75 + (k % 3) * RADIUS * 0.35) * growIn;
+      const midLen = baseLen * 0.55;
+      const jitterAng = seedAng + Math.sin(k * 4.3) * 0.18;
+      const mx = Math.cos(jitterAng) * midLen, my = Math.sin(jitterAng) * midLen;
+      const ex = Math.cos(seedAng) * baseLen, ey = Math.sin(seedAng) * baseLen;
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(mx, my);
+      ctx.lineTo(ex, ey);
+      ctx.stroke();
+      // 主裂痕分岔的小支線，加強碎裂感
+      if (k % 2 === 0) {
+        const branchAng = seedAng + 0.5;
+        const bx = mx + Math.cos(branchAng) * baseLen * 0.3;
+        const by = my + Math.sin(branchAng) * baseLen * 0.3;
+        ctx.beginPath();
+        ctx.moveTo(mx, my);
+        ctx.lineTo(bx, by);
+        ctx.stroke();
+      }
+    }
+    ctx.shadowBlur = 0;
+
+    // 外圍細小紅色碎粒，隨標記存在時間緩緩漂浮
+    for (let sp = 0; sp < 6; sp++) {
+      const spAng = elapsed * 1.4 + sp * (Math.PI * 2 / 6);
+      const spR = RADIUS * 0.95 + Math.sin(elapsed * 3 + sp) * 4;
+      ctx.beginPath();
+      ctx.arc(Math.cos(spAng) * spR, Math.sin(spAng) * spR, 1.6, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255,110,90,0.85)';
+      ctx.fill();
+    }
+
+    ctx.restore();
+  }
+
+  // 娜娜明「黑閃」：撞擊瞬間炸開的漆黑鋸齒閃電裂痕
+  if (state.nanamiBlackFlashFX) {
+    for (const fx of state.nanamiBlackFlashFX) {
+      const prog = 1 - fx.life / fx.maxLife;
+      ctx.save();
+      ctx.globalAlpha = (1 - prog) * 0.95;
+      ctx.translate(fx.x, fx.y);
+      ctx.rotate(fx.angle);
+      const bfLen = fx.len * (1 - prog * 0.3);
+      // 外層紅色描邊＋發光，讓黑色閃電在暗色背景下呈現黑紅配色
+      ctx.shadowColor = '#ff2020'; ctx.shadowBlur = 16;
+      ctx.strokeStyle = '#e81c1c';
+      ctx.lineWidth = 4 - prog * 2.5;
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      const segs = 5;
+      for (let si = 1; si <= segs; si++) {
+        const lx = (bfLen / segs) * si;
+        const ly = (si % 2 === 0 ? 1 : -1) * (6 - prog * 4);
+        ctx.lineTo(lx, ly);
+      }
+      ctx.stroke();
+      // 內層漆黑閃電本體
+      ctx.shadowBlur = 0;
+      ctx.strokeStyle = '#0a0a0a';
+      ctx.lineWidth = 2 - prog * 1.2;
+      ctx.stroke();
+      ctx.restore();
+    }
+  }
+
+  // 娜娜明「弱點擊破」：白閃過後噴出的血珠，帶拖尾感並隨重力落下淡出
+  if (state.nanamiMarkBreakFX) {
+    for (const mfx of state.nanamiMarkBreakFX) {
+      if (mfx.delay > 0) continue; // 還在白閃延遲階段，尚未噴血
+      const mprog = 1 - mfx.life / mfx.maxLife; // 0→1
+      const alpha = Math.max(0, 1 - mprog * 1.15);
+      if (alpha <= 0) continue;
+      const speed = Math.hypot(mfx.vx, mfx.vy);
+      const ang = Math.atan2(mfx.vy, mfx.vx);
+      ctx.save();
+      ctx.translate(mfx.x, mfx.y);
+      ctx.rotate(ang);
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = '#c81c1c';
+      // 血珠拉出隨速度而長的水滴狀，速度越快拖尾越長
+      const stretch = Math.min(10, speed * 0.03);
+      ctx.beginPath();
+      ctx.moveTo(-stretch, 0);
+      ctx.quadraticCurveTo(0, -mfx.r, mfx.r * 0.9, 0);
+      ctx.quadraticCurveTo(0, mfx.r, -stretch, 0);
+      ctx.closePath();
+      ctx.fill();
       ctx.restore();
     }
   }
@@ -19516,6 +20367,159 @@ function render() {
       }
     }
   }
+
+  // 娜娜明「十劃咒法・瓦落瓦落」：攻擊牆壁瞬間的裂痕特效
+  if (state.nanamiWallHitFX && state.nanamiWallHitFX.length) {
+    for (const wfx of state.nanamiWallHitFX) {
+      const wprog = 1 - wfx.life / wfx.maxLife; // 0→1
+      const fadeAlpha = Math.max(0, 1 - wprog);
+      ctx.save();
+
+      // 撞擊白光爆閃（前段瞬間最亮，快速衰退）
+      const flashA = Math.max(0, 1 - wprog * 4);
+      if (flashA > 0) {
+        const g = ctx.createRadialGradient(wfx.x, wfx.y, 0, wfx.x, wfx.y, 46);
+        g.addColorStop(0, `rgba(255,255,255,${0.9 * flashA})`);
+        g.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(wfx.x, wfx.y, 46, 0, Math.PI * 2); ctx.fill();
+      }
+
+      // 放射狀裂痕：從撞擊點沿牆面炸開的鋸齒裂紋
+      ctx.strokeStyle = `rgba(60,50,42,${0.85 * fadeAlpha})`;
+      ctx.lineWidth = 2.2;
+      ctx.shadowColor = '#2b241c';
+      ctx.shadowBlur = 4;
+      for (const crack of wfx.cracks) {
+        const growProg = Math.min(1, wprog / 0.3); // 前0.3秒裂紋長出
+        const segs = 4;
+        let px = wfx.x, py = wfx.y;
+        ctx.beginPath();
+        ctx.moveTo(px, py);
+        for (let s = 1; s <= segs; s++) {
+          const segFrac = (s / segs) * growProg;
+          if (segFrac <= 0) break;
+          const baseLen = crack.len * (s / segs);
+          const wobble = Math.sin(s * 12.9 + crack.ang * 7) * crack.len * crack.jag * 0.18;
+          const nx = wfx.x + Math.cos(crack.ang) * baseLen + Math.cos(crack.ang + Math.PI/2) * wobble;
+          const ny = wfx.y + Math.sin(crack.ang) * baseLen + Math.sin(crack.ang + Math.PI/2) * wobble;
+          ctx.lineTo(nx, ny);
+          px = nx; py = ny;
+        }
+        ctx.stroke();
+      }
+
+      // 剝落塵屑：沿裂痕方向緩緩飄散的碎屑點
+      for (let dpi = 0; dpi < 10; dpi++) {
+        const crack = wfx.cracks[dpi % wfx.cracks.length];
+        const driftLen = crack.len * (0.5 + 0.5 * Math.sin(dpi * 3.1));
+        const dpx = wfx.x + Math.cos(crack.ang) * driftLen * (0.5 + wprog * 0.6);
+        const dpy = wfx.y + Math.sin(crack.ang) * driftLen * (0.5 + wprog * 0.6) + wprog * 14;
+        ctx.beginPath();
+        ctx.arc(dpx, dpy, 1.6, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(138,115,85,${0.6 * fadeAlpha})`;
+        ctx.fill();
+      }
+
+      ctx.restore();
+    }
+  }
+
+  // 娜娜明「十劃咒法・瓦落瓦落」：落石預警圈→墜落岩塊→砸落塵爆
+  if (state.nanamiRockFX && state.nanamiRockFX.length) {
+    for (let i = state.nanamiRockFX.length - 1; i >= 0; i--) {
+      const rfx = state.nanamiRockFX[i];
+      if (rfx.life <= 0) continue;
+      const prog = 1 - rfx.life / rfx.maxLife; // 0→1
+      const tx = rfx.x, ty = rfx.y;
+
+      // 階段一（0~0.55）：地面預警圈，收縮提示落點
+      if (prog < 0.55) {
+        const wProg = prog / 0.55;
+        ctx.save();
+        ctx.strokeStyle = `rgba(138,115,85,${0.85 * (1 - wProg * 0.2)})`;
+        ctx.lineWidth = 3;
+        ctx.setLineDash([8, 6]);
+        ctx.beginPath();
+        ctx.arc(tx, ty, 46 - wProg * 18, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.restore();
+      }
+
+      // 階段二（0.35~0.75）：石塊自上方墜落
+      if (prog >= 0.35 && prog < 0.75) {
+        const fProg = (prog - 0.35) / 0.4;
+        const skyOffset = -260 * (1 - fProg);
+        const rx = tx, ry = ty + skyOffset;
+        ctx.save();
+        ctx.beginPath();
+        ctx.ellipse(tx, ty, 20 * (0.4 + fProg * 0.7), 8 * (0.4 + fProg * 0.7), 0, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(0,0,0,${0.15 + fProg * 0.35})`;
+        ctx.fill();
+        ctx.fillStyle = '#8a7355';
+        ctx.beginPath();
+        ctx.moveTo(rx - 12, ry + 6);
+        ctx.lineTo(rx - 6, ry - 10);
+        ctx.lineTo(rx + 8, ry - 8);
+        ctx.lineTo(rx + 12, ry + 5);
+        ctx.lineTo(rx + 2, ry + 12);
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = '#5c4a35';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // 階段三（0.75~1.0）：砸落塵爆
+      if (prog >= 0.75) {
+        const bProg = (prog - 0.75) / 0.25;
+        ctx.save();
+        const g = ctx.createRadialGradient(tx, ty, 0, tx, ty, 60 * bProg);
+        g.addColorStop(0, `rgba(200,180,150,${0.7 * (1 - bProg)})`);
+        g.addColorStop(1, 'rgba(138,115,85,0)');
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(tx, ty, 60 * bProg, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+      }
+    }
+  }
+
+  // 娜娜明「黑閃／十劃咒法弱點擊破」全螢幕打擊感特效：先黑屏、再白閃，畫在最上層蓋住整個畫面
+  if (state.nanamiCineFX) {
+    const fx = state.nanamiCineFX;
+    ctx.save();
+    if (fx.t < fx.blackDur) {
+      // 第一階段：瞬間黑屏（不淡入淡出，模擬影格凍結的「卡黑」感）
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    } else {
+      // 第二階段：白閃打擊感，隨時間快速淡出（用平方衰減，讓亮度更快收斂，不會太刺眼）；黑閃版會多疊加放射狀衝擊線
+      const fProg = (fx.t - fx.blackDur) / fx.flashDur; // 0→1
+      const alpha = Math.max(0, 1 - fProg) ** 2;
+      ctx.fillStyle = `rgba(255,255,255,${(fx.big ? 0.55 : 0.4) * alpha})`;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      if (fx.big) {
+        // 黑閃專屬：從畫面中心炸開的放射狀白色衝擊線，加強打擊感
+        const cx = canvas.width / 2, cy = canvas.height / 2;
+        const lineCount = 16;
+        ctx.strokeStyle = `rgba(20,20,20,${0.4 * alpha})`;
+        ctx.lineWidth = 3;
+        for (let li = 0; li < lineCount; li++) {
+          const ang = (li / lineCount) * Math.PI * 2;
+          const innerR = 30 + fProg * 60;
+          const outerR = innerR + 90 + fProg * 220;
+          ctx.beginPath();
+          ctx.moveTo(cx + Math.cos(ang) * innerR, cy + Math.sin(ang) * innerR);
+          ctx.lineTo(cx + Math.cos(ang) * outerR, cy + Math.sin(ang) * outerR);
+          ctx.stroke();
+        }
+      }
+    }
+    ctx.restore();
+  }
 }
 
 // 無形：在角色頭頂顯示「距離下次變身還有幾秒」的倒計時
@@ -19550,14 +20554,17 @@ function ensureTwinBarEl(n) {
   if (!block) return null;
   el = document.createElement('div');
   el.id = id;
-  el.style.cssText = 'position:relative;height:6px;margin-top:3px;background:rgba(255,255,255,0.08);border-radius:4px;overflow:hidden;';
-  el.innerHTML = `<div id="p${n}-twinbar" style="position:absolute;top:0;left:0;height:100%;width:100%;background:linear-gradient(90deg,#3fa9e8aa,#3fa9e8);transition:width .12s;"></div>`;
+  el.style.cssText = 'position:relative;width:100%;height:6px;margin-top:3px;background:rgba(255,255,255,0.08);border-radius:4px;overflow:hidden;';
+  const anchorSide = (n % 2 === 1) ? 'left' : 'right';
+  const gradDir = (n % 2 === 1) ? '90deg' : '270deg';
+  el.innerHTML = `<div id="p${n}-twinbar" style="position:absolute;top:0;${anchorSide}:0;height:100%;width:100%;background:linear-gradient(${gradDir},#3fa9e8aa,#3fa9e8);transition:width .12s;"></div>`;
   block.appendChild(el);
   return el;
 }
 
 function updateHUD() {
   if (!state.balls) return;
+  if (dummyPracticeMode) dummyUpdateStatsDisplay();
   if (sandboxMode) { updateSandboxHUD(); return; }
   const playerCount = state.playerCount || Math.min(4, state.balls.length);
   for (let n = 1; n <= Math.min(4, playerCount); n++) {
@@ -19884,6 +20891,7 @@ function updateHUD() {
 }
 
 function showResult(deadBalls) {
+  dummyControlsShow(false);
   const overlay = document.getElementById('overlay');
   const titleEl = document.getElementById('result-title');
   const subEl   = document.getElementById('result-sub');
@@ -19894,6 +20902,15 @@ function showResult(deadBalls) {
     subEl.textContent = state.balls.length > 2 ? '所有戰士同歸於盡' : '兩位勇士同歸於盡';
   } else {
     const winner = winnerBall;
+    // 寫入勝率榜：排除組裝機器人、沙盒隊伍戰、木偶訓練（角色組合不固定或非正式對戰）
+    if (!assembleMode && !sandboxMode && !dummyPracticeMode) {
+      const recordedPlayers = new Set();
+      state.balls.forEach(b => {
+        if (recordedPlayers.has(b.player) || !b.char || !b.char.id) return;
+        recordedPlayers.add(b.player);
+        recordCharacterResult(b.char.id, b.player === winner.player);
+      });
+    }
     // 多人混戰時，loser 僅用於特定勝利台詞查詢，取最後一位倒下的對手
     const loser  = deadBalls[deadBalls.length - 1] || deadBalls[0];
     const isWheelFinale = wheelState && !wheelState.active;
@@ -19971,213 +20988,8 @@ const loseQuote = loser.char && loser.char.loseQuote ? pickQuote(loser.char.lose
     return; // 不顯示一般 overlay
   }
 
-  if (endlessMode) {
-    // 無盡模式：判斷 P1 是否獲勝（player 是數字 1/2）
-    const p1Won = deadBalls.length === 2 ? false : !deadBalls.find(b => b.player === 1);
-    const sid = endlessSessionId;
-    setTimeout(() => { if (endlessSessionId === sid) handleEndlessResult(p1Won); }, 800);
-    return; // 不顯示一般 overlay
-  }
   overlay.classList.add('show');
 }
-
-// ══════════════ 無盡闖關模式 ══════════════
-let endlessMode = false;
-let endlessStage = 1;
-let endlessSessionId = 0; // 用來作廢舊的 setTimeout
-let endlessBest = parseInt(localStorage.getItem('endlessBest') || '0');
-let endlessEnemyId = null;
-let endlessPlayerCharId = null;
-
-function startEndless() {
-  endlessMode = true;
-  endlessStage = 1;
-  setPlayerMode(2); // 闖關固定單挑，避免殘留3-4人混戰設定（含UI顯示）混進來
-  p3Choice = null; p4Choice = null;
-  showEndlessPick();
-}
-
-function showEndlessPick() {
-  // 隱藏其他畫面
-  document.getElementById('select-screen').style.display = 'none';
-  document.getElementById('game-screen').style.display = 'none';
-  document.getElementById('overlay').classList.remove('show');
-  document.getElementById('endless-result-screen').style.display = 'none';
-  document.getElementById('endless-pick-screen').style.display = 'flex';
-
-  // 關卡資訊
-  document.getElementById('ep-stage').textContent = `第 ${endlessStage} 關`;
-  document.getElementById('ep-best').textContent = endlessBest > 0 ? `🏆 最高紀錄：第 ${endlessBest} 關` : '';
-
-  // 隨機選一個對手（跟上次不同；排除紅石青金石雙生角色）
-  const endlessPool = CHARACTERS.filter(c => c.id !== 'rsqjs' && c.id !== 'dragon4');
-  let enemyChar;
-  do { enemyChar = endlessPool[Math.floor(Math.random() * endlessPool.length)]; }
-  while (enemyChar.id === endlessEnemyId && endlessPool.length > 1);
-  endlessEnemyId = enemyChar.id;
-  document.getElementById('ep-next-enemy').textContent = `${enemyChar.emoji} ${enemyChar.name}`;
-
-  // 三個隨機玩家角色選項（不重複；排除紅石青金石雙生角色）
-  const pool = [...endlessPool].sort(() => Math.random() - 0.5).slice(0, 3);
-  const cardsEl = document.getElementById('ep-cards');
-  cardsEl.innerHTML = '';
-
-  pool.forEach((ch, idx) => {
-    // 外層：做翻轉容器
-    const wrapper = document.createElement('div');
-    wrapper.style.cssText = `
-      width:140px;height:220px;perspective:700px;cursor:pointer;flex-shrink:0;
-      opacity:0;transform:translateY(-60px);
-      transition:opacity 0.35s ease ${idx*0.18}s, transform 0.35s ease ${idx*0.18}s;
-    `;
-
-    const inner = document.createElement('div');
-    inner.style.cssText = `
-      width:100%;height:100%;position:relative;
-      transform-style:preserve-3d;
-      transition:transform 0.55s cubic-bezier(0.4,0,0.2,1);
-    `;
-
-    // 牌背
-    const back = document.createElement('div');
-    back.style.cssText = `
-      position:absolute;inset:0;backface-visibility:hidden;
-      background:linear-gradient(135deg,#1a0030,#2d0060);
-      border:2px solid rgba(180,80,255,0.5);border-radius:14px;
-      display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
-    `;
-    back.innerHTML = `
-      <div style="font-size:2.5rem;filter:drop-shadow(0 0 10px #aa44ff)">🌀</div>
-      <div style="font-size:0.7rem;color:rgba(180,80,255,0.8);letter-spacing:.15em">點擊翻牌</div>
-    `;
-
-    // 牌面（預先建好但先藏起來，rotateY(180deg) 反面朝前）
-    const front = document.createElement('div');
-    front.style.cssText = `
-      position:absolute;inset:0;backface-visibility:hidden;
-      transform:rotateY(180deg);
-      background:rgba(255,255,255,0.04);
-      border:1px solid rgba(255,255,255,0.15);border-radius:14px;
-      display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
-      padding:12px 8px;text-align:center;
-    `;
-    front.innerHTML = `
-      <div style="font-size:2.4rem">${charIconHTML(ch, '2.4rem')}</div>
-      <div style="font-size:0.92rem;font-weight:700;color:#eee">${ch.name}</div>
-      <div style="font-size:0.64rem;color:#888;line-height:1.45">${ch.desc}</div>
-      <div style="display:flex;flex-wrap:wrap;gap:3px;justify-content:center;margin-top:2px">
-        ${ch.stats.map(s=>`<span style="font-size:0.58rem;padding:2px 6px;background:rgba(255,255,255,0.08);border-radius:8px;color:#aaa">${s}</span>`).join('')}
-      </div>
-    `;
-
-    inner.appendChild(back);
-    inner.appendChild(front);
-    wrapper.appendChild(inner);
-    cardsEl.appendChild(wrapper);
-
-    let flipped = false;
-
-    wrapper.onclick = () => {
-      if (!flipped) {
-        // 翻面
-        flipped = true;
-        inner.style.transform = 'rotateY(180deg)';
-        // 翻面後牌邊發光
-        setTimeout(() => {
-          front.style.borderColor = 'rgba(255,160,60,0.6)';
-          front.style.boxShadow = '0 0 18px rgba(255,140,0,0.3)';
-          wrapper.onmouseover = () => front.style.background = 'rgba(255,160,60,0.1)';
-          wrapper.onmouseout  = () => front.style.background = 'rgba(255,255,255,0.04)';
-        }, 280);
-      } else {
-        // 已翻面，第二次點擊才出戰
-        endlessPlayerCharId = ch.id;
-        launchEndlessBattle(ch.id, endlessEnemyId);
-      }
-    };
-
-    // 發牌入場動畫
-    requestAnimationFrame(() => {
-      setTimeout(() => {
-        wrapper.style.opacity = '1';
-        wrapper.style.transform = 'translateY(0)';
-      }, 50 + idx * 180);
-    });
-  });
-}
-
-function launchEndlessBattle(p1Id, p2Id) {
-  p1Choice = p1Id;
-  p2Choice = p2Id;
-  document.getElementById('endless-pick-screen').style.display = 'none';
-  startGame();
-  document.getElementById('endless-stop-btn').style.display = 'block';
-}
-
-function endlessQuit() {
-  // 用內嵌確認，避免 confirm() 被瀏覽器封鎖
-  const btn = document.getElementById('endless-stop-btn');
-  if (btn.dataset.confirming === '1') {
-    btn.dataset.confirming = '0';
-    btn.textContent = '✕ 放棄闖關';
-    btn.style.background = 'rgba(255,60,60,0.15)';
-    endlessMode = false;
-    endlessSessionId++;
-    if (gameLoop) { cancelAnimationFrame(gameLoop); gameLoop = null; }
-    document.getElementById('endless-stop-btn').style.display = 'none';
-    backToSelect();
-  } else {
-    btn.dataset.confirming = '1';
-    btn.textContent = '確定放棄？再按一次';
-    btn.style.background = 'rgba(255,60,60,0.4)';
-    setTimeout(() => {
-      if (btn.dataset.confirming === '1') {
-        btn.dataset.confirming = '0';
-        btn.textContent = '✕ 放棄闖關';
-        btn.style.background = 'rgba(255,60,60,0.15)';
-      }
-    }, 2500);
-  }
-}
-
-function handleEndlessResult(p1Won) {
-  if (p1Won) {
-    endlessStage++;
-    showEndlessPick();
-  } else {
-    // 更新最高紀錄
-    const reached = endlessStage;
-    if (reached > endlessBest) {
-      endlessBest = reached;
-      localStorage.setItem('endlessBest', endlessBest);
-    }
-    document.getElementById('endless-pick-screen').style.display = 'none';
-    document.getElementById('endless-result-screen').style.display = 'flex';
-    document.getElementById('er-stage').textContent = `抵達第 ${reached} 關`;
-    document.getElementById('er-best').textContent = `🏆 最高紀錄：第 ${endlessBest} 關`;
-    document.getElementById('overlay').classList.remove('show');
-  }
-}
-
-function backToSelect() {
-  endlessMode = false;
-  p1Choice = null; p2Choice = null;
-  document.getElementById('endless-stop-btn').style.display = 'none';
-  document.getElementById('endless-result-screen').style.display = 'none';
-  document.getElementById('endless-pick-screen').style.display = 'none';
-  document.getElementById('game-screen').style.display = 'none';
-  document.getElementById('select-screen').style.display = 'flex';
-  // 清除選角畫面的選中狀態
-  document.querySelectorAll('.char-card').forEach(c => c.classList.remove('selected','p1','p2'));
-  const lbl1 = document.getElementById('p1-selected-label');
-  const lbl2 = document.getElementById('p2-selected-label');
-  if (lbl1) lbl1.textContent = '請選擇角色';
-  if (lbl2) lbl2.textContent = '請選擇角色';
-  const startBtn = document.getElementById('start-btn');
-  if (startBtn) startBtn.disabled = true;
-}
-
-document.getElementById('endless-btn')?.addEventListener('click', startEndless);
 
 // ══════════════ 組裝模式（自組機器人闖關） ══════════════
 let assembleMode = false;
@@ -20699,7 +21511,6 @@ function sandboxStartBattle() {
 
   sandboxMode = true;
   wheelState = null;
-  endlessMode = false;
   assembleMode = false;
 
   resizeArena(w, h);
@@ -20804,6 +21615,15 @@ function sandboxStartBattle() {
     baieReflectFX: [],
     steveAxeFX: [],
     yutaSlashFX: [],
+    nanamiSlashFX: [],
+    nanamiRockFX: [],
+    nanamiWallHitFX: [],
+    nanamiBlackFlashFX: [],
+    nanamiMarkBreakFX: [],
+    nanamiCineFX: null,
+    nanamiWallShakeTimer: 0,
+    nanamiWallShakeDur: NANAMI_WALL_SHAKE_DUR,
+    nanamiWallShakeMag: 0,
     turrets: [],
     engGrids: [],
     engLaserFX: [],
@@ -20861,6 +21681,7 @@ function sandboxStartBattle() {
   if (gameLoop) cancelAnimationFrame(gameLoop);
   lastTime = performance.now();
   elapsed = 0;
+  hitStopTimer = 0;
   gameLoop = requestAnimationFrame(tick);
 }
 
