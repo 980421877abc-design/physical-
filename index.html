@@ -855,6 +855,17 @@
 
 <!-- ══ SELECT SCREEN ══ -->
 <div id="select-screen">
+  <button id="settings-gear-btn" type="button" style="position:absolute;top:0.5rem;left:0.5rem;z-index:6;width:30px;height:30px;border-radius:8px;background:rgba(15,12,8,0.55);border:1px solid rgba(200,168,75,0.4);color:#e8dcc8;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center">⚙️</button>
+  <div id="settings-panel" style="display:none;position:absolute;top:2.6rem;left:0.5rem;z-index:6;background:rgba(5,3,2,0.95);border:1px solid rgba(200,168,75,0.4);border-radius:10px;padding:10px 12px;flex-direction:column;gap:10px;font-family:sans-serif;min-width:150px;box-shadow:0 4px 20px rgba(0,0,0,0.12)">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+      <label for="bg-color-picker" style="font-size:0.7rem;color:#ccc;letter-spacing:.06em">🎨 地圖顏色</label>
+      <input type="color" id="bg-color-picker" value="#000000" style="width:32px;height:26px;border:none;border-radius:6px;background:none;cursor:pointer;padding:0">
+    </div>
+    <button id="dmgnum-toggle-btn" type="button" onclick="toggleDamageNumbersBtn()" style="display:flex;align-items:center;justify-content:space-between;gap:10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:5px 8px;color:#eee;font-size:0.7rem;cursor:pointer">
+      <span><span id="dmgnum-toggle-emoji">🔢</span> 傷害數字</span>
+      <span id="dmgnum-toggle-name">開</span>
+    </button>
+  </div>
   <h1>競技場對決</h1>
   <p class="subtitle">ARENA · BATTLE · CHAMPIONSHIP</p>
   <button class="roster-btn" id="roster-btn">📖 角色圖鑑</button>
@@ -944,11 +955,6 @@
       <span>🏆</span>
       <span>勝率榜</span>
     </button>
-  </div>
-
-  <div class="bg-color-select" style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:10px">
-    <label for="bg-color-picker" style="font-size:0.75rem;color:#888;letter-spacing:.1em">🎨 背景顏色</label>
-    <input type="color" id="bg-color-picker" value="#000000" style="width:36px;height:28px;border:none;border-radius:6px;background:none;cursor:pointer;padding:0">
   </div>
 
   <button class="start-btn" id="start-btn" disabled>開始對決</button>
@@ -1051,7 +1057,7 @@
 <!-- ══ GAME SCREEN ══ -->
 
 <!-- ══ 組裝模式：零件挑選畫面 ══ -->
-<div id="assemble-pick-screen" style="display:none;position:fixed;inset:0;background:#04070a;z-index:200;flex-direction:column;align-items:center;justify-content:flex-start;gap:0;font-family:sans-serif;color:#eee;overflow-y:auto;padding:24px 16px 40px;">
+<div id="assemble-pick-screen" style="display:none;position:fixed;inset:0;background:#0a0008;z-index:200;flex-direction:column;align-items:center;justify-content:flex-start;gap:0;font-family:sans-serif;color:#eee;overflow-y:auto;padding:24px 16px 40px;">
   <div style="font-size:1.4rem;font-weight:900;letter-spacing:.15em;color:#8fd6ff;text-shadow:0 0 18px #2a7fbf;margin-bottom:4px">🤖 組裝你的機器人</div>
   <div style="font-size:0.72rem;color:#f39c12;letter-spacing:.05em;margin-bottom:2px">⚠️ 4個部位只能裝3個，balance 一下要跳過其中一欄</div>
   <div id="assemble-step-indicator" style="font-size:0.8rem;color:#8fd6ff;letter-spacing:.08em;margin-bottom:4px;font-weight:700"></div>
@@ -1066,7 +1072,7 @@
 </div>
 
 <!-- ══ 組裝模式：關卡宣告畫面 ══ -->
-<div id="assemble-stage-screen" style="display:none;position:fixed;inset:0;background:#04070a;z-index:200;flex-direction:column;align-items:center;justify-content:center;gap:0;font-family:sans-serif;color:#eee;">
+<div id="assemble-stage-screen" style="display:none;position:fixed;inset:0;background:#0a0008;z-index:200;flex-direction:column;align-items:center;justify-content:center;gap:0;font-family:sans-serif;color:#eee;">
   <div id="as-stage" style="font-size:1.5rem;font-weight:900;letter-spacing:.15em;color:#8fd6ff;text-shadow:0 0 18px #2a7fbf;margin-bottom:4px">第 1 關</div>
   <div style="font-size:0.75rem;color:#888;letter-spacing:.12em;margin-bottom:2px">對手</div>
   <div id="as-enemy" style="font-size:1.6rem;font-weight:700;margin-bottom:18px">─</div>
@@ -1079,7 +1085,7 @@
 </div>
 
 <!-- ══ 組裝模式：結算畫面 ══ -->
-<div id="assemble-result-screen" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:201;flex-direction:column;align-items:center;justify-content:center;gap:12px;font-family:sans-serif;color:#eee;">
+<div id="assemble-result-screen" style="display:none;position:fixed;inset:0;background:rgba(5,3,2,0.95);z-index:201;flex-direction:column;align-items:center;justify-content:center;gap:12px;font-family:sans-serif;color:#eee;">
   <div style="font-size:2rem;font-weight:900;color:#ff4444;text-shadow:0 0 24px #ff2200">💀 挑戰失敗</div>
   <div id="as-r-stage" style="font-size:1.1rem;color:#8fd6ff;font-weight:700"></div>
   <div id="as-r-best" style="font-size:0.9rem;color:#888"></div>
@@ -1154,6 +1160,20 @@ const FIREBASE_CONFIG = {
   projectId: "test-c6c79"
 };
 
+// ──────────────── 傷害數字開關 ────────────────
+let damageNumbersEnabled = localStorage.getItem('damageNumbersEnabled') !== '0'; // 預設開啟
+function setDamageNumbersEnabled(on) {
+  damageNumbersEnabled = on;
+  localStorage.setItem('damageNumbersEnabled', on ? '1' : '0');
+  const nameEl = document.getElementById('dmgnum-toggle-name');
+  if (nameEl) nameEl.textContent = on ? '開' : '關';
+}
+function toggleDamageNumbersBtn() {
+  setDamageNumbersEnabled(!damageNumbersEnabled);
+}
+document.addEventListener('DOMContentLoaded', () => setDamageNumbersEnabled(damageNumbersEnabled));
+if (document.readyState !== 'loading') setDamageNumbersEnabled(damageNumbersEnabled);
+
 let winRateDB = null;
 if (FIREBASE_CONFIG.databaseURL) {
   try {
@@ -1205,9 +1225,16 @@ const HIT_SOUND_DISTORTION_CURVE = (() => {
   return curve;
 })();
 
+const HIT_SOUND_LAST_PLAY = {};
+const HIT_SOUND_MIN_INTERVAL = 0.06; // 同一種音效至少間隔這麼久才會再觸發一次（秒）
 function playHitSound(type) {
   try {
     const ctx = getAudioCtx();
+    const nowCheck = ctx.currentTime;
+    const lastPlay = HIT_SOUND_LAST_PLAY[type] || -Infinity;
+    if (nowCheck - lastPlay < HIT_SOUND_MIN_INTERVAL) return;
+    HIT_SOUND_LAST_PLAY[type] = nowCheck;
+
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     const dist = ctx.createWaveShaper();
@@ -1650,7 +1677,8 @@ function getDummyDps() {
 // 木偶又完全不會反擊，自然打不到那個血量區間。這裡提供手動調整自身血量的按鈕，
 // 純粹直接改 hp（不經過 dealDamage），不會被木偶的傷害統計記錄到，也不會觸發死亡判定（下限鎖在1，不會真的歸零）。
 function getBallMaxHp(b) {
-  return b.char.type === 'sans' ? SANS_MAX_HP : b.char.type === 'rsqjs' ? RSQJS_MAX_HP : MAX_HP;
+  if (b.customMaxHp != null) return b.customMaxHp;
+  return b.char.type === 'sans' ? SANS_MAX_HP : b.char.type === 'rsqjs' ? RSQJS_MAX_HP : b.char.type === 'momoi' ? MOMOI_MAX_HP : MAX_HP;
 }
 
 function dummySetOwnHp(fraction) {
@@ -1715,13 +1743,6 @@ const WALL               = 1;
 const MAX_HP             = 1200;
 const BASE_SPEED         = 140;
 
-//一拳超人常數
-const OPM_COUNTDOWN_START    = 45;   // 怒氣值上限
-const OPM_COLLISION_COOLDOWN = 0.3;  // 每次碰撞的內置CD（秒），防連觸
-const OPM_COLLISION_REDUCE   = 1.0;    // 每次碰撞時增加的怒氣值
-const OPM_RAGE_PARTICLE_THRESHOLD = 0.3; // 怒氣超過此比例才出現粒子
-const OPM_DMG_REDUCE          = 0.3;  // 全局減傷比例（受到的所有傷害降低）
-const OPM_WALL_REDUCE          = 0.5; // 撞牆時減少的怒氣值倒數秒數
 
 //廚師常數
 const CHEF_ATTACK_INTERVAL = 2.0; //攻擊CD
@@ -1746,6 +1767,13 @@ const VAMPIRE_BITE_INTERVAL   = 0.20; // 每次咬擊間隔（秒）
 const VAMPIRE_DASH_INTERVAL   = 9;   // 蝙蝠狂襲CD（秒）
 const VAMPIRE_DASH_SPEED      = 750;  // 衝刺速度
 const VAMPIRE_DASH_DURATION   = 0.55; // 衝刺最長持續時間（秒）
+//一拳超人常數
+const OPM_COUNTDOWN_START    = 45;   // 怒氣值上限
+const OPM_COLLISION_COOLDOWN = 0.3;  // 每次碰撞的內置CD（秒），防連觸
+const OPM_COLLISION_REDUCE   = 1.0;    // 每次碰撞時增加的怒氣值
+const OPM_RAGE_PARTICLE_THRESHOLD = 0.3; // 怒氣超過此比例才出現粒子
+const OPM_DMG_REDUCE          = 0.3;  // 全局減傷比例（受到的所有傷害降低）
+const OPM_WALL_REDUCE          = 0.5; // 撞牆時減少的怒氣值倒數秒數
 
 // 詛咒之王常數
 const CURSE_SLASH_INTERVAL    = 4.25;   // 解：斬痕發動間隔（秒）
@@ -2464,7 +2492,7 @@ const DRAGON4_REBEL_WEAKEN_MULT  = 0.5;  // 對手傷害輸出減半
 // 娜娜明（七海建人）專屬常數 ────────────────
 const NANAMI_SLASH_DMG            = 40;   // 「劈砍」基礎傷害
 const NANAMI_SLASH_INTERVAL       = 0.8;  // 「劈砍」攻擊間隔（CD）
-const NANAMI_SLASH_RANGE          = 130;  // 「劈砍」觸發距離
+const NANAMI_SLASH_RANGE          = 140;  // 「劈砍」觸發距離
 const NANAMI_SLASH_CHARGE         = 0.10; // 「劈砍」揮刀前搖時間
 const NANAMI_ANALYSIS_MAX_STACKS  = 10;   // 「情報解析」最高層數
 const NANAMI_ANALYSIS_TICK        = 0.8;  // 每幾秒累積一層
@@ -2490,6 +2518,39 @@ const NANAMI_OVERTIME_TRIGGER     = 20.0; // 「加班時間」開戰後幾秒�
 const NANAMI_OVERTIME_DMG_MULT    = 1.5;  // 加班時間傷害倍率
 const NANAMI_OVERTIME_BLACKFLASH  = 0.20; // 加班時間期間黑閃基礎機率下限
 const NANAMI_OVERTIME_SPEED_MULT  = 1.3;  // 加班時間移速倍率
+
+// ══════ 桃井／綠 專屬常數══════
+const MOMOI_MAX_HP               = 750;   // 桃井／綠 各自的獨立血量上限
+const MOMOI_BULLET_DAMAGE        = 15;    // 桃井「獨特創意」普攻每顆子彈傷害
+const MOMOI_BULLET_SPEED         = 500;   // 子彈飛行速度
+const MOMOI_BURST_INTERVAL       = 1.5;   // 每輪三連發的間隔（秒）
+const MOMOI_BURST_GAP            = 0.09;  // 三連發中，每顆子彈之間的出手間隔（前中後依序射出，非霰彈同時發射）
+const MOMOI_BURST_SPREAD         = 0.23;  // 左中右三顆子彈的扇形角度（弧度）
+const MOMOI_SHOTS_BEFORE_RELOAD  = 10;    // 幾輪三連發後進行換彈
+const MOMOI_RELOAD_TIME          = 2.5;   // 換彈耗時
+const MOMOI_SKILL_CD             = 5;     // 「創作的痛苦」冷卻
+const MOMOI_SKILL_DAMAGE         = 70;    // 「創作的痛苦」基礎傷害
+const MOMOI_SKILL_RANGE          = 200;   // 「創作的痛苦」扇形範圍半徑
+const MOMOI_SKILL_ANGLE          = Math.PI / 3; // 「創作的痛苦」扇形範圍半角（±60°）
+const MOMOI_SKILL_SYNERGY_BONUS  = 10;    // 綠在場時，「創作的痛苦」額外傷害
+const MOMOI_PASSIVE_INTERVAL     = 10;    // 「堅守期限」觸發間隔
+const MOMOI_PASSIVE_BUFF_DMG     = 10;    // 「堅守期限」增加的傷害
+const MOMOI_PASSIVE_BUFF_DURATION = 5;   // 「堅守期限」增傷持續時間
+const MOMOI_SYNERGY_DMG_BONUS    = 5;     // 開發者加成：綠在場時，桃井所有攻擊額外傷害
+
+const MIDORI_BULLET_DAMAGE       = 30;    // 「新鮮靈感」普攻傷害
+const MIDORI_BULLET_SPEED        = 680;
+const MIDORI_ATTACK_INTERVAL     = 1.5;   // 普攻間隔（基礎）
+const MIDORI_SYNERGY_ATTACK_INTERVAL = 1.0; // 開發者加成：桃井還活著時，普攻間隔縮短為1秒
+const MIDORI_SHOTS_BEFORE_RELOAD = 5;     // 幾次普攻後進行換彈
+const MIDORI_RELOAD_TIME         = 2.5;   // 換彈耗時
+const MIDORI_SKILL_CD            = 6;     // 「繪畫藝術」冷卻
+const MIDORI_SKILL_SHOTS         = 5;     // 「繪畫藝術」連續射擊次數（可重複命中同一人）
+const MIDORI_SKILL_SHOT_GAP      = 0.12;  // 「繪畫藝術」每發間隔
+const MIDORI_SKILL_DAMAGE        = 35;    // 「繪畫藝術」每發傷害
+const MIDORI_SKILL_SYNERGY_BONUS = 5;     // 桃井在場時，「繪畫藝術」每發額外傷害
+const MIDORI_PASSIVE_INTERVAL    = 10;    // 「洗練的品味」觸發間隔
+const MIDORI_PASSIVE_HEAL        = 60;   // 「洗練的品味」回復量
 
 const MIN_SPEED          = 100;   // 最低移動速度（技能停止中除外）
 const BOOST_INTERVAL_MIN = 3;
@@ -2631,7 +2692,8 @@ const CHARACTERS = [
  '好乏味啊' ,'先聲明，你才是挑戰者'],
   yuta:'學會如何運用你身上的能力吧去保護他人吧，憂太。',
   tiger:['我很看好你喔，悠仁。','五條什麼的，無所喂了吧。','放馬過來吧！'],
-  geto:['傑，你是我唯一的摯友。','因為我們是最強的。']}
+  geto:['傑，你是我唯一的摯友。','因為我們是最強的。'],
+  nanami:'我們用報廢的飯糰玩傳接球吧～'}
   },
   {
   id: 'cursed', emoji: '💀', weapon: '⚔️', name: '詛咒之王',
@@ -2671,7 +2733,7 @@ tiger:['你那同情我的態度真是令人作嘔，這只顯得你很懦弱。
   desc: '​「在我的槍口前，每個人都只有一秒的時間後悔。」​游走在法律與罪惡邊緣的頂尖槍手。沒有人知道他的真名，只知道當他的皮靴馬刺聲響起，就代表死神的腳步近了。',
   stats: [  '連射 8s', ' 閃光彈'],
   skills: ['被動：每次撞牆裝彈兩發，上限6發。', '主動：累積足夠子彈後停下連射，每發45傷害。', '閃光彈：定時投擲閃光彈，持續8秒，造成80範圍傷害並封鎖對手攻擊或技能CD。'],
-  color: '#b8860b', glowColor: 'rgba(184,134,11,0.6)', type: 'gunner',
+  color: '#f0c84a', glowColor: 'rgba(184,134,11,0.6)', type: 'gunner',
   winQuote: '顆秒！！！！！！。',
   loseQuote: '……看來這次，慢了半拍。'
   },
@@ -2799,7 +2861,8 @@ cursed:'喂喂喂 太甜了吧！'}
 gojo:['這樣就可以了吧，老師。','老師你的術式好礙事啊。'],
 cursed:'我不會憎恨你，但我會殺了你。如果你願意回到我體內，我就放過你。',
 geto:'在成為咒術師前，我們是人類。',
-yuki:'這是對我哥哥重要的人來說，她的理想'
+yuki:'這是對我哥哥重要的人來說，她的理想',
+nanami:'娜娜明⋯⋯？'
 }
   },
   {
@@ -3009,8 +3072,33 @@ yuki:'這是對我哥哥重要的人來說，她的理想'
       `「加班時間」：戰鬥開始${NANAMI_OVERTIME_TRIGGER}秒後發動，所有攻擊傷害提升至${Math.round(NANAMI_OVERTIME_DMG_MULT*100)}%，黑閃基礎觸發率提升至${Math.round(NANAMI_OVERTIME_BLACKFLASH*100)}%，移動速度提升，身上開始冒藍色咒力。`
     ],
     color: '#3d5a80', glowColor: 'rgba(61,90,128,0.6)', type: 'nanami',
-    winQuote: '加班費，記得算給我。',
-    loseQuote: '……看來今天，還是得繼續加班。'
+    winQuote: '勞動就是狗屎、很遺憾，接下來是加班時間。',
+    loseQuote: '我已經收到很多人的感謝，沒有遺憾了。',
+    vsQuotes: {
+      tiger: '我有義務要優先照顧你。',
+      gojo: '我信任他，也信賴他，但是我並不尊敬他！'
+    }
+  },
+  {
+    id: 'momoi', emoji: '🍑', emoji2: '💚', weapon: '🔫', name: '桃井／綠',
+    desc: '「靈感這種東西，是要用痛苦換來的。」／「靈感新鮮的時候，不用趕快畫下來嗎？」形影不離的創作者姊妹，桃井帶著獨特創意四處奔走，綠總跟在一旁，笑咪咪卻毫不留情地把子彈全招呼過去。',
+    stats: ['獨特創意', '創作的痛苦', '堅守期限', '新鮮靈感', '繪畫藝術', '洗練的品味'],
+    skills: [
+      `雙生：本角色由🍑桃井／💚綠兩顆球組成，各自擁有獨立${MOMOI_MAX_HP}血量（右上角分兩條血顯示）。`,
+      `🍑「獨特創意」：每${MOMOI_BURST_INTERVAL}秒發射三顆子彈，左中右各一顆（小扇形，依序射出、不是霰彈同時發射），每顆${MOMOI_BULLET_DAMAGE}傷害，射擊${MOMOI_SHOTS_BEFORE_RELOAD}輪後進行${MOMOI_RELOAD_TIME}秒的換彈。`,
+      `🍑「創作的痛苦」：冷卻${MOMOI_SKILL_CD}秒，對面前扇形範圍內所有敵人造成${MOMOI_SKILL_DAMAGE}傷害；綠還活著時，額外造成${MOMOI_SKILL_SYNERGY_BONUS}傷害。`,
+      `🍑「堅守期限」：每${MOMOI_PASSIVE_INTERVAL}秒，自身所有攻擊增加${MOMOI_PASSIVE_BUFF_DMG}傷害，持續${MOMOI_PASSIVE_BUFF_DURATION}秒。`,
+      `💚「新鮮靈感」：每${MIDORI_ATTACK_INTERVAL}秒對一名敵人造成${MIDORI_BULLET_DAMAGE}傷害，射擊${MIDORI_SHOTS_BEFORE_RELOAD}次後進行${MIDORI_RELOAD_TIME}秒的換彈。`,
+      `💚「繪畫藝術」：冷卻${MIDORI_SKILL_CD}秒，連續射擊${MIDORI_SKILL_SHOTS}次（可重複命中同一人），每次${MIDORI_SKILL_DAMAGE}傷害；桃井還活著時，每次額外造成${MIDORI_SKILL_SYNERGY_BONUS}傷害。`,
+      `💚「洗練的品味」：每${MIDORI_PASSIVE_INTERVAL}秒，恢復桃井與綠兩人中血量較少的一方${MIDORI_PASSIVE_HEAL}血。`,
+      `開發者加成：兩人都還活著時，綠的攻速從每${MIDORI_ATTACK_INTERVAL}秒一發提升至每${MIDORI_SYNERGY_ATTACK_INTERVAL}秒一發，桃井所有攻擊額外造成${MOMOI_SYNERGY_DMG_BONUS}傷害。`
+    ],
+    color: '#f2a65a', glowColor: 'rgba(242,166,90,0.6)', type: 'momoi', isTwin: true,
+    twinRoles: {
+      momoi:  { suffix: '🍑', color: '#f2a65a', glowColor: 'rgba(242,166,90,0.6)', image: 'image/momoi.png' },
+      midori: { suffix: '💚', color: '#5cb85c', glowColor: 'rgba(92,184,92,0.6)', image: 'image/midori.png' }
+    },
+    winQuote: ['太好了！完全勝利！', '姐姐，不能太得意忘形喔。']
   }
 ];
 
@@ -3099,7 +3187,7 @@ function setPlayerMode(count) {
 
 // 三人以上混戰時，機制在多人場面會失衡的角色停用選取：
 // 一拳超人（一擊必殺）、DIO（世界時停對多人影響過大）
-const LOCKED_IN_MULTI = ['opm', 'dio', 'rsqjs', 'dragon4']; // rsqjs/dragon4：多球共用一個玩家欄位，3人以上混戰的淘汰/HUD邏輯未驗證，先停用
+const LOCKED_IN_MULTI = ['opm', 'dio', 'rsqjs', 'dragon4', 'momoi']; // rsqjs/dragon4/momoi：多球共用一個玩家欄位，3人以上混戰的淘汰/HUD邏輯未驗證，先停用
 
 function refreshOpmLock() {
   const locked = playerModeCount >= 3;
@@ -3315,7 +3403,7 @@ function openWinRateBoard() {
     }
     listEl.innerHTML = rows.map((r, i) => {
       const ch = CHARACTERS.find(c => c.id === r.id);
-      const name = ch ? ch.displayName : r.id;
+      const name = ch ? ch.name : r.id;
       const icon = ch ? charIconHTML(ch, '1.3rem') : '❓';
       const pct = (r.rate * 100).toFixed(1);
       return `<div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:8px 12px">
@@ -3548,7 +3636,7 @@ function closeRoster() { document.getElementById('roster-modal').classList.remov
   const backBtn = document.getElementById('wp-back-btn');
   const cancelBtn = document.getElementById('wp-cancel-btn');
 
-  const WHEEL_LOCKED = ['opm', 'rsqjs', 'dragon4']; // 車輪戰停用角色：一拳超人的一擊必殺在接力賽中太破壞平衡；rsqjs/dragon4 多球角色的車輪戰交接邏輯未支援
+  const WHEEL_LOCKED = ['opm', 'rsqjs', 'dragon4', 'momoi']; // 車輪戰停用角色：一拳超人的一擊必殺在接力賽中太破壞平衡；rsqjs/dragon4/momoi 多球角色的車輪戰交接邏輯未支援
 
   CHARACTERS.forEach(ch => {
     const sq = document.createElement('div');
@@ -4185,6 +4273,17 @@ document.getElementById('arena-modal-close').addEventListener('click', () => {
 document.getElementById('bg-color-picker').addEventListener('input', (e) => {
   selectedBgColor = e.target.value;
 });
+
+// 遊戲畫面左上角設定齒輪：開關地圖顏色／傷害數字面板
+document.getElementById('settings-gear-btn').addEventListener('click', (e) => {
+  e.stopPropagation();
+  const panel = document.getElementById('settings-panel');
+  panel.style.display = (panel.style.display === 'flex') ? 'none' : 'flex';
+});
+document.getElementById('settings-panel').addEventListener('click', (e) => e.stopPropagation());
+document.addEventListener('click', () => {
+  document.getElementById('settings-panel').style.display = 'none';
+});
 document.getElementById('back-btn').addEventListener('click', () => {
   document.getElementById('overlay').classList.remove('show');
   document.getElementById('game-screen').style.display = 'none';
@@ -4221,8 +4320,8 @@ function forfeitGame() {
   overlay.classList.add('show');
 }
 
-const P1_COLORS ={ chef:'#e84545',drunk:'#7b4cca', opm:'#f5f5f5', vampire:'#8b1a8b', gojo:'#00cfff', cursed:'#c0392b', trapper:'#27ae60', yi:'#e8e8e8', gunner:'#b8860b', samurai:'#d4af37', mage:'#9b59b6', thunder:'#f1c40f', blacksmith:'#cd7f32', naoya:'#c8c8e8', itachi:'#8b0000', yuta:'#ff6fa5', engineer:'#3a8fd6', cannondad:'#bdbdbd', dio:'#f5d020', tiger:'#cc2200', stargirl:'#ffe066', obito:'#ff6600', fisherman:'#4a90d9', geto:'#5b3a8e', sakiko:'#c9a4d1', joseph:'#2f7dc0', steve:'#4a8f3c',daji:'#e08ac7',yuki:'#b8860b',wuxing:'#9b8cce',sans:'#e8e8e8',pucci:'#8e6bbf',baie:'#e8c840',rsqjs:'#e84b4b',dragon4:'#c9a959',nanami:'#3d5a80' };
-const P2_COLORS = { chef:'#ff9f43', drunk:'#48dbfb', opm:'#aaaaaa', vampire:'#cc44cc', gojo:'#7ff8ff', cursed:'#e74c3c', trapper:'#2ecc71', yi:'#cccccc', gunner:'#f0c040', samurai:'#ffe88a', mage:'#d7aefb', thunder:'#ffe066', blacksmith:'#e8a840', naoya:'#aaaacc', itachi:'#ff3333', yuta:'#ffa3c8', engineer:'#7ec8ff', cannondad:'#787878', dio:'#fff066', tiger:'#ff4422', stargirl:'#fff5aa', obito:'#ffaa44', fisherman:'#8ec6ff', geto:'#a678e0', sakiko:'#e8cdf0', joseph:'#6fb8ee', steve:'#8fd96b',daji:'#e8cdf8' ,yuki:'#b8960b',wuxing:'#c3b8e8',sans:'#a8d8f0',pucci:'#c9a8e8',baie:'#a86fe0',rsqjs:'#3fa9e8',dragon4:'#e8d38f',nanami:'#7e9cc4'};
+const P1_COLORS ={ chef:'#e84545',drunk:'#7b4cca', opm:'#f5f5f5', vampire:'#8b1a8b', gojo:'#00cfff', cursed:'#c0392b', trapper:'#27ae60', yi:'#e8e8e8', gunner:'#f0c84a', samurai:'#d4af37', mage:'#9b59b6', thunder:'#f1c40f', blacksmith:'#cd7f32', naoya:'#c8c8e8', itachi:'#8b0000', yuta:'#ff6fa5', engineer:'#3a8fd6', cannondad:'#bdbdbd', dio:'#f5d020', tiger:'#cc2200', stargirl:'#ffe066', obito:'#ff6600', fisherman:'#4a90d9', geto:'#5b3a8e', sakiko:'#c9a4d1', joseph:'#2f7dc0', steve:'#4a8f3c',daji:'#e08ac7',yuki:'#f0c84a',wuxing:'#9b8cce',sans:'#e8e8e8',pucci:'#8e6bbf',baie:'#e8c840',rsqjs:'#e84b4b',dragon4:'#c9a959',nanami:'#3d5a80',momoi:'#f2a65a' };
+const P2_COLORS = { chef:'#ff9f43', drunk:'#48dbfb', opm:'#aaaaaa', vampire:'#cc44cc', gojo:'#7ff8ff', cursed:'#e74c3c', trapper:'#2ecc71', yi:'#cccccc', gunner:'#f0c040', samurai:'#ffe88a', mage:'#d7aefb', thunder:'#ffe066', blacksmith:'#e8a840', naoya:'#aaaacc', itachi:'#ff3333', yuta:'#ffa3c8', engineer:'#7ec8ff', cannondad:'#787878', dio:'#fff066', tiger:'#ff4422', stargirl:'#fff5aa', obito:'#ffaa44', fisherman:'#8ec6ff', geto:'#a678e0', sakiko:'#e8cdf0', joseph:'#6fb8ee', steve:'#8fd96b',daji:'#e8cdf8' ,yuki:'#b8960b',wuxing:'#c3b8e8',sans:'#a8d8f0',pucci:'#c9a8e8',baie:'#a86fe0',rsqjs:'#3fa9e8',dragon4:'#e8d38f',nanami:'#7e9cc4',momoi:'#ffcf8f'};
 
 // 玩家 1、2 用既有的兩張色表；玩家 3 以上（多人混戰用）用同一顏色做色調偏移，避免撞色。
 // 之後若要幫玩家 3/4 手動指定色表，只要新增 P3_COLORS / P4_COLORS 並在這裡優先讀取即可。
@@ -4534,6 +4633,20 @@ const PROGRESS_HANDLERS = {
     }
     return { atFrac: 1, barColor: b.char.color };
   },
+  momoi(b) {
+    // 桃井（momoi角色）：顯示三連發／換彈進度；綠（midori角色）：顯示普攻／換彈進度
+    if (b.twinRole === 'momoi') {
+      if (b.momoiReloading) return { atFrac: 1 - Math.max(0, b.momoiReloadTimer) / MOMOI_RELOAD_TIME, barColor: '#ff6600' };
+      if (b.momoiBurstFiring) return { atFrac: b.momoiBurstBulletsFired / 3, barColor: '#ffdd66' };
+      return { atFrac: 1 - Math.max(0, b.momoiBurstTimer) / MOMOI_BURST_INTERVAL, barColor: b.char.twinRoles.momoi.color };
+    }
+    if (b.twinRole === 'midori') {
+      if (b.midoriReloading) return { atFrac: 1 - Math.max(0, b.midoriReloadTimer) / MIDORI_RELOAD_TIME, barColor: '#ff6600' };
+      if (b.midoriSkillActive) return { atFrac: b.midoriSkillShotsFired / MIDORI_SKILL_SHOTS, barColor: '#7CFC00' };
+      return { atFrac: 1 - Math.max(0, b.midoriAttackTimer) / (twinPartnerAlive(b) ? MIDORI_SYNERGY_ATTACK_INTERVAL : MIDORI_ATTACK_INTERVAL), barColor: b.char.twinRoles.midori.color };
+    }
+    return { atFrac: 1, barColor: b.char.color };
+  },
   dragon4(b) {
     // 四天之龍：四顆球各自技能CD不同，顯示自己那顆的技能冷卻進度
     const roleCd = {
@@ -4595,7 +4708,7 @@ function pickWuxingForm(ball) {
   // 普奇神父（跨多階段、場上全域道具如CD光碟／🚀的複雜狀態機）同樣排除，避免變身時狀態不完整。
   // 自組機器人（組裝模式限定、id為custom_assembled、type為custom）本身零件是玩家另外選的，
   // 無形變身抽到這個只會複製到「當下這一份」零件組合、狀態不完整，直接排除（用type判斷，id判斷會漏掉）。
-  const EXCLUDED = ['wuxing', 'dio', 'opm', 'sans', 'pucci', 'rsqjs', 'dragon4'];
+  const EXCLUDED = ['wuxing', 'dio', 'opm', 'sans', 'pucci', 'rsqjs', 'dragon4', 'momoi'];
   const pool = CHARACTERS.filter(c => !EXCLUDED.includes(c.id) && c.type !== 'custom' && c.id !== ball.char.id);
   if (pool.length === 0) return CHARACTERS.find(c => !EXCLUDED.includes(c.id) && c.type !== 'custom') || ball.char;
   return pool[Math.floor(Math.random() * pool.length)];
@@ -4674,10 +4787,10 @@ updateWuxingFn = function (dt) {
 function makeBall(x, y, vx, vy, ch, player, twinRole) {
   return {
     x, y, vx, vy,
-    hp: ch.type === 'sans' ? SANS_MAX_HP : ch.type === 'rsqjs' ? RSQJS_MAX_HP : MAX_HP,
+    hp: ch.type === 'sans' ? SANS_MAX_HP : ch.type === 'rsqjs' ? RSQJS_MAX_HP : ch.type === 'momoi' ? MOMOI_MAX_HP : MAX_HP,
     char: ch, player,
     isDummy: ch.type === 'dummy', // 木偶訓練模式：固定不動、不會反擊、血量永遠回滿
-    twinRole: ch.type === 'rsqjs' ? twinRole : null,          // 'stop'(🛑紅石) 或 'diamond'(🔷青金石)
+    twinRole: (ch.type === 'rsqjs' || ch.type === 'momoi') ? twinRole : null,  // rsqjs: 'stop'/'diamond'；momoi: 'momoi'(🍑)/'midori'(💚)
     twinPartnerId: null,                                       // 執行期指向搭檔球（見 startGame 連結）
     // ══════ 四天之龍（dragon4）專屬狀態 ══════
     quadSiblings: ch.type === 'dragon4' ? [] : null,           // 其餘三顆龍球參考（見 startGame 連結），用於血量同步
@@ -5191,6 +5304,30 @@ gojoChargingVisual: ch.type === 'gojo' ? false : null,
     rsqjsHasBombSkill:  ch.type === 'rsqjs' ? (twinRole === 'stop') : null, // 是否擁有炸藥能力（復仇後可能轉移給🔷）
     rsqjsHasWaterSkill: ch.type === 'rsqjs' ? (twinRole === 'diamond') : null, // 是否擁有水攻能力（復仇後可能轉移給🛑）
     rsqjsRevengeUsed:   ch.type === 'rsqjs' ? false : null,                // 復仇是否已觸發過（避免重複）
+
+    // ══════ 🍑桃井（momoi角色，twinRole==='momoi'）專屬狀態 ══════
+    momoiBurstTimer:        (ch.type === 'momoi' && twinRole === 'momoi') ? 0 : null,     // 下一輪三連發倒數
+    momoiBurstFiring:       (ch.type === 'momoi' && twinRole === 'momoi') ? false : null, // 是否正在三連發中
+    momoiBurstBulletsFired: (ch.type === 'momoi' && twinRole === 'momoi') ? 0 : null,     // 本輪已射出幾顆（0~3）
+    momoiBurstBulletTimer:  (ch.type === 'momoi' && twinRole === 'momoi') ? 0 : null,     // 三連發中，下一顆子彈倒數
+    momoiShotCount:         (ch.type === 'momoi' && twinRole === 'momoi') ? 0 : null,     // 距上次換彈，已完成幾輪三連發
+    momoiReloading:         (ch.type === 'momoi' && twinRole === 'momoi') ? false : null, // 是否換彈中
+    momoiReloadTimer:       (ch.type === 'momoi' && twinRole === 'momoi') ? 0 : null,     // 換彈倒數
+    momoiSkillTimer:        (ch.type === 'momoi' && twinRole === 'momoi') ? MOMOI_SKILL_CD * 0.4 : null, // 「創作的痛苦」冷卻
+    momoiPassiveTimer:      (ch.type === 'momoi' && twinRole === 'momoi') ? MOMOI_PASSIVE_INTERVAL : null, // 「堅守期限」倒數
+    momoiBuffTimer:         (ch.type === 'momoi' && twinRole === 'momoi') ? 0 : null,     // 「堅守期限」增傷剩餘時間
+
+    // ══════ 💚綠（momoi角色，twinRole==='midori'）專屬狀態 ══════
+    midoriAttackTimer:   (ch.type === 'momoi' && twinRole === 'midori') ? 0 : null,       // 下一次普攻倒數
+    midoriShotCount:     (ch.type === 'momoi' && twinRole === 'midori') ? 0 : null,       // 距上次換彈，已射擊幾次
+    midoriReloading:     (ch.type === 'momoi' && twinRole === 'midori') ? false : null,   // 是否換彈中
+    midoriReloadTimer:   (ch.type === 'momoi' && twinRole === 'midori') ? 0 : null,       // 換彈倒數
+    midoriSkillTimer:    (ch.type === 'momoi' && twinRole === 'midori') ? MIDORI_SKILL_CD * 0.4 : null, // 「繪畫藝術」冷卻
+    midoriSkillActive:   (ch.type === 'momoi' && twinRole === 'midori') ? false : null,   // 「繪畫藝術」發動中
+    midoriSkillShotsFired: (ch.type === 'momoi' && twinRole === 'midori') ? 0 : null,     // 「繪畫藝術」已射擊次數
+    midoriSkillShotTimer:  (ch.type === 'momoi' && twinRole === 'midori') ? 0 : null,     // 「繪畫藝術」下一發倒數
+    midoriSkillTarget:     null,  // 「繪畫藝術」鎖定的目標（可重複命中同一人）
+    midoriPassiveTimer:  (ch.type === 'momoi' && twinRole === 'midori') ? MIDORI_PASSIVE_INTERVAL : null, // 「洗練的品味」倒數
   };
 }
 
@@ -5279,6 +5416,13 @@ function startGame() {
       diamondBall.twinPartner = stopBall;
       return [stopBall, diamondBall];
     }
+    if (ch.isTwin && ch.type === 'momoi') {
+      const momoiBall = makeBall(px - 14, py, vx, vy, ch, i + 1, 'momoi');
+      const midoriBall = makeBall(px + 14, py, -vx, -vy, ch, i + 1, 'midori');
+      momoiBall.twinPartner = midoriBall;
+      midoriBall.twinPartner = momoiBall;
+      return [momoiBall, midoriBall];
+    }
     if (ch.isQuad && ch.type === 'dragon4') {
       // 四天之龍：四顆球各自套用不同配色/emoji的角色副本（type仍是'dragon4'，其餘邏輯不受影響）
       const offsets = [[-14, -14], [14, -14], [-14, 14], [14, 14]];
@@ -5299,7 +5443,7 @@ function startGame() {
   state = {
     playerCount,
     balls: twinBallGroups.flat(),
-    projectiles: [], wallKnives: [], hitFlashes: [], batParticles: [], slashMarks: [], traps: [], yiBlackStones: [], yiStoneBurstFX: [], opmFX: [], gojoKillFX: null, curseSliceKillFX: null, elapsed: 0,
+    projectiles: [], wallKnives: [], hitFlashes: [], damageNumbers: [], batParticles: [], slashMarks: [], traps: [], yiBlackStones: [], yiStoneBurstFX: [], opmFX: [], momoiFanFX: [], gojoKillFX: null, curseSliceKillFX: null, elapsed: 0,
     arena: selectedArena,
     bgColor: selectedBgColor,
     thunderPillars: [],
@@ -5800,6 +5944,13 @@ function dealDamage(target, dmg, options = {}) {
   } else {
     target.hp = Math.max(0, target.hp - actual);
   }
+  // 傷害數字：白色飄字，往上飄並淡出，受設定開關控制
+  if (damageNumbersEnabled && actual > 0 && state && state.damageNumbers) {
+    state.damageNumbers.push({
+      x: target.x + (Math.random() - 0.5) * 12, y: target.y - (target.r || 20),
+      value: Math.round(actual), life: 0.8, maxLife: 0.8, vy: -42
+    });
+  }
   // 木偶訓練模式：記錄總傷害／秒傷統計，並讓木偶血量立即回滿，永遠不會真正被擊倒
   if (target.isDummy) {
     recordDummyDamage(actual);
@@ -6183,6 +6334,10 @@ function getEnemies(b) {
 // 普奇神父「天堂製造」是否在場（用來縮短DIO世界時停持續時間）
 function pucciHeavenPresent() {
   return state.balls.some(x => x.char.type === 'pucci' && x.pucciHeavenActive && x.hp > 0);
+}
+// 桃井／綠：判斷自己的雙生搭檔是否還活著，供雙方的開發者加成與技能加成使用
+function twinPartnerAlive(b) {
+  return !!(b.twinPartner && b.twinPartner.hp > 0);
 }
 // 從場上找出離 (x,y) 最近、且玩家編號不是 excludePlayer、還活著的球
 function getNearestEnemyTo(x, y, excludePlayer) {
@@ -8580,6 +8735,207 @@ for (let bi = 0; bi < state.balls.length; bi++) {
         angle
       });
       } // end else (not paralyzed)
+    }
+  }
+
+  // ── 桃井邏輯：「獨特創意」三連發、「創作的痛苦」扇形AOE、「堅守期限」被動增傷 ──
+  for (let bi = 0; bi < state.balls.length; bi++) {
+    const b = state.balls[bi];
+    if (b.hp <= 0) continue;
+    if (b.char.type !== 'momoi' || b.twinRole !== 'momoi') continue;
+    if ((state.dioWorldGlobalActive && b !== state.dioWorldCaster) || b.obitoInSpace || b.pucciDiscFrozen) continue;
+
+    // 「堅守期限」：每 MOMOI_PASSIVE_INTERVAL 秒，增加 MOMOI_PASSIVE_BUFF_DMG 傷害，持續 MOMOI_PASSIVE_BUFF_DURATION 秒
+    b.momoiPassiveTimer -= dt;
+    if (b.momoiPassiveTimer <= 0) {
+      b.momoiPassiveTimer = MOMOI_PASSIVE_INTERVAL;
+      b.momoiBuffTimer = MOMOI_PASSIVE_BUFF_DURATION;
+      state.hitFlashes.push({ x: b.x, y: b.y, r: 26, alpha: 0.9, color: '#ffb400', t: 0.4 });
+      if (!state.standCryFX) state.standCryFX = [];
+      state.standCryFX.push({ text: '堅', x: b.x, y: b.y - 30, life: 0.9, maxLife: 0.9, color: '#f2a65a', player: b.player });
+    }
+    if (b.momoiBuffTimer > 0) { b.momoiBuffTimer -= dt; if (b.momoiBuffTimer < 0) b.momoiBuffTimer = 0; }
+    const momoiDmgBonus = (b.momoiBuffTimer > 0 ? MOMOI_PASSIVE_BUFF_DMG : 0) + (twinPartnerAlive(b) ? MOMOI_SYNERGY_DMG_BONUS : 0);
+
+    // 「獨特創意」：每輪三連發，左中右各一顆，依序射出（非霰彈同時發射）
+    if (b.momoiReloading) {
+      b.momoiReloadTimer -= dt;
+      if (b.momoiReloadTimer <= 0) {
+        b.momoiReloading = false;
+        b.momoiShotCount = 0;
+        b.momoiBurstTimer = 0;
+      }
+    } else if (b.momoiBurstFiring) {
+      b.momoiBurstBulletTimer -= dt;
+      if (b.momoiBurstBulletTimer <= 0 && b.momoiBurstBulletsFired < 3) {
+        const enemy = getNearestEnemyTo(b.x, b.y, b.player);
+        if (enemy) {
+          const baseAngle = Math.atan2(enemy.y - b.y, enemy.x - b.x);
+          const offsets = [-MOMOI_BURST_SPREAD, 0, MOMOI_BURST_SPREAD];
+          const angle = baseAngle + offsets[b.momoiBurstBulletsFired];
+          state.projectiles.push({
+            x: b.x, y: b.y,
+            vx: Math.cos(angle) * MOMOI_BULLET_SPEED, vy: Math.sin(angle) * MOMOI_BULLET_SPEED,
+            type: 'bullet', owner: b.player, color: b.char.twinRoles.momoi.color,
+            damage: MOMOI_BULLET_DAMAGE + momoiDmgBonus, r: 5, active: true, angle
+          });
+          playHitSound('knife');
+          const muzzleX = b.x + Math.cos(angle) * (RADIUS + 6);
+          const muzzleY = b.y + Math.sin(angle) * (RADIUS + 6);
+          state.hitFlashes.push({ x: muzzleX, y: muzzleY, r: 7, alpha: 0.75, color: '#ffdd66', t: 0.08 });
+        }
+        b.momoiBurstBulletsFired++;
+        b.momoiBurstBulletTimer = MOMOI_BURST_GAP;
+        if (b.momoiBurstBulletsFired >= 3) {
+          b.momoiBurstFiring = false;
+          b.momoiShotCount++;
+          b.momoiBurstTimer = MOMOI_BURST_INTERVAL;
+          if (b.momoiShotCount >= MOMOI_SHOTS_BEFORE_RELOAD) {
+            b.momoiReloading = true;
+            b.momoiReloadTimer = MOMOI_RELOAD_TIME;
+          }
+        }
+      }
+    } else {
+      b.momoiBurstTimer -= dt;
+      if (b.momoiBurstTimer <= 0) {
+        const enemy = getNearestEnemyTo(b.x, b.y, b.player);
+        if (enemy) {
+          b.momoiBurstFiring = true;
+          b.momoiBurstBulletsFired = 0;
+          b.momoiBurstBulletTimer = 0;
+        } else {
+          b.momoiBurstTimer = 0.2;
+        }
+      }
+    }
+
+    // 「創作的痛苦」：對面前扇形範圍內所有敵人造成AOE傷害
+    if (b.momoiSkillTimer > 0) b.momoiSkillTimer -= dt;
+    if (b.momoiSkillTimer <= 0) {
+      const enemy = getNearestEnemyTo(b.x, b.y, b.player);
+      if (enemy) {
+        b.momoiSkillTimer = MOMOI_SKILL_CD;
+        if (state && state.stats) state.stats[b.player].skillUses++;
+        const baseAngle = Math.atan2(enemy.y - b.y, enemy.x - b.x);
+        const skillDmg = MOMOI_SKILL_DAMAGE + (twinPartnerAlive(b) ? MOMOI_SKILL_SYNERGY_BONUS : 0) + momoiDmgBonus;
+        for (const foe of getEnemies(b)) {
+          const ddx = foe.x - b.x, ddy = foe.y - b.y;
+          const dist = Math.hypot(ddx, ddy);
+          if (dist > MOMOI_SKILL_RANGE) continue;
+          let diff = Math.abs(Math.atan2(ddy, ddx) - baseAngle);
+          if (diff > Math.PI) diff = Math.PI * 2 - diff;
+          if (diff <= MOMOI_SKILL_ANGLE) {
+            dealDamage(foe, skillDmg, { attackerPlayer: b.player });
+            state.hitFlashes.push({ x: foe.x, y: foe.y, r: 38, alpha: 1.1, color: '#ff9933', t: 0.32 });
+            state.hitFlashes.push({ x: foe.x, y: foe.y, r: 18, alpha: 1.0, color: '#ffffff', t: 0.16 });
+          }
+        }
+        // 扇形範圍視覺：實際填色扇形（派形）＋核心衝擊波，讓範圍清楚可見
+        if (!state.momoiFanFX) state.momoiFanFX = [];
+        state.momoiFanFX.push({
+          x: b.x, y: b.y, angle: baseAngle, halfAngle: MOMOI_SKILL_ANGLE, range: MOMOI_SKILL_RANGE,
+          color: '#ff9933', life: 0.32, maxLife: 0.32
+        });
+        state.hitFlashes.push({ x: b.x, y: b.y, r: 46, alpha: 1.3, color: '#ffffff', t: 0.18 });
+        playHitSound('opm');
+      }
+    }
+  }
+
+  // ── 綠邏輯：「新鮮靈感」普攻、「繪畫藝術」連續射擊、「洗練的品味」被動治療 ──
+  for (let bi = 0; bi < state.balls.length; bi++) {
+    const b = state.balls[bi];
+    if (b.hp <= 0) continue;
+    if (b.char.type !== 'momoi' || b.twinRole !== 'midori') continue;
+    if ((state.dioWorldGlobalActive && b !== state.dioWorldCaster) || b.obitoInSpace || b.pucciDiscFrozen) continue;
+
+    // 「新鮮靈感」：普攻，桃井在場時攻速從1.5秒提升為1秒一發（單發手槍彈，不是連發）
+    if (b.midoriReloading) {
+      b.midoriReloadTimer -= dt;
+      if (b.midoriReloadTimer <= 0) {
+        b.midoriReloading = false;
+        b.midoriShotCount = 0;
+        b.midoriAttackTimer = 0;
+      }
+    } else if (!b.midoriSkillActive) {
+      b.midoriAttackTimer -= dt;
+      if (b.midoriAttackTimer <= 0) {
+        const enemy = getNearestEnemyTo(b.x, b.y, b.player);
+        if (enemy) {
+          const angle = Math.atan2(enemy.y - b.y, enemy.x - b.x);
+          state.projectiles.push({
+            x: b.x, y: b.y,
+            vx: Math.cos(angle) * MIDORI_BULLET_SPEED, vy: Math.sin(angle) * MIDORI_BULLET_SPEED,
+            type: 'bullet', owner: b.player, color: b.char.twinRoles.midori.color,
+            damage: MIDORI_BULLET_DAMAGE, r: 7, active: true, angle
+          });
+          playHitSound('knife');
+          const muzzleX = b.x + Math.cos(angle) * (RADIUS + 6);
+          const muzzleY = b.y + Math.sin(angle) * (RADIUS + 6);
+          state.hitFlashes.push({ x: muzzleX, y: muzzleY, r: 11, alpha: 0.9, color: '#9be89b', t: 0.1 });
+          b.midoriShotCount++;
+          b.midoriAttackTimer = twinPartnerAlive(b) ? MIDORI_SYNERGY_ATTACK_INTERVAL : MIDORI_ATTACK_INTERVAL;
+          if (b.midoriShotCount >= MIDORI_SHOTS_BEFORE_RELOAD) {
+            b.midoriReloading = true;
+            b.midoriReloadTimer = MIDORI_RELOAD_TIME;
+          }
+        } else {
+          b.midoriAttackTimer = 0.2;
+        }
+      }
+    }
+
+    // 「繪畫藝術」：鎖定一名敵人連續射擊5次（可重複命中同一人）
+    if (b.midoriSkillTimer > 0) b.midoriSkillTimer -= dt;
+    if (!b.midoriSkillActive && b.midoriSkillTimer <= 0) {
+      const enemy = getNearestEnemyTo(b.x, b.y, b.player);
+      if (enemy) {
+        b.midoriSkillActive = true;
+        b.midoriSkillShotsFired = 0;
+        b.midoriSkillShotTimer = 0;
+        b.midoriSkillTarget = enemy;
+        b.midoriSkillTimer = MIDORI_SKILL_CD;
+        if (state && state.stats) state.stats[b.player].skillUses++;
+      }
+    }
+    if (b.midoriSkillActive) {
+      b.midoriSkillShotTimer -= dt;
+      if (b.midoriSkillShotTimer <= 0 && b.midoriSkillShotsFired < MIDORI_SKILL_SHOTS) {
+        const target = (b.midoriSkillTarget && b.midoriSkillTarget.hp > 0) ? b.midoriSkillTarget : getNearestEnemyTo(b.x, b.y, b.player);
+        if (target) {
+          const angle = Math.atan2(target.y - b.y, target.x - b.x);
+          const dmg = MIDORI_SKILL_DAMAGE + (twinPartnerAlive(b) ? MIDORI_SKILL_SYNERGY_BONUS : 0);
+          state.projectiles.push({
+            x: b.x, y: b.y,
+            vx: Math.cos(angle) * MIDORI_BULLET_SPEED * 1.3, vy: Math.sin(angle) * MIDORI_BULLET_SPEED * 1.3,
+            type: 'bullet', owner: b.player, color: '#7CFC00',
+            damage: dmg, r: 6, active: true, angle
+          });
+          playHitSound('knife');
+        }
+        b.midoriSkillShotsFired++;
+        b.midoriSkillShotTimer = MIDORI_SKILL_SHOT_GAP;
+        if (b.midoriSkillShotsFired >= MIDORI_SKILL_SHOTS) {
+          b.midoriSkillActive = false;
+          b.midoriSkillTarget = null;
+        }
+      }
+    }
+
+    // 「洗練的品味」：定時恢復桃井與綠兩人中血量較少的一方
+    b.midoriPassiveTimer -= dt;
+    if (b.midoriPassiveTimer <= 0) {
+      b.midoriPassiveTimer = MIDORI_PASSIVE_INTERVAL;
+      const candidates = [b, b.twinPartner].filter(x => x && x.hp > 0);
+      if (candidates.length) {
+        let lowest = candidates[0];
+        for (const c of candidates) if (c.hp < lowest.hp) lowest = c;
+        lowest.hp = Math.min(getBallMaxHp(lowest), lowest.hp + MIDORI_PASSIVE_HEAL);
+        state.hitFlashes.push({ x: lowest.x, y: lowest.y, r: 28, alpha: 0.9, color: '#7CFC00', t: 0.45 });
+        if (!state.standCryFX) state.standCryFX = [];
+        state.standCryFX.push({ text: '+' + MIDORI_PASSIVE_HEAL, x: lowest.x, y: lowest.y - 30, life: 0.9, maxLife: 0.9, color: '#7CFC00', player: b.player });
+      }
     }
   }
 
@@ -13785,6 +14141,25 @@ waypoints.push({
     if (hf.t <= 0) state.hitFlashes.splice(i, 1);
   }
 
+  // 桃井「創作的痛苦」扇形特效更新
+  if (state.momoiFanFX) {
+    for (let i = state.momoiFanFX.length - 1; i >= 0; i--) {
+      state.momoiFanFX[i].life -= dt;
+      if (state.momoiFanFX[i].life <= 0) state.momoiFanFX.splice(i, 1);
+    }
+  }
+
+  // 傷害數字：往上飄，飄升速度隨時間變慢，淡出後移除
+  if (state.damageNumbers) {
+    for (let i = state.damageNumbers.length - 1; i >= 0; i--) {
+      const dn = state.damageNumbers[i];
+      dn.life -= dt;
+      dn.y += dn.vy * dt;
+      dn.vy *= 0.94;
+      if (dn.life <= 0) state.damageNumbers.splice(i, 1);
+    }
+  }
+
   // 奕：白旗引爆棋子碎片物理更新
   if (state.yiStoneBurstFX) {
     for (let i = state.yiStoneBurstFX.length - 1; i >= 0; i--) {
@@ -14740,9 +15115,34 @@ function drawSansSkullCannon(ctx, x, y, angle, size, alpha, glowAmt) {
   ctx.restore();
 }
 
+// 玩家自訂地圖顏色：如果直接拿使用者選的顏色整片鋪滿，飽和度通常偏高，
+// 看起來會很死板、像是硬P上去的色塊。改成中心稍亮、邊緣稍暗的柔和漸層，
+// 質感才會跟其他主題場地（熔岩／雪地／草地…）的柔和暈影風格一致。
+function hexToRgbTuple(hex) {
+  let h = (hex || '#000000').replace('#', '');
+  if (h.length === 3) h = h.split('').map(c => c + c).join('');
+  const num = parseInt(h, 16) || 0;
+  return [(num >> 16) & 255, (num >> 8) & 255, num & 255];
+}
+function softBgFillStyle(hex, W, H) {
+  const [r, g, b] = hexToRgbTuple(hex);
+  const lighten = v => Math.round(v + (255 - v) * 0.4);
+  const darken = v => Math.round(v * 0.4);
+  const grad = ctx.createRadialGradient(W / 2, H / 2, 4, W / 2, H / 2, Math.max(W, H) * 0.78);
+  grad.addColorStop(0, `rgb(${lighten(r)},${lighten(g)},${lighten(b)})`);
+  grad.addColorStop(0.55, `rgb(${r},${g},${b})`);
+  grad.addColorStop(1, `rgb(${darken(r)},${darken(g)},${darken(b)})`);
+  return grad;
+}
+
 function render() {
   ctx.clearRect(0, 0, W, H);
-  ctx.fillStyle = (state && state.bgColor) ? state.bgColor : '#a8d8f0'; ctx.fillRect(0, 0, W, H);
+  if (state && state.bgColor && state.bgColor !== '#000000') {
+    ctx.fillStyle = softBgFillStyle(state.bgColor, W, H);
+  } else {
+    ctx.fillStyle = '#000000';
+  }
+  ctx.fillRect(0, 0, W, H);
 
   // 熔岩場地背景
   if (state.arena === 'lava') {
@@ -14898,6 +15298,16 @@ function render() {
       ctx.arc(0, 0, r, rot, rot + Math.PI * 1.4);
       ctx.stroke();
     }
+    ctx.restore();
+  }
+
+  // 玩家自訂地圖顏色：疊加一層淡淡的色調，這樣不管選哪個主題場地都看得出差異
+  // （前面各主題場地都會用自己的顏色整片蓋掉底色，只疊在最上面才不會被蓋掉）
+  if (state.bgColor && state.bgColor !== '#000000') {
+    ctx.save();
+    ctx.globalAlpha = 0.22;
+    ctx.fillStyle = softBgFillStyle(state.bgColor, W, H);
+    ctx.fillRect(0, 0, W, H);
     ctx.restore();
   }
 
@@ -15936,40 +16346,9 @@ function render() {
     ctx.restore();
   }
 
-// ── 赫球視覺（共用：真身現代最強 與 組裝機器人「赫」零件都用這套，斥力主題：外爆裂痕＋衝擊環） ──
+// ── 赫球視覺（共用：真身現代最強 與 組裝機器人「赫」零件都用這套） ──
   function drawGojoRedBall(ball) {
-    drawGojoTrail(ball, '255,68,68');
     ctx.save();
-    const ang = ball.ringAngle || 0;
-    const pulse = 0.7 + 0.3 * Math.sin(Date.now() / 150);
-
-    // ── 外爆裂痕（放射狀鋸齒閃電，象徵「反轉」的爆裂衝擊） ──
-    const spikeCount = 7;
-    ctx.shadowColor = '#ff2222'; ctx.shadowBlur = 16 * pulse;
-    ctx.strokeStyle = `rgba(255,120,90,${0.75 * pulse})`;
-    ctx.lineWidth = 2;
-    for (let i = 0; i < spikeCount; i++) {
-      const a2 = ang + (i / spikeCount) * Math.PI * 2;
-      const innerR = ball.r * 1.1;
-      const outerR = ball.r * (1.9 + 0.4 * Math.sin(Date.now()/120 + i));
-      const jagX = Math.cos(a2 + 0.15) * innerR * 1.4;
-      const jagY = Math.sin(a2 + 0.15) * innerR * 1.4;
-      ctx.beginPath();
-      ctx.moveTo(ball.x + Math.cos(a2) * innerR, ball.y + Math.sin(a2) * innerR);
-      ctx.lineTo(ball.x + jagX, ball.y + jagY);
-      ctx.lineTo(ball.x + Math.cos(a2) * outerR, ball.y + Math.sin(a2) * outerR);
-      ctx.stroke();
-    }
-
-    // ── 衝擊環（沿反方向旋轉，與蒼球的光圈相呼應但為斥力紅色系） ──
-    ctx.shadowBlur = 20 * pulse;
-    ctx.strokeStyle = `rgba(255,90,90,${0.85 * pulse})`;
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.ellipse(ball.x, ball.y, ball.r * 1.7, ball.r * 0.6, -ang * 1.3, 0, Math.PI * 2);
-    ctx.stroke();
-
-    // ── 赫球主體（加強光暈與漸層） ──
     ctx.shadowColor = '#ff2222'; ctx.shadowBlur = 32;
     const rg = ctx.createRadialGradient(ball.x - 3, ball.y - 3, 1, ball.x, ball.y, ball.r);
     rg.addColorStop(0, '#ffffff');
@@ -17383,6 +17762,32 @@ function render() {
     }
   }
 
+  // 桃井「創作的痛苦」：真正的扇形範圍特效（填色派形＋外框），比之前的散點更像扇形
+  if (state.momoiFanFX) {
+    for (const fx of state.momoiFanFX) {
+      const prog = Math.max(0, fx.life / fx.maxLife); // 1→0
+      const growth = 0.55 + 0.45 * (1 - Math.pow(1 - Math.min(1, (1 - prog) * 3), 2)); // 前段快速展開到滿
+      const range = fx.range * Math.min(1, growth);
+      ctx.save();
+      const grad = ctx.createRadialGradient(fx.x, fx.y, 0, fx.x, fx.y, range);
+      grad.addColorStop(0, fx.color + 'cc');
+      grad.addColorStop(0.7, fx.color + '66');
+      grad.addColorStop(1, fx.color + '00');
+      ctx.beginPath();
+      ctx.moveTo(fx.x, fx.y);
+      ctx.arc(fx.x, fx.y, range, fx.angle - fx.halfAngle, fx.angle + fx.halfAngle);
+      ctx.closePath();
+      ctx.globalAlpha = prog;
+      ctx.fillStyle = grad;
+      ctx.fill();
+      ctx.strokeStyle = fx.color;
+      ctx.lineWidth = 2;
+      ctx.globalAlpha = prog * 0.9;
+      ctx.stroke();
+      ctx.restore();
+    }
+  }
+
   // 命中特效
   for (const f of state.hitFlashes) {
     const prog = f.t/(f.maxT || 0.35);
@@ -17390,6 +17795,23 @@ function render() {
     ctx.beginPath(); ctx.arc(f.x,f.y,flashRadius,0,Math.PI*2);
     const alphaHex = Math.floor(f.alpha*prog*255).toString(16).padStart(2,'0');
     ctx.fillStyle = f.color+alphaHex; ctx.fill();
+  }
+
+  // 傷害數字（白色飄字，受設定開關控制）
+  if (damageNumbersEnabled && state.damageNumbers && state.damageNumbers.length) {
+    ctx.save();
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = 'bold 15px sans-serif';
+    for (const dn of state.damageNumbers) {
+      const prog = Math.max(0, dn.life / dn.maxLife);
+      ctx.globalAlpha = prog;
+      ctx.shadowColor = 'rgba(0,0,0,0.7)';
+      ctx.shadowBlur = 3;
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText(String(dn.value), dn.x, dn.y);
+    }
+    ctx.restore();
   }
 
   // 宇治波鼬：須佐能乎刺擊刀刃特效
@@ -19302,15 +19724,32 @@ function render() {
       ctx.restore();
     }
 
+    // 桃井「堅守期限」：增傷期間持續顯示脈動橘色光環＋火焰符號，讓20秒的增傷時間清楚可見
+    if (b.char.type === 'momoi' && b.twinRole === 'momoi' && b.momoiBuffTimer > 0) {
+      const buffPulse = 0.6 + 0.4 * Math.abs(Math.sin(elapsed * 5));
+      ctx.save();
+      ctx.beginPath(); ctx.arc(b.x, b.y, RADIUS + 9, 0, Math.PI*2);
+      ctx.strokeStyle = `rgba(255,153,51,${buffPulse})`;
+      ctx.lineWidth = 3;
+      ctx.shadowColor = '#ff9933'; ctx.shadowBlur = 14;
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+      ctx.font = `12px serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.globalAlpha = buffPulse * 0.9;
+      ctx.fillText('🔥', b.x, b.y - RADIUS - 13);
+      ctx.globalAlpha = 1;
+      ctx.restore();
+    }
+
     // HP 圓弧
-    const hpFrac = b.char.type === 'sans' ? b.hp / SANS_MAX_HP : b.char.type === 'rsqjs' ? b.hp / RSQJS_MAX_HP : b.hp / MAX_HP;
+    const hpFrac = getBallMaxHp(b) ? b.hp / getBallMaxHp(b) : 0;
     ctx.beginPath(); ctx.arc(b.x,b.y,RADIUS+4,-Math.PI/2,-Math.PI/2+Math.PI*2*hpFrac);
-    ctx.strokeStyle = b.char.type === 'rsqjs' ? (b.twinRole === 'diamond' ? '#3fa9e8' : '#e84b4b') : b.char.color; ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.stroke();
+    ctx.strokeStyle = (b.char.isTwin && b.char.twinRoles && b.char.twinRoles[b.twinRole]) ? b.char.twinRoles[b.twinRole].color : b.char.color; ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.stroke();
 
     // 角色圖示（emoji 或圖片）
     ctx.font = `${RADIUS*1.1}px serif`; ctx.textAlign='center'; ctx.textBaseline='middle';
-    if (b.char.type === 'rsqjs') {
-      const roleData = b.char.twinRoles[b.twinRole === 'diamond' ? 'diamond' : 'stop'];
+    if (b.char.isTwin && b.char.twinRoles) {
+      const roleData = b.char.twinRoles[b.twinRole] || b.char.twinRoles[Object.keys(b.char.twinRoles)[0]];
       drawCharIcon(ctx, { image: roleData.image, emoji: roleData.suffix }, b.x, b.y, RADIUS * 1.8);
     } else {
       drawCharIcon(ctx, b.char, b.x, b.y, RADIUS * 1.8);
@@ -20605,10 +21044,15 @@ function renderWuxingCountdown() {
 }
 
 // 雙生角色（紅石青金石）用：懶建立第二條血條 DOM，掛在 pN 血條下方
-function ensureTwinBarEl(n) {
+function ensureTwinBarEl(n, color) {
   const id = `p${n}-twinbar-wrap`;
+  const barColor = color || '#3fa9e8';
   let el = document.getElementById(id);
-  if (el) return el;
+  if (el) {
+    const tbar = document.getElementById(`p${n}-twinbar`);
+    if (tbar) tbar.style.background = `linear-gradient(${(n % 2 === 1) ? '90deg' : '270deg'},${barColor}aa,${barColor})`;
+    return el;
+  }
   const nameEl = document.getElementById(`p${n}-hud-name`);
   const block = nameEl ? nameEl.parentElement : null;
   if (!block) return null;
@@ -20617,7 +21061,7 @@ function ensureTwinBarEl(n) {
   el.style.cssText = 'position:relative;width:100%;height:6px;margin-top:3px;background:rgba(255,255,255,0.08);border-radius:4px;overflow:hidden;';
   const anchorSide = (n % 2 === 1) ? 'left' : 'right';
   const gradDir = (n % 2 === 1) ? '90deg' : '270deg';
-  el.innerHTML = `<div id="p${n}-twinbar" style="position:absolute;top:0;${anchorSide}:0;height:100%;width:100%;background:linear-gradient(${gradDir},#3fa9e8aa,#3fa9e8);transition:width .12s;"></div>`;
+  el.innerHTML = `<div id="p${n}-twinbar" style="position:absolute;top:0;${anchorSide}:0;height:100%;width:100%;background:linear-gradient(${gradDir},${barColor}aa,${barColor});transition:width .12s;"></div>`;
   block.appendChild(el);
   return el;
 }
@@ -20630,12 +21074,14 @@ function updateHUD() {
   for (let n = 1; n <= Math.min(4, playerCount); n++) {
     const ownBalls = state.balls.filter(b => b.player === n);
     if (ownBalls.length === 0) continue;
-    // 雙生角色：🛑(stop)顯示在主血條，🔷(diamond)顯示在下方副血條
-    const main = ownBalls.find(b => b.twinRole !== 'diamond') || ownBalls[0];
-    const twin = ownBalls.find(b => b.twinRole === 'diamond');
+    // 雙生角色：主要角色顯示在主血條，第二位角色顯示在下方副血條（依 twinRoles 定義的順序決定主/副）
+    const isTwinChar = ownBalls[0] && ownBalls[0].char.isTwin && ownBalls[0].char.twinRoles;
+    const twinRoleKeys = isTwinChar ? Object.keys(ownBalls[0].char.twinRoles) : null;
+    const main = isTwinChar ? (ownBalls.find(b => b.twinRole === twinRoleKeys[0]) || ownBalls[0]) : ownBalls[0];
+    const twin = isTwinChar ? ownBalls.find(b => b.twinRole === twinRoleKeys[1]) : null;
 
     const hp = Math.max(0, main.hp);
-    const hpScale = main.char.type === 'sans' ? SANS_MAX_HP : main.char.type === 'rsqjs' ? RSQJS_MAX_HP : MAX_HP;
+    const hpScale = getBallMaxHp(main);
     const bleed = Math.min(main.tigerBleedPool || 0, hpScale - hp);
     const barEl = document.getElementById(`p${n}-bar`);
     if (barEl) barEl.style.width = (hp/hpScale*100)+'%';
@@ -20649,11 +21095,14 @@ function updateHUD() {
     const numEl = document.getElementById(`p${n}-hp-num`);
     if (twin) {
       const thp = Math.max(0, twin.hp);
-      if (numEl) numEl.textContent = `🛑${Math.ceil(hp)}/${hpScale}　🔷${Math.ceil(thp)}/${RSQJS_MAX_HP}`;
-      const wrap = ensureTwinBarEl(n);
+      const twinScale = getBallMaxHp(twin);
+      const mainSuffix = main.char.twinRoles[main.twinRole].suffix;
+      const twinSuffix = twin.char.twinRoles[twin.twinRole].suffix;
+      if (numEl) numEl.textContent = `${mainSuffix}${Math.ceil(hp)}/${hpScale}　${twinSuffix}${Math.ceil(thp)}/${twinScale}`;
+      const wrap = ensureTwinBarEl(n, twin.char.twinRoles[twin.twinRole].color);
       if (wrap) {
         const tbar = document.getElementById(`p${n}-twinbar`);
-        if (tbar) tbar.style.width = (thp/RSQJS_MAX_HP*100)+'%';
+        if (tbar) tbar.style.width = (thp/twinScale*100)+'%';
         wrap.style.display = '';
       }
     } else {
@@ -20684,6 +21133,20 @@ function updateHUD() {
       }
       const water = b.rsqjsHasWaterSkill ? `💧${Math.max(0, b.rsqjsWaterTimer).toFixed(1)}s` : '';
       return `🔷📖${Math.max(0, b.rsqjsBookTimer).toFixed(1)}s 💧${Math.max(0, b.rsqjsWaterTimer).toFixed(1)}s`.trim();
+    }
+    return '';
+  }
+  function momoiStatusText(b) {
+    if (b.twinRole === 'momoi') {
+      const state = b.momoiReloading ? `裝彈中${Math.max(0, b.momoiReloadTimer).toFixed(1)}s` : `${b.momoiShotCount}/${MOMOI_SHOTS_BEFORE_RELOAD}輪`;
+      const skillCd = b.momoiSkillTimer > 0 ? `🎯${b.momoiSkillTimer.toFixed(1)}s` : '🎯就緒';
+      const buff = b.momoiBuffTimer > 0 ? `🔥+${MOMOI_PASSIVE_BUFF_DMG} ${b.momoiBuffTimer.toFixed(1)}s` : '';
+      return `🍑${state} ${skillCd} ${buff}`.trim();
+    }
+    if (b.twinRole === 'midori') {
+      const state = b.midoriReloading ? `裝彈中${Math.max(0, b.midoriReloadTimer).toFixed(1)}s` : `${b.midoriShotCount}/${MIDORI_SHOTS_BEFORE_RELOAD}發`;
+      const skillCd = b.midoriSkillActive ? '🖌️發動中' : (b.midoriSkillTimer > 0 ? `🖌️${b.midoriSkillTimer.toFixed(1)}s` : '🖌️就緒');
+      return `💚${state} ${skillCd}`.trim();
     }
     return '';
   }
@@ -20924,6 +21387,22 @@ function updateHUD() {
         statusEl.innerHTML = barHTML + ' ' + txt + '　';
         statusEl.dataset.rsqjsPart = statusEl.innerHTML;
       }
+    } else if (b.char.type === 'momoi') {
+      // 桃井／綠：兩顆球共用一個狀態欄，🍑先寫入，💚接著附加
+      const txt = momoiStatusText(b);
+      const barItem = b.twinRole === 'momoi'
+        ? { label: '🍑創作的痛苦', pct: 1 - Math.max(0, b.momoiSkillTimer) / MOMOI_SKILL_CD, color: '#f2a65a' }
+        : b.twinRole === 'midori'
+          ? { label: '💚繪畫藝術', pct: 1 - Math.max(0, b.midoriSkillTimer) / MIDORI_SKILL_CD, color: '#5cb85c' }
+          : null;
+      const barHTML = barItem ? buildCdBarsHTML([barItem]) : '';
+      if (b.twinRole === 'midori') {
+        statusEl.innerHTML = (statusEl.dataset.momoiPart || '') + barHTML + ' ' + txt;
+        statusEl.dataset.momoiPart = '';
+      } else {
+        statusEl.innerHTML = barHTML + ' ' + txt + '　';
+        statusEl.dataset.momoiPart = statusEl.innerHTML;
+      }
     } else if (b.char.type === 'dragon4') {
       // 四天之龍：四顆球的技能冷卻條合併顯示在同一個狀態欄，任一顆算出來的結果都相同
       const group = [b, ...(b.quadSiblings || [])];
@@ -20970,7 +21449,9 @@ function showResult(deadBalls) {
       state.balls.forEach(b => {
         if (recordedPlayers.has(b.player) || !b.char || !b.char.id) return;
         recordedPlayers.add(b.player);
-        perPlayerChar.push({ player: b.player, charId: b.char.id });
+        // 無形變身後 b.char 會被換成當下變成的角色，真正身分要看 wuxingBaseChar 才不會記錯人
+        const realCharId = b.wuxingBaseChar ? b.wuxingBaseChar.id : b.char.id;
+        perPlayerChar.push({ player: b.player, charId: realCharId });
       });
       const distinctChars = new Set(perPlayerChar.map(p => p.charId));
       if (perPlayerChar.length === 2 && distinctChars.size > 1) {
@@ -21257,7 +21738,7 @@ function confirmAssemble() {
 }
 
 function pickAssembleEnemy() {
-  const pool = CHARACTERS.filter(c => c.id !== 'custom_assembled' && c.id !== 'rsqjs' && c.id !== 'dragon4');
+  const pool = CHARACTERS.filter(c => c.id !== 'custom_assembled' && c.id !== 'rsqjs' && c.id !== 'dragon4' && c.id !== 'momoi');
   let enemyChar;
   do { enemyChar = pool[Math.floor(Math.random() * pool.length)]; }
   while (enemyChar.id === assembleEnemyId && pool.length > 1);
@@ -21406,13 +21887,13 @@ function sandboxInitUI() {
     .sb-btn{background:rgba(255,160,60,0.15);border:1px solid rgba(255,160,60,0.5);color:#ffcf8f;border-radius:8px;padding:6px 12px;cursor:pointer;font-size:0.85rem}
     .sb-btn.danger{background:rgba(255,60,60,0.12);border-color:rgba(255,80,80,0.4);color:#ff8f8f}
     .sb-btn.primary{background:rgba(80,200,120,0.18);border-color:rgba(80,200,120,0.5);color:#8fe8a8;font-weight:700}
-    #sandbox-char-modal{display:none;position:fixed;inset:0;background:rgba(5,3,2,0.96);z-index:400;flex-direction:column;align-items:center;justify-content:center;gap:14px;overflow-y:auto;padding:16px 0;box-sizing:border-box}
+    #sandbox-char-modal{display:none;position:fixed;inset:0;background:rgba(5,3,2,0.95);z-index:400;flex-direction:column;align-items:center;justify-content:center;gap:14px;overflow-y:auto;padding:16px 0;box-sizing:border-box}
     #sandbox-char-grid{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;max-width:720px;max-height:60vh;overflow-y:auto;padding:10px}
     .sb-char-btn{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:10px 6px;width:80px;cursor:pointer;color:#eee;text-align:center;font-size:0.68rem;line-height:1.3}
     .sb-char-btn:active{background:rgba(255,160,60,0.3)}
     .sb-num{width:78px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.2);color:#fff;border-radius:6px;padding:4px 6px;font-size:0.9rem}
     #sandbox-hud{display:none;width:min(700px,96vw);flex-wrap:wrap;gap:6px;justify-content:center;padding:6px 0;box-sizing:border-box}
-    .sb-hud-team{display:flex;align-items:center;gap:6px;background:rgba(0,0,0,0.35);border-radius:10px;padding:4px 10px;font-size:0.7rem;min-width:110px;color:#eee}
+    .sb-hud-team{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.35);border-radius:10px;padding:4px 10px;font-size:0.7rem;min-width:110px;color:#eee}
     .sb-hud-bar-wrap{width:56px;height:6px;background:rgba(255,255,255,0.15);border-radius:3px;overflow:hidden;flex-shrink:0}
     .sb-hud-bar{height:100%;border-radius:3px}
   `;
@@ -21471,7 +21952,7 @@ function sandboxInitUI() {
   });
 
   const charGrid = document.getElementById('sandbox-char-grid');
-  const SANDBOX_BANNED = ['opm', 'rsqjs', 'dragon4']; // 跟3人以上混戰／車輪戰一樣停用：一拳超人一擊必殺太破壞平衡；紅石青金石／四天之龍多球共用一個隊伍欄位，混戰邏輯未驗證
+  const SANDBOX_BANNED = ['opm', 'rsqjs', 'dragon4', 'momoi']; // 跟3人以上混戰／車輪戰一樣停用：一拳超人一擊必殺太破壞平衡；紅石青金石／四天之龍／桃井綠多球共用一個隊伍欄位，混戰邏輯未驗證
   CHARACTERS.filter(ch => !SANDBOX_BANNED.includes(ch.id)).forEach(ch => {
     const btn = document.createElement('div');
     btn.className = 'sb-char-btn';
@@ -21479,7 +21960,7 @@ function sandboxInitUI() {
     btn.onclick = () => {
       if (sandboxPickerTargetTeamId == null) return;
       const team = sandboxTeams.find(t => t.id === sandboxPickerTargetTeamId);
-      if (team) team.members.push(ch.id);
+      if (team) team.members.push({ id: ch.id, hp: null });
       sandboxRenderTeams();
     };
     charGrid.appendChild(btn);
@@ -21516,9 +21997,17 @@ function sandboxRenderTeams() {
     const teamEl = document.createElement('div');
     teamEl.className = 'sb-team';
     const color = sandboxColorForIndex(ti);
-    const chipsHTML = team.members.map((cid, mi) => {
-      const ch = CHARACTERS.find(c => c.id === cid);
-      return `<span class="sb-chip">${ch ? charIconHTML(ch, '1em') + ' ' + ch.name : cid}<button data-ti="${ti}" data-mi="${mi}" class="sb-remove-member">✕</button></span>`;
+    const chipsHTML = team.members.map((m, mi) => {
+      const ch = CHARACTERS.find(c => c.id === m.id);
+      const defaultHp = ch ? (ch.type === 'sans' ? SANS_MAX_HP : MAX_HP) : MAX_HP;
+      const unit = ch && ch.type === 'sans' ? '格' : '血量';
+      const val = (m.hp != null) ? m.hp : '';
+      return `<span class="sb-chip">${ch ? charIconHTML(ch, '1em') + ' ' + ch.name : m.id}
+        <input type="number" class="sb-hp-input" data-ti="${ti}" data-mi="${mi}" min="1" step="1"
+          placeholder="${defaultHp}" value="${val}" title="自訂${unit}（留空＝預設 ${defaultHp}）"
+          style="width:52px;background:rgba(255,255,255,0.3);border:1px solid rgba(255,255,255,0.2);border-radius:6px;color:#eee;font-size:0.75rem;padding:2px 4px;margin-left:2px">
+        <span style="opacity:0.6;font-size:0.7rem">${unit}</span>
+        <button data-ti="${ti}" data-mi="${mi}" class="sb-remove-member">✕</button></span>`;
     }).join('');
     teamEl.innerHTML = `
       <div class="sb-team-head">
@@ -21552,6 +22041,13 @@ function sandboxRenderTeams() {
       sandboxRenderTeams();
     };
   });
+  container.querySelectorAll('.sb-hp-input').forEach(inp => {
+    inp.onchange = (e) => {
+      const ti = +e.target.dataset.ti, mi = +e.target.dataset.mi;
+      const v = parseInt(e.target.value, 10);
+      sandboxTeams[ti].members[mi].hp = (Number.isFinite(v) && v > 0) ? v : null;
+    };
+  });
   container.querySelectorAll('.sb-remove-member').forEach(btn => {
     btn.onclick = (e) => {
       const ti = +e.currentTarget.dataset.ti, mi = +e.currentTarget.dataset.mi;
@@ -21563,8 +22059,8 @@ function sandboxRenderTeams() {
 
 // 開始（或重新開始）沙盒對戰：讀取目前的隊伍/場地設定並建立戰鬥
 function sandboxStartBattle() {
-  const SANDBOX_BANNED = ['opm', 'rsqjs', 'dragon4'];
-  sandboxTeams.forEach(t => { t.members = t.members.filter(cid => !SANDBOX_BANNED.includes(cid)); });
+  const SANDBOX_BANNED = ['opm', 'rsqjs', 'dragon4', 'momoi'];
+  sandboxTeams.forEach(t => { t.members = t.members.filter(m => !SANDBOX_BANNED.includes(m.id)); });
   const activeTeams = sandboxTeams.filter(t => t.members.length > 0);
   if (activeTeams.length < 2) {
     alert('至少需要 2 支隊伍，且每隊至少要有 1 名角色，才能開始沙盒對戰。');
@@ -21617,11 +22113,12 @@ function sandboxStartBattle() {
     // 隊內成員圍成小圓分散出生，人數越多半徑越大，避免整隊疊在同一點上
     const subR = memberCount > 1 ? Math.min(70, 22 + memberCount * 5) : 0;
 
-    team.members.forEach((cid, mi) => {
+    team.members.forEach((m, mi) => {
+      const cid = m.id;
       const base = CHARACTERS.find(c => c.id === cid);
       if (!base) return;
-      const dupTotal = team.members.filter(x => x === cid).length;
-      const idSeenSoFar = team.members.slice(0, mi + 1).filter(x => x === cid).length;
+      const dupTotal = team.members.filter(x => x.id === cid).length;
+      const idSeenSoFar = team.members.slice(0, mi + 1).filter(x => x.id === cid).length;
       const ch = {
         ...base,
         color: teamColor, // 同隊所有角色統一用同一個隊伍色，方便混戰時分辨敵我
@@ -21633,12 +22130,24 @@ function sandboxStartBattle() {
       const moveAngle = Math.random() * Math.PI * 2;
       const vx = Math.cos(moveAngle) * BASE_SPEED, vy = Math.sin(moveAngle) * BASE_SPEED;
 
+      // 自訂血量：Sans 是獨立的「格數」次數血條，跟其他角色的一般血量池不是同一套單位，
+      // 不能共用同一個換算公式，各自照自己的欄位獨立套用
+      const applyCustomHp = (ball) => {
+        if (m.hp != null) { ball.hp = m.hp; ball.customMaxHp = m.hp; }
+      };
+
       if (ch.isTwin && ch.type === 'rsqjs') {
         const stopBall = makeBall(px - 14, py, vx, vy, ch, teamPlayer, 'stop');
         const diamondBall = makeBall(px + 14, py, -vx, -vy, ch, teamPlayer, 'diamond');
         stopBall.twinPartner = diamondBall;
         diamondBall.twinPartner = stopBall;
         allBalls.push(stopBall, diamondBall);
+      } else if (ch.isTwin && ch.type === 'momoi') {
+        const momoiBall = makeBall(px - 14, py, vx, vy, ch, teamPlayer, 'momoi');
+        const midoriBall = makeBall(px + 14, py, -vx, -vy, ch, teamPlayer, 'midori');
+        momoiBall.twinPartner = midoriBall;
+        midoriBall.twinPartner = momoiBall;
+        allBalls.push(momoiBall, midoriBall);
       } else if (ch.isQuad && ch.type === 'dragon4') {
         const offsets = [[-14, -14], [14, -14], [-14, 14], [14, 14]];
         const quadBalls = DRAGON4_ROLES.map((info, ri) => {
@@ -21652,7 +22161,9 @@ function sandboxStartBattle() {
         quadBalls.forEach(b => { b.quadSiblings = quadBalls.filter(o => o !== b); });
         allBalls.push(...quadBalls);
       } else {
-        allBalls.push(makeBall(px, py, vx, vy, ch, teamPlayer));
+        const b = makeBall(px, py, vx, vy, ch, teamPlayer);
+        applyCustomHp(b);
+        allBalls.push(b);
       }
       if (!initialStats[teamPlayer]) initialStats[teamPlayer] = { totalDmg: 0, maxHit: 0, skillUses: 0 };
     });
@@ -21662,7 +22173,7 @@ function sandboxStartBattle() {
   state = {
     playerCount: activeTeams.length,
     balls: allBalls,
-    projectiles: [], wallKnives: [], hitFlashes: [], batParticles: [], slashMarks: [], traps: [], yiBlackStones: [], yiStoneBurstFX: [], opmFX: [], gojoKillFX: null, curseSliceKillFX: null, elapsed: 0,
+    projectiles: [], wallKnives: [], hitFlashes: [], damageNumbers: [], batParticles: [], slashMarks: [], traps: [], yiBlackStones: [], yiStoneBurstFX: [], opmFX: [], momoiFanFX: [], gojoKillFX: null, curseSliceKillFX: null, elapsed: 0,
     arena: selectedArena,
     bgColor: selectedBgColor,
     thunderPillars: [],
@@ -21761,10 +22272,7 @@ function updateSandboxHUD() {
     const members = state.balls.filter(b => b.player === pid);
     const alive = members.filter(b => b.hp > 0);
     const totalHp = members.reduce((s, b) => s + Math.max(0, b.hp), 0);
-    const totalMax = members.reduce((s, b) => {
-      const scale = b.char.type === 'sans' ? SANS_MAX_HP : b.char.type === 'rsqjs' ? RSQJS_MAX_HP : MAX_HP;
-      return s + scale;
-    }, 0);
+    const totalMax = members.reduce((s, b) => s + getBallMaxHp(b), 0);
     const pct = totalMax > 0 ? Math.max(0, totalHp / totalMax * 100) : 0;
     const color = members[0] ? members[0].char.color : '#fff';
     const name = sandboxActiveTeamNames[pid] || `隊伍${pid}`;
