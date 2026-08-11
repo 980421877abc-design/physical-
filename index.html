@@ -8,7 +8,7 @@
   @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500;700;900&family=Cinzel:wght@600;800&family=Oswald:wght@500;700&display=swap');
 
   /* ============================================================
-     設計系統 Design Tokens — 黑金玻璃擬態 / Dark-Gold Glassmorphism
+     設計系統 Design Tokens 
      ============================================================ */
   :root {
     --bg: #060608;
@@ -2377,7 +2377,7 @@ const OPM_DMG_REDUCE          = 0.3;  // 全局減傷比例（受到的所有傷
 const OPM_WALL_REDUCE          = 0.5; // 撞牆時減少的怒氣值倒數秒數
 
 // 詛咒之王常數
-const CURSE_SLASH_INTERVAL    = 4.25;   // 解：斬痕發動間隔（秒）
+const CURSE_SLASH_INTERVAL    = 4.0;   // 解：斬痕發動間隔（秒）
 const CURSE_SLASH_DAMAGE      = 140;   // 解：斬痕傷害
 const CURSE_SLASH_SLOW_FACTOR = 0.6;   // 解：緩速倍率（剩幾成速度）
 const CURSE_SLASH_SLOW_DUR    = 2.0;   // 解：緩速持續時間（秒）
@@ -2387,7 +2387,7 @@ const CURSE_DOT_DAMAGE        = 25;    // 捌：每秒dot傷害
 const CURSE_DOT_DURATION      = 2.0;   // 捌：dot持續時間（秒）
 const CURSE_DOMAIN_HP         = 550;   // 伏魔御廚子：觸發血量
 const CURSE_DOMAIN_RADIUS     = 135;   // 伏魔御廚子：範圍半徑（px）
-const CURSE_DOMAIN_FRAMEDMG   = 5;     // 伏魔御廚子：每幀傷害
+const CURSE_DOMAIN_FRAMEDMG   = 6;     // 伏魔御廚子：每幀傷害
 const CURSE_DOMAIN_FREEZE_DUR = 2.0;   // 伏魔御廚子：原地持續時間（秒）
 
 // 陷阱大師常數
@@ -2464,7 +2464,7 @@ const NAOBITO_KYOUSEI_THRESHOLD   = 6;     // 凶星軌跡觸發所需殘影數
 const NAOBITO_KYOUSEI_PIERCE_DMG  = 60;    // 凶星軌跡本體穿刺傷害
 const NAOBITO_KYOUSEI_SHADOW_DMG  = 20;    // 凶星軌跡每殘影傷害
 const NAOBITO_KYOUSEI_SPEED       = 550;   // 凶星軌跡衝刺速度（px/s）
-const NAOBITO_KYOUSEI_COOLDOWN    = 4.0;   // 凶星軌跡觸發後CD（秒）
+const NAOBITO_KYOUSEI_COOLDOWN    = 5.0;   // 凶星軌跡觸發後CD（秒）
 const NAOBITO_PATH_DEVIATION      = 100;   // 路徑中繼點偏移量（px）
 const NAOBITO_RETREAT_DISTANCE    = 100;   // 接近敵人後，遠離的距離（px）
 const NAOBITO_DASH_MAX_DURATION   = 2.0;   // 單次衝刺最大持續時間（秒），超時強制結束避免卡住
@@ -2807,14 +2807,14 @@ const GETO_CANE_KNOCKBACK        = 200;   // 游雲：擊退速度
 // ── Oblivionis（豐川祥子）專屬常數 ──
 const SAKIKO_NOTE_MAX_STACK      = 10;    // 場上音符（含Nova）上限層數
 const SAKIKO_NOTE_DMG_PER_STACK  = 0.04;  // 場上每多1顆音符，傷害加成比例（滿層+40%）
-const SAKIKO_PIANO_DAMAGE        = 20;    // 🎹鋼琴模式：音符基礎傷害
+const SAKIKO_PIANO_DAMAGE        = 25;    // 🎹鋼琴模式：音符基礎傷害
 const SAKIKO_PIANO_INTERVAL      = 0.9;   // 🎹鋼琴模式：發射間隔（攻速較慢）
-const SAKIKO_PIANO_SPEED         = 150;   // 🎹鋼琴模式：音符移動速度（較慢）
+const SAKIKO_PIANO_SPEED         = 180;   // 🎹鋼琴模式：音符移動速度（較慢）
 const SAKIKO_ORGAN_DAMAGE        = 10;    // 🎺管風琴模式：音符基礎傷害（較低）
 const SAKIKO_ORGAN_INTERVAL      = 0.45;  // 管風琴模式：發射間隔（攻速大幅提升）
-const SAKIKO_ORGAN_SPEED         = 260;   // 管風琴模式：音符移動速度（較快）
+const SAKIKO_ORGAN_SPEED         = 290;   // 管風琴模式：音符移動速度（較快）
 const SAKIKO_NOTE_RADIUS         = 7;     // 音符判定半徑
-const SAKIKO_NOTE_TURN_RATE      = 2.0;   // 音符追蹤轉向速率（弧度/秒）
+const SAKIKO_NOTE_TURN_RATE      = 3.0;   // 音符追蹤轉向速率（弧度/秒）
 const SAKIKO_NOTE_LIFESPAN       = 6.0;   // 音符最長存在時間（秒）
 
 const SAKIKO_FEVER_MAX           = 450;   // Fever值上限
@@ -2831,7 +2831,7 @@ const SAKIKO_NOVA_DECAY_END      = 0.04;  // 新月甦醒：最後一發傷害�
 const SAKIKO_DUAL_DURATION       = 4.0;   // 殘月的餘韻：雙音色齊發＋不死持續時間
 const SAKIKO_DUAL_FIRE_INTERVAL  = 0.25;  // 殘月的餘韻：期間每個音色的發射間隔（比平時快，但不過度誇張）
 const SAKIKO_DUAL_SPAWN_BURST    = 1;     // 殘月的餘韻：每次觸發噴出的音符數
-const SAKIKO_DUAL_NOTE_CAP       = 30;    // 殘月的餘韻：期間場上音符數量上限（平時的兩倍）
+const SAKIKO_DUAL_NOTE_CAP       = 30;    // 殘月的餘韻：期間場上音符數量上限
 const SAKIKO_DUAL_SPREAD         = 0.35;  // 殘月的餘韻：音符噴發散射角度（弧度）
 
 // 大喬（波紋使者）
@@ -2900,7 +2900,7 @@ const STEVE_ELYTRA_THRUST_DMG = 100; // 鞘翅第三擊：茅穿刺傷害
 // 妲己（九尾妖狐）
 const DAJI_TAIL_MAX          = 9;      // 尾巴上限，集滿觸發被動
 const DAJI_FIRE_INTERVAL     = 3.0;    // 鬼火（普攻）發射間隔
-const DAJI_FIRE_DAMAGE       = 50;     // 鬼火傷害
+const DAJI_FIRE_DAMAGE       = 40;     // 鬼火傷害
 const DAJI_FIRE_SPEED        = 200;    // 鬼火飛行速度
 const DAJI_FIRE_RADIUS       = 8;      // 鬼火判定半徑
 const DAJI_FIRE_TURN_RATE    = 2.4;    // 鬼火追蹤轉向速率（弧度/秒）
@@ -2922,9 +2922,9 @@ const DAJI_BALL_DMG_PER_TAIL = 10;     // 每條尾巴額外傷害
 const DAJI_BALL_MAX_DMG      = 180;    // 法術球最高傷害
 const DAJI_BALL_BASE_RADIUS  = 8;      // 法術球基礎半徑
 const DAJI_BALL_MAX_RADIUS   = 20;     // 法術球最大半徑（強化/滿尾巴）
-const DAJI_BALL_SPEED        = 260;    // 法術球飛行速度
+const DAJI_BALL_SPEED        = 300;    // 法術球飛行速度
 const DAJI_ENH_CHANNEL_TIME  = 1.5;    // 強化技能二：原地蓄力時間
-const DAJI_ENH_HEAL          = 30;    // 釋放強化技能時恢復生命值
+const DAJI_ENH_HEAL          = 100;    // 釋放強化技能時恢復生命值
 
 // 九十九由基 專屬常數
 const YUKI_PHOENIX_DELAY          = 0.2;   // 碰撞後延遲觸發「鳳輪」秒數
@@ -3060,14 +3060,14 @@ const RSQJS_ENCHANT_MAX_LV         = 5;    // 附魔等級上限（避免無限�
 const RSQJS_STEALTH_DURATION = 2.0;    // 復仇後「迅捷潛行」無敵時間
 const RSQJS_STEALTH_CD       = 6.0;    // 迅捷潛行冷卻
 // ══════════════ 四天之龍：次元融合（四球共享血量角色） ══════════════
-const DRAGON4_DMG_REDUCE       = 0.25;  // 被動：受到傷害減免25%
+const DRAGON4_DMG_REDUCE       = 0.1;  // 受到傷害減免
 const DRAGON4_ENRAGE_HP        = 600;   // 血量低於此值進入強化狀態
 const DRAGON4_ENRAGE_CD_MUL    = 0.5;   // 強化狀態：技能冷卻減半
 
 // 🟨擺弧噴射
 const DRAGON4_PENDULUM_CD        = 6;
 const DRAGON4_PENDULUM_DURATION  = 2;
-const DRAGON4_PENDULUM_DPS       = 100;
+const DRAGON4_PENDULUM_DPS       = 80;
 const DRAGON4_PENDULUM_RANGE     = 34;   // 判定半寬（類似純愛砲的射線寬度）
 
 // 🟪猛毒控制
@@ -3122,7 +3122,7 @@ const NANAMI_OVERTIME_BLACKFLASH  = 0.20; // 加班時間期間黑閃基礎機�
 const NANAMI_OVERTIME_SPEED_MULT  = 1.3;  // 加班時間移速倍率
 
 // ══════ 桃井／綠 專屬常數══════
-const MOMOI_MAX_HP               = 750;   // 桃井／綠 各自的獨立血量上限
+const MOMOI_MAX_HP               = 700;   // 桃井／綠 各自的獨立血量上限
 const MOMOI_BULLET_DAMAGE        = 15;    // 桃井「獨特創意」普攻每顆子彈傷害
 const MOMOI_BULLET_SPEED         = 500;   // 子彈飛行速度
 const MOMOI_BURST_INTERVAL       = 1.5;   // 每輪三連發的間隔（秒）
@@ -3202,11 +3202,35 @@ const ONIICHAN_ENRAGE_SPEED_MULT   = 1.5;
 const ONIICHAN_TIDE_HP_THRESHOLD   = 300;
 const ONIICHAN_TIDE_COOLDOWN       = 10;
 const ONIICHAN_TIDE_WAVE_COUNT     = 3;
-const ONIICHAN_TIDE_WAVE_DAMAGE    = 30;
-const ONIICHAN_TIDE_WAVE_SPEED     = 100;
+const ONIICHAN_TIDE_WAVE_DAMAGE    = 60;
+const ONIICHAN_TIDE_WAVE_SPEED     = 200;
 const ONIICHAN_TIDE_WAVE_GAP       = 0.4;
-const ONIICHAN_TIDE_WAVE_MAX_R     = 260;
+const ONIICHAN_TIDE_WAVE_MAX_R     = 240;
 
+// 波風水門
+const MINATO_KUNAI_SPEED           = 2200;  // 苦無飛行速度（飛得很快，近乎瞬間插牆）
+const MINATO_SLASH_CHARGE_TIME     = 0.15;  // 丟出苦無後蓄力時間
+const MINATO_SLASH_SPEED           = 1600;  // 飛雷神斬衝刺速度
+const MINATO_SLASH_DASH_RANGE      = 240;   // 飛雷神斬衝刺最長距離
+const MINATO_SLASH_DAMAGE          = 60;    // 飛雷神斬單段傷害
+const MINATO_SLASH_MAX_COMBO       = 5;     // 飛雷神斬最大連段次數
+const MINATO_SLASH_COOLDOWN        = 3;     // 飛雷神斬CD（連段全部結束後才開始倒數）
+const MINATO_STAGE2_KUNAI_REQ      = 12;    // 觸發飛雷神二段所需牆上苦無數
+const MINATO_STAGE2_MOVE_SPEED     = 3400;  // 二段位移速度（比飛雷神斬快得多，近乎瞬移感）
+const MINATO_KILLFX_HITS           = 8;     // 斬殺動畫：連續發動飛雷神二段的瞬移斬擊次數
+const MINATO_KILLFX_HIT_INTERVAL   = 0.10;  // 斬殺動畫：每次瞬移斬擊間隔（秒）
+const MINATO_KILLFX_SHATTER_LIFE   = 1.0;   // 斬殺動畫：最終將敵人砍成碎片的演出時長（秒）
+const MINATO_STAGE2_HIT_DAMAGE     = 25;    // 二段位移途中每段傷害
+const MINATO_PARRY_DURATION        = 5;     // 防反狀態持續時間
+const MINATO_PARRY_KICK_DAMAGE     = 40;    // 防反反擊踢擊傷害
+const MINATO_RASENGAN_COOLDOWN     = 10;    // 螺旋丸CD
+const MINATO_RASENGAN_DASH_DIST    = 160;   // 普通螺旋丸衝刺距離
+const MINATO_RASENGAN_DASH_SPEED   = 1000;   // 普通螺旋丸衝刺速度
+const MINATO_RASENGAN_DAMAGE       = 60;    // 普通螺旋丸傷害
+const MINATO_RASENGAN_GRAB_TIME    = 0.35;  // 防反狀態螺旋丸抓取施法時間
+const MINATO_RASENGAN_PARRY_DAMAGE = 80;    // 防反狀態螺旋丸傷害
+const MINATO_PASSIVE_COOLDOWN      = 3;     // 被動「黃色閃光」CD
+const MINATO_WALL_INSET             = 16;   // 苦無插牆位置與牆面內縮距離，避免視覺卡牆
 
 const MIN_SPEED          = 100;   // 最低移動速度（技能停止中除外）
 const BOOST_INTERVAL_MIN = 3;
@@ -3355,7 +3379,7 @@ const CHARACTERS = [
   id: 'cursed', emoji: '💀', weapon: '⚔️', name: '詛咒之王',
   desc: '​「別自以為是了，雜碎。誰允許你抬頭看我的？」​千年前曾讓無數咒術師陷入絕望、擁有四隻手兩張臉的「詛咒之王」。他的存在本身就是天災，用他的術式「御廚子」將對手給切成碎片。',
   stats: ['解', '捌', '伏魔御廚子'],
-  skills: ['「解」：敵人靠近時先預警箭頭鎖定，短暫延遲後斬擊，造成140傷害並緩速，CD4.25s。', '「捌」：碰觸敵方時觸發近戰斬擊，造成25傷害×2s的持續傷害。', '領域展開「伏魔御廚子」：血量降至550展開，對領域內角色造成5傷害/幀。'],
+  skills: ['「解」：敵人靠近時先預警箭頭鎖定，短暫延遲後斬擊，造成140傷害並緩速，CD4s。', '「捌」：碰觸敵方時觸發近戰斬擊，造成25傷害×2s的持續傷害。', '領域展開「伏魔御廚子」：血量降至550展開，對領域內角色造成6傷害/幀。'],
   color: '#c0392b', glowColor: 'rgba(192,57,43,0.6)', type: 'cursed',
   winQuote: '不過是沒出生在我時代的凡夫罷了。',
   loseQuote: '……別小看我，我可是『詛咒』啊',
@@ -3428,7 +3452,10 @@ tiger:['你那同情我的態度真是令人作嘔，這只顯得你很懦弱。
   id: 'blacksmith', emoji: '🔨', weapon: '⚔️', name: '鍛造師',
   desc: '​「千錘百鍊始成鋼，我的傑作，能斬斷神明的骨頭。」​隱居於火山熔岩旁的傳奇鍛造大師。對他而言，每一次錘擊都是與鋼鐵的對話',
   stats: ['鍛造',  '劍擊' ],
-  skills: ['鍛造：平時持續鍛造武器，每次鍛造累積10點加傷害並加快下次鍛造速度。', '劍擊：靠近敵人時拔劍砍擊，造成20+鍛造加傷害；每次劍擊後重置鍛造速度。'],
+  skills: [
+    `鍛造：平時持續鍛造武器，每次鍛造累積${SMITH_FORGE_DMG_PER_STACK}點加傷害並加快下次鍛造速度（上限${SMITH_FORGE_MAX_STACKS}層）。`,
+    `劍擊：靠近敵人時拔劍砍擊，造成${SMITH_SWORD_BASE_DAMAGE}+鍛造加傷害；每次劍擊額外鍛造1層，並重置鍛造速度。`,
+  ],
   color: '#cd7f32', glowColor: 'rgba(205,127,50,0.6)', type: 'blacksmith',
   winQuote: '比蟑螂還不如。',
   loseQuote: '……這把劍，終究還沒鍛造完全。'
@@ -3438,7 +3465,7 @@ tiger:['你那同情我的態度真是令人作嘔，這只顯得你很懦弱。
   desc: '​「別隨便碰我，雜魚的弱者臭味會傳染的。」​咒術界名門「禪院家」的嫡子。擁有極致的天賦與高傲的血統，唯我獨尊，視弱者與女性如草芥。除了心中崇拜的那位「暴君」外，他不把任何人放在眼裡。',
   stats: ['投射法術', '凶星軌跡'],
   skills: [
-    `投射法術：預定好行動軌跡時沿途留下殘影分身，上限${NAOBITO_SHADOW_MAX}個；敵人碰到殘影造成${NAOBITO_SHADOW_DAMAGE}傷害，CD${ NAOBITO_PATH_INTERVAL}s。`,
+    `投射法術：預定好行動軌跡時沿途留下殘影分身，上限${NAOBITO_SHADOW_MAX}個；敵人碰到殘影造成${NAOBITO_SHADOW_DAMAGE}傷害，CD${NAOBITO_PATH_INTERVAL}s。`,
     `「凶星軌跡」：累積${NAOBITO_KYOUSEI_THRESHOLD}個殘影時自動觸發，所有殘影與本體同時衝向敵人，造成${NAOBITO_KYOUSEI_PIERCE_DMG}+殘影${NAOBITO_KYOUSEI_SHADOW_DMG}×N傷害。`,
   ],
   color: '#e8e8f0', glowColor: 'rgba(220,220,255,0.6)', type: 'naoya',
@@ -3472,7 +3499,7 @@ cursed:'我會親手殺了宿儺，為老師報仇。' ,
  itachi:'你沒有朋友或是家人嗎？',
  tiger:'你背負的罪惡不屬於你，你沒有錯。',
  geto:'真失禮，我們可是純愛阿。',
- oniichan:'雖然我是獨生女，但你真的是最棒的哥哥'
+ 
  }
   },
   {
@@ -3545,7 +3572,9 @@ oniichan:'大哥，謝謝你'
   winQuote: ['我沒有名字，也不以任何身份而活。','我要創造一個有琳的世界','不能守護該守護的人，這份力量又有什麼意義？'],
   loseQuote: '好不容易才搞好關係……最終還是沒能向琳告白啊。',
   vsQuotes: { itachi: ['宇智波的血脈，終究逃不過悲劇嗎。','你選擇守護，我選擇毀滅，僅此而已。'],
-  geto: '為了理想的世界不擇手段，我們還挺像的。' }
+  geto: '為了理想的世界不擇手段，我們還挺像的。',
+  minato:['水門老師，這個村子，這個世界，已經都無所謂了！','既是為了發動戰爭，也是為了永久的和平','身為我的老師，卻沒認出我，你也不過爾爾',]
+   }
   },
   {
   id: 'fisherman', emoji: '🎣', weapon: '🪝', name: '釣魚佬',
@@ -3627,13 +3656,14 @@ oniichan:'大哥，謝謝你'
   id: 'yuki', emoji: '🪐', weapon: '🌀', name: '九十九由基',
   desc: '「……那，你喜歡什麼類型的女性？」深不見底的重力操控者。每一次碰撞，都只是引力累積的前奏——當重力疊滿之時，她的身軀將化作足以吞噬萬物的星漿與黑洞。',
   stats: ['鳳輪', '重力', '星漿體', '假想黑洞'],
-  skills: ['被動「引力」：由基自身帶有少許引力，持續將週遭敵人微微拉近，重力層數越高拉力越強。', '「鳳輪」：碰撞敵人後延遲片刻，鳳輪環繞由基身旁現身進行掃蕩攻擊，造成120傷害，並為自己疊加一層「重力」。', '被動「重力」：每層增加10%傷害，最多5層；疊滿後進入「星漿體」狀態。', '「星漿體」：持續15秒，每秒扣除20點血量；期間獲得「星之怒」，每2.5秒將敵人拉向自己，並立刻釋放兩次「鳳輪」。', '「假想黑洞」：星漿體狀態下，任一方血量低於400時發動，持續2.5秒持續將敵人吸入並造成200傷害/秒，結束後由基扣除500點血量。'],
+  skills: ['被動「引力」：由基自身帶有少許引力，持續將週遭敵人微微拉近，重力層數越高拉力越強。', '「ki鳳輪」：碰撞敵人後延遲片刻，鳳輪環繞由基身旁現身進行掃蕩攻擊，造成120傷害，並為自己疊加一層「重力」。', '被動「重力」：每層增加10%傷害，最多5層；疊滿後進入「星漿體」狀態。', '「星漿體」：持續15秒，每秒扣除20點血量；期間獲得「星之怒」，每2.5秒將敵人拉向自己，並立刻釋放兩次「鳳輪」。', '「假想黑洞」：星漿體狀態下，任一方血量低於400時發動，持續2.5秒持續將敵人吸入並造成200傷害/秒，結束後由基扣除500點血量。'],
   color: '#4b0082', glowColor: 'rgba(75,0,130,0.6)', type: 'yuki',
   winQuote: '你喜歡什麼類型的女性？',
-  loseQuote: '身為詛咒的你 已經死了！。',
-  vsQuotes: { geto: ['把非術師給肅清嘛，或許能吧','你能回答我之前的問題嘛',] ,
+  loseQuote: '無論重力，還是質量，深究下去的話。',
+  vsQuotes: { geto: ['把非術師給肅清嘛，或許也是個方法吧','你能回答我之前的問題嘛',] ,
   tiger:'這是我一生的研究，接下來的靈魂與肉體之爭，就交給你們了。',
-  yuta:'你必須作為主要戰力去參加死滅迴游，這裡就交給我吧。'
+  yuta:'你必須作為主要戰力去參加死滅迴游，這裡就交給我吧。',
+  oniichan:['雖然我是獨生女，但你真的是最棒的哥哥','作為『詛咒』的你已經在這裡死了。活下去吧!']
   }
   
   
@@ -3796,9 +3826,32 @@ oniichan:'大哥，謝謝你'
     vsQuotes: {
       tiger: '怎麼⋯⋯回事⋯⋯',
       geto: '原來是這麼一回事，加茂憲倫！',
-      yuta: '九十九，我是「人」嗎？',
+      yuki: '九十九，我是「人」嗎？',
       naoya: '我無法理解你這種不愛自己兄弟的人的心情',
     }
+  },
+  {
+    id: 'minato', emoji: '🥷', weapon: '🗡️', name: '波風水門',
+    desc: '「戰場上最快的男人。」木葉的金色閃光，將苦無標記與空間轉移運用到極致的天才忍者，敵人甚至來不及看清他的身影，勝負便已分曉。',
+    stats: ['飛雷神斬', '飛雷神二段', '螺旋丸'],
+    skills: [
+      `「飛雷神斬」：朝敵人丟出苦無並短暫蓄力，隨即朝苦無方向發動穿透斬擊，造成${MINATO_SLASH_DAMAGE}傷害；斬擊命中則再次連段，最多${MINATO_SLASH_MAX_COMBO}次，苦無會插在牆上，CD${MINATO_SLASH_COOLDOWN}s。`,
+      `「飛雷神二段」：牆上苦無累積${MINATO_STAGE2_KUNAI_REQ}把以上時觸發，額外丟出一把苦無後，在所有苦無間高速移動，每次移動對路途上的敵人造成${MINATO_STAGE2_HIT_DAMAGE}傷害，結束後收回所有苦無並進入${MINATO_PARRY_DURATION}秒「防反」狀態。`,
+      `防反狀態：受到攻擊時無效該傷害，並瞬移到攻擊者身旁一腳踢出，造成${MINATO_PARRY_KICK_DAMAGE}傷害與擊退，之後解除防反。`,
+      `「螺旋丸」：CD${MINATO_RASENGAN_COOLDOWN}s，衝向敵人造成${MINATO_RASENGAN_DAMAGE}傷害與擊退；若在防反狀態中發動，則改為瞬移到敵人身旁抓住敵人後轟出螺旋丸，造成${MINATO_RASENGAN_PARRY_DAMAGE}傷害並提前結束防反。發動螺旋丸時，飛雷神斬CD暫停倒數直到螺旋丸結束。`,
+      `【被動】「金色閃光」：受到攻擊時瞬移到場上隨機一把苦無位置，並額外朝敵人丟出一把苦無，CD${MINATO_PASSIVE_COOLDOWN}s。苦無本身沒有傷害，僅作為飛雷神的位移標記。`,
+          ],
+    color: '#f4d35e', glowColor: 'rgba(244,211,94,0.6)', type: 'minato',
+    winQuote:['雖然是對手，但你還不賴。','多少了解金色閃光的由來了嗎？','背負火影之名！我不能輸！'],
+    loseQuote: '相信他吧，他可是……我們的孩子啊！',
+
+vsQuotes: {
+      obito: ['如果那時我能認出你，是否你還會走向一樣的道路','原來你還活著，如果你能成為火影該多好',]
+      
+    }
+
+
+
   }
 ];
 
@@ -4516,7 +4569,7 @@ function runCustomPeriodicHeal(b, dt, ns, cfg) {
   b.customExtra[timerKey] = customExtraGet(b, timerKey, cfg.interval) - dt;
   if (b.customExtra[timerKey] <= 0) {
     b.customExtra[timerKey] = cfg.interval;
-    b.hp = Math.min(MAX_HP, b.hp + cfg.amount);
+    b.hp = Math.min(getBallMaxHp(b), b.hp + cfg.amount);
     state.hitFlashes.push({ x: b.x, y: b.y, r: 26, alpha: 0.85, color: '#66ff88', t: 0.4 });
   }
 }
@@ -5034,8 +5087,8 @@ function forfeitGame() {
   overlay.classList.add('show');
 }
 
-const P1_COLORS ={ chef:'#e84545',drunk:'#7b4cca', opm:'#f5f5f5', vampire:'#8b1a8b', gojo:'#00cfff', cursed:'#c0392b', trapper:'#27ae60', yi:'#e8e8e8', gunner:'#f0c84a', samurai:'#d4af37', mage:'#9b59b6', thunder:'#f1c40f', blacksmith:'#cd7f32', naoya:'#c8c8e8', itachi:'#8b0000', yuta:'#ff6fa5', engineer:'#3a8fd6', cannondad:'#bdbdbd', dio:'#f5d020', tiger:'#cc2200', stargirl:'#ffe066', obito:'#ff6600', fisherman:'#4a90d9', geto:'#5b3a8e', sakiko:'#c9a4d1', joseph:'#2f7dc0', steve:'#4a8f3c',daji:'#e08ac7',yuki:'#f0c84a',wuxing:'#9b8cce',sans:'#e8e8e8',pucci:'#8e6bbf',baie:'#e8c840',rsqjs:'#e84b4b',dragon4:'#c9a959',nanami:'#3d5a80',momoi:'#f2a65a',oniichan:'#c41e3a' };
-const P2_COLORS = { chef:'#ff9f43', drunk:'#48dbfb', opm:'#aaaaaa', vampire:'#cc44cc', gojo:'#7ff8ff', cursed:'#e74c3c', trapper:'#2ecc71', yi:'#cccccc', gunner:'#f0c040', samurai:'#ffe88a', mage:'#d7aefb', thunder:'#ffe066', blacksmith:'#e8a840', naoya:'#aaaacc', itachi:'#ff3333', yuta:'#ffa3c8', engineer:'#7ec8ff', cannondad:'#787878', dio:'#fff066', tiger:'#ff4422', stargirl:'#fff5aa', obito:'#ffaa44', fisherman:'#8ec6ff', geto:'#a678e0', sakiko:'#e8cdf0', joseph:'#6fb8ee', steve:'#8fd96b',daji:'#e8cdf8' ,yuki:'#b8960b',wuxing:'#c3b8e8',sans:'#a8d8f0',pucci:'#c9a8e8',baie:'#a86fe0',rsqjs:'#3fa9e8',dragon4:'#e8d38f',nanami:'#7e9cc4',momoi:'#ffcf8f',oniichan:'#ff5566'};
+const P1_COLORS ={ chef:'#e84545',drunk:'#7b4cca', opm:'#f5f5f5', vampire:'#8b1a8b', gojo:'#00cfff', cursed:'#c0392b', trapper:'#27ae60', yi:'#e8e8e8', gunner:'#f0c84a', samurai:'#d4af37', mage:'#9b59b6', thunder:'#f1c40f', blacksmith:'#cd7f32', naoya:'#c8c8e8', itachi:'#8b0000', yuta:'#ff6fa5', engineer:'#3a8fd6', cannondad:'#bdbdbd', dio:'#f5d020', tiger:'#cc2200', stargirl:'#ffe066', obito:'#ff6600', fisherman:'#4a90d9', geto:'#5b3a8e', sakiko:'#c9a4d1', joseph:'#2f7dc0', steve:'#4a8f3c',daji:'#e08ac7',yuki:'#f0c84a',wuxing:'#9b8cce',sans:'#e8e8e8',pucci:'#8e6bbf',baie:'#e8c840',rsqjs:'#e84b4b',dragon4:'#c9a959',nanami:'#3d5a80',momoi:'#f2a65a',oniichan:'#c41e3a',minato:'#f4d35e' };
+const P2_COLORS = { chef:'#ff9f43', drunk:'#48dbfb', opm:'#aaaaaa', vampire:'#cc44cc', gojo:'#7ff8ff', cursed:'#e74c3c', trapper:'#2ecc71', yi:'#cccccc', gunner:'#f0c040', samurai:'#ffe88a', mage:'#d7aefb', thunder:'#ffe066', blacksmith:'#e8a840', naoya:'#aaaacc', itachi:'#ff3333', yuta:'#ffa3c8', engineer:'#7ec8ff', cannondad:'#787878', dio:'#fff066', tiger:'#ff4422', stargirl:'#fff5aa', obito:'#ffaa44', fisherman:'#8ec6ff', geto:'#a678e0', sakiko:'#e8cdf0', joseph:'#6fb8ee', steve:'#8fd96b',daji:'#e8cdf8' ,yuki:'#b8960b',wuxing:'#c3b8e8',sans:'#a8d8f0',pucci:'#c9a8e8',baie:'#a86fe0',rsqjs:'#3fa9e8',dragon4:'#e8d38f',nanami:'#7e9cc4',momoi:'#ffcf8f',oniichan:'#ff5566',minato:'#fff0a3'};
 
 // 玩家 1、2 用既有的兩張色表；玩家 3 以上（多人混戰用）用同一顏色做色調偏移，避免撞色。
 // 之後若要幫玩家 3/4 手動指定色表，只要新增 P3_COLORS / P4_COLORS 並在這裡優先讀取即可。
@@ -5400,6 +5453,18 @@ const PROGRESS_HANDLERS = {
   wuxing(b) {
     return {
       atFrac: 1 - Math.max(0, Math.min(1, (b.wuxingTimer || 0) / WUXING_TRANSFORM_INTERVAL)),
+      barColor: b.char.color
+    };
+  },
+  minato(b) {
+    if (b.minatoStage2Active) return { atFrac: 1, barColor: '#8ff3ff' };
+    if (b.minatoParryTimer > 0) return { atFrac: b.minatoParryTimer / MINATO_PARRY_DURATION, barColor: '#ffdd55' };
+    if (b.minatoRasenganPhase && b.minatoRasenganPhase !== 'idle') return { atFrac: 1, barColor: '#4fc3f7' };
+    if (b.minatoSlashPhase && b.minatoSlashPhase !== 'idle') return { atFrac: 1, barColor: '#f4d35e' };
+    const wallCount = (state && state.minatoKunai) ? state.minatoKunai.filter(k => k.owner === b.player).length : 0;
+    if (wallCount >= MINATO_STAGE2_KUNAI_REQ) return { atFrac: 1, barColor: '#8ff3ff' };
+    return {
+      atFrac: 1 - Math.max(0, Math.min(1, (b.minatoSlashCd || 0) / MINATO_SLASH_COOLDOWN)),
       barColor: b.char.color
     };
   }
@@ -5927,6 +5992,29 @@ gojoChargingVisual: ch.type === 'gojo' ? false : null,
     wuxingBaseChar: ch.type === 'wuxing' ? ch : null,   // 保留「這是無形」的標記（角色定義本身）
     wuxingTimer:    ch.type === 'wuxing' ? 0 : null,     // 距離下次變身倒數（0 = 開局立刻變身一次）
     wuxingFlash:    ch.type === 'wuxing' ? 0 : null,     // 變身瞬間的短暫特效倒數
+    // 波風水門專屬狀態
+    minatoSlashCd:         ch.type === 'minato' ? 0 : null,          // 飛雷神斬CD倒數（連段全部結束才開始算）
+    minatoSlashCombo:      ch.type === 'minato' ? 0 : null,          // 目前連段次數
+    minatoSlashPhase:      ch.type === 'minato' ? 'idle' : null,     // 'idle'|'charging'|'dashing'
+    minatoSlashTimer:      ch.type === 'minato' ? 0 : null,          // 蓄力計時
+    minatoSlashAngle:      ch.type === 'minato' ? 0 : null,          // 衝刺方向
+    minatoSlashTargetX:    ch.type === 'minato' ? 0 : null,          // 衝刺目標點（苦無落點）X
+    minatoSlashTargetY:    ch.type === 'minato' ? 0 : null,          // 衝刺目標點Y
+    minatoSlashHit:        ch.type === 'minato' ? false : null,      // 本次衝刺是否命中敵人（決定是否連段）
+    minatoSlashHitTargets: ch.type === 'minato' ? null : null,       // 本次衝刺已命中過的敵人（避免同段多次命中）
+    minatoStage2Active:    ch.type === 'minato' ? false : null,      // 是否處於飛雷神二段
+    minatoStage2Path:      ch.type === 'minato' ? null : null,       // 二段位移路徑（依規則排序後的苦無座標陣列）
+    minatoStage2Index:     ch.type === 'minato' ? 0 : null,          // 目前移動到路徑第幾個點
+    minatoStage2HitTargets:ch.type === 'minato' ? null : null,       // 目前路徑段已命中過的敵人
+    minatoParryTimer:      ch.type === 'minato' ? 0 : null,          // 防反狀態剩餘時間
+    minatoRasenganCd:      ch.type === 'minato' ? 0 : null,          // 螺旋丸CD倒數
+    minatoRasenganPhase:   ch.type === 'minato' ? 'idle' : null,     // 'idle'|'charging'|'dashing'|'grab'
+    minatoRasenganTimer:   ch.type === 'minato' ? 0 : null,          // 蓄力/抓取計時
+    minatoRasenganAngle:   ch.type === 'minato' ? 0 : null,          // 普通螺旋丸衝刺方向
+    minatoRasenganTraveled:ch.type === 'minato' ? 0 : null,          // 普通螺旋丸已衝刺距離
+    minatoRasenganHit:     ch.type === 'minato' ? false : null,      // 普通螺旋丸本次是否已命中
+    minatoRasenganTarget:  ch.type === 'minato' ? null : null,       // 防反螺旋丸抓取的敵人
+    minatoPassiveCd:       ch.type === 'minato' ? 0 : null,          // 被動「黃色閃光」CD倒數
     // 組裝模式（自組機器人）專屬狀態
     customParts:        ch.type === 'custom' ? ch.parts : null,
     customDrunkTimer:   ch.type === 'custom' && ch.parts.passive === 'p_drunk'   ? randBetween(DRUNK_DIR_CHANGE_MIN, DRUNK_DIR_CHANGE_MAX) : null,
@@ -6179,7 +6267,7 @@ function startGame() {
   state = {
     playerCount,
     balls: twinBallGroups.flat(),
-    projectiles: [], wallKnives: [], hitFlashes: [], damageNumbers: [], batParticles: [], slashMarks: [], traps: [], yiBlackStones: [], yiStoneBurstFX: [], opmFX: [], momoiFanFX: [], gojoKillFX: null, curseSliceKillFX: null, elapsed: 0,
+    projectiles: [], wallKnives: [], minatoKunai: [], minatoTeleportFX: [], hitFlashes: [], damageNumbers: [], batParticles: [], slashMarks: [], traps: [], yiBlackStones: [], yiStoneBurstFX: [], opmFX: [], momoiFanFX: [], gojoKillFX: null, curseSliceKillFX: null, minatoKillFX: null, elapsed: 0,
     arena: selectedArena,
     bgColor: selectedBgColor,
     thunderPillars: [],
@@ -6574,6 +6662,28 @@ function dealDamage(target, dmg, options = {}) {
   if (target.char && target.char.type === 'obito' && target.obitoPhasing) return;
   // 被帶土抓進神威空間的敵人：在空間裡免疫主場地攻擊
   if (target.obitoInSpace && !options.bypassParry) return;
+  // 波風水門「防反」狀態：這次傷害完全無效，並瞬移到攻擊者身旁一腳反擊
+  if (target.char && target.char.type === 'minato' && target.minatoParryTimer > 0 && !options.bypassParry) {
+    const attacker = options.attackerPlayer != null ? state.balls.find(x => x.player === options.attackerPlayer && x.hp > 0) : null;
+    if (attacker && attacker !== target) {
+      const ang = Math.atan2(attacker.y - target.y, attacker.x - target.x) || 0;
+      target.x = attacker.x - Math.cos(ang) * (target.r + attacker.r + 4);
+      target.y = attacker.y - Math.sin(ang) * (target.r + attacker.r + 4);
+      target.vx = 0; target.vy = 0;
+      dealDamage(attacker, MINATO_PARRY_KICK_DAMAGE, { attackerPlayer: target.player });
+      const kAng = Math.atan2(attacker.y - target.y, attacker.x - target.x) || 0;
+      attacker.vx += Math.cos(kAng) * 500; attacker.vy += Math.sin(kAng) * 500;
+      if (state) {
+        state.hitFlashes.push({ x: attacker.x, y: attacker.y, r: 34, alpha: 1, color: '#ffdd55', t: 0.3 });
+        // 瞬移踢擊的迴旋腿軌跡（水門→攻擊者的一小段金色揮擊殘影）
+        state.minatoTeleportFX.push({ x1: target.x, y1: target.y, x2: attacker.x, y2: attacker.y, life: 0.18, maxLife: 0.18, owner: target.player, color: '#ffdd55' });
+        state.slashMarks.push({ x: attacker.x, y: attacker.y, angle: kAng, life: 0.32, maxLife: 0.32, hit: true, owner: target.player, style: 'minato_kick' });
+        playHitSound('opm');
+      }
+    }
+    target.minatoParryTimer = 0;
+    return;
+  }
   // 一拳超人必殺拳穿透招架減傷（bypassParry flag）
   const isParrying = target.char && target.char.type === 'samurai' && target.samuraiParrying;
   let mul = 1;
@@ -6717,7 +6827,7 @@ function dealDamage(target, dmg, options = {}) {
   if (baieRevivePending) {
     target.baieReviveUsed = true;
     const effMax = MAX_HP * (target.baieLoveActive ? (1 + BAIE_LOVE_HP_BONUS) : 1);
-    target.hp = Math.min(effMax, target.hp + MAX_HP * BAIE_REVIVE_HEAL_RATIO);
+    target.hp = Math.min(effMax, target.hp + getBallMaxHp(target) * BAIE_REVIVE_HEAL_RATIO);
     const foe = getNearestEnemy(target);
     if (foe && foe.hp > 0) dealDamage(foe, BAIE_REVIVE_SELFDMG, { attackerPlayer: target.player });
     if (state) {
@@ -6756,6 +6866,32 @@ function dealDamage(target, dmg, options = {}) {
   if (target.char && target.char.type === 'sans' && actual > 0 && !options.bypassParry && !options.continuousDamage) {
     target.sansHitIframeTimer = SANS_HIT_IFRAME_DUR;
   }
+  // 波風水門被動「黃色閃光」：受到攻擊時瞬移到場上隨機一把苦無，並額外朝敵人丟出一把苦無
+  if (target.char && target.char.type === 'minato' && actual > 0 && !(target.minatoPassiveCd > 0) &&
+      !target.minatoStage2Active && target.hp > 0 && state) {
+    const wallSpots = state.minatoKunai ? state.minatoKunai.filter(k => k.owner === target.player) : [];
+    if (wallSpots.length > 0) {
+      const prevX = target.x, prevY = target.y;
+      const spot = wallSpots[Math.floor(Math.random() * wallSpots.length)];
+      target.x = spot.x; target.y = spot.y;
+      // 原地消失的黃色爆閃 + 落點爆閃 + 電光殘影軌跡，比照飛雷神二段瞬移的呈現方式
+      state.hitFlashes.push({ x: prevX, y: prevY, r: 22, alpha: 0.85, color: '#ffe066', t: 0.25 });
+      state.hitFlashes.push({ x: target.x, y: target.y, r: 30, alpha: 1, color: '#ffe066', t: 0.3 });
+      state.minatoTeleportFX.push({ x1: prevX, y1: prevY, x2: target.x, y2: target.y, life: 0.22, maxLife: 0.22, owner: target.player, color: '#ffe066' });
+      state.slashMarks.push({ x: target.x, y: target.y, angle: 0, life: 0.22, maxLife: 0.22, hit: true, owner: target.player, style: 'minato_teleport' });
+      playHitSound('vampire_dash');
+    }
+    const foe = getNearestEnemyTo(target.x, target.y, target.player);
+    if (foe) {
+      const ang = Math.atan2(foe.y - target.y, foe.x - target.x);
+      state.projectiles.push({
+        x: target.x, y: target.y,
+        vx: Math.cos(ang) * MINATO_KUNAI_SPEED, vy: Math.sin(ang) * MINATO_KUNAI_SPEED,
+        type: 'kunai', owner: target.player, ownerBall: target, damage: 0, r: 6, color: target.char.color, angle: ang
+      });
+    }
+    target.minatoPassiveCd = MINATO_PASSIVE_COOLDOWN;
+  }
   // 普奇神父：唸密語時被「真正打中」才會中斷（熔岩／中毒等持續性傷害不算，否則熔岩場地會讓密語永遠唸不出來）
   if (target.char && target.char.type === 'pucci' && actual > 0 && !options.continuousDamage) {
     target.pucciChantActive = false;
@@ -6792,6 +6928,8 @@ function purgeDeadPlayerEntities(player, deadBall) {
   if (state.engGrids) state.engGrids = state.engGrids.filter(t => t.owner !== player);
   // 插在牆上的刀：同隊若有其他還活著的廚師，只清掉這顆球自己插的刀，不動到隊友的
   if (state.wallKnives) state.wallKnives = state.wallKnives.filter(k => (k.ownerBall && deadBall) ? k.ownerBall !== deadBall : k.owner !== player);
+  if (state.minatoKunai) state.minatoKunai = state.minatoKunai.filter(k => k.owner !== player);
+  if (state.minatoTeleportFX) state.minatoTeleportFX = state.minatoTeleportFX.filter(t => t.owner !== player);
   // 還在飛行／擴散中的招式型物件
   if (state.cannonBeamFX) state.cannonBeamFX = state.cannonBeamFX.filter(x => x.owner !== player);
   if (state.engLaserFX) state.engLaserFX = state.engLaserFX.filter(x => x.owner !== player);
@@ -6989,6 +7127,295 @@ function killSummon(summon) {
 }
 
 // 每幀更新所有召喚物：壽命、內建簡易 AI、自訂邏輯、DIO 世界時停。已掛在 update() 主迴圈中。
+// ── 波風水門：射線求牆壁交點（丟苦無/二段位移用，算出從(x,y)朝angle方向會插在哪面牆上） ──
+// inset：插牆點與真正牆面之間留的內縮距離，避免苦無視覺上卡進牆裡、也讓水門衝刺時能真正到得了
+function minatoRayToWall(x, y, angle, inset = MINATO_WALL_INSET) {
+  const dx = Math.cos(angle), dy = Math.sin(angle);
+  let tMax = Infinity;
+  if (dx > 0.0001) tMax = Math.min(tMax, (W - WALL - inset - x) / dx);
+  else if (dx < -0.0001) tMax = Math.min(tMax, (WALL + inset - x) / dx);
+  if (dy > 0.0001) tMax = Math.min(tMax, (H - WALL - inset - y) / dy);
+  else if (dy < -0.0001) tMax = Math.min(tMax, (WALL + inset - y) / dy);
+  if (!isFinite(tMax) || tMax < 0) tMax = 200;
+  return { x: x + dx * tMax, y: y + dy * tMax };
+}
+
+// ── 波風水門：發動飛雷神斬一段（丟苦無→蓄力→之後轉為衝刺） ──
+function startMinatoSlash(b, enemy) {
+  const angle = Math.atan2(enemy.y - b.y, enemy.x - b.x) || 0;
+  const landing = minatoRayToWall(b.x, b.y, angle); // 苦無仍然飛到牆邊插住（供飛雷神二段累積用）
+  state.projectiles.push({
+    x: b.x, y: b.y, vx: Math.cos(angle) * MINATO_KUNAI_SPEED, vy: Math.sin(angle) * MINATO_KUNAI_SPEED,
+    type: 'kunai', owner: b.player, ownerBall: b, damage: 0, r: 6, color: b.char.color, angle
+  });
+  // 衝刺距離另外設短距上限，不隨苦無一路衝到牆邊，避免斬擊跨越整張地圖
+  const wallDist = Math.hypot(landing.x - b.x, landing.y - b.y);
+  const dashDist = Math.min(wallDist, MINATO_SLASH_DASH_RANGE);
+  b.minatoSlashPhase = 'charging';
+  b.minatoSlashTimer = MINATO_SLASH_CHARGE_TIME;
+  b.minatoSlashAngle = angle;
+  b.minatoSlashTargetX = b.x + Math.cos(angle) * dashDist;
+  b.minatoSlashTargetY = b.y + Math.sin(angle) * dashDist;
+  b.vx = 0; b.vy = 0;
+}
+
+// ── 波風水門：飛雷神斬衝刺段的每幀處理（穿透判定＋位移） ──
+function stepMinatoSlashDash(b, dt) {
+  const dx = b.minatoSlashTargetX - b.x, dy = b.minatoSlashTargetY - b.y;
+  const dist = Math.hypot(dx, dy);
+  const moveDist = MINATO_SLASH_SPEED * dt;
+  for (const foe of getEnemies(b)) {
+    if (!foe || foe.hp <= 0 || b.minatoSlashHitTargets.has(foe)) continue;
+    if (Math.hypot(foe.x - b.x, foe.y - b.y) < b.r + foe.r + 14) {
+      dealDamage(foe, MINATO_SLASH_DAMAGE, { attackerPlayer: b.player });
+      b.minatoSlashHitTargets.add(foe);
+      b.minatoSlashHit = true;
+      state.hitFlashes.push({ x: foe.x, y: foe.y, r: 28, alpha: 1, color: '#fff5cc', t: 0.25 });
+      state.slashMarks.push({ x: foe.x, y: foe.y, angle: b.minatoSlashAngle, life: 0.3, maxLife: 0.3, hit: true, owner: b.player, style: 'iaido' });
+      playHitSound('samurai_iaido');
+    }
+  }
+  const ARRIVE_EPS = b.r + 6; // 需比牆壁碰撞留下的最小間距（半徑）還寬，否則永遠到不了終點卡住
+  if (dist <= moveDist || dist < ARRIVE_EPS) {
+    b.x = Math.max(WALL + b.r, Math.min(W - WALL - b.r, b.minatoSlashTargetX));
+    b.y = Math.max(WALL + b.r, Math.min(H - WALL - b.r, b.minatoSlashTargetY));
+    finishMinatoSlash(b);
+  } else {
+    b.x += (dx / dist) * moveDist;
+    b.y += (dy / dist) * moveDist;
+  }
+}
+
+// ── 波風水門：飛雷神斬衝刺結束，判斷是否連段 ──
+function finishMinatoSlash(b) {
+  b.minatoSlashPhase = 'idle';
+  b.vx = 0; b.vy = 0;
+  b.minatoSlashCombo = (b.minatoSlashCombo || 0) + 1;
+  if (b.minatoSlashHit && b.minatoSlashCombo < MINATO_SLASH_MAX_COMBO) {
+    const nextEnemy = getNearestEnemyTo(b.x, b.y, b.player);
+    if (nextEnemy && nextEnemy.hp > 0) {
+      startMinatoSlash(b, nextEnemy);
+      return;
+    }
+  }
+  b.minatoSlashCombo = 0;
+  b.minatoSlashCd = MINATO_SLASH_COOLDOWN;
+}
+
+// ── 波風水門：發動飛雷神二段（牆上苦無≥10時觸發） ──
+function startMinatoStage2(b, enemy) {
+  const angle = Math.atan2(enemy.y - b.y, enemy.x - b.x) || 0;
+  const extra = minatoRayToWall(b.x, b.y, angle);
+  state.minatoKunai.push({ x: extra.x, y: extra.y, angle, owner: b.player, ownerBall: b, color: b.char.color });
+  state.hitFlashes.push({ x: extra.x, y: extra.y, r: 20, alpha: 1, color: b.char.color, t: 0.3 });
+
+  const points = state.minatoKunai.filter(k => k.owner === b.player).map(k => ({ x: k.x, y: k.y }));
+  const path = [];
+  let curX = b.x, curY = b.y;
+  const remaining = points.slice();
+  while (remaining.length) {
+    let bestIdx = 0, bestDist = -1;
+    for (let i = 0; i < remaining.length; i++) {
+      const d = Math.hypot(remaining[i].x - curX, remaining[i].y - curY);
+      if (d > bestDist) { bestDist = d; bestIdx = i; }
+    }
+    const next = remaining.splice(bestIdx, 1)[0];
+    path.push(next);
+    curX = next.x; curY = next.y;
+  }
+  b.minatoStage2Active = true;
+  b.minatoStage2Path = path;
+  b.minatoStage2Index = 0;
+  b.minatoStage2HitTargets = new Set();
+  b.vx = 0; b.vy = 0;
+  b.invincible = true; // 飛雷神二段全程無敵，避免高速穿梭途中被打斷/白打
+  state.hitFlashes.push({ x: b.x, y: b.y, r: 26, alpha: 1, color: '#8ff3ff', t: 0.25 });
+}
+
+// ── 波風水門：飛雷神二段的每幀處理（在苦無間高速移動） ──
+function stepMinatoStage2(b, dt) {
+  const path = b.minatoStage2Path;
+  if (!path || b.minatoStage2Index >= path.length) { finishMinatoStage2(b); return; }
+  const target = path[b.minatoStage2Index];
+  const prevX = b.x, prevY = b.y;
+  const dx = target.x - b.x, dy = target.y - b.y;
+  const dist = Math.hypot(dx, dy);
+  const moveDist = MINATO_STAGE2_MOVE_SPEED * dt;
+  for (const foe of getEnemies(b)) {
+    if (!foe || foe.hp <= 0 || b.minatoStage2HitTargets.has(foe)) continue;
+    if (Math.hypot(foe.x - b.x, foe.y - b.y) < b.r + foe.r + 16) {
+      dealDamage(foe, MINATO_STAGE2_HIT_DAMAGE, { attackerPlayer: b.player });
+      b.minatoStage2HitTargets.add(foe);
+      state.hitFlashes.push({ x: foe.x, y: foe.y, r: 18, alpha: 0.8, color: '#8ff3ff', t: 0.15 });
+    }
+  }
+  const ARRIVE_EPS = b.r + 6; // 同飛雷神斬：終點若貼牆，中心永遠到不了原始座標，需放寬到達判定距離
+  if (dist <= moveDist || dist < ARRIVE_EPS) {
+    b.x = Math.max(WALL + b.r, Math.min(W - WALL - b.r, target.x));
+    b.y = Math.max(WALL + b.r, Math.min(H - WALL - b.r, target.y));
+    b.minatoStage2Index++;
+    b.minatoStage2HitTargets = new Set();
+    // 冰青色電光落點爆閃，區別於飛雷神斬的金色斬擊特效
+    state.slashMarks.push({ x: b.x, y: b.y, angle: 0, life: 0.22, maxLife: 0.22, hit: true, owner: b.player, style: 'minato_teleport' });
+  } else {
+    b.x += (dx / dist) * moveDist;
+    b.y += (dy / dist) * moveDist;
+  }
+  state.minatoTeleportFX.push({ x1: prevX, y1: prevY, x2: b.x, y2: b.y, life: 0.25, maxLife: 0.25, owner: b.player });
+}
+
+// ── 波風水門：飛雷神二段結束，收回苦無並進入防反狀態 ──
+function finishMinatoStage2(b) {
+  b.minatoStage2Active = false;
+  b.minatoStage2Path = null;
+  b.minatoStage2Index = 0;
+  b.vx = 0; b.vy = 0;
+  b.invincible = false;
+  state.minatoKunai = state.minatoKunai.filter(k => k.owner !== b.player);
+  b.minatoParryTimer = MINATO_PARRY_DURATION;
+  state.hitFlashes.push({ x: b.x, y: b.y, r: 40, alpha: 1.1, color: '#ffe066', t: 0.4 });
+  playHitSound('opm');
+}
+
+// ── 波風水門：發動螺旋丸（一般衝刺版／防反抓取版） ──
+function startMinatoRasengan(b, enemy) {
+  const parryMode = b.minatoParryTimer > 0;
+  if (parryMode) {
+    const ang = Math.atan2(b.y - enemy.y, b.x - enemy.x) || 0;
+    b.x = enemy.x + Math.cos(ang) * (b.r + enemy.r + 6);
+    b.y = enemy.y + Math.sin(ang) * (b.r + enemy.r + 6);
+    b.minatoRasenganPhase = 'grab';
+    b.minatoRasenganTimer = MINATO_RASENGAN_GRAB_TIME;
+    b.minatoRasenganTarget = enemy;
+    b.vx = 0; b.vy = 0; enemy.vx = 0; enemy.vy = 0;
+    b.minatoParryTimer = 0;
+    state.hitFlashes.push({ x: b.x, y: b.y, r: 24, alpha: 1, color: '#4fc3f7', t: 0.3 });
+  } else {
+    const angle = Math.atan2(enemy.y - b.y, enemy.x - b.x) || 0;
+    b.minatoRasenganPhase = 'charging';
+    b.minatoRasenganTimer = 0.25;
+    b.minatoRasenganAngle = angle;
+    b.minatoRasenganTraveled = 0;
+    b.vx = 0; b.vy = 0;
+  }
+}
+
+// ── 波風水門：一般螺旋丸衝刺段的每幀處理 ──
+function stepMinatoRasenganDash(b, dt) {
+  const speed = MINATO_RASENGAN_DASH_SPEED;
+  const moveDist = speed * dt;
+  b.x += Math.cos(b.minatoRasenganAngle) * moveDist;
+  b.y += Math.sin(b.minatoRasenganAngle) * moveDist;
+  b.minatoRasenganTraveled = (b.minatoRasenganTraveled || 0) + moveDist;
+  if (!b.minatoRasenganHit) {
+    for (const foe of getEnemies(b)) {
+      if (!foe || foe.hp <= 0) continue;
+      if (Math.hypot(foe.x - b.x, foe.y - b.y) < b.r + foe.r + 8) {
+        dealDamage(foe, MINATO_RASENGAN_DAMAGE, { attackerPlayer: b.player });
+        const kAng = Math.atan2(foe.y - b.y, foe.x - b.x) || 0;
+        foe.vx += Math.cos(kAng) * 480; foe.vy += Math.sin(kAng) * 480;
+        state.hitFlashes.push({ x: foe.x, y: foe.y, r: 42, alpha: 1.1, color: '#4fc3f7', t: 0.35 });
+        playHitSound('opm');
+        b.minatoRasenganHit = true;
+        break;
+      }
+    }
+  }
+  if (b.minatoRasenganHit || b.minatoRasenganTraveled >= MINATO_RASENGAN_DASH_DIST) {
+    b.minatoRasenganPhase = 'idle';
+    b.minatoRasenganTraveled = 0;
+    b.vx = 0; b.vy = 0;
+    b.minatoRasenganCd = MINATO_RASENGAN_COOLDOWN;
+  }
+}
+
+// ── 波風水門：防反狀態螺旋丸抓取結算 ──
+function finishMinatoRasenganGrab(b) {
+  const foe = b.minatoRasenganTarget;
+  if (foe && foe.hp > 0) {
+    dealDamage(foe, MINATO_RASENGAN_PARRY_DAMAGE, { attackerPlayer: b.player });
+    const kAng = Math.atan2(foe.y - b.y, foe.x - b.x) || 0;
+    foe.vx += Math.cos(kAng) * 600; foe.vy += Math.sin(kAng) * 600;
+    state.hitFlashes.push({ x: foe.x, y: foe.y, r: 50, alpha: 1.2, color: '#4fc3f7', t: 0.4 });
+    playHitSound('opm');
+  }
+  b.minatoRasenganPhase = 'idle';
+  b.minatoRasenganTarget = null;
+  b.vx = 0; b.vy = 0;
+  b.minatoRasenganCd = MINATO_RASENGAN_COOLDOWN;
+}
+
+// ── 波風水門：主更新（CD倒數＋自動觸發技能），每幀對場上每顆水門球呼叫一次 ──
+function updateMinato(dt) {
+  if (!state) return;
+  for (const b of state.balls) {
+    if (!b || b.hp <= 0 || b.char.type !== 'minato') continue;
+    const frozen = (state.dioWorldGlobalActive && b !== state.dioWorldCaster) || (b.arenaFrozen > 0) || b.pucciDiscFrozen || (b.gunnerStunTimer > 0) || b.obitoInSpace;
+    if (frozen) continue;
+
+    if (b.minatoParryTimer > 0) {
+      b.minatoParryTimer -= dt;
+      if (b.minatoParryTimer < 0) b.minatoParryTimer = 0;
+    }
+
+    if (b.minatoStage2Active) { stepMinatoStage2(b, dt); continue; }
+
+    if (b.minatoSlashPhase === 'charging') {
+      b.minatoSlashTimer -= dt;
+      if (b.minatoSlashTimer <= 0) {
+        b.minatoSlashPhase = 'dashing';
+        b.minatoSlashHitTargets = new Set();
+        b.minatoSlashHit = false;
+      }
+    } else if (b.minatoSlashPhase === 'dashing') {
+      stepMinatoSlashDash(b, dt);
+    }
+
+    if (b.minatoRasenganPhase === 'charging') {
+      b.minatoRasenganTimer -= dt;
+      if (b.minatoRasenganTimer <= 0) {
+        b.minatoRasenganPhase = 'dashing';
+        b.minatoRasenganHit = false;
+        b.minatoRasenganTraveled = 0;
+      }
+    } else if (b.minatoRasenganPhase === 'dashing') {
+      stepMinatoRasenganDash(b, dt);
+    } else if (b.minatoRasenganPhase === 'grab') {
+      b.minatoRasenganTimer -= dt;
+      if (b.minatoRasenganTimer <= 0) finishMinatoRasenganGrab(b);
+    }
+
+    const rasenganBusy = b.minatoRasenganPhase && b.minatoRasenganPhase !== 'idle';
+    if (b.minatoSlashPhase === 'idle' && !rasenganBusy && b.minatoSlashCd > 0) {
+      b.minatoSlashCd -= dt;
+      if (b.minatoSlashCd < 0) b.minatoSlashCd = 0;
+    }
+    if (!rasenganBusy && b.minatoRasenganCd > 0) {
+      b.minatoRasenganCd -= dt;
+      if (b.minatoRasenganCd < 0) b.minatoRasenganCd = 0;
+    }
+    if (b.minatoPassiveCd > 0) {
+      b.minatoPassiveCd -= dt;
+      if (b.minatoPassiveCd < 0) b.minatoPassiveCd = 0;
+    }
+
+    const enemy = getNearestEnemyTo(b.x, b.y, b.player);
+    if (!enemy || enemy.hp <= 0) continue;
+
+    const bothIdle = b.minatoSlashPhase === 'idle' && !rasenganBusy && !b.minatoStage2Active;
+    if (bothIdle) {
+      const wallCount = state.minatoKunai.filter(k => k.owner === b.player).length;
+      if (wallCount >= MINATO_STAGE2_KUNAI_REQ) {
+        startMinatoStage2(b, enemy);
+      } else if (b.minatoRasenganCd <= 0) {
+        startMinatoRasengan(b, enemy);
+      } else if (b.minatoSlashCd <= 0) {
+        startMinatoSlash(b, enemy);
+      }
+    }
+  }
+}
+
 function updateSummons(dt) {
   if (!state.summons || !state.summons.length) {
     // 死亡特效仍要繼續淡出，即使目前沒有任何存活的召喚物
@@ -7218,6 +7645,81 @@ function tick(now) {
     }
   }
 
+  // 波風水門「飛雷神・亂斬」擊殺演出更新（在 update 之外，避免被 early return 跳過）
+  if (state.minatoKillFX) {
+    const fx = state.minatoKillFX;
+    fx.flashAlpha = Math.max(0, fx.flashAlpha - dt * 4);
+    for (const s of fx.flurrySlashes) s.life -= dt;
+    fx.flurrySlashes = fx.flurrySlashes.filter(s => s.life > 0);
+
+    if (fx.phase === 'flurry') {
+      fx.hitTimer -= dt;
+      if (fx.hitTimer <= 0 && fx.hitIndex < fx.hits) {
+        fx.hitIndex++;
+        const b = fx.killerBall;
+        const orbitAngle = Math.random() * Math.PI * 2;
+        const orbitR = 90 + Math.random() * 70;
+        b.x = fx.targetX + Math.cos(orbitAngle) * orbitR;
+        b.y = fx.targetY + Math.sin(orbitAngle) * orbitR;
+        const slashAngle = Math.atan2(fx.targetY - b.y, fx.targetX - b.x);
+        fx.flurrySlashes.push({ angle: slashAngle, life: 0.3, maxLife: 0.3 });
+        state.hitFlashes.push({ x: fx.targetX, y: fx.targetY, r: 28, alpha: 1, color: '#ffe066', t: 0.18 });
+        fx.flashAlpha = 0.35;
+        playHitSound('opm');
+        fx.hitTimer = MINATO_KILLFX_HIT_INTERVAL;
+      } else if (fx.hitIndex >= fx.hits && fx.hitTimer <= -0.15) {
+        // 亂斬結束，將敵人砍成碎片
+        fx.phase = 'shatter';
+        fx.flashAlpha = 1;
+        const FRAG_N = 7;
+        let ang = -Math.PI / 2;
+        fx.fragments = Array.from({ length: FRAG_N }, () => {
+          const span = (Math.PI * 2) / FRAG_N;
+          const a0 = ang; ang += span;
+          const dir = a0 + span / 2;
+          return {
+            angleStart: a0, angleSpan: span,
+            offX: 0, offY: 0,
+            vx: Math.cos(dir) * (80 + Math.random() * 130),
+            vy: Math.sin(dir) * (80 + Math.random() * 130) - 60,
+            rot: 0, rotV: (Math.random() - 0.5) * 7,
+          };
+        });
+        fx.particles = Array.from({ length: 32 }, () => {
+          const pAng = Math.random() * Math.PI * 2;
+          const spd = 70 + Math.random() * 210;
+          return {
+            x: fx.targetX, y: fx.targetY,
+            vx: Math.cos(pAng) * spd, vy: Math.sin(pAng) * spd,
+            life: 0.4 + Math.random() * 0.6, maxLife: 0.5 + Math.random() * 0.5,
+            r: 2 + Math.random() * 3
+          };
+        });
+        fx.shatterTimer = MINATO_KILLFX_SHATTER_LIFE;
+        state.hitFlashes.push({ x: fx.targetX, y: fx.targetY, r: 60, alpha: 1.2, color: '#ffffff', t: 0.35 });
+        playHitSound('vampire_dash');
+      }
+    } else if (fx.phase === 'shatter') {
+      fx.shatterTimer -= dt;
+      for (const f of fx.fragments) {
+        f.offX += f.vx * dt; f.offY += f.vy * dt;
+        f.vy += 260 * dt;
+        f.rot += f.rotV * dt;
+      }
+      for (const p of fx.particles) {
+        p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 100 * dt; p.life -= dt;
+      }
+      if (fx.shatterTimer <= 0) {
+        state.minatoKillFX = null;
+        cancelAnimationFrame(gameLoop);
+        gameLoop = null;
+        const deadM = state.balls.filter(b => b.hp <= 0);
+        setTimeout(() => handleRoundEnd(deadM), 100);
+        return;
+      }
+    }
+  }
+
   // 無量空處特效更新（在 update 之外，避免被 early return 跳過）
   if (state.gojoKillFX) {
     const fx = state.gojoKillFX;
@@ -7343,8 +7845,39 @@ function tick(now) {
     return;
   }
   if (dead.length > 0) {
+    // 波風水門擊殺對手：觸發「飛雷神・亂斬」終結演出（僅限1v1、且只在一般模式觸發，排除組裝/沙盒/木偶/車輪戰）
+    if (!state.curseSliceKillFX && !state.gojoKillFX && !state.minatoKillFX) {
+      const minatoKiller = state.balls.find(b => b.hp > 0 && b.char.type === 'minato');
+      const minatoAnyDead = dead.find(b => b.char.type !== 'minato');
+      const isNormalMode = !assembleMode && !sandboxMode && !dummyPracticeMode && !wheelState;
+      if (minatoKiller && minatoAnyDead && isNormalMode && state.playerCount === 2) {
+        state.minatoKillFX = {
+          phase: 'flurry',
+          hitIndex: 0, hits: MINATO_KILLFX_HITS,
+          hitTimer: 0.15,
+          killerBall: minatoKiller,
+          targetX: minatoAnyDead.x, targetY: minatoAnyDead.y,
+          targetPlayer: minatoAnyDead.player,
+          color: minatoAnyDead.char.color,
+          flurrySlashes: [],
+          shatterTimer: 0,
+          fragments: [], particles: [],
+          flashAlpha: 0.4,
+        };
+        for (const b of state.balls) { b.vx = 0; b.vy = 0; b.invincible = true; b.attackTimer = 0; }
+        minatoAnyDead.vx = 0; minatoAnyDead.vy = 0;
+        state.hitFlashes.push({ x: minatoAnyDead.x, y: minatoAnyDead.y, r: 30, alpha: 1, color: '#ffe066', t: 0.25 });
+        gameLoop = requestAnimationFrame(tick);
+        return;
+      }
+    }
+    // 飛雷神・亂斬演出播放中
+    if (state.minatoKillFX) {
+      gameLoop = requestAnimationFrame(tick);
+      return;
+    }
     // 詛咒之王擊殺任意對手：觸發橫切動畫
-    if (!state.curseSliceKillFX && !state.gojoKillFX) {
+    if (!state.curseSliceKillFX && !state.gojoKillFX && !state.minatoKillFX) {
       const cursedKiller = state.balls.find(b => b.hp > 0 && b.char.type === 'cursed');
       const anyDead = dead.find(b => b.char.type !== 'cursed');
       if (cursedKiller && anyDead) {
@@ -7387,7 +7920,7 @@ function tick(now) {
     }
 
     // Gojo 擊殺：觸發無量空處
-    if (!state.gojoKillFX) {
+    if (!state.gojoKillFX && !state.minatoKillFX) {
       const killer = state.balls.find(b => b.hp > 0 && b.char.type === 'gojo');
       if (killer) {
         const lines = [];
@@ -7431,6 +7964,9 @@ function update(dt) {
   }
 
   const [b0, b1] = state.balls; // Note: used only for ball-ball collision of opposing first balls
+
+  // 飛雷神・亂斬演出播放中：只更新特效，跳過所有遊戲邏輯
+  if (state.minatoKillFX) return;
 
   // 無量空處播放中：只更新特效，跳過所有遊戲邏輯
   if (state.gojoKillFX) return;
@@ -7532,7 +8068,7 @@ function update(dt) {
       for (const b of state.balls) {
         if (b.hp <= 0) continue; // 已死亡不再有任何行為
         if (!arenaHealDmgAffects(b)) continue; // Sans不受場地回血影響
-        b.hp = Math.min(MAX_HP, b.hp + ARENA_GRASS_HEAL);
+        b.hp = Math.min(getBallMaxHp(b), b.hp + ARENA_GRASS_HEAL);
         state.hitFlashes.push({ x: b.x, y: b.y, r: 30, alpha: 1, color: '#66ff88', t: 0.5 });
       }
     }
@@ -7678,7 +8214,7 @@ function update(dt) {
         const enemy = (b.vampireBiteTarget && b.vampireBiteTarget.hp > 0) ? b.vampireBiteTarget : null;
         if (enemy) {
           dealDamage(enemy, VAMPIRE_BITE_DAMAGE, { attackerPlayer: b.player });
-          b.hp = Math.min(MAX_HP, b.hp + VAMPIRE_BITE_HEAL);
+          b.hp = Math.min(getBallMaxHp(b), b.hp + VAMPIRE_BITE_HEAL);
           // 傷害特效
           state.hitFlashes.push({ x: enemy.x, y: enemy.y, r: 30, alpha: 1.0, color: '#ff0055', t: 0.3 });
           // 回血特效（在吸血鬼位置）
@@ -7863,7 +8399,7 @@ function update(dt) {
             const enemy = (b.customBiteTarget && b.customBiteTarget.hp > 0) ? b.customBiteTarget : null;
             if (enemy) {
               dealDamage(enemy, VAMPIRE_BITE_DAMAGE, { attackerPlayer: b.player });
-              b.hp = Math.min(MAX_HP, b.hp + VAMPIRE_BITE_HEAL);
+              b.hp = Math.min(getBallMaxHp(b), b.hp + VAMPIRE_BITE_HEAL);
               state.hitFlashes.push({ x: enemy.x, y: enemy.y, r: 30, alpha: 1.0, color: '#ff0055', t: 0.3 });
               state.hitFlashes.push({ x: b.x, y: b.y, r: 20, alpha: 0.8, color: '#aa00ff', t: 0.25 });
               playHitSound('vampire_bite');
@@ -8200,7 +8736,7 @@ function update(dt) {
     }
 
     // 移動（凍結則不移動；虎天帝超新星蓄力視為被束縛定身，完全不動；被帶土抓進神威空間者完全凍結；冰雪場地凍結同樣完全不動；被妲己魅惑拉近時也暫停自身移動，避免抵銷拉近效果）
-    if (!b.frozenByVampire && !b.obitoInSpace && !(b.char.type === 'vampire' && b.vampireBiting) && !(b.mageFreezeTimer > 0) && !(b.itachiPinnedTimer > 0) && !b.itachiBiting && !b.tigerNovaCharging && !(b.thunderStunTimer > 0) && !(b.arenaFrozen > 0) && !(b.getoBoundTimer > 0) && !b.getoUltimateCharging && !(b.beachCurrentSuckTimer > 0) && !b.frozenByJoseph && !(b.char.type === 'joseph' && (b.josephState === 'charging' || b.josephUltimateActive)) && !(b.dajiCharmedTimer > 0) && !(b.sansGravityTimer > 0) && !b.sansUltActive && !(b.pucciGravityTimer > 0)) {
+    if (!b.frozenByVampire && !b.obitoInSpace && !(b.char.type === 'vampire' && b.vampireBiting) && !(b.mageFreezeTimer > 0) && !(b.itachiPinnedTimer > 0) && !b.itachiBiting && !b.tigerNovaCharging && !(b.thunderStunTimer > 0) && !(b.arenaFrozen > 0) && !(b.getoBoundTimer > 0) && !b.getoUltimateCharging && !(b.beachCurrentSuckTimer > 0) && !b.frozenByJoseph && !(b.char.type === 'joseph' && (b.josephState === 'charging' || b.josephUltimateActive)) && !(b.dajiCharmedTimer > 0) && !(b.sansGravityTimer > 0) && !b.sansUltActive && !(b.pucciGravityTimer > 0) && !(b.char.type === 'minato' && (b.minatoStage2Active || (b.minatoSlashPhase && b.minatoSlashPhase !== 'idle') || (b.minatoRasenganPhase && b.minatoRasenganPhase !== 'idle')))) {
       const speedMul = (b.curseSlowTimer > 0 ? CURSE_SLASH_SLOW_FACTOR : 1.0) * (b.inSandZone ? ARENA_SAND_SLOW_FACTOR : 1.0) *
         (b.char.type === 'pucci' && b.pucciHeavenActive ? b.pucciSpeedMult : 1.0) *
         (b.pucciWallClingTimer > 0 ? PUCCI_MOON_WALLCLING_SLOW : 1.0) *
@@ -8429,7 +8965,7 @@ function update(dt) {
 
       // 寶箱：碰到恢復20血（Sans不受場地回血影響）
       if (arenaHealDmgAffects(b) && state.beachChest && Math.hypot(b.x - state.beachChest.x, b.y - state.beachChest.y) < RADIUS + ARENA_BEACH_CHEST_R) {
-        b.hp = Math.min(MAX_HP, b.hp + ARENA_BEACH_CHEST_HEAL);
+        b.hp = Math.min(getBallMaxHp(b), b.hp + ARENA_BEACH_CHEST_HEAL);
         state.hitFlashes.push({ x: b.x, y: b.y, r: 30, alpha: 1, color: '#ffd700', t: 0.5 });
         state.beachChest = null;
       }
@@ -8507,7 +9043,9 @@ function update(dt) {
   // 帶土虛影/轉移/空間/虛化階段：不觸發球球碰撞；被抓入空間的敵人也不參與；火球衝刺中也排除（避免抓人前被物理碰撞彈開）
   if ((b0.char.type === 'obito' && (['ghost','teleporting','in_space','grabbing','returning'].includes(b0.obitoKamuiPhase) || b0.obitoFireballDashing || b0.obitoPhasing)) ||
       (b1.char.type === 'obito' && (['ghost','teleporting','in_space','grabbing','returning'].includes(b1.obitoKamuiPhase) || b1.obitoFireballDashing || b1.obitoPhasing)) ||
-      b0.obitoInSpace || b1.obitoInSpace) continue;
+      b0.obitoInSpace || b1.obitoInSpace ||
+      (b0.char.type === 'minato' && (b0.minatoStage2Active || (b0.minatoSlashPhase && b0.minatoSlashPhase !== 'idle') || (b0.minatoRasenganPhase === 'dashing' || b0.minatoRasenganPhase === 'grab'))) ||
+      (b1.char.type === 'minato' && (b1.minatoStage2Active || (b1.minatoSlashPhase && b1.minatoSlashPhase !== 'idle') || (b1.minatoRasenganPhase === 'dashing' || b1.minatoRasenganPhase === 'grab')))) continue;
   const dx = b1.x - b0.x, dy = b1.y - b0.y;
   const dist = Math.sqrt(dx*dx + dy*dy);
   const minDist = b0.r + b1.r;
@@ -8713,7 +9251,7 @@ function update(dt) {
           const isBreathing = jo.josephState === 'breathing';
           const dmg = isBreathing ? JOSEPH_CONTACT_DMG_RIPPLE : JOSEPH_CONTACT_DMG_BASE;
           dealDamage(target, dmg, { attackerPlayer: jo.player });
-          if (isBreathing) jo.hp = Math.min(MAX_HP, jo.hp + JOSEPH_HP_REGEN_ON_HIT);
+          if (isBreathing) jo.hp = Math.min(getBallMaxHp(jo), jo.hp + JOSEPH_HP_REGEN_ON_HIT);
           state.hitFlashes.push({ x: target.x, y: target.y, r: 16, alpha: 0.7, color: isBreathing ? '#2f7dc0' : '#7799bb', t: 0.25 });
         }
       });
@@ -9367,14 +9905,72 @@ for (let bi = 0; bi < state.balls.length; bi++) {
       if (b.yiArenaTimer <= 0) {
         b.yiArenaActive = false;
       }
-      // 強制敵人在小競技場範圍內反彈
+      // 強制範圍內「所有」敵方球都反彈（雙生／四胞胎等多球角色，每顆球各自受困，不只鎖住最近那顆）：
+      // 規則與主場地邊界撞牆完全相同（含撞牆觸發的被動效果）
       const half = YI_ARENA_SIZE;
       const ax1 = b.yiArenaCx - half, ax2 = b.yiArenaCx + half;
       const ay1 = b.yiArenaCy - half, ay2 = b.yiArenaCy + half;
-      if (enemy.x - RADIUS < ax1) { enemy.x = ax1 + RADIUS; enemy.vx = Math.abs(enemy.vx); }
-      if (enemy.x + RADIUS > ax2) { enemy.x = ax2 - RADIUS; enemy.vx = -Math.abs(enemy.vx); }
-      if (enemy.y - RADIUS < ay1) { enemy.y = ay1 + RADIUS; enemy.vy = Math.abs(enemy.vy); }
-      if (enemy.y + RADIUS > ay2) { enemy.y = ay2 - RADIUS; enemy.vy = -Math.abs(enemy.vy); }
+      for (const foe of getEnemies(b)) {
+        // 飛雷神二段瞬移期間無視此牆壁，不受阻擋
+        if (foe.char.type === 'minato' && foe.minatoStage2Active) continue;
+        let yiHitWall = false;
+        if (foe.x - RADIUS < ax1) { foe.x = ax1 + RADIUS; foe.vx =  Math.abs(foe.vx); yiHitWall = true; }
+        if (foe.x + RADIUS > ax2) { foe.x = ax2 - RADIUS; foe.vx = -Math.abs(foe.vx); yiHitWall = true; }
+        if (foe.y - RADIUS < ay1) { foe.y = ay1 + RADIUS; foe.vy =  Math.abs(foe.vy); yiHitWall = true; }
+        if (foe.y + RADIUS > ay2) { foe.y = ay2 - RADIUS; foe.vy = -Math.abs(foe.vy); yiHitWall = true; }
+
+        if (yiHitWall) {
+          // 陷阱大師：碰邊界放置尖刺
+          if (foe.char.type === 'trapper') {
+            const myTraps = state.traps.filter(t => t.owner === foe.player);
+            if (myTraps.length < TRAP_MAX_COUNT) {
+              const tx = Math.max(ax1 + 8, Math.min(ax2 - 8, foe.x + randBetween(-20, 20)));
+              const ty = Math.max(ay1 + 8, Math.min(ay2 - 8, foe.y + randBetween(-20, 20)));
+              state.traps.push({ x: tx, y: ty, owner: foe.player, color: foe.char.color, hitCooldown: 0, chainPulling: false, spawnFlash: 0.4 });
+              playHitSound('trap_place');
+            }
+          }
+          // 無名槍手：撞牆裝彈
+          if (foe.char.type === 'gunner' && !foe.gunnerFiring) {
+            foe.gunnerAmmo = Math.min(GUNNER_MAG_SIZE, foe.gunnerAmmo + GUNNER_MAG_count);
+            if (foe.gunnerAmmo >= GUNNER_MAG_SIZE) {
+              foe.gunnerFiring = true; if (state && state.stats) state.stats[foe.player].skillUses++;
+              foe.gunnerAmmoFired = 0;
+              foe.gunnerFireTimer = 0;
+            }
+          }
+          // 組裝機器人（連射零件）：撞牆裝彈，邏輯比照無名槍手
+          if (foe.char.type === 'custom' && foe.customParts && foe.customParts.basic === 'a_gunner' && !foe.customGunnerFiring) {
+            foe.customGunnerAmmo = Math.min(GUNNER_MAG_SIZE, foe.customGunnerAmmo + GUNNER_MAG_count);
+            if (foe.customGunnerAmmo >= GUNNER_MAG_SIZE) {
+              foe.customGunnerFiring = true; if (state && state.stats) state.stats[foe.player].skillUses++;
+              foe.customGunnerAmmoFired = 0;
+              foe.customGunnerFireTimer = 0;
+            }
+          }
+          // 雷電法王：碰牆放置閃電柱（貼牆）
+          if (foe.char.type === 'thunder') {
+            const myPillars = state.thunderPillars.filter(p => p.owner === foe.player);
+            if (myPillars.length < THUNDER_PILLAR_MAX) {
+              let wallSide = 'left';
+              let px = Math.round(foe.x), py = Math.round(foe.y);
+              if (foe.x - RADIUS < ax1 + 2)       { wallSide = 'left';   px = ax1; }
+              else if (foe.x + RADIUS > ax2 - 2)  { wallSide = 'right';  px = ax2; }
+              else if (foe.y - RADIUS < ay1 + 2)  { wallSide = 'top';    py = ay1; }
+              else                                  { wallSide = 'bottom'; py = ay2; }
+              const tooClose = myPillars.some(p => Math.hypot(p.x - px, p.y - py) < THUNDER_PILLAR_MIN_DIST && p.wallSide === wallSide);
+              if (!tooClose) {
+                state.thunderPillars.push({
+                  x: px, y: py, wallSide, owner: foe.player, color: foe.char.color,
+                  life: THUNDER_PILLAR_LIFETIME, spawnFlash: 0.5
+                });
+                playHitSound('trap_place');
+                state.hitFlashes.push({ x: px, y: py, r: THUNDER_SPAWN_FX_R, alpha: 1.0, color: '#f1c40f', t: 0.4 });
+              }
+            }
+          }
+        }
+      }
     }
   }
 
@@ -10879,6 +11475,7 @@ for (let bi = 0; bi < state.balls.length; bi++) {
 
   // 通用召喚物（給未來新角色用，見 spawnSummon 等函式上方的說明）
   updateSummons(dt);
+  updateMinato(dt);
 
   for (let bi = 0; bi < state.balls.length; bi++) {
     const b = state.balls[bi];
@@ -10937,6 +11534,9 @@ for (let bi = 0; bi < state.balls.length; bi++) {
             life: 0.3, maxLife: 0.3
           });
           playHitSound('samurai_iaido');
+
+          // 攻擊時也鍛造一層（跟遠離敵人時的鍛造共用同一個層數上限，永久疊加不重置）
+          b.smithForgeStacks = Math.min(b.smithForgeStacks + 1, SMITH_FORGE_MAX_STACKS);
 
           // 重置鍛造速度（攻速回到基礎值），但鍛造層數永久保留，不再清零
           b.smithForgeInterval = SMITH_FORGE_INTERVAL_BASE;
@@ -11105,8 +11705,8 @@ for (let bi = 0; bi < state.balls.length; bi++) {
       b.baieLoveTimer = BAIE_LOVE_DURATION;
       b.baieZaiePending = false;
       b.baieZaieActive = false;
-      const effMax = MAX_HP * (1 + BAIE_LOVE_HP_BONUS);
-      b.hp = Math.min(effMax, b.hp + MAX_HP * BAIE_LOVE_HP_BONUS);
+      const effMax = getBallMaxHp(b) * (1 + BAIE_LOVE_HP_BONUS);
+      b.hp = Math.min(effMax, b.hp + getBallMaxHp(b) * BAIE_LOVE_HP_BONUS);
       if (!state.standCryFX) state.standCryFX = [];
       state.standCryFX.push({ text: '愛上雷神', x: b.x, y: b.y, life: 2.2, maxLife: 2.2, color: '#e8d020', player: b.player });
       // 領域展開特效：金紫漸變衝擊波，層層外擴
@@ -11125,7 +11725,7 @@ for (let bi = 0; bi < state.balls.length; bi++) {
         b.baieZaieActive = false;
         b.baieLoveCooldownTimer = BAIE_LOVE_MIN_INTERVAL;
         b.baieKindling = (b.baieKindling || 0) + BAIE_KINDLING_ON_EXIT;
-        b.hp = Math.min(MAX_HP, b.hp); // 變身結束，超出上限的血量隨之消退
+        b.hp = Math.min(getBallMaxHp(b), b.hp); // 變身結束，超出上限的血量隨之消退
         if (!state.standCryFX) state.standCryFX = [];
         state.standCryFX.push({ text: '支柱・死星天裁', x: b.x, y: b.y, life: 1.8, maxLife: 1.8, color: '#ffaa33', player: b.player });
         const foesNow = getEnemies(b).filter(e => e.hp > 0);
@@ -11154,7 +11754,7 @@ for (let bi = 0; bi < state.balls.length; bi++) {
     if (b.rsqjsHasBombSkill) {
       if (b.rsqjsAppleBuffTimer > 0) {
         b.rsqjsAppleBuffTimer -= dt;
-        b.hp = Math.min(RSQJS_MAX_HP, b.hp + RSQJS_APPLE_HEAL_PS * dt);
+        b.hp = Math.min(getBallMaxHp(b), b.hp + RSQJS_APPLE_HEAL_PS * dt);
         if (Math.random() < 0.3) state.hitFlashes.push({ x: b.x, y: b.y, r: 16, alpha: 0.6, color: '#8fef6a', t: 0.25 });
       }
       const bombCdMul = b.rsqjsAppleBuffTimer > 0 ? 0.5 : 1;
@@ -11222,7 +11822,7 @@ for (let bi = 0; bi < state.balls.length; bi++) {
     if (b.twinRole === 'diamond' && b.rsqjsHasBombSkill) {
       if (b.rsqjsAppleBuffTimer > 0) {
         b.rsqjsAppleBuffTimer -= dt;
-        b.hp = Math.min(RSQJS_MAX_HP, b.hp + RSQJS_APPLE_HEAL_PS * dt);
+        b.hp = Math.min(getBallMaxHp(b), b.hp + RSQJS_APPLE_HEAL_PS * dt);
       }
       const bombCdMul2 = b.rsqjsAppleBuffTimer > 0 ? 0.5 : 1;
       b.rsqjsBombTimer -= dt;
@@ -11579,6 +12179,14 @@ waypoints.push({
   for (let i = state.slashMarks.length-1; i >= 0; i--) {
     state.slashMarks[i].life -= dt;
     if (state.slashMarks[i].life <= 0) state.slashMarks.splice(i, 1);
+  }
+
+  // 波風水門：飛雷神二段殘影軌跡更新
+  if (state.minatoTeleportFX) {
+    for (let i = state.minatoTeleportFX.length-1; i >= 0; i--) {
+      state.minatoTeleportFX[i].life -= dt;
+      if (state.minatoTeleportFX[i].life <= 0) state.minatoTeleportFX.splice(i, 1);
+    }
   }
 
   // 一拳超人特效更新（移至 tick() 內，確保比賽結束凍結邏輯時特效仍能正常播完）
@@ -12232,6 +12840,13 @@ waypoints.push({
               angle: p.angle, owner: p.owner, ownerBall: knifeOwnerBall, color: p.color
             });
           }
+        } else if (p.type === 'kunai' && state.minatoKunai) {
+          const pushOutR = OBSTACLE_ARENA_RADIUS + (p.r || 8);
+          const nx = odist > 0 ? odx / odist : 1, ny = odist > 0 ? ody / odist : 0;
+          state.minatoKunai.push({
+            x: W / 2 + nx * pushOutR, y: H / 2 + ny * pushOutR,
+            angle: p.angle, owner: p.owner, ownerBall: p.ownerBall, color: p.color
+          });
         }
         state.projectiles.splice(i, 1);
         continue;
@@ -12240,6 +12855,8 @@ waypoints.push({
 
     let removed = false;
     for (let bi = 0; bi < state.balls.length; bi++) {
+      // 水門的苦無本身沒有傷害，直接穿過所有角色，只在碰牆時插住
+      if (p.type === 'kunai') continue;
       // 未反彈：跳過己方；已反彈：跳過反彈者（武士），打原始 owner
       const skipPlayer = p.reflected ? p.reflectedBy : p.owner;
       if (state.balls[bi].player === skipPlayer) continue;
@@ -12367,7 +12984,7 @@ waypoints.push({
             // 技巧1：魔術師回血
             const mage = state.balls.find(m => m.player === p.owner && m.char.type === 'mage');
             if (mage) {
-              mage.hp = Math.min(MAX_HP, mage.hp + MAGE_TRICK_HEAL);
+              mage.hp = Math.min(getBallMaxHp(mage), mage.hp + MAGE_TRICK_HEAL);
               state.hitFlashes.push({ x: mage.x, y: mage.y, r: 40, alpha: 1.2, color: '#2ecc71', t: 0.55 });
               state.hitFlashes.push({ x: mage.x, y: mage.y, r: 18, alpha: 0.8, color: '#ffffff', t: 0.35 });
             }
@@ -12506,6 +13123,13 @@ waypoints.push({
         if (p.y < WALL || p.y > H-WALL) { p.vy = -p.vy; p.y = Math.max(WALL, Math.min(H-WALL, p.y)); }
       } else if (p.type === 'shimetsu') {
         state.projectiles.splice(i, 1);
+      } else if (p.type === 'kunai') {
+        p.x = Math.max(WALL + MINATO_WALL_INSET, Math.min(W-WALL-MINATO_WALL_INSET, p.x));
+        p.y = Math.max(WALL + MINATO_WALL_INSET, Math.min(H-WALL-MINATO_WALL_INSET, p.y));
+        if (state.minatoKunai) {
+          state.minatoKunai.push({ x: p.x, y: p.y, angle: p.angle, owner: p.owner, ownerBall: p.ownerBall, color: p.color });
+        }
+        state.projectiles.splice(i, 1);
       } else { state.projectiles.splice(i, 1); }
     }
   }
@@ -12571,7 +13195,7 @@ waypoints.push({
       const sd = Math.hypot(b.x - enemy.x, b.y - enemy.y);
       if (sd < ITACHI_SUSANOO_BITE_RANGE) {
         dealDamage(enemy, ITACHI_SUSANOO_BITE_DAMAGE, { attackerPlayer: b.player });
-        b.hp = Math.min(MAX_HP, b.hp + ITACHI_SUSANOO_BITE_HEAL);
+        b.hp = Math.min(getBallMaxHp(b), b.hp + ITACHI_SUSANOO_BITE_HEAL);
         const stabAngle = Math.atan2(enemy.y - b.y, enemy.x - b.x);
         state.itachiStabFX = state.itachiStabFX || [];
         state.itachiStabFX.push({
@@ -13287,7 +13911,7 @@ waypoints.push({
       const br = state.dioBreads[i];
       if (Math.hypot(b.x - br.x, b.y - br.y) < RADIUS + br.r) {
         state.dioBreads.splice(i, 1);
-        b.hp = Math.min(MAX_HP, b.hp + DIO_BREAD_HEAL);
+        b.hp = Math.min(getBallMaxHp(b), b.hp + DIO_BREAD_HEAL);
         state.hitFlashes.push({ x: b.x, y: b.y, r: 26, alpha: 0.8, color: '#e8a33d', t: 0.3 });
         if (b.pucciDiscFrozen) continue;
         const bAngle = Math.atan2(enemy.y - b.y, enemy.x - b.x);
@@ -14608,7 +15232,7 @@ waypoints.push({
             const clearAmt = Math.min(b.tigerBleedPool || 0, (dmg1 + dmg2) * 1.5);
             if (clearAmt > 0) {
               b.tigerBleedPool -= clearAmt;
-              b.hp = Math.min(MAX_HP, b.hp + clearAmt);
+              b.hp = Math.min(getBallMaxHp(b), b.hp + clearAmt);
               state.hitFlashes.push({ x: b.x, y: b.y, r: 30, alpha: 1.0, color: '#22cc66', t: 0.3 });
             }
             state.hitFlashes.push({ x: b.x, y: b.y, r: 18, alpha: 0.8, color: '#330066', t: 0.2 });
@@ -14785,7 +15409,7 @@ waypoints.push({
       b.josephRegenTimer -= dt;
       if (b.josephRegenTimer <= 0) {
         b.josephRegenTimer = JOSEPH_HP_REGEN_INTERVAL;
-        b.hp = Math.min(MAX_HP, b.hp + JOSEPH_HP_REGEN_AMOUNT);
+        b.hp = Math.min(getBallMaxHp(b), b.hp + JOSEPH_HP_REGEN_AMOUNT);
         state.hitFlashes.push({ x: b.x, y: b.y, r: 16, alpha: 0.6, color: '#66ccff', t: 0.3 });
       }
     }
@@ -14805,7 +15429,7 @@ waypoints.push({
         const isFinalHit = b.josephUltimateStep >= JOSEPH_ULTIMATE_COMBO_HITS;
         const perHitDmg = JOSEPH_ULTIMATE_COMBO_DMG / JOSEPH_ULTIMATE_COMBO_HITS;
         dealDamage(tgt, perHitDmg, { attackerPlayer: b.player });
-        b.hp = Math.min(MAX_HP, b.hp + JOSEPH_HP_REGEN_ON_HIT);
+        b.hp = Math.min(getBallMaxHp(b), b.hp + JOSEPH_HP_REGEN_ON_HIT);
         state.hitFlashes.push({ x: tgt.x, y: tgt.y, r: 22, alpha: 0.9, color: '#ffe066', t: 0.2 });
         state.josephPunchFX.push({ x: b.x, y: b.y, tx: tgt.x, ty: tgt.y, side: (b.josephUltimateStep % 2 === 0 ? 1 : -1), life: 0.2, maxLife: 0.2, owner: b.player, style: 'combo' });
         playHitSound('opm');
@@ -14820,7 +15444,7 @@ waypoints.push({
             tgt.rippleStacks = (tgt.rippleStacks || 0) + JOSEPH_ULTIMATE_FINAL_STACK;
             tgt.rippleOwnerPlayer = b.player;
           }
-          b.hp = Math.min(MAX_HP, b.hp + JOSEPH_HP_REGEN_ON_HIT);
+          b.hp = Math.min(getBallMaxHp(b), b.hp + JOSEPH_HP_REGEN_ON_HIT);
           const kdx = tgt.x - b.x, kdy = tgt.y - b.y;
           const kd = Math.hypot(kdx, kdy) || 1;
           tgt.vx += (kdx / kd) * JOSEPH_ULTIMATE_FINAL_KNOCKBACK;
@@ -14841,7 +15465,7 @@ waypoints.push({
       // 發動 Sunlight Yellow Overdrive：第一拳
       b.josephUltimateCooldown = JOSEPH_ULTIMATE_COOLDOWN;
       dealDamage(enemy, JOSEPH_ULTIMATE_FIRST_DMG, { attackerPlayer: b.player });
-      b.hp = Math.min(MAX_HP, b.hp + JOSEPH_HP_REGEN_ON_HIT);
+      b.hp = Math.min(getBallMaxHp(b), b.hp + JOSEPH_HP_REGEN_ON_HIT);
       state.hitFlashes.push({ x: enemy.x, y: enemy.y, r: 26, alpha: 1, color: '#ffe066', t: 0.3 });
       state.josephPunchFX.push({ x: b.x, y: b.y, tx: enemy.x, ty: enemy.y, life: 0.28, maxLife: 0.28, owner: b.player, style: 'first' });
       playHitSound('opm');
@@ -14861,7 +15485,7 @@ waypoints.push({
         if (b.josephDashTimer <= 0 && jDistToEnemy < JOSEPH_DASH_RANGE) {
           b.josephDashTimer = JOSEPH_DASH_COOLDOWN;
           dealDamage(enemy, JOSEPH_DASH_DAMAGE, { attackerPlayer: b.player });
-          b.hp = Math.min(MAX_HP, b.hp + JOSEPH_HP_REGEN_ON_HIT);
+          b.hp = Math.min(getBallMaxHp(b), b.hp + JOSEPH_HP_REGEN_ON_HIT);
           enemy.rippleStacks = (enemy.rippleStacks || 0) + JOSEPH_DASH_STACK;
           enemy.rippleOwnerPlayer = b.player;
           const dashAng = Math.atan2(enemy.y - b.y, enemy.x - b.x);
@@ -14871,7 +15495,7 @@ waypoints.push({
         } else if (b.josephSpringTimer <= 0 && jDistToEnemy < JOSEPH_SPRING_RANGE && jDistToEnemy >= JOSEPH_DASH_RANGE) {
           b.josephSpringTimer = JOSEPH_SPRING_COOLDOWN;
           dealDamage(enemy, JOSEPH_SPRING_DAMAGE, { attackerPlayer: b.player });
-          b.hp = Math.min(MAX_HP, b.hp + JOSEPH_HP_REGEN_ON_HIT);
+          b.hp = Math.min(getBallMaxHp(b), b.hp + JOSEPH_HP_REGEN_ON_HIT);
           enemy.rippleStacks = (enemy.rippleStacks || 0) + JOSEPH_SPRING_STACK;
           enemy.rippleOwnerPlayer = b.player;
           const springAng = Math.atan2(enemy.y - b.y, enemy.x - b.x);
@@ -15331,7 +15955,7 @@ waypoints.push({
         b.getoDotTickTimer = GETO_ENTANGLE_TICK_TIME;
         dealDamage(b, b.getoDotDmg, { attackerPlayer: b.getoDotOwnerPlayer });
         const healer = state.balls.find(x => x.player === b.getoDotOwnerPlayer);
-        if (healer && healer.hp > 0) healer.hp = Math.min(MAX_HP, healer.hp + b.getoDotDmg * GETO_ENTANGLE_HEAL_RATIO);
+        if (healer && healer.hp > 0) healer.hp = Math.min(getBallMaxHp(healer), healer.hp + b.getoDotDmg * GETO_ENTANGLE_HEAL_RATIO);
         state.hitFlashes.push({ x: b.x + randBetween(-10, 10), y: b.y + randBetween(-10, 10), r: 12, alpha: 0.7, color: '#5b3a8e', t: 0.3 });
         // 每次觸發傷害，身上長出一根新枝條
         if (!b.getoBranches) b.getoBranches = [];
@@ -15624,7 +16248,7 @@ if (!b.sakikoDualActive) {
       b.dajiCharmStun = enhanced ? DAJI_MELEE_STUN_ENH : 0;
       if (enhanced) {
         b.dajiEnhanceReady = false;
-        b.hp = Math.min(MAX_HP, b.hp + DAJI_ENH_HEAL);
+        b.hp = Math.min(getBallMaxHp(b), b.hp + DAJI_ENH_HEAL);
       }
       dajiGainTail(b);
       state.hitFlashes.push({ x: enemy.x, y: enemy.y, r: 18, alpha: 0.8, color: '#ff8ad1', t: 0.35 });
@@ -15637,7 +16261,7 @@ if (!b.sakikoDualActive) {
       b.dajiSkill2Cd = DAJI_SKILL2_CD;
       if (enhanced) {
         b.dajiEnhanceReady = false;
-        b.hp = Math.min(MAX_HP, b.hp + DAJI_ENH_HEAL);
+        b.hp = Math.min(getBallMaxHp(b), b.hp + DAJI_ENH_HEAL);
         b.dajiSkill2Channel = DAJI_ENH_CHANNEL_TIME;
         state.hitFlashes.push({ x: b.x, y: b.y, r: 22, alpha: 0.9, color: '#ff4fa3', t: 0.4 });
       } else {
@@ -16480,6 +17104,49 @@ function render() {
       ctx.globalAlpha = prog * 0.6;
       ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1; ctx.shadowBlur = 0;
       ctx.beginPath(); ctx.arc(0, 0, r * 0.5, 0, Math.PI * 2); ctx.stroke();
+    } else if (s.style === 'minato_teleport') {
+      // 飛雷神二段：位移落點的電光爆閃（冰青白色放射星紋，區別於飛雷神斬的金色斬線）
+      const r = 10 + (1 - prog) * 22;
+      ctx.strokeStyle = '#8ff3ff';
+      ctx.lineWidth = 2.2 - prog * 1.2;
+      ctx.shadowColor = '#c8feff'; ctx.shadowBlur = 16 * prog;
+      for (let k = 0; k < 8; k++) {
+        const a2 = (k / 8) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.moveTo(Math.cos(a2) * r * 0.25, Math.sin(a2) * r * 0.25);
+        ctx.lineTo(Math.cos(a2) * r, Math.sin(a2) * r);
+        ctx.stroke();
+      }
+      ctx.globalAlpha = prog * 0.7;
+      ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1.2; ctx.shadowBlur = 0;
+      ctx.beginPath(); ctx.arc(0, 0, r * 0.45, 0, Math.PI * 2); ctx.stroke();
+    } else if (s.style === 'minato_kick') {
+      // 防反反擊踢擊：金色迴旋腿部揮擊弧線＋衝擊星芒（區別於飛雷神斬的直線斬擊）
+      const r = 30 + (1 - prog) * 14;
+      ctx.strokeStyle = '#ffdd55';
+      ctx.lineWidth = 6 - prog * 4;
+      ctx.lineCap = 'round';
+      ctx.shadowColor = '#fff2b0'; ctx.shadowBlur = 20 * prog;
+      ctx.beginPath();
+      ctx.arc(0, 0, r, -Math.PI * 0.62, Math.PI * 0.18, false);
+      ctx.stroke();
+      ctx.globalAlpha = prog * 0.65;
+      ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2; ctx.shadowBlur = 0;
+      ctx.beginPath();
+      ctx.arc(0, 0, r * 0.8, -Math.PI * 0.56, Math.PI * 0.1, false);
+      ctx.stroke();
+      // 衝擊星芒：命中點向外放射的短線
+      ctx.globalAlpha = prog;
+      ctx.strokeStyle = '#fff6cc'; ctx.lineWidth = 1.6; ctx.lineCap = 'butt';
+      for (let k = 0; k < 6; k++) {
+        const a2 = -Math.PI * 0.3 + (k / 5) * Math.PI * 0.9;
+        const inner = 6, outer = 14 + (1 - prog) * 12;
+        ctx.beginPath();
+        ctx.moveTo(Math.cos(a2) * inner, Math.sin(a2) * inner);
+        ctx.lineTo(Math.cos(a2) * outer, Math.sin(a2) * outer);
+        ctx.stroke();
+      }
+      ctx.lineCap = 'butt';
     } else {
       // 解：原始斜斬痕
       const len = 55;
@@ -17276,9 +17943,105 @@ function render() {
     ctx.fillText('🔪',0,0); ctx.restore();
   }
 
+  // 波風水門：插牆苦無（飛雷神的位移標記）
+  if (state.minatoKunai) {
+    for (const k of state.minatoKunai) {
+      ctx.save(); ctx.translate(k.x, k.y); ctx.rotate(k.angle || 0);
+      ctx.fillStyle = '#d8dde3';
+      ctx.shadowColor = k.color || '#f4d35e'; ctx.shadowBlur = 8;
+      ctx.beginPath(); ctx.moveTo(10, 0); ctx.lineTo(-4, -4); ctx.lineTo(-4, 4); ctx.closePath(); ctx.fill();
+      ctx.shadowBlur = 0;
+      ctx.strokeStyle = k.color || '#f4d35e'; ctx.lineWidth = 1.6;
+      ctx.beginPath(); ctx.arc(-7, 0, 3.4, 0, Math.PI * 2); ctx.stroke();
+      ctx.restore();
+    }
+  }
+
+  // 波風水門：飛雷神二段的冰青色電光殘影軌跡／防反踢擊的金色揮擊殘影
+  if (state.minatoTeleportFX) {
+    for (const t of state.minatoTeleportFX) {
+      const prog = t.life / t.maxLife;
+      const col = t.color || '#8ff3ff';
+      ctx.save();
+      ctx.globalAlpha = prog * 0.85;
+      ctx.strokeStyle = col;
+      ctx.lineWidth = 3 * prog;
+      ctx.shadowColor = col; ctx.shadowBlur = 14 * prog;
+      // 鋸齒狀線條，強化「快速揮動／電光」的質感
+      const mx = (t.x1 + t.x2) / 2 + (Math.random() - 0.5) * 10;
+      const my = (t.y1 + t.y2) / 2 + (Math.random() - 0.5) * 10;
+      ctx.beginPath();
+      ctx.moveTo(t.x1, t.y1);
+      ctx.lineTo(mx, my);
+      ctx.lineTo(t.x2, t.y2);
+      ctx.stroke();
+      ctx.globalAlpha = prog * 0.5;
+      ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1; ctx.shadowBlur = 0;
+      ctx.beginPath(); ctx.moveTo(t.x1, t.y1); ctx.lineTo(t.x2, t.y2); ctx.stroke();
+      ctx.restore();
+    }
+  }
+
+  // 波風水門：螺旋丸持球視覺（藍色查克拉球，蓄力／衝刺／防反抓取皆顯示）
+  for (const b of state.balls) {
+    if (b.hp <= 0 || b.char.type !== 'minato') continue;
+    const phase = b.minatoRasenganPhase;
+    if (!phase || phase === 'idle') continue;
+    let angle = b.minatoRasenganAngle || 0;
+    let orbR = 14;
+    if (phase === 'charging') {
+      const prog = 1 - Math.max(0, Math.min(1, b.minatoRasenganTimer / 0.25));
+      orbR = 6 + prog * 12;
+    } else if (phase === 'dashing') {
+      orbR = 18;
+    } else if (phase === 'grab') {
+      if (b.minatoRasenganTarget) angle = Math.atan2(b.minatoRasenganTarget.y - b.y, b.minatoRasenganTarget.x - b.x) || 0;
+      const prog = 1 - Math.max(0, Math.min(1, b.minatoRasenganTimer / MINATO_RASENGAN_GRAB_TIME));
+      orbR = 10 + prog * 20;
+    }
+    const ox = b.x + Math.cos(angle) * (b.r + orbR * 0.6);
+    const oy = b.y + Math.sin(angle) * (b.r + orbR * 0.6);
+    // 衝刺時留一小段拖尾，強化推進感
+    if (phase === 'dashing') {
+      ctx.save();
+      ctx.globalAlpha = 0.4;
+      ctx.strokeStyle = '#4fc3f7';
+      ctx.lineWidth = orbR * 0.7;
+      ctx.shadowColor = '#4fc3f7'; ctx.shadowBlur = 10;
+      ctx.beginPath();
+      ctx.moveTo(ox - Math.cos(angle) * 26, oy - Math.sin(angle) * 26);
+      ctx.lineTo(ox, oy);
+      ctx.stroke();
+      ctx.restore();
+    }
+    ctx.save();
+    ctx.translate(ox, oy);
+    const spin = (Date.now() / 60) % (Math.PI * 2);
+    ctx.shadowColor = '#4fc3f7'; ctx.shadowBlur = 20;
+    const grad = ctx.createRadialGradient(-orbR * 0.3, -orbR * 0.3, 1, 0, 0, orbR);
+    grad.addColorStop(0, '#ffffff');
+    grad.addColorStop(0.35, '#bdeeff');
+    grad.addColorStop(0.7, '#4fc3f7');
+    grad.addColorStop(1, '#1565c0');
+    ctx.fillStyle = grad;
+    ctx.beginPath(); ctx.arc(0, 0, orbR, 0, Math.PI * 2); ctx.fill();
+    // 螺旋紋理：三道旋轉弧線，模擬查克拉不斷旋轉攪動的質感
+    ctx.rotate(spin);
+    ctx.strokeStyle = 'rgba(255,255,255,0.55)';
+    ctx.lineWidth = 1.6;
+    ctx.shadowBlur = 0;
+    for (let k = 0; k < 3; k++) {
+      const a0 = (k / 3) * Math.PI * 2;
+      ctx.beginPath();
+      ctx.arc(0, 0, orbR * 0.65, a0, a0 + Math.PI * 0.7);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+
 // ── 術式球飛行拖尾（共用：蒼／赫／紫皆可用，依殘影座標畫淡出光點） ──
-  function drawGojoTrail(ball, rgb) {
-    const trail = ball.trail;
+  function drawGojoTrail(ball, rgb) {    const trail = ball.trail;
     if (!trail || trail.length < 2) return;
     ctx.save();
     for (let i = 0; i < trail.length; i++) {
@@ -17687,6 +18450,22 @@ function render() {
       ctx.fillStyle = p.color;
       ctx.fillRect(-2.5, -6.5, 1.6, 13);
       ctx.restore();
+    } else if (p.type === 'kunai') {
+      ctx.filter = 'none';
+      // 拖尾：黃色高速殘影
+      const ktrailLen = 34;
+      const ktg = ctx.createLinearGradient(-ktrailLen, 0, 0, 0);
+      ktg.addColorStop(0, `${p.color}00`);
+      ktg.addColorStop(1, `${p.color}bb`);
+      ctx.strokeStyle = ktg; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(-ktrailLen, 0); ctx.lineTo(-3, 0); ctx.stroke();
+      // 苦無刀身（三角刀刃＋方形環柄）
+      ctx.fillStyle = '#d8dde3';
+      ctx.shadowColor = '#fff9c4'; ctx.shadowBlur = 6;
+      ctx.beginPath(); ctx.moveTo(9, 0); ctx.lineTo(-3, -3.5); ctx.lineTo(-3, 3.5); ctx.closePath(); ctx.fill();
+      ctx.shadowBlur = 0;
+      ctx.strokeStyle = p.color; ctx.lineWidth = 1.4;
+      ctx.beginPath(); ctx.arc(-6, 0, 3, 0, Math.PI * 2); ctx.stroke();
     } else if (p.type === 'bottle') {
       ctx.filter = 'none';
       // 拖尾：飛行方向留下淡出的酒液噴濺線條（沿用 local +x = 飛行方向的座標系）
@@ -21349,6 +22128,108 @@ function render() {
     ctx.fillStyle = rg; ctx.fill();
   }
 
+  // ── 波風水門「飛雷神・亂斬」擊殺演出 ──
+  if (state.minatoKillFX) {
+    const fx = state.minatoKillFX;
+
+    // 每次瞬移斬擊 / 碎裂瞬間的全螢幕閃光
+    if (fx.flashAlpha > 0) {
+      ctx.save();
+      ctx.globalAlpha = fx.flashAlpha * 0.6;
+      ctx.fillStyle = '#fff7cc';
+      ctx.fillRect(0, 0, W, H);
+      ctx.restore();
+    }
+
+    if (fx.phase === 'flurry') {
+      // 被凍結的敵人殘影（本體已因 hp<=0 從戰場消失，靠特效自己撐住畫面）
+      ctx.save();
+      ctx.globalAlpha = 0.92;
+      ctx.beginPath();
+      ctx.arc(fx.targetX, fx.targetY, RADIUS, 0, Math.PI * 2);
+      ctx.fillStyle = fx.color;
+      ctx.shadowColor = fx.color;
+      ctx.shadowBlur = 10;
+      ctx.fill();
+      ctx.restore();
+
+      // 每次瞬移斬擊留下的金色斬線殘影
+      for (const s of fx.flurrySlashes) {
+        const a = Math.max(0, s.life / s.maxLife);
+        ctx.save();
+        ctx.globalAlpha = a;
+        ctx.translate(fx.targetX, fx.targetY);
+        ctx.rotate(s.angle);
+        ctx.beginPath();
+        ctx.moveTo(-RADIUS * 1.8, 0);
+        ctx.lineTo(RADIUS * 1.8, 0);
+        ctx.strokeStyle = '#ffe066';
+        ctx.lineWidth = 3;
+        ctx.shadowColor = '#ffd23f';
+        ctx.shadowBlur = 16;
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // 連擊次數文字
+      ctx.save();
+      ctx.font = 'bold 14px sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillStyle = '#ffe066';
+      ctx.shadowColor = '#ffd23f'; ctx.shadowBlur = 10;
+      ctx.fillText(`⚡飛雷神・亂れ斬り ${fx.hitIndex}/${fx.hits}`, fx.targetX, fx.targetY - RADIUS - 26);
+      ctx.restore();
+    } else if (fx.phase === 'shatter') {
+      // 血粒子
+      for (const p of fx.particles) {
+        if (p.life <= 0) continue;
+        const pa = p.life / p.maxLife;
+        ctx.save();
+        ctx.globalAlpha = pa * 0.85;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = '#c0392b';
+        ctx.shadowColor = '#e74c3c';
+        ctx.shadowBlur = 6;
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // 碎片飛散（敵人被砍成碎片）
+      const fade = Math.max(0, fx.shatterTimer / MINATO_KILLFX_SHATTER_LIFE);
+      for (const f of fx.fragments) {
+        ctx.save();
+        ctx.globalAlpha = fade;
+        ctx.translate(fx.targetX + f.offX, fx.targetY + f.offY);
+        ctx.rotate(f.rot);
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.arc(0, 0, RADIUS, f.angleStart, f.angleStart + f.angleSpan);
+        ctx.closePath();
+        ctx.fillStyle = fx.color;
+        ctx.shadowColor = fx.color;
+        ctx.shadowBlur = 10;
+        ctx.fill();
+        ctx.strokeStyle = '#ffe066';
+        ctx.lineWidth = 1.5;
+        ctx.shadowBlur = 6;
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      if (fade > 0) {
+        ctx.save();
+        ctx.globalAlpha = fade;
+        ctx.font = 'bold 16px sans-serif';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillStyle = '#ffe066';
+        ctx.shadowColor = '#ffd23f'; ctx.shadowBlur = 14;
+        ctx.fillText('⚡黃色閃光・終焉', fx.targetX, fx.targetY - RADIUS - 34);
+        ctx.restore();
+      }
+    }
+  }
+
   // ── 砲爹 vs 乙骨 決鬥終結 ──
   if (state.cannonDuelFX) {
     const fx = state.cannonDuelFX;
@@ -23271,7 +24152,7 @@ function sandboxStartBattle() {
   state = {
     playerCount: activeTeams.length,
     balls: allBalls,
-    projectiles: [], wallKnives: [], hitFlashes: [], damageNumbers: [], batParticles: [], slashMarks: [], traps: [], yiBlackStones: [], yiStoneBurstFX: [], opmFX: [], momoiFanFX: [], gojoKillFX: null, curseSliceKillFX: null, elapsed: 0,
+    projectiles: [], wallKnives: [], minatoKunai: [], minatoTeleportFX: [], hitFlashes: [], damageNumbers: [], batParticles: [], slashMarks: [], traps: [], yiBlackStones: [], yiStoneBurstFX: [], opmFX: [], momoiFanFX: [], gojoKillFX: null, curseSliceKillFX: null, minatoKillFX: null, elapsed: 0,
     arena: arenaId,
     bgColor: selectedBgColor,
     thunderPillars: [],
