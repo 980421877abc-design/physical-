@@ -1111,7 +1111,7 @@ const JOHNNY_CRAWL_DAMAGE_STEP = 300;
 // ══════ 阿梅（Amelia Watson）專屬常數 ══════
 const AMELIA_MELEE_DAMAGE         = 40;
 const AMELIA_MELEE_RANGE           = 90;
-const AMELIA_MELEE_INTERVAL        = 0.7; // 【阿梅冷卻／時間】揮擊間隔（秒）
+const AMELIA_MELEE_INTERVAL        = 0.9; // 【阿梅冷卻／時間】揮擊間隔（秒）
 const AMELIA_PISTOL_DAMAGE         = 20;
 const AMELIA_PISTOL_SPEED          = 620;
 const AMELIA_PISTOL_INTERVAL       = 0.5; // 【阿梅冷卻／時間】手槍每發間隔（秒）
