@@ -575,12 +575,12 @@ vsQuotes: {
   },
 
 {
-  id: 'amelia', emoji: '🕵🏻', weapon: '🔍', name: '阿梅',
-    desc: '「真相只有一個。」來自時空盡頭的偵探，揮動放大鏡、拔槍射擊，並用懷錶與另一個自己交換命運。',
+  id: 'amelia', emoji: '🕵🏻', weapon: '🔍', name: '阿梅', image: 'image/amelia.png',
+    desc: '會說話的狐狸、魔法松鼠、超人狗狗等等，對網絡上各種關於hololive的奇聞軼事感到好奇的她，在調查這些傳聞的過程中，自己也萌生了成為偶像的想法，但意外的來到這個地方。',
     stats: ['放大鏡揮擊', '手槍射擊', 'Ground Pound', '時空旅人'],
     skills: [`近戰：靠近敵人時以放大鏡揮擊，造成${AMELIA_MELEE_DAMAGE}傷害。`, `遠程：手槍每${AMELIA_PISTOL_INTERVAL}秒射1發，每發${AMELIA_PISTOL_DAMAGE}傷害；${AMELIA_PISTOL_MAG_SIZE}發後裝填${AMELIA_PISTOL_RELOAD_TIME}秒。`, `Ground Pound：暫時消失${AMELIA_GROUND_POUND_DELAY}秒後落在敵人附近，造成${AMELIA_GROUND_POUND_DAMAGE}範圍傷害並緩速40%。`, `時空旅人：開場一次抽取${AMELIA_TIME_TRAVEL_MIN_HP}～${AMELIA_TIME_TRAVEL_MAX_HP}血，召喚同血量的阿梅。`, `被動「偵探」：放大鏡揮擊命中時疊加，最多${AMELIA_DETECTIVE_MAX_STACKS}層；每層使敵人受到的傷害增加${AMELIA_DETECTIVE_VULN_PER_STACK * 100}%。`, '被動「懷錶」：本體血量到達抽取血量時憑空消失；召喚阿梅不具備此被動。'],
     color: '#d9b15f', glowColor: 'rgba(217,177,95,0.72)', type: 'amelia',
-    winQuote: 'The game is afoot.',
-    loseQuote: '線索……還差最後一個。'
+    winQuote: 'Fast and easy... just like your mom!.',
+    loseQuote: '（摔打鍵盤的聲音）。'
   },
 ];
