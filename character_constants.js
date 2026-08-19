@@ -1271,6 +1271,3 @@ const DRAGON4_ROLES = [
 
 const RSQJS_BOMB_IMAGE = 'image/tnt-bomb.png';
 
-//  【快速調整區】天慧龍 Boss 血量
-// 只要修改下一行的數字即可調整天慧龍總血量；目前為 20000。
-const DRAGON_HP = 20000;
