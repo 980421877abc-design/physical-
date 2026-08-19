@@ -2764,6 +2764,35 @@ function drawItemIcon(ctx, imgSrc, fallbackEmoji, x, y, size) {
 // 阿梅僅限標準 1v1；其他模式與多人模式均不可使用。
 const AMELIA_CHARACTER_ID = 'amelia';
 
+// 角色資料是可由使用者直接編輯的外部檔案；UI 層不能假設每個欄位都保持原本型別。
+// 遊戲核心仍會在 startGame() 前做嚴格驗證，但選角畫面先用安全值渲染，
+// 避免單一角色的 stats/type/skills 改壞後，buildCarousels() 提前拋錯，導致開始按鈕沒有事件。
+function getCharacterRoster() {
+  return (typeof CHARACTERS !== 'undefined' && Array.isArray(CHARACTERS)) ? CHARACTERS : [];
+}
+
+function getCharacterForUI(ch, index = 0) {
+  const raw = (ch && typeof ch === 'object') ? ch : {};
+  const stats = Array.isArray(raw.stats) ? raw.stats : (raw.stats == null ? [] : [raw.stats]);
+  const skills = Array.isArray(raw.skills) ? raw.skills : (raw.skills == null ? [] : [raw.skills]);
+  return {
+    ...raw,
+    id: typeof raw.id === 'string' && raw.id.trim() ? raw.id : `invalid_character_${index + 1}`,
+    name: raw.name == null ? `未命名角色 ${index + 1}` : String(raw.name),
+    desc: raw.desc == null ? '角色資料缺少描述' : String(raw.desc),
+    stats: stats.filter(v => v != null).map(v => String(v)),
+    skills: skills.filter(v => v != null).map(v => String(v)),
+    color: typeof raw.color === 'string' && raw.color.trim() ? raw.color : '#888888',
+    glowColor: typeof raw.glowColor === 'string' && raw.glowColor.trim() ? raw.glowColor : 'rgba(136,136,136,0.6)',
+    type: typeof raw.type === 'string' && raw.type.trim() ? raw.type : 'unknown'
+  };
+}
+
+function showRosterDataWarning(message) {
+  console.error('[角色資料] ' + message);
+  alert(`角色資料有誤：${message}\\n\\n請檢查 character_roster.js 的 id、type、stats、skills 欄位。`);
+}
+
 // ──────────────── CAROUSEL STATE ────────────────
 const carouselState = {
   p1: { index: 0, selected: null, dragging: false, startX: 0, currentX: 0 },
@@ -2825,29 +2854,46 @@ function refreshOpmLock() {
 }
 
 function updateStartBtnState() {
+  const btn = document.getElementById('start-btn');
+  if (!btn) return;
   const choices = [p1Choice, p2Choice, p3Choice, p4Choice].slice(0, playerModeCount);
-  document.getElementById('start-btn').disabled = choices.some(c => !c);
+  const roster = getCharacterRoster();
+  const known = id => id === DUMMY_CHARACTER.id || roster.some(ch => ch && ch.id === id);
+  const disabled = choices.length === 0 || choices.some(id => !id || !known(id));
+  btn.disabled = disabled;
+  btn.setAttribute('aria-disabled', String(disabled));
+  btn.title = disabled ? '請先完成所有玩家的有效選角' : '';
 }
 
 function buildCarousels() {
+  const roster = getCharacterRoster();
   ['p1', 'p2', 'p3', 'p4'].forEach(p => {
     const track = document.getElementById(`${p}-track`);
     const dotsEl = document.getElementById(`${p}-dots`);
+    if (!track || !dotsEl) return;
 
-    CHARACTERS.forEach((ch, i) => {
+    roster.forEach((ch, i) => {
+      const uiCh = getCharacterForUI(ch, i);
       const card = document.createElement('div');
       card.className = 'char-card';
-      card.dataset.charId = ch.id;
+      card.dataset.charId = uiCh.id;
       card.dataset.index = i;
       card.innerHTML = `
         <div class="char-header">
-          <span class="char-emoji">${charIconHTML(ch, '1.8rem')}</span>
-          <span class="char-name">${ch.name}</span>
+          <span class="char-emoji">${charIconHTML(uiCh, '1.8rem')}</span>
+          <span class="char-name">${uiCh.name}</span>
         </div>
-        <div class="char-desc">${ch.desc}</div>
-        <div class="char-stat">${ch.stats.map(s => `<span class="stat-badge">${s}</span>`).join('')}</div>
+        <div class="char-desc">${uiCh.desc}</div>
+        <div class="char-stat">${uiCh.stats.map(s => `<span class="stat-badge">${s}</span>`).join('')}</div>
       `;
-      card.addEventListener('click', () => selectChar(p, ch.id));
+      const rawId = ch && ch.id;
+      card.addEventListener('click', () => {
+        if (typeof rawId !== 'string' || !rawId.trim()) {
+          showRosterDataWarning(`第 ${i + 1} 筆角色缺少有效的 id`);
+          return;
+        }
+        selectChar(p, rawId);
+      });
       track.appendChild(card);
     });
 
@@ -2855,7 +2901,7 @@ function buildCarousels() {
     const pageNum = document.createElement('span');
     pageNum.className = 'carousel-page-num';
     pageNum.id = `${p}-page-num`;
-    pageNum.textContent = `1 / ${CHARACTERS.length}`;
+    pageNum.textContent = `1 / ${roster.length}`;
     dotsEl.appendChild(pageNum);
 
     setupSwipe(p);
@@ -2916,21 +2962,31 @@ function setupSwipe(player) {
 
 function goToSlide(player, index) {
   const cs = carouselState[player];
-  const total = CHARACTERS.length;
+  const roster = getCharacterRoster();
+  const total = roster.length;
+  if (!cs || total === 0) {
+    showRosterDataWarning('角色清單沒有成功載入');
+    return;
+  }
   cs.index = ((index % total) + total) % total;
   const track = document.getElementById(`${player}-track`);
-  track.style.transform = `translateX(-${cs.index * 100}%)`;
+  if (track) track.style.transform = `translateX(-${cs.index * 100}%)`;
   const pageNum = document.getElementById(`${player}-page-num`);
   if (pageNum) pageNum.textContent = `${cs.index + 1} / ${total}`;
-  const currentChar = CHARACTERS[cs.index];
-  if (currentChar) selectChar(player, currentChar.id);
+  const currentChar = roster[cs.index];
+  if (currentChar && typeof currentChar.id === 'string' && currentChar.id.trim()) selectChar(player, currentChar.id);
 }
 
 function randomChar(player) {
-  const idx = Math.floor(Math.random() * CHARACTERS.length);
-  const ch = CHARACTERS[idx];
+  const roster = getCharacterRoster();
+  if (!roster.length) {
+    showRosterDataWarning('角色清單沒有成功載入');
+    return;
+  }
+  const idx = Math.floor(Math.random() * roster.length);
+  const ch = roster[idx];
   goToSlide(player, idx);
-  selectChar(player, ch.id);
+  if (ch && typeof ch.id === 'string' && ch.id.trim()) selectChar(player, ch.id);
 }
 
 function selectChar(player, charId) {
@@ -2951,9 +3007,13 @@ function selectChar(player, charId) {
     }
   });
 
-  const ch = CHARACTERS.find(c => c.id === charId);
-  document.getElementById(`${player}-selected-label`).innerHTML =
-    ch ? `✓ ${charIconHTML(ch, '1em')} ${ch.name}` : '請選擇角色';
+  const ch = getCharacterRoster().find(c => c && c.id === charId);
+  const label = document.getElementById(`${player}-selected-label`);
+  if (label) {
+    label.innerHTML = ch
+      ? `✓ ${charIconHTML(getCharacterForUI(ch), '1em')} ${getCharacterForUI(ch).name}`
+      : '請選擇角色';
+  }
 
   updateStartBtnState();
 }
@@ -3118,26 +3178,29 @@ function closeRoster() { document.getElementById('roster-modal').classList.remov
   const targetLabel = { p1: '玩家一', p2: '玩家二', p3: '玩家三', p4: '玩家四' };
 
   // ── 建立方塊圖鑑 ──
-  CHARACTERS.forEach(ch => {
+  getCharacterRoster().forEach((ch, i) => {
+    const uiCh = getCharacterForUI(ch, i);
     const sq = document.createElement('div');
     sq.className = 'roster-sq';
-    sq.dataset.charid = ch.id;
-    sq.style.setProperty('--sq-glow', ch.glowColor || (ch.color + '88'));
-    sq.innerHTML = charIconHTML(ch, '1.6rem');
+    sq.dataset.charid = uiCh.id;
+    sq.style.setProperty('--sq-glow', uiCh.glowColor || (uiCh.color + '88'));
+    sq.innerHTML = charIconHTML(uiCh, '1.6rem');
     grid.appendChild(sq);
   });
 
   function renderDetail(ch) {
+    const uiCh = getCharacterForUI(ch);
+    const skills = uiCh.skills.length ? uiCh.skills : [uiCh.desc];
     detail.innerHTML = `
-      <div class="roster-detail-card" style="border-color:${ch.color}66">
+      <div class="roster-detail-card" style="border-color:${uiCh.color}66">
         <div class="roster-detail-top">
-          <div class="roster-detail-emoji">${charIconHTML(ch, '1.9rem')}</div>
+          <div class="roster-detail-emoji">${charIconHTML(uiCh, '1.9rem')}</div>
           <div>
-            <div class="roster-detail-name" style="color:${ch.color}">${ch.name}</div>
-            <div class="roster-detail-type">${ch.type.toUpperCase()}</div>
+            <div class="roster-detail-name" style="color:${uiCh.color}">${uiCh.name}</div>
+            <div class="roster-detail-type">${uiCh.type.toUpperCase()}</div>
           </div>
         </div>
-        <ul class="roster-skill-list">${(ch.skills || [ch.desc]).map(s => `<li>${s}</li>`).join('')}</ul>
+        <ul class="roster-skill-list">${skills.map(s => `<li>${s}</li>`).join('')}</ul>
         <div class="roster-confirm-hint">再點一下圖示，選為 <b>${targetLabel[rosterTarget]}</b></div>
       </div>
     `;
@@ -3157,7 +3220,7 @@ function closeRoster() { document.getElementById('roster-modal').classList.remov
     const sq = e.target.closest('.roster-sq');
     if (!sq) return;
     const charId = sq.dataset.charid;
-    const ch = CHARACTERS.find(c => c.id === charId);
+    const ch = getCharacterRoster().find(c => c && c.id === charId);
     if (!ch) return;
 
     if (isAmeliaCharacterId(charId) && playerModeCount !== 2) {
@@ -3351,7 +3414,7 @@ function closeBossCodex() { document.getElementById('boss-codex-modal').classLis
       slot.style.cssText = 'width:34px;height:34px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:1.15rem;border:1.5px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.04);';
       const charId = ids[i];
       if (charId) {
-        const ch = CHARACTERS.find(c => c.id === charId);
+        const ch = getCharacterRoster().find(c => c && c.id === charId);
         slot.innerHTML = ch ? charIconHTML(ch, '1.1rem') : '?';
         slot.style.borderColor = ch ? ch.color : 'rgba(255,255,255,0.3)';
         slot.style.boxShadow = ch ? `0 0 8px ${ch.color}66` : '';
@@ -5923,7 +5986,7 @@ gojoChargingVisual: ch.type === 'gojo' ? false : null,
   };
 }
 
-function startGame() {
+function startGameCore() {
   const isDummyRestart = (p2Choice === DUMMY_CHARACTER.id);
   const playerChoicesForModeCheck = [p1Choice, p2Choice, p3Choice, p4Choice].slice(0, playerModeCount);
   const hasAmelia = playerChoicesForModeCheck.some(isAmeliaCharacterId);
@@ -5970,7 +6033,7 @@ function startGame() {
   const idSeenSoFar = {};
 
   const chs = playerChoices.map((id, i) => {
-    const base = id === DUMMY_CHARACTER.id ? DUMMY_CHARACTER : CHARACTERS.find(c => c.id === id);
+    const base = id === DUMMY_CHARACTER.id ? DUMMY_CHARACTER : getCharacterRoster().find(c => c && c.id === id);
     const dupTotal = idCounts[id];
     idSeenSoFar[id] = (idSeenSoFar[id] || 0) + 1;
     return {
@@ -6162,6 +6225,76 @@ function startGame() {
   elapsed  = 0;
   gameLoop = requestAnimationFrame(tick);
 
+}
+
+// 開始流程防護：角色資料檔可由使用者直接調整；若改動造成 ID 失效或必要欄位缺失，
+// 不應先把選角畫面隱藏後才在 makeBall() 內拋錯，否則使用者只會看到「按開始沒反應」。
+function validateStartChoices(choices) {
+  const issues = [];
+  (choices || []).forEach((id, index) => {
+    const slot = `P${index + 1}`;
+    if (!id) {
+      issues.push(`${slot} 尚未選擇角色`);
+      return;
+    }
+    const ch = id === DUMMY_CHARACTER.id
+      ? DUMMY_CHARACTER
+      : getCharacterRoster().find(candidate => candidate && candidate.id === id);
+    if (!ch) {
+      issues.push(`${slot} 的角色 ID「${id}」不存在`);
+      return;
+    }
+    const missing = ['name', 'type', 'stats', 'skills', 'color', 'glowColor']
+      .filter(key => ch[key] == null || (Array.isArray(ch[key]) && ch[key].length === 0));
+    if (missing.length) issues.push(`${slot}「${ch.name || id}」缺少欄位：${missing.join('、')}`);
+    if (typeof ch.type !== 'string' || !ch.type.trim()) {
+      issues.push(`${slot}「${ch.name || id}」的 type 無效`);
+    }
+  });
+  return issues;
+}
+
+function restoreSelectScreenAfterStartError(error, issues = []) {
+  if (gameLoop) cancelAnimationFrame(gameLoop);
+  gameLoop = null;
+  state = {};
+  dummyPracticeMode = false;
+  sandboxMode = false;
+  bossMode = false;
+  const gameEl = document.getElementById('game-screen');
+  const selectEl = document.getElementById('select-screen');
+  if (gameEl) gameEl.style.display = 'none';
+  if (selectEl) selectEl.style.display = 'flex';
+  updateStartBtnState();
+
+  const detail = issues.length
+    ? issues.join('；')
+    : (error && error.message ? error.message : String(error || '未知初始化錯誤'));
+  console.error('[startGame] 對局初始化失敗：', error || issues);
+  alert(`無法開始對局：${detail.slice(0, 260)}\\n\\n請檢查最近修改的角色 ID、type、stats、skills 或數值常數。`);
+}
+
+function startGame() {
+  const choices = [p1Choice, p2Choice, p3Choice, p4Choice].slice(0, playerModeCount);
+  const issues = validateStartChoices(choices);
+  if (issues.length) {
+    restoreSelectScreenAfterStartError(null, issues);
+    return false;
+  }
+
+  try {
+    startGameCore();
+    const balls = state && Array.isArray(state.balls) ? state.balls : null;
+    const malformedBall = !balls || balls.length < choices.length || balls.some(ball =>
+      !ball || !ball.char || !Number.isFinite(ball.x) || !Number.isFinite(ball.y) ||
+      !Number.isFinite(ball.vx) || !Number.isFinite(ball.vy) || !Number.isFinite(ball.hp)
+    );
+    if (malformedBall) throw new Error('角色球體初始化後含有無效數值');
+    return true;
+  } catch (error) {
+    restoreSelectScreenAfterStartError(error);
+    return false;
+  }
 }
 
 function createAmeliaClone(source, hpValue, x, y) {
