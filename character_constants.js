@@ -768,8 +768,7 @@ const RSQJS_ENCHANT_DMG_PER_LV     = 50;   // 「傷害」每級：+50最高傷�
 const RSQJS_ENCHANT_MAX_LV         = 5;    // 附魔等級上限（避免無限疊加失控）
 const RSQJS_STEALTH_DURATION = 2.0;    // 復仇後「迅捷潛行」無敵時間
 const RSQJS_STEALTH_CD       = 6.0;    // 迅捷潛行冷卻
-// ══════════════ 角色 40/42：四天之龍：次元融合（四球共享血量角色） ══════════════
-// 注意：四天之龍（DRAGON4_*）是一般角色，不是天慧龍 Boss。天慧龍 Boss 的 DRAGON_* 常數全部位於 boss_constants.js。
+// ══════════════ 四天之龍：次元融合（四球共享血量角色） ══════════════
 const DRAGON4_DMG_REDUCE       = 0.1;  // 受到傷害減免
 const DRAGON4_ENRAGE_HP        = 600;   // 血量低於此值進入強化狀態
 const DRAGON4_ENRAGE_CD_MUL    = 0.5;   // 強化狀態：技能冷卻減半
@@ -1050,8 +1049,7 @@ const EM_ARCANE_ORBIT_RADIUS             = 42;
 const EM_ARCANE_ORBIT_SPEED              = 1.8;
 const EM_ARCANE_SPARK_COUNT              = 10;
 
-// ══════════════ 角色 41/42：喬尼・喬斯達／牙 ══════════════
-// 以下 JOHNNY_* 常數對應 character_roster.js 的 id: 'johnny'。
+// 喬尼・喬斯達／牙：獨立角色系統
 const JOHNNY_MAX_HP = 1500;
 const JOHNNY_ACT1_CD = 1.5;
 const JOHNNY_ACT2_CD = 4;
@@ -1110,12 +1108,11 @@ const JOHNNY_FAMILIARITY_STEP = 30;
 const JOHNNY_OBSERVE_INTERVAL = 1.5;
 const JOHNNY_CRAWL_DAMAGE_STEP = 300;
 
-// ══════════════ 角色 42/42：阿梅（Amelia Watson） ══════════════
-// 以下 AMELIA_* 常數對應 character_roster.js 的 id: 'amelia'，位於一般角色排列最後。
-const AMELIA_MELEE_DAMAGE         = 50;
+// ══════ 阿梅（Amelia Watson）專屬常數 ══════
+const AMELIA_MELEE_DAMAGE         = 40;
 const AMELIA_MELEE_RANGE           = 90;
 const AMELIA_MELEE_INTERVAL        = 0.7; // 【阿梅冷卻／時間】揮擊間隔（秒）
-const AMELIA_PISTOL_DAMAGE         = 30;
+const AMELIA_PISTOL_DAMAGE         = 20;
 const AMELIA_PISTOL_SPEED          = 620;
 const AMELIA_PISTOL_INTERVAL       = 0.5; // 【阿梅冷卻／時間】手槍每發間隔（秒）
 const AMELIA_PISTOL_MAG_SIZE       = 6;
@@ -1274,3 +1271,6 @@ const DRAGON4_ROLES = [
 
 const RSQJS_BOMB_IMAGE = 'image/tnt-bomb.png';
 
+//  【快速調整區】天慧龍 Boss 血量
+// 只要修改下一行的數字即可調整天慧龍總血量；目前為 20000。
+const DRAGON_HP = 20000;
