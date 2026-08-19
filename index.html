@@ -4183,7 +4183,7 @@ function runGojoDualSkill(b, dt) {
     // 穿透飛行，經過敵人時每幀扣血
     if (enemy) {
       const ed = Math.sqrt((ball.x-enemy.x)**2 + (ball.y-enemy.y)**2);
-      if (ed < ball.r + RADIUS) {
+      if (ed < ball.r + getCombatRadius(enemy)) {
         dealDamage(enemy, ball.frameDmg, { attackerPlayer: b.player });
         state.hitFlashes.push({ x: enemy.x, y: enemy.y, r: 22, alpha: 0.9, color: '#00cfff', t: 0.12 });
       }
@@ -4209,7 +4209,7 @@ function runGojoDualSkill(b, dt) {
 
     if (enemy) {
       const ed = Math.sqrt((ball.x-enemy.x)**2 + (ball.y-enemy.y)**2);
-      if (ed < ball.r + RADIUS) {
+      if (ed < ball.r + getCombatRadius(enemy)) {
         dealDamage(enemy, ball.damage, { attackerPlayer: b.player });
         const kdx = enemy.x - ball.x, kdy = enemy.y - ball.y;
         const kd = Math.sqrt(kdx*kdx + kdy*kdy) || 1;
@@ -6313,6 +6313,10 @@ function ameliaGroundPoundLand(b) {
 
 function updateAmeliaGroundPound(b, dt) {
   if ((b.ameliaGroundPoundTimer || 0) <= 0) return false;
+  const dioWorldFrozen = !!(state && state.dioWorldGlobalActive &&
+    (!state.dioWorldCaster || b !== state.dioWorldCaster));
+  const cooldownFrozen = hasStatusEffect(b, 'cooldownFreeze') || (b.cooldownFreezeTimer || 0) > 0;
+  if (dioWorldFrozen || cooldownFrozen) return false;
   b.ameliaGroundPoundTimer = Math.max(0, b.ameliaGroundPoundTimer - Math.max(0, dt || 0));
   b.ameliaGroundPoundElapsed = AMELIA_GROUND_POUND_DELAY - b.ameliaGroundPoundTimer;
   b.vx = 0; b.vy = 0;
@@ -6349,11 +6353,17 @@ function spawnAmeliaPistolShot(b, enemy) {
 
 function updateAmeliaCombat(b, dt) {
   if (!b || !b.char || b.char.type !== 'amelia' || b.hp <= 0 || b.ameliaPermanentGone) return;
+  // DIO 世界時停與冷卻凍結都必須在 Ground Pound 分支之前判斷，否則
+  // Ground Pound 的蓄力／落地，以及手槍、換彈、放大鏡攻擊 CD 仍會繼續倒數。
+  const dioWorldFrozen = !!(state && state.dioWorldGlobalActive &&
+    (!state.dioWorldCaster || b !== state.dioWorldCaster));
+  const cooldownFrozen = hasStatusEffect(b, 'cooldownFreeze') || (b.cooldownFreezeTimer || 0) > 0;
+  if (dioWorldFrozen || cooldownFrozen || b.frozenByVampire || b.obitoInSpace || b.pucciDiscFrozen || isBallInBossDryPowderZone(b)) return;
   if (b.ameliaDetectiveFlash > 0) b.ameliaDetectiveFlash = Math.max(0, b.ameliaDetectiveFlash - dt);
   if (b.ameliaGroundPoundPulse > 0) b.ameliaGroundPoundPulse = Math.max(0, b.ameliaGroundPoundPulse - dt);
   if (b.ameliaGroundPoundImpactTimer > 0) b.ameliaGroundPoundImpactTimer = Math.max(0, b.ameliaGroundPoundImpactTimer - dt);
   if (b.ameliaGroundPoundTimer > 0) { updateAmeliaGroundPound(b, dt); return; }
-  if (b.frozenByVampire || b.obitoInSpace || b.pucciDiscFrozen || isBallInBossDryPowderZone(b)) return;
+  
   if ((b.ameliaGroundPoundCooldown || 0) > 0) {
     b.ameliaGroundPoundCooldown = Math.max(0, b.ameliaGroundPoundCooldown - dt);
   }
@@ -6810,6 +6820,14 @@ function triggerAmeliaWatchDefeat(target) {
 }
 
 function dealDamage(target, dmg, options = {}) {
+  // 世界時停的最後一道保護：即使某個角色的攻擊入口漏掉個別 frozen guard，
+  // 非 DIO 施放者仍不能在時停中對任何目標造成傷害；DIO 自己的攻擊則保留。
+  if (state && state.dioWorldGlobalActive && state.dioWorldCaster) {
+    const attacker = options.attackerBall || (options.attackerPlayer != null
+      ? state.balls.find(ball => ball && ball.player === options.attackerPlayer)
+      : null);
+    if (!options.codeKill && attacker && attacker.player !== state.dioWorldCaster.player) return;
+  }
   if (target && target._isSummonTarget) return damageTargetableSummon(target, dmg, options);
   // codeKill：真正的代碼殺，只由一拳超人／系統級斬殺使用；穿透完整生存機制。
   const trueDamage = options.trueDamage === true;
@@ -7320,6 +7338,15 @@ function purgeDeadPlayerEntities(player, deadBall) {
       ownerBall.dioWorldActive = false;
       ownerBall.dioHighActive = false;
       ownerBall.dioWorldTimer = 0;
+      ownerBall.dioWorldKnifeTimer = 0;
+      ownerBall.dioRushing = false;
+      ownerBall.dioRushTimer = 0;
+      ownerBall.dioSteamrollerPending = false;
+      if (state.dioWorldCaster === ownerBall) {
+        state.dioWorldGlobalActive = false;
+        state.dioWorldCaster = null;
+      }
+      if (state.dioSteamroller && state.dioSteamroller.owner === ownerBall.player) state.dioSteamroller = null;
     }
     // 其餘同樣「靠自己更新迴圈才會關閉、迴圈卻在 hp<=0 時整段跳過」的技能狀態，
     // 死亡時一併重置，避免殘留的展開特效/持續判定卡住畫面。
@@ -8150,6 +8177,11 @@ function updateSummonDamageOverTime(dt) {
 }
 
 // 從場上找出離 (x,y) 最近、且玩家編號不是 excludePlayer、還活著的球或夏油咒靈召喚物
+function getCombatRadius(target) {
+  const radius = Number(target && (target.r ?? target.radius));
+  return Number.isFinite(radius) && radius > 0 ? radius : RADIUS;
+}
+
 function getNearestEnemyTo(x, y, excludePlayer, targetFilter = null) {
   let best = null, bestD = Infinity;
   const candidates = getAllCombatTargets();
@@ -8737,7 +8769,36 @@ function updateDragonGroupBattle(dt) {
   return true;
 }
 
+function primeDioWorldActivations(dt) {
+  if (!state || !state.balls || state.matchEnded || state.bossWorldSlashFX || state.minatoKillFX ||
+      state.gojoKillFX || state.curseSliceKillFX || state.cannonDuelFX || state.ameliaWatchDepartureActive) return;
+  const step = Math.max(0, Number(dt) || 0);
+  // 先把上一幀已啟動的世界同步成全域狀態，不能等到角色更新中段才建立快照。
+  const activeDio = state.balls.find(b => b && b.hp > 0 && b.char && b.char.type === 'dio' && b.dioWorldActive);
+  state.dioWorldGlobalActive = !!activeDio;
+  state.dioWorldCaster = activeDio || null;
+  for (const b of state.balls) {
+    if (!b || b.hp <= 0 || !b.char || b.char.type !== 'dio' || b.dioWorldActive) continue;
+    // 與正式 DIO 邏輯相同：被定身、光碟／乾粉凍結或冷卻凍結時不能開世界。
+    if ((b.thunderParalyzed || 0) > 0 || b.pucciDiscFrozen || isBallInBossDryPowderZone(b) || hasStatusEffect(b, 'cooldownFreeze')) continue;
+    const cooldown = Number(b.dioWorldCooldownTimer);
+    // 正式更新稍後會把 cooldown 減去 dt；若本幀會歸零，先在角色攻擊前啟動時停。
+    if (!Number.isFinite(cooldown) || cooldown > step) continue;
+    b.dioWorldActive = true;
+    state.dioWorldGlobalActive = true;
+    state.dioWorldCaster = b;
+    b.dioWorldTimer = DIO_WORLD_DURATION * (pucciHeavenPresent() ? PUCCI_HEAVEN_DIOWORLD_SHORTEN : 1);
+    b.dioWorldKnifeTimer = 0;
+    b.dioWorldCooldownTimer = DIO_WORLD_COOLDOWN;
+    playHitSound('knife');
+    if (!state.standCryFX) state.standCryFX = [];
+    state.standCryFX.push({ text: 'The WORLD', x: b.x, y: b.y, life: 1.8, maxLife: 1.8, color: '#ff4444', player: b.player });
+  }
+}
+
 function update(dt) {
+  // 時停啟動預判必須先於 Boss 與角色更新，避免冷卻剛好歸零時敵人先偷打一擊。
+  primeDioWorldActivations(dt);
   // Boss 專屬狀態必須先於 matchEnded 判斷處理，否則宿儺第一條血歸零會被當成戰敗。
   if (bossMode) updateRegisteredBosses(dt);
   // 世界斬演出期間只讓宿儺自己的世界斬計時器與外部特效繼續更新。
@@ -10748,7 +10809,7 @@ for (let bi = 0; bi < state.balls.length; bi++) {
 
       // 碰敵人
       const ed = Math.sqrt((ball.x-enemy.x)**2+(ball.y-enemy.y)**2);
-      if (ed < ball.r+RADIUS) {
+      if (ed < ball.r + getCombatRadius(enemy)) {
         if (ball.type==='purple' || ball.type==='blue') {
           // 穿透飛行，經過時每幀扣血
           dealDamage(enemy, ball.frameDmg, { attackerPlayer: b.player });
@@ -12477,7 +12538,7 @@ for (let bi = 0; bi < state.balls.length; bi++) {
           const cos = Math.cos(lz.angle), sin = Math.sin(lz.angle);
           const localX = dx * cos + dy * sin;
           const localY = -dx * sin + dy * cos;
-          if (localX > 0 && localX < lz.length && Math.abs(localY) < lz.width / 2 + RADIUS) {
+          if (localX > 0 && localX < lz.length && Math.abs(localY) < lz.width / 2 + getCombatRadius(target)) {
             dealDamage(target, CANNON_BEAM_DAMAGE, { attackerPlayer: lz.owner });
             lz.hit = true;
             state.hitFlashes.push({ x: target.x, y: target.y, r: 28, alpha: 1.0, color: '#ffd9a0', t: 0.3 });
@@ -12797,7 +12858,7 @@ for (let bi = 0; bi < state.balls.length; bi++) {
           const cos = Math.cos(lz.angle), sin = Math.sin(lz.angle);
           const localX = dx * cos + dy * sin;
           const localY = -dx * sin + dy * cos;
-          if (localX > 0 && localX < lz.length && Math.abs(localY) < lz.width / 2 + RADIUS) {
+          if (localX > 0 && localX < lz.length && Math.abs(localY) < lz.width / 2 + getCombatRadius(target)) {
             dealDamage(target, ENGINEER_LASER_DAMAGE, { attackerPlayer: lz.owner });
             lz.hit = true;
             state.hitFlashes.push({ x: target.x, y: target.y, r: 30, alpha: 1.0, color: '#aee0ff', t: 0.3 });
@@ -13621,7 +13682,7 @@ waypoints.push({
       const enemy = getNearestEnemyTo(p.x, p.y, p.owner);
       if (enemy) {
         const dist = Math.hypot(enemy.x - p.x, enemy.y - p.y);
-        if (dist < RADIUS + p.r) {
+        if (dist < getCombatRadius(enemy) + p.r) {
           dealDamage(enemy, p.damage, { attackerPlayer: p.owner });
           p.hit = true;
           state.hitFlashes.push({ x: enemy.x, y: enemy.y, r: 22, alpha: 0.85, color: '#aaaaff', t: 0.25 });
@@ -13920,7 +13981,7 @@ waypoints.push({
         for (const target of state.balls) {
           if (target.hp <= 0 || target.player === b.player) continue;
           const bd = Math.hypot(bone.x - target.x, bone.y - target.y);
-          if (bd < RADIUS + 8) {
+          if (bd < getCombatRadius(target) + 8) {
             bone.tickTimer = SANS_BONE_TICK;
             dealDamage(target, SANS_BONE_DAMAGE, { attackerPlayer: b.player });
             state.hitFlashes.push({ x: target.x, y: target.y, r: 14, alpha: 1, color: '#ffffff', t: 0.15 });
@@ -14009,11 +14070,11 @@ waypoints.push({
       for (const target of getAllCombatTargets()) {
         if (target.hp <= 0 || target.player === wall.owner) continue;
         const withinBand = wall.horizontal
-          ? Math.abs(target.x - wall.center) < wall.len / 2 + RADIUS
-          : Math.abs(target.y - wall.center) < wall.len / 2 + RADIUS;
+          ? Math.abs(target.x - wall.center) < wall.len / 2 + getCombatRadius(target)
+          : Math.abs(target.y - wall.center) < wall.len / 2 + getCombatRadius(target);
         const closeToLine = wall.horizontal
-          ? Math.abs(target.y - wall.pos) < RADIUS + 6
-          : Math.abs(target.x - wall.pos) < RADIUS + 6;
+          ? Math.abs(target.y - wall.pos) < getCombatRadius(target) + 6
+          : Math.abs(target.x - wall.pos) < getCombatRadius(target) + 6;
         if (withinBand && closeToLine) {
           dealDamage(target, SANS_WALL_DAMAGE, { attackerPlayer: wall.owner });
           state.hitFlashes.push({ x: target.x, y: target.y, r: 22, alpha: 0.9, color: '#e8e8e8', t: 0.25 });
@@ -14040,7 +14101,7 @@ waypoints.push({
       const cosA = Math.cos(lz.angle), sinA = Math.sin(lz.angle);
       const localX = dx * cosA + dy * sinA;
       const localY = -dx * sinA + dy * cosA;
-      if (localX > 0 && localX < lz.length && Math.abs(localY) < lz.width / 2 + RADIUS) {
+      if (localX > 0 && localX < lz.length && Math.abs(localY) < lz.width / 2 + getCombatRadius(target)) {
         dealDamage(target, lz.damage, { attackerPlayer: lz.owner });
         lz.hitSet.add(target);
         state.hitFlashes.push({ x: target.x, y: target.y, r: 30, alpha: 1, color: '#dff0ff', t: 0.3 });
@@ -14107,7 +14168,7 @@ waypoints.push({
         const dx = target.x - fz.x, dy = target.y - fz.y;
         const localX = dx * cosA + dy * sinA;
         const localY = -dx * sinA + dy * cosA;
-        if (localX > 0 && localX < hitDist && Math.abs(localY) < fz.width / 2 + RADIUS) hitDist = localX;
+        if (localX > 0 && localX < hitDist && Math.abs(localY) < fz.width / 2 + getCombatRadius(target)) hitDist = localX;
       }
       const blastX = fz.x + cosA * hitDist, blastY = fz.y + sinA * hitDist;
       const blastR = (fz.blastR != null ? fz.blastR : CURSE_KAMADO_BLAST_R) * (fz.scale || 1);
@@ -14503,7 +14564,7 @@ waypoints.push({
       // 帶土虛化態：吸收命中自己的投射物到口袋
       if (b.char && b.char.type === 'obito' && b.obitoPhasing) {
         const pd2 = Math.sqrt((p.x-b.x)**2 + (p.y-b.y)**2);
-        if (pd2 < RADIUS + 10) {
+        if (pd2 < getCombatRadius(b) + 10) {
           if (!b.obitoAbsorbStored) b.obitoAbsorbStored = [];
           if (b.obitoAbsorbStored.length < OBITO_ABSORB_MAX_STORED) {
             b.obitoAbsorbStored.push({ origType: p.type, origColor: p.color || '#ffffff', damage: p.damage || 30 });
@@ -14527,7 +14588,7 @@ waypoints.push({
         }
       }
       const pd = Math.sqrt((p.x-b.x)**2 + (p.y-b.y)**2);
-      if (pd < RADIUS+10) {
+      if (pd < getCombatRadius(b) + 10) {
         // 末代武士招架反彈
         if (b.char.type === 'samurai' && b.samuraiParrying &&
             p.owner !== b.player) {
@@ -14715,7 +14776,7 @@ waypoints.push({
           const blastX = b.x, blastY = b.y;
           if (ownerBall) {
             for (const foe of getEnemies(ownerBall)) {
-              if (Math.hypot(foe.x - blastX, foe.y - blastY) < STEVE_FIREWORK_SPLASH_RADIUS + RADIUS) {
+              if (Math.hypot(foe.x - blastX, foe.y - blastY) < STEVE_FIREWORK_SPLASH_RADIUS + getCombatRadius(foe)) {
                 dealDamage(foe, p.damage, { attackerPlayer: p.owner });
               }
             }
@@ -15630,6 +15691,8 @@ waypoints.push({
           b.dioBreadEaten = 0;
           b.dioHighActive = true;
           b.dioWorldActive = true;
+          state.dioWorldGlobalActive = true;
+          state.dioWorldCaster = b;
           b.dioWorldTimer = DIO_WORLD_HIGH_DURATION * (pucciHeavenPresent() ? PUCCI_HEAVEN_DIOWORLD_SHORTEN : 1);
           b.dioWorldKnifeTimer = 0;
           b.dioWorldCooldownTimer = DIO_WORLD_COOLDOWN;
@@ -15654,6 +15717,8 @@ waypoints.push({
         b.dioWorldCooldownTimer = 2.0; // 打斷：2秒後再試
       } else {
       b.dioWorldActive = true;
+      state.dioWorldGlobalActive = true;
+      state.dioWorldCaster = b;
       b.dioWorldTimer = DIO_WORLD_DURATION * (pucciHeavenPresent() ? PUCCI_HEAVEN_DIOWORLD_SHORTEN : 1);
       b.dioWorldKnifeTimer = 0;
       b.dioWorldCooldownTimer = DIO_WORLD_COOLDOWN;
@@ -27985,8 +28050,15 @@ function getBossTotalHp(definitionOrBoss) {
 
 function updateRegisteredBosses(dt) {
   if (!state || !state.balls) return;
+  // Boss 更新原本在 DIO 世界快照建立前執行，若只依賴稍後才更新的
+  // state.dioWorldGlobalActive，天慧龍會在時停中多跑一幀甚至持續放招。
+  // 直接檢查 DIO 本體的 active 狀態，確保同一幀也能凍結敵方 Boss。
+  const activeDio = state.balls.find(ball =>
+    ball && ball.char && ball.char.type === 'dio' && ball.dioWorldActive
+  ) || (state.dioWorldGlobalActive ? state.dioWorldCaster : null);
   for (const ball of state.balls) {
     if (!ball || !ball.char || !ball.char.isBoss) continue;
+    if (activeDio && ball !== activeDio) continue;
     const definition = getBossDefinitionForBall(ball);
     if (definition && typeof definition.update === 'function') definition.update(ball, dt);
   }
@@ -28950,6 +29022,8 @@ function dragonUpdateQi(boss, dt) {
 function updateBossDragon(dt, boss) {
   const gs = getDragonBattleState();
   if (!gs || !state || boss.hp <= 0) return;
+  // 天慧龍與 DIO 為敵對隊伍時，世界時停中不可推進蓄力、冷卻、爆炸或彗星流程。
+  if (state.dioWorldGlobalActive && (!state.dioWorldCaster || boss !== state.dioWorldCaster)) return;
   boss.dragonStationary = false;
   if (state.dragonCometNotice) {
     state.dragonCometNotice.life -= dt;
