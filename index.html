@@ -2608,6 +2608,7 @@ const BASE_SPEED         = 140;
 let bossMode = false;                 // 是否正處於Boss模式
 let bossPicks = [];                  // 玩家依序挑選的出戰角色id；至少1名，不設固定人數上限
 let bossPickStep = 0;
+let bossLastBattleConfig = null; // 最近一次 Boss 挑戰的隊伍與 Boss 定義，供失敗／成功後「再戰一局」沿用
 
 // ============================================================================
 // BOSS CONFIG EXTERNALIZED: complete Sukuna and Tianhui/Valstrax Boss values
@@ -2621,9 +2622,9 @@ function curseC(ch, ball) {
 
 // ============================================================================
 </script>
-<script src="character_constants.js"></script>
+<script src="character_constants.js?v=tsukuyomi-dual-stab-1"></script>
 <script src="boss_constants.js"></script>
-<script src="character_roster.js"></script>
+<script src="character_roster.js?v=kashimo-deer-icon-2"></script>
 
 <script>
 // ============================================================================
@@ -2761,7 +2762,7 @@ function drawItemIcon(ctx, imgSrc, fallbackEmoji, x, y, size) {
   }
 }
 
-// 阿梅僅限標準 1v1；其他模式與多人模式均不可使用。
+// 阿梅的懷錶在 1v1 會直接結算敗北；多人模式則只讓阿梅離場，戰鬥繼續。
 const AMELIA_CHARACTER_ID = 'amelia';
 
 // 角色資料是可由使用者直接編輯的外部檔案；UI 層不能假設每個欄位都保持原本型別。
@@ -2829,7 +2830,7 @@ function setPlayerMode(count) {
 
 // 三人以上混戰時，機制在多人場面會失衡的角色停用選取：
 // 一拳超人（一擊必殺）、DIO（世界時停對多人影響過大）
-const LOCKED_IN_MULTI = ['opm', 'dio', 'rsqjs', 'dragon4', 'momoi', AMELIA_CHARACTER_ID]; // 多人模式停用：特殊多球角色與僅限1v1的阿梅
+const LOCKED_IN_MULTI = ['opm', 'dio', 'rsqjs', 'dragon4', 'momoi']; // 多人模式停用：特殊多球角色；阿梅可用於多人測試
 
 function isAmeliaCharacterId(charId) {
   return charId === AMELIA_CHARACTER_ID;
@@ -2990,7 +2991,6 @@ function randomChar(player) {
 }
 
 function selectChar(player, charId) {
-  if (isAmeliaCharacterId(charId) && playerModeCount !== 2) return; // 阿梅僅限標準1v1
   if (LOCKED_IN_MULTI.includes(charId) && playerModeCount >= 3) return; // 三人以上禁用
   const cs = carouselState[player];
   cs.selected = charId;
@@ -3223,10 +3223,6 @@ function closeRoster() { document.getElementById('roster-modal').classList.remov
     const ch = getCharacterRoster().find(c => c && c.id === charId);
     if (!ch) return;
 
-    if (isAmeliaCharacterId(charId) && playerModeCount !== 2) {
-      renderDetail(ch); // 阿梅僅限標準1v1，其他模式只能預覽
-      return;
-    }
     if (LOCKED_IN_MULTI.includes(charId) && playerModeCount >= 3) {
       renderDetail(ch); // 仍可預覽技能，但不能選取
       return;
@@ -3491,10 +3487,6 @@ document.getElementById('wheel-btn')?.addEventListener('click', () => window.ope
 
 // 開始一場車輪戰：建立 wheelState 並打第一場（雙方各自隊伍第1位）
 function startWheelBattle() {
-  if (wheelPicks.some(isAmeliaCharacterId)) {
-    alert('阿梅僅限標準 1v1，無法加入車輪戰。');
-    return;
-  }
   const newWheelState = {
     teamA: wheelPicks.slice(0, 3),
     teamB: wheelPicks.slice(3, 6),
@@ -3912,7 +3904,7 @@ function runCustomSusanooSkill(b, dt) {
     if (target && e.susanooStabTimer <= 0 && Math.hypot(target.x - b.x, target.y - b.y) < ITACHI_SUSANOO_BITE_RANGE + b.r - RADIUS) {
       e.susanooStabTimer = CUSTOM_SUSANOO_STAB_INTERVAL;
       dealDamage(target, CUSTOM_SUSANOO_STAB_DAMAGE, { attackerPlayer: b.player });
-      state.itachiStabFX.push({ x: b.x, y: b.y, angle: Math.atan2(target.y - b.y, target.x - b.x), life: 0.28, maxLife: 0.28 });
+      state.itachiStabFX.push({ x: b.x, y: b.y, angle: Math.atan2(target.y - b.y, target.x - b.x), life: 0.34, maxLife: 0.34, phase: (b.x * 0.017 + b.y * 0.013) % (Math.PI * 2) });
       state.hitFlashes.push({ x: target.x, y: target.y, r: 34, alpha: 1, color: '#ff3333', t: 0.3 });
     }
     if (e.susanooTimer <= 0) {
@@ -4147,7 +4139,7 @@ function runOpmPunchSkill(b, dt) {
   b.customExtra.opmPunchTimer = customExtraGet(b, 'opmPunchTimer', CUSTOM_OPM_PUNCH_INTERVAL) - dt;
   if (b.customExtra.opmPunchTimer <= 0) {
     b.customExtra.opmPunchTimer = CUSTOM_OPM_PUNCH_INTERVAL;
-    const enemy = getNearestEnemyTo(b.x, b.y, b.player);
+    const enemy = getNearestPlayerEnemyTo(b.x, b.y, b.player);
     if (enemy) {
       dealDamage(enemy, MAX_HP, { attackerPlayer: b.player, codeKill: true });
       state.hitFlashes.push({ x: enemy.x, y: enemy.y, r: 60, alpha: 1, color: '#ffffff', t: 0.5 });
@@ -4351,9 +4343,16 @@ let updateWuxingFn = null; // 無形的變身更新邏輯，稍後在下面賦�
 document.getElementById('start-btn').addEventListener('click', startGame);
 document.getElementById('replay-btn').addEventListener('click', () => {
   // Boss 戰雖借用 sandboxMode 的多球戰鬥引擎，但結果頁不能因此誤回沙盒。
+  // 必須沿用最近一場的 Boss 定義；尤其天慧龍討伐失敗後不能退回 BOSS_CHARACTERS[0] 的宿儺。
   if (bossMode) {
-    const ids = Array.isArray(bossPicks) ? bossPicks.filter(Boolean) : [];
-    if (ids.length >= 1) launchBossBattle(ids, BOSS_CHARACTERS[0]);
+    const saved = bossLastBattleConfig;
+    const ids = Array.isArray(saved?.teamIds) && saved.teamIds.length
+      ? saved.teamIds.slice()
+      : (Array.isArray(bossPicks) ? bossPicks.filter(Boolean) : []);
+    const bossId = saved?.bossDefinitionId || null;
+    const selectedBoss = (BOSS_CHARACTERS || []).find(b => b.id === bossId || b.type === bossId)
+      || BOSS_CHARACTERS[0];
+    if (ids.length >= 1 && selectedBoss) launchBossBattle(ids, selectedBoss, bossId || selectedBoss);
     else startBossMode();
   } else if (sandboxMode) {
     sandboxStartBattle();
@@ -4522,8 +4521,8 @@ function forfeitGame() {
   overlay.classList.add('show');
 }
 
-const P1_COLORS ={ chef:'#e84545',drunk:'#7b4cca', opm:'#f5f5f5', vampire:'#8b1a8b', gojo:'#00cfff', cursed:'#c0392b', trapper:'#27ae60', yi:'#e8e8e8', gunner:'#f0c84a', samurai:'#d4af37', mage:'#9b59b6', thunder:'#f1c40f', blacksmith:'#cd7f32', naoya:'#c8c8e8', itachi:'#8b0000', yuta:'#ff6fa5', engineer:'#3a8fd6', cannondad:'#bdbdbd', dio:'#f5d020', tiger:'#cc2200', stargirl:'#ffe066', obito:'#ff6600', fisherman:'#4a90d9', geto:'#5b3a8e', sakiko:'#c9a4d1', joseph:'#2f7dc0', steve:'#4a8f3c',daji:'#e08ac7',yuki:'#f0c84a',wuxing:'#9b8cce',sans:'#e8e8e8',pucci:'#8e6bbf',baie:'#e8c840',rsqjs:'#e84b4b',dragon4:'#c9a959',nanami:'#3d5a80',momoi:'#f2a65a',oniichan:'#c41e3a',minato:'#f4d35e',elementmaster:'#8e6fd6', johnny:'#3b82f6', amelia:'#d6b36a' };
-const P2_COLORS = { chef:'#ff9f43', drunk:'#48dbfb', opm:'#aaaaaa', vampire:'#cc44cc', gojo:'#7ff8ff', cursed:'#e74c3c', trapper:'#2ecc71', yi:'#cccccc', gunner:'#f0c040', samurai:'#ffe88a', mage:'#d7aefb', thunder:'#ffe066', blacksmith:'#e8a840', naoya:'#aaaacc', itachi:'#ff3333', yuta:'#ffa3c8', engineer:'#7ec8ff', cannondad:'#787878', dio:'#fff066', tiger:'#ff4422', stargirl:'#fff5aa', obito:'#ffaa44', fisherman:'#8ec6ff', geto:'#a678e0', sakiko:'#e8cdf0', joseph:'#6fb8ee', steve:'#8fd96b',daji:'#e8cdf8' ,yuki:'#b8960b',wuxing:'#c3b8e8',sans:'#a8d8f0',pucci:'#c9a8e8',baie:'#a86fe0',rsqjs:'#3fa9e8',dragon4:'#e8d38f',nanami:'#7e9cc4',momoi:'#ffcf8f',oniichan:'#ff5566',minato:'#fff0a3',elementmaster:'#bfa4ff', johnny:'#9fc2ff', amelia:'#f4d37b'};
+const P1_COLORS ={ chef:'#e84545',drunk:'#7b4cca', opm:'#f5f5f5', vampire:'#8b1a8b', gojo:'#00cfff', cursed:'#c0392b', trapper:'#27ae60', yi:'#e8e8e8', gunner:'#f0c84a', samurai:'#d4af37', mage:'#9b59b6', thunder:'#f1c40f', blacksmith:'#cd7f32', naoya:'#c8c8e8', itachi:'#8b0000', yuta:'#ff6fa5', engineer:'#3a8fd6', cannondad:'#bdbdbd', dio:'#f5d020', tiger:'#cc2200', stargirl:'#ffe066', obito:'#ff6600', fisherman:'#4a90d9', geto:'#5b3a8e', sakiko:'#c9a4d1', joseph:'#2f7dc0', steve:'#4a8f3c',daji:'#e08ac7',yuki:'#f0c84a',wuxing:'#9b8cce',sans:'#e8e8e8',pucci:'#8e6bbf',baie:'#e8c840',rsqjs:'#e84b4b',dragon4:'#c9a959',nanami:'#3d5a80',momoi:'#f2a65a',oniichan:'#c41e3a',minato:'#f4d35e',elementmaster:'#8e6fd6', johnny:'#3b82f6', amelia:'#d6b36a', kashimo:'#b7f7ff' };
+const P2_COLORS = { chef:'#ff9f43', drunk:'#48dbfb', opm:'#aaaaaa', vampire:'#cc44cc', gojo:'#7ff8ff', cursed:'#e74c3c', trapper:'#2ecc71', yi:'#cccccc', gunner:'#f0c040', samurai:'#ffe88a', mage:'#d7aefb', thunder:'#ffe066', blacksmith:'#e8a840', naoya:'#aaaacc', itachi:'#ff3333', yuta:'#ffa3c8', engineer:'#7ec8ff', cannondad:'#787878', dio:'#fff066', tiger:'#ff4422', stargirl:'#fff5aa', obito:'#ffaa44', fisherman:'#8ec6ff', geto:'#a678e0', sakiko:'#e8cdf0', joseph:'#6fb8ee', steve:'#8fd96b',daji:'#e8cdf8' ,yuki:'#b8960b',wuxing:'#c3b8e8',sans:'#a8d8f0',pucci:'#c9a8e8',baie:'#a86fe0',rsqjs:'#3fa9e8',dragon4:'#e8d38f',nanami:'#7e9cc4',momoi:'#ffcf8f',oniichan:'#ff5566',minato:'#fff0a3',elementmaster:'#bfa4ff', johnny:'#9fc2ff', amelia:'#f4d37b', kashimo:'#f5d76e'};
 
 // 玩家 1、2 用既有的兩張色表；玩家 3 以上（多人混戰用）用同一顏色做色調偏移，避免撞色。
 // 之後若要幫玩家 3/4 手動指定色表，只要新增 P3_COLORS / P4_COLORS 並在這裡優先讀取即可。
@@ -4562,6 +4561,21 @@ function shiftHue(hex, degrees) {
 }
 
 const PROGRESS_HANDLERS = {
+  kashimo(b) {
+    if (b.kashimoAmberActive) {
+      if (b.kashimoDeerLightningCharging) {
+        return { atFrac: 1 - Math.max(0, b.kashimoDeerLightningChargeTimer || 0) / KASHIMO_DEER_LIGHTNING_CHARGE, barColor: KASHIMO_DEER_LIGHTNING_COLOR };
+      }
+      const amber = Math.max(0, b.kashimoAmberTimer || 0);
+      return { atFrac: 1 - amber / KASHIMO_AMBER_DURATION, barColor: KASHIMO_AMBER_COLOR };
+    }
+    const field = Math.max(0, b.kashimoFieldTimer || 0);
+    if (field > 0) return { atFrac: 1 - field / KASHIMO_FIELD_COOLDOWN, barColor: KASHIMO_FIELD_COLOR };
+    const trap = Math.max(0, b.kashimoTrapTimer || 0);
+    if (trap > 0) return { atFrac: 1 - trap / KASHIMO_TRAP_COOLDOWN, barColor: KASHIMO_FIELD_COLOR };
+    const attack = Math.max(0, b.kashimoAttackTimer || 0);
+    return { atFrac: 1 - attack / KASHIMO_ATTACK_INTERVAL, barColor: b.char && b.char.color ? b.char.color : '#b7f7ff' };
+  },
   amelia(b) {
     const pound = Math.max(0, b.ameliaGroundPoundTimer || 0);
     if (pound > 0) return { atFrac: 1 - pound / AMELIA_GROUND_POUND_DELAY, barColor: '#f0c96b' };
@@ -5311,6 +5325,27 @@ function makeBall(x, y, vx, vy, ch, player, twinRole) {
     emWindPullTimer: ch.type === 'elementmaster' ? 0 : null,        // 風奧義：定期吸拉計時（獨立於DoT）
     emGolem: ch.type === 'elementmaster' ? null : null,             // 土奧義：土魔像 {x,y,hopTimer,hitCooldown}
     emElecUltStrikeTimer: ch.type === 'elementmaster' ? 0 : null,   // 電奧義：隨機閃電計時
+    // 鹿紫雲一／鹿博士：正負電荷、雙技能 CD 與幻獸琥珀／鹿式電狀態
+    kashimoPositiveCharge: ch.type === 'kashimo' ? 0 : null,
+    kashimoNegativeCharge: 0,
+    kashimoAttackTimer: ch.type === 'kashimo' ? KASHIMO_ATTACK_INTERVAL : null,
+    kashimoTrapTimer: ch.type === 'kashimo' ? KASHIMO_TRAP_COOLDOWN : null,
+    kashimoFieldTimer: ch.type === 'kashimo' ? KASHIMO_FIELD_COOLDOWN : null,
+    kashimoDashTimer: ch.type === 'kashimo' ? 0 : null,
+    kashimoDashTarget: null, kashimoDashHit: false, kashimoDashActive: false,
+    kashimoCollisionCd: ch.type === 'kashimo' ? 0 : null,
+    kashimoWallCd: ch.type === 'kashimo' ? 0 : null,
+    kashimoAmberUnlockTimer: ch.type === 'kashimo' ? KASHIMO_AMBER_UNLOCK_TIME : null,
+    kashimoAmberActive: ch.type === 'kashimo' ? false : null,
+    kashimoAmberUsed: ch.type === 'kashimo' ? false : null,
+    kashimoAmberTimer: ch.type === 'kashimo' ? 0 : null,
+    kashimoAmberEnded: ch.type === 'kashimo' ? false : null,
+    kashimoBleedTimer: ch.type === 'kashimo' ? 0 : null,
+    kashimoDeerLightningTimer: ch.type === 'kashimo' ? KASHIMO_DEER_LIGHTNING_COOLDOWN : null,
+    kashimoDeerLightningCharging: ch.type === 'kashimo' ? false : null,
+    kashimoDeerLightningChargeTimer: ch.type === 'kashimo' ? 0 : null,
+    kashimoDeerLightningAngle: ch.type === 'kashimo' ? 0 : null,
+    kashimoFacingAngle: ch.type === 'kashimo' ? 0 : null,
     // 阿梅專屬狀態：本體與時空旅人召喚體共用攻擊邏輯，但召喚體關閉一次性技能與懷錶。
     ameliaIsClone: !!ch.ameliaIsClone,
     ameliaTimeTravelUsed: !!ch.ameliaIsClone,
@@ -5491,7 +5526,9 @@ gojoChargingVisual: ch.type === 'gojo' ? false : null,
     itachiCrowUsed: ch.type === 'itachi' ? false : null,        // 烏鴉替身是否已用
     itachiSusanooUsed: ch.type === 'itachi' ? false : null,     // 須佐能乎是否已用
     itachiSusanooActive: ch.type === 'itachi' ? false : null,   // 須佐能乎是否啟動中
-    itachiSusanooTimer: ch.type === 'itachi' ? 0 : null,        // 須佐能乎剩餘時間
+    itachiSusanooTimer: ch.type === 'itachi' ? 0 : null,     // 須佐能乎剩餘時間
+    itachiTsukuyomiStabTimer: ch.type === 'itachi' ? 0 : null, // 月讀定身期間雙側刺擊CD
+    itachiTsukuyomiTarget: ch.type === 'itachi' ? null : null,   // 月讀目前鎖定的定身目標
     // 須佐能乎近戰連擊狀態
     itachiBiting: ch.type === 'itachi' ? false : null,
     itachiBiteStep: ch.type === 'itachi' ? 0 : null,
@@ -5990,11 +6027,8 @@ function startGameCore() {
   const isDummyRestart = (p2Choice === DUMMY_CHARACTER.id);
   const playerChoicesForModeCheck = [p1Choice, p2Choice, p3Choice, p4Choice].slice(0, playerModeCount);
   const hasAmelia = playerChoicesForModeCheck.some(isAmeliaCharacterId);
-  const isStandardOneVsOne = playerModeCount === 2 && !isDummyRestart && !assembleMode;
-  if (hasAmelia && !isStandardOneVsOne) {
-    alert('阿梅僅限標準 1v1，其他模式不可使用。');
-    return;
-  }
+  // 阿梅允許在多人模式測試；懷錶在 1v1 直接結算，
+  // 在多人模式則只讓阿梅所屬玩家離場，交回一般淘汰流程。
   resizeArena(350, 350); // 一般開局一律還原成標準場地尺寸，避免沿用先前沙盒模式自訂的場地大小
   // 一般開局預設視為離開木偶訓練模式；但若p2Choice仍是木偶（例如按「再戰一局」重新開打同一場木偶訓練），
   // 則視為木偶模式的重新開始，重置統計並保持控制面板顯示，而不是直接關閉。
@@ -6112,6 +6146,7 @@ function startGameCore() {
     bgColor: selectedBgColor,
     thunderPillars: [],
     thunderStrikes: [],
+    kashimoFields: [], kashimoTraps: [], kashimoLightningFX: [], kashimoDeerOrbs: [], kashimoAmberWaves: [], kashimoSparks: [], kashimoShockwaves: [], kashimoScreenFX: [],
     smithForgeParticles: [],
     steveMineDebris: [],
     // ══════ 通用「有生命召喚物」註冊表（給未來新角色使用，見 spawnSummon 等函式的說明）══════
@@ -6932,6 +6967,8 @@ function triggerAmeliaWatchDefeat(target) {
   }
   if (target.ameliaWatchDepartureActive) return;
   const defeatedPlayer = target.player;
+  const isWheelBattle = typeof wheelState !== 'undefined' && !!(wheelState && wheelState.active);
+  const isMultiplayerBattle = (state.playerCount || 2) > 2 || isWheelBattle;
   target.hp = Math.max(1, target.hp || 1); // 離場演出期間保留可繪製本體，但已從戰鬥目標中移除。
   target.vx = 0;
   target.vy = 0;
@@ -6941,7 +6978,8 @@ function triggerAmeliaWatchDefeat(target) {
   state.ameliaWatchDepartureActive = true;
   state.ameliaWatchDeparturePlayer = defeatedPlayer;
   state.ameliaWatchDefeatPlayer = defeatedPlayer;
-  state.ameliaWatchDefeatPending = true;
+  // 1v1：懷錶離場後直接進入原本的敗北演出；多人：只把阿梅所屬玩家淘汰，交回一般多人 outcomeDead/aliveCount 流程。
+  state.ameliaWatchDefeatPending = !isMultiplayerBattle;
   // 懷錶代表「這個人從時間線上消失」，因此同一玩家的其他球也視為同隊淘汰。
   for (const b of state.balls) {
     if (!b || b.player !== defeatedPlayer) continue;
@@ -7367,6 +7405,14 @@ function purgeDeadPlayerEntities(player, deadBall) {
   if (state.emTotems) state.emTotems = state.emTotems.filter(t => t.owner !== player);
   if (state.emGolems) state.emGolems = state.emGolems.filter(g => g.owner !== player);
   if (state.thunderPillars) state.thunderPillars = state.thunderPillars.filter(t => t.owner !== player);
+  if (state.kashimoFields) state.kashimoFields = state.kashimoFields.filter(t => t.owner !== player);
+  if (state.kashimoTraps) state.kashimoTraps = state.kashimoTraps.filter(t => t.owner !== player);
+  if (state.kashimoLightningFX) state.kashimoLightningFX = state.kashimoLightningFX.filter(t => t.owner !== player);
+  if (state.kashimoSparks) state.kashimoSparks = state.kashimoSparks.filter(t => t.owner !== player);
+  if (state.kashimoShockwaves) state.kashimoShockwaves = state.kashimoShockwaves.filter(t => t.owner !== player);
+  if (state.kashimoScreenFX) state.kashimoScreenFX = state.kashimoScreenFX.filter(t => t.owner !== player);
+  if (state.kashimoDeerOrbs) state.kashimoDeerOrbs = state.kashimoDeerOrbs.filter(t => t.owner !== player);
+
   if (state.turrets) state.turrets = state.turrets.filter(t => t.owner !== player);
   if (state.engGrids) state.engGrids = state.engGrids.filter(t => t.owner !== player);
   // 插在牆上的刀：同隊若有其他還活著的廚師，只清掉這顆球自己插的刀，不動到隊友的
@@ -8331,6 +8377,11 @@ function getNearestEnemy(b) {
   return getNearestEnemyTo(b.x, b.y, b.player);
 }
 
+// 一拳秒殺拳不應被夏油的咒靈召喚物吸走；優先鎖定真正的敵方玩家角色。
+function getNearestPlayerEnemyTo(x, y, excludePlayer) {
+  return getNearestEnemyTo(x, y, excludePlayer, cand => !cand._isSummonTarget);
+}
+
 // 九十九由基：觸發一次「鳳輪」掃蕩攻擊（碰撞觸發／星之怒雙發皆呼叫此函式）
 // 鳳輪環繞在由基自己身旁現身，對範圍內所有敵人造成傷害
 function yukiTriggerPhoenix(b) {
@@ -8572,9 +8623,9 @@ function tick(now) {
   render();
   renderWuxingCountdown();
   updateHUD();
-  // 阿梅懷錶：本體從時間線消失即代表該玩家敗北，直接沿用一般結算畫面。
-  // 放在 Boss／天慧龍專用結果之前，但只由一般玩家戰鬥旗標進入，不改動 Boss 流程。
-  if (state.ameliaWatchDefeatPending && !state.ameliaWatchDepartureActive && !state.ameliaWatchDefeatHandled && !bossMode && !state.dragonGroupBattle) {
+  // 阿梅懷錶：1v1 本體從時間線消失即直接結算敗北；多人只淘汰阿梅，不能在此短路整場對局。
+  // 多人模式會繼續往下走 outcomeDead/aliveCount，直到只剩一名玩家才結算。
+  if (state.ameliaWatchDefeatPending && (state.playerCount || 2) <= 2 && !state.ameliaWatchDepartureActive && !state.ameliaWatchDefeatHandled && !bossMode && !state.dragonGroupBattle) {
     state.ameliaWatchDefeatHandled = true;
     const defeatedPlayer = state.ameliaWatchDefeatPlayer;
     const watchDead = state.balls.filter(b => b && b.player === defeatedPlayer);
@@ -8929,6 +8980,516 @@ function primeDioWorldActivations(dt) {
   }
 }
 
+
+// ══════ 鹿紫雲一／鹿博士：正式版電荷系統與型態技能 ══════
+function isKashimoBall(b) { return !!(b && b.char && b.char.type === 'kashimo'); }
+function kashimoCooldownFactor(b) {
+  return isKashimoBall(b) && b.kashimoAmberActive ? KASHIMO_AMBER_CD_MULT : 1.0;
+}
+function kashimoTargets(b) {
+  return getAllCombatTargets().filter(t => t && t.hp > 0 && (t.player ?? t.owner) !== b.player && !t.ameliaPermanentGone && !t.ameliaWatchDepartureActive);
+}
+function kashimoAddPositive(b, amount = 1) {
+  if (!isKashimoBall(b)) return;
+  b.kashimoPositiveCharge = Math.min(KASHIMO_POSITIVE_MAX, (b.kashimoPositiveCharge || 0) + amount);
+}
+function kashimoReleaseCharge(attacker, target, extra = 1) {
+  if (!attacker || !target || target.hp <= 0) return false;
+  const multiplier = attacker.kashimoAmberActive ? KASHIMO_AMBER_NEGATIVE_MULT : 1;
+  const amount = Math.max(0, Math.floor(extra * multiplier));
+  if (amount <= 0) return false;
+  const before = target.kashimoNegativeCharge || 0;
+  target.kashimoNegativeCharge = Math.min(KASHIMO_NEGATIVE_MAX, before + amount);
+  if (target.kashimoNegativeCharge < KASHIMO_NEGATIVE_MAX) return false;
+  target.kashimoNegativeCharge = 0;
+  dealDamage(target, KASHIMO_RELEASE_DAMAGE, { attackerPlayer: attacker.player, attackerBall: attacker });
+  target.thunderStunTimer = Math.max(target.thunderStunTimer || 0, KASHIMO_RELEASE_PARALYZE);
+  target.vx = 0; target.vy = 0;
+  state.thunderStunFX = state.thunderStunFX || [];
+  state.thunderStunFX.push({ x: target.x, y: target.y, life: 0.72, maxLife: 0.72, kind: 'kashimo-release' });
+  // 瞬雷：集中雷柱＋紫白爆發環，讓「五層釋放」在多人混戰中也能一眼辨識。
+  const releaseX = target.x, releaseY = target.y;
+  const releaseOffsets = [-22, 0, 22];
+  for (let i = 0; i < releaseOffsets.length; i++) {
+    const ox = releaseOffsets[i];
+    state.kashimoLightningFX = state.kashimoLightningFX || [];
+    state.kashimoLightningFX.push({
+      x1: releaseX + ox * 0.52, y1: releaseY - 178 - (i === 1 ? 24 : 0),
+      x2: releaseX + ox * 0.16, y2: releaseY,
+      life: 0.42 - i * 0.035, maxLife: 0.42 - i * 0.035,
+      owner: attacker.player, kind: 'release', power: i === 1 ? 1.55 : 1.05,
+      color: i === 1 ? '#f4e7ff' : '#a987ff', seed: releaseX * 0.11 + releaseY * 0.07 + i * 9.7
+    });
+  }
+  kashimoEmitBurst(target.x, target.y, { color: '#8f6cff', owner: attacker.player, count: 26, speed: 390, r1: 154, rings: 1, tier: 3, kind: 'release' });
+  state.kashimoShockwaves = state.kashimoShockwaves || [];
+  if (state.kashimoShockwaves.length < 6) {
+    state.kashimoShockwaves.push({ x: target.x, y: target.y, r0: 10, r1: 112, life: 0.62, maxLife: 0.62, color: '#f1ddff', width: 4.2, owner: attacker.player, kind: 'release', tier: 3 });
+  }
+  // 瞬雷專用局部閃光：比一般命中更醒目，但只覆蓋目標周圍，不做高負載全屏閃爍。
+  state.kashimoScreenFX = state.kashimoScreenFX || [];
+  state.kashimoScreenFX.push({ x: target.x, y: target.y, life: 0.34, maxLife: 0.34, color: '#d9c2ff', owner: attacker.player, kind: 'release' });
+  state.hitFlashes.push({ x: target.x, y: target.y, r: 78, alpha: 1.25, color: '#f6eaff', t: 0.40 });
+  state.damageNumbers.push({ x: target.x, y: target.y - 42, value: `瞬雷 ${KASHIMO_RELEASE_DAMAGE}`, color: '#ead8ff', life: 0.9, maxLife: 0.9, scale: 1.02 });
+  playHitSound('opm');
+  return true;
+}
+function kashimoSkillHit(attacker, target, damage, negativeStacks = 1) {
+  if (!attacker || !target || attacker.hp <= 0 || target.hp <= 0) return false;
+  dealDamage(target, damage, { attackerPlayer: attacker.player, attackerBall: attacker });
+  kashimoReleaseCharge(attacker, target, negativeStacks);
+  state.hitFlashes.push({ x: target.x, y: target.y, r: attacker.kashimoAmberActive ? 32 : 22, alpha: 0.9, color: attacker.kashimoAmberActive ? KASHIMO_AMBER_COLOR : KASHIMO_FIELD_COLOR, t: 0.25 });
+  return true;
+}
+function kashimoHitTarget(attacker, target, damage, negativeStacks = 1) {
+  if (!kashimoSkillHit(attacker, target, damage, negativeStacks)) return;
+  attacker.kashimoDashHit = true;
+}
+function kashimoEmitDashTrail(b, intensity = 1) {
+  if (!b || !state || !isKashimoBall(b)) return;
+  state.kashimoLightningFX = state.kashimoLightningFX || [];
+  state.kashimoSparks = state.kashimoSparks || [];
+  const angle = Number.isFinite(b.kashimoFacingAngle) ? b.kashimoFacingAngle : Math.atan2(b.vy || 0, b.vx || 1);
+  const ux = Math.cos(angle), uy = Math.sin(angle);
+  const px = -uy, py = ux;
+  const backX = b.x - ux * (b.r * 2.6), backY = b.y - uy * (b.r * 2.6);
+  const frontX = b.x + ux * (b.r * 1.15), frontY = b.y + uy * (b.r * 1.15);
+  // 三條拉長的速度線：主線明亮，兩條偏移副線提供方向感，不使用大量常駐粒子。
+  const addSpeedLine = (offset, length, power, life, color, seedOffset) => {
+    const sx = b.x - ux * length + px * offset;
+    const sy = b.y - uy * length + py * offset;
+    const ex = b.x + ux * (b.r * 1.25) + px * offset * 0.22;
+    const ey = b.y + uy * (b.r * 1.25) + py * offset * 0.22;
+    state.kashimoLightningFX.push({
+      x1: sx, y1: sy, x2: ex, y2: ey,
+      life, maxLife: life, owner: b.player, kind: 'dash', dashSpeedLine: true,
+      power: power * intensity, color, seed: (state.elapsed || 0) * 37 + b.x * 0.07 + seedOffset
+    });
+  };
+  if (state.kashimoLightningFX.length > 54) state.kashimoLightningFX.splice(0, state.kashimoLightningFX.length - 54);
+  // 拉長主速度線與兩條副線，讓閃電突刺在小球高速移動時仍有明確方向感。
+  addSpeedLine(0, b.r * 7.2, 1.42, 0.23, '#d9fbff', 0);
+  addSpeedLine(b.r * 0.62, b.r * 5.2, 0.90, 0.19, '#8cecff', 5.3);
+  addSpeedLine(-b.r * 0.62, b.r * 4.7, 0.78, 0.17, '#b9a4ff', 11.7);
+  // 中央粗亮核心：不是常駐粒子，只在每次速度線生成時存在約四分之一秒。
+  state.kashimoLightningFX.push({
+    x1: b.x - ux * (b.r * 7.8), y1: b.y - uy * (b.r * 7.8),
+    x2: b.x + ux * (b.r * 1.45), y2: b.y + uy * (b.r * 1.45),
+    life: 0.25, maxLife: 0.25, owner: b.player, kind: 'dash', dashSpeedLine: true, dashCore: true,
+    power: 1.52 * intensity, color: '#efffff', seed: (state.elapsed || 0) * 43 + b.x * 0.11
+  });
+  if (intensity >= 0.95 && state.hitFlashes) {
+    state.hitFlashes.push({ x: b.x, y: b.y, r: 30, alpha: 0.72, color: '#d9fbff', t: 0.16 });
+  }
+
+  // 少量向後噴出的亮粒子，配合速度線形成殘影，不讓粒子密度回到先前過量狀態。
+  if (state.kashimoSparks.length > 84) state.kashimoSparks.splice(0, state.kashimoSparks.length - 84);
+  for (let i = 0; i < 4; i++) {
+    const a = angle + Math.PI + (Math.random() - 0.5) * 0.42;
+    const speed = 95 + Math.random() * 95;
+    state.kashimoSparks.push({
+      x: backX + (Math.random() - 0.5) * 10, y: backY + (Math.random() - 0.5) * 10,
+      vx: Math.cos(a) * speed, vy: Math.sin(a) * speed,
+      life: 0.16 + Math.random() * 0.10, maxLife: 0.26,
+      size: 1.7 + Math.random() * 2.0,
+      color: i === 0 ? '#ffffff' : (i === 1 ? '#8cecff' : '#c8b5ff'), owner: b.player,
+      glow: 9, drag: 0.88, kind: 'dash'
+    });
+  }
+}
+function kashimoActivateAmber(b) {
+  if (!isKashimoBall(b) || b.kashimoAmberActive || b.kashimoAmberUsed || b.kashimoAmberEnded) return;
+  const targets = kashimoTargets(b);
+  const totalNegative = targets.reduce((sum, target) => sum + Math.max(0, target.kashimoNegativeCharge || 0), 0);
+  const totalCharges = Math.max(0, b.kashimoPositiveCharge || 0) + totalNegative;
+  for (const target of targets) target.kashimoNegativeCharge = 0;
+  if (totalCharges > 0) {
+    const burstDamage = KASHIMO_AMBER_RELEASE_DAMAGE_PER_CHARGE * totalCharges;
+    for (const target of targets) {
+      if (Math.hypot(target.x - b.x, target.y - b.y) <= KASHIMO_AMBER_RELEASE_RADIUS + getCombatRadius(target)) {
+        dealDamage(target, burstDamage, { attackerPlayer: b.player, attackerBall: b });
+        state.hitFlashes.push({ x: target.x, y: target.y, r: 36, alpha: 0.62, color: KASHIMO_AMBER_COLOR, t: 0.28 });
+      }
+    }
+  }
+  // 記錄一次性釋放的中心與時間：範圍提示只在啟動瞬間出現，不增加常駐負載。
+  b.kashimoAmberBurstX = b.x;
+  b.kashimoAmberBurstY = b.y;
+  b.kashimoAmberBurstAt = state.elapsed || 0;
+  b.kashimoAmberBurstRadius = KASHIMO_AMBER_RELEASE_RADIUS;
+  b.kashimoPositiveCharge = 0;
+  b.kashimoAmberUsed = true;
+  b.kashimoAmberActive = true;
+  b.kashimoAmberTimer = KASHIMO_AMBER_DURATION;
+  b.kashimoBleedTimer = 1.0;
+  b.kashimoAttackTimer = 0;
+  b.kashimoFieldTimer = 0;
+  b.kashimoDeerLightningTimer = 0;
+  b.kashimoDeerLightningCharging = false;
+  state.hitFlashes.push({ x: b.x, y: b.y, r: 42, alpha: 0.58, color: KASHIMO_AMBER_COLOR, t: 0.32 });
+  kashimoEmitAmberBurst(b);
+  playHitSound('opm');
+}
+
+function kashimoEmitBurst(x, y, opts = {}) {
+  if (!state) return;
+  state.kashimoSparks = state.kashimoSparks || [];
+  state.kashimoShockwaves = state.kashimoShockwaves || [];
+  const color = opts.color || KASHIMO_FIELD_COLOR;
+  const owner = opts.owner ?? null;
+  const tier = opts.tier || 2;
+  const requestedCount = opts.count ?? KASHIMO_FX_SPARK_COUNT;
+  const requestedRings = opts.rings ?? 0;
+  // 視覺分級：小反饋不能搶鏡，技能節點只保留有限層次，只有幻獸琥珀可以全套爆發。
+  const count = tier === 1 ? Math.min(requestedCount, 5) : tier === 2 ? Math.min(requestedCount, 10) : Math.min(requestedCount, 14);
+  const rings = tier === 1 ? 0 : tier === 2 ? Math.min(requestedRings, 1) : Math.min(requestedRings, 1);
+  if (state.kashimoSparks.length > 64) state.kashimoSparks.splice(0, state.kashimoSparks.length - 64);
+  if (state.kashimoShockwaves.length > 5) state.kashimoShockwaves.splice(0, state.kashimoShockwaves.length - 5);
+  const speed = opts.speed || 260;
+  for (let i = 0; i < count; i++) {
+    const a = Math.random() * Math.PI * 2;
+    const s = speed * (0.35 + Math.random() * 0.95);
+    state.kashimoSparks.push({
+      x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s,
+      life: 0.35 + Math.random() * 0.55, maxLife: 0.9,
+      size: tier === 1 ? 1.2 + Math.random() * 2.0 : 1.5 + Math.random() * 3.8,
+      color, owner,
+      glow: tier === 1 ? 5 + Math.random() * 8 : 8 + Math.random() * 18,
+      drag: 0.93,
+      kind: opts.kind || 'burst', tier
+    });
+  }
+  for (let i = 0; i < rings; i++) {
+    state.kashimoShockwaves.push({
+      x, y, r0: opts.r0 || 8, r1: (opts.r1 || 110) + i * 26,
+      life: tier === 3 ? 0.42 + i * 0.08 : 0.3 + i * 0.06,
+      maxLife: tier === 3 ? 0.42 + i * 0.08 : 0.3 + i * 0.06,
+      color: i % 2 ? '#ffffff' : color, width: tier === 3 ? (i === 0 ? 4 : 2) : (i === 0 ? 2.4 : 1.4),
+      owner, kind: opts.kind || 'burst', tier
+    });
+  }
+}
+function kashimoEmitAmberBurst(b) {
+  if (!state || !b) return;
+  // 幻獸琥珀保留「唯一大招」辨識度，但採用短促、低亮度的爆發，避免持續白屏造成卡頓。
+  kashimoEmitBurst(b.x, b.y, {
+    color: KASHIMO_AMBER_COLOR, owner: b.player,
+    count: 10, speed: 260,
+    r0: 12, r1: 118, rings: 1, tier: 3, kind: 'amber'
+  });
+  state.kashimoScreenFX = state.kashimoScreenFX || [];
+  state.kashimoScreenFX.push({
+    x: b.x, y: b.y, life: 0.18, maxLife: 0.18,
+    color: KASHIMO_AMBER_COLOR, owner: b.player, kind: 'amber'
+  });
+  if (state.hitFlashes) {
+    state.hitFlashes.push({ x: b.x, y: b.y, r: 54, alpha: 0.48, color: '#fff4bd', t: 0.24 });
+  }
+}
+function drawKashimoJaggedArc(ctx, x1, y1, x2, y2, seed, jitter = KASHIMO_FX_ARC_JITTER, segments = 10) {
+  const dx = x2 - x1, dy = y2 - y1;
+  const len = Math.hypot(dx, dy) || 1;
+  const perpX = -dy / len, perpY = dx / len;
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  for (let i = 1; i < segments; i++) {
+    const t = i / segments;
+    const wobble = Math.sin(seed + i * 17.31) * jitter * Math.sin(Math.PI * t);
+    ctx.lineTo(x1 + dx * t + perpX * wobble, y1 + dy * t + perpY * wobble);
+  }
+  ctx.lineTo(x2, y2);
+  ctx.stroke();
+}
+
+function kashimoStartDeerLightning(b) {
+  if (!b.kashimoAmberActive || b.kashimoDeerLightningCharging || b.kashimoDeerLightningTimer > 0) return;
+  // 正式規格：鹿式電沿蓄力時的前方發射，不鎖定敵人；若完全靜止則沿上一次速度／預設向右。
+  let dx = b.vx, dy = b.vy;
+  // 以蓄力開始瞬間的最近敵人作為瞄準參考；蓄力後不再追蹤，避免球體漂移。
+  const aimTarget = kashimoTargets(b)
+    .filter(t => t && t.hp > 0)
+    .sort((a, c) => Math.hypot(a.x - b.x, a.y - b.y) - Math.hypot(c.x - b.x, c.y - b.y))[0];
+  if (aimTarget) {
+    dx = aimTarget.x - b.x;
+    dy = aimTarget.y - b.y;
+  }
+  if (Math.hypot(dx, dy) < 0.001) {
+    const lastAngle = Number.isFinite(b.kashimoFacingAngle) ? b.kashimoFacingAngle : 0;
+    dx = Math.cos(lastAngle); dy = Math.sin(lastAngle);
+  }
+  b.kashimoDeerLightningAngle = Math.atan2(dy, dx);
+  b.kashimoDashActive = false;
+  b.kashimoDashTarget = null;
+  b.kashimoDeerLightningCharging = true;
+  b.kashimoDeerLightningChargeTimer = KASHIMO_DEER_LIGHTNING_CHARGE;
+  b.vx = 0; b.vy = 0;
+  state.hitFlashes.push({ x: b.x, y: b.y, r: 35, alpha: 0.9, color: KASHIMO_DEER_LIGHTNING_COLOR, t: KASHIMO_DEER_LIGHTNING_CHARGE });
+}
+function kashimoFireDeerLightning(b) {
+  const angle = b.kashimoDeerLightningAngle || 0;
+  const x = b.x + Math.cos(angle) * (b.r + 18);
+  const y = b.y + Math.sin(angle) * (b.r + 18);
+  b.kashimoDeerLightningCharging = false;
+  b.kashimoDeerLightningTimer = KASHIMO_DEER_LIGHTNING_COOLDOWN * kashimoCooldownFactor(b);
+  state.kashimoDeerOrbs = state.kashimoDeerOrbs || [];
+  state.kashimoSparks = state.kashimoSparks || [];
+  state.kashimoShockwaves = state.kashimoShockwaves || [];
+  state.kashimoScreenFX = state.kashimoScreenFX || [];
+  for (const orb of state.kashimoDeerOrbs) {
+    if (state.kashimoSparks.length < 420) {
+      state.kashimoSparks.push({
+        x: orb.x - orb.vx * 0.018, y: orb.y - orb.vy * 0.018,
+        vx: -orb.vx * 0.035 + (Math.random() - 0.5) * 80,
+        vy: -orb.vy * 0.035 + (Math.random() - 0.5) * 80,
+        life: 0.22 + Math.random() * 0.18, maxLife: 0.4,
+        size: 1.8 + Math.random() * 2.8, color: Math.random() < 0.5 ? '#fff7ad' : '#8cecff',
+        owner: orb.owner, glow: 14, drag: 0.94, kind: 'deer-trail'
+      });
+    }
+  }
+
+  state.kashimoDeerOrbs.push({
+    x, y,
+    vx: Math.cos(angle) * KASHIMO_DEER_LIGHTNING_SPEED,
+    vy: Math.sin(angle) * KASHIMO_DEER_LIGHTNING_SPEED,
+    angle,
+    travel: 0,
+    life: 2.4,
+    maxLife: 2.4,
+    owner: b.player,
+    radius: KASHIMO_DEER_LIGHTNING_RADIUS,
+    hitTargets: new Set()
+  });
+  kashimoEmitBurst(b.x, b.y, { color: KASHIMO_DEER_LIGHTNING_COLOR, owner: b.player, count: 16, speed: 320, r1: 110, rings: 1, tier: 2, kind: 'deer-fire' });
+  playHitSound('opm');
+}
+function kashimoPlaceTrap(b) {
+  if (b.kashimoAmberActive) return;
+  state.kashimoTraps = state.kashimoTraps || [];
+  // 正式規格：如意棒不會自行消失；再次使用技能時才替換舊棒。
+  for (let i = state.kashimoTraps.length - 1; i >= 0; i--) {
+    if (state.kashimoTraps[i].owner === b.player) state.kashimoTraps.splice(i, 1);
+  }
+  state.kashimoTraps.push({ x: b.x, y: b.y, owner: b.player, life: KASHIMO_TRAP_LIFETIME, pulse: 0, hitCooldowns: new Map(), spawnFlash: 0.55 });
+  kashimoEmitBurst(b.x, b.y, { color: '#bd9dff', owner: b.player, count: 8, speed: 140, r1: 54, rings: 0, tier: 1, kind: 'trap-place' });
+  playHitSound('trap_chain');
+}
+function kashimoPlaceField(b) {
+  // 鎖定施放瞬間的座標；後續更新與繪製一律使用 anchorX／anchorY。
+  state.kashimoFields.push({ x: b.x, y: b.y, anchorX: b.x, anchorY: b.y, owner: b.player, life: KASHIMO_FIELD_DURATION, tick: 0, chargeTick: KASHIMO_FIELD_CHARGE_TICK, pulse: 0 });
+  kashimoEmitBurst(b.x, b.y, { color: '#7d5cff', owner: b.player, count: 10, speed: 200, r1: KASHIMO_FIELD_RADIUS * 0.9, rings: 1, tier: 2, kind: 'field-place' });
+  playHitSound('trap_chain');
+}
+function kashimoDistanceToSegment(px, py, ax, ay, bx, by) {
+  const dx = bx - ax, dy = by - ay, len2 = dx * dx + dy * dy;
+  if (len2 <= 0) return Math.hypot(px - ax, py - ay);
+  const t = Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / len2));
+  return Math.hypot(px - (ax + t * dx), py - (ay + t * dy));
+}
+function updateKashimo(b, dt) {
+  if (!isKashimoBall(b) || b.hp <= 0) return;
+  if (state.dioWorldGlobalActive && b !== state.dioWorldCaster) return;
+  if (b.cooldownFreezeTimer > 0 || b.obitoInSpace || b.pucciDiscFrozen || b.ameliaWatchDepartureActive) return;
+  b.kashimoCollisionCd = Math.max(0, (b.kashimoCollisionCd || 0) - dt);
+  b.kashimoWallCd = Math.max(0, (b.kashimoWallCd || 0) - dt);
+  if (Math.hypot(b.vx, b.vy) > 1) b.kashimoFacingAngle = Math.atan2(b.vy, b.vx);
+
+  if (!b.kashimoAmberActive && !b.kashimoAmberUsed && !b.kashimoAmberEnded) {
+    b.kashimoAmberUnlockTimer -= dt;
+    if (b.kashimoAmberUnlockTimer <= 0) kashimoActivateAmber(b);
+  }
+  const cdFactor = kashimoCooldownFactor(b);
+  b.kashimoFieldTimer -= dt;
+  if (b.kashimoFieldTimer <= 0) {
+    b.kashimoFieldTimer = KASHIMO_FIELD_COOLDOWN * cdFactor;
+    kashimoPlaceField(b);
+  }
+  if (!b.kashimoAmberActive) {
+    b.kashimoTrapTimer -= dt;
+    if (b.kashimoTrapTimer <= 0) {
+      b.kashimoTrapTimer = KASHIMO_TRAP_COOLDOWN;
+      kashimoPlaceTrap(b);
+    }
+  }
+  if (b.kashimoAmberActive) {
+    b.kashimoAmberTimer -= dt;
+    b.kashimoBleedTimer -= dt;
+    if (b.kashimoBleedTimer <= 0) {
+      b.kashimoBleedTimer += 1.0;
+      b.hp = Math.max(0, b.hp - KASHIMO_AMBER_SELF_BLEED_DPS);
+      state.damageNumbers.push({ x: b.x, y: b.y - b.r - 8, value: KASHIMO_AMBER_SELF_BLEED_DPS, color: KASHIMO_AMBER_COLOR, life: 0.35, maxLife: 0.35 });
+    }
+    if (b.kashimoAmberTimer <= 0) {
+      b.kashimoAmberActive = false;
+      b.kashimoAmberEnded = true;
+      b.kashimoDeerLightningCharging = false;
+    }
+    b.kashimoDeerLightningTimer -= dt;
+    if (b.kashimoDeerLightningCharging) {
+      b.kashimoDeerLightningChargeTimer -= dt;
+      b.vx = 0; b.vy = 0;
+      if (b.kashimoDeerLightningChargeTimer <= 0) kashimoFireDeerLightning(b);
+    } else if (b.kashimoAmberActive && b.kashimoDeerLightningTimer <= 0) {
+      kashimoStartDeerLightning(b);
+    }
+  }
+
+  b.kashimoAttackTimer -= dt;
+  if (b.kashimoDashActive) {
+    b.kashimoDashTimer -= dt;
+    b.kashimoDashVfxTimer = (b.kashimoDashVfxTimer || 0) - dt;
+    if (b.kashimoDashVfxTimer <= 0) {
+      b.kashimoDashVfxTimer = 0.105;
+      kashimoEmitDashTrail(b, 0.78);
+    }
+    if (b.kashimoDashTimer <= 0) {
+      const target = b.kashimoDashTarget;
+      if (target && target.hp > 0 && !b.kashimoDashHit && Math.hypot(target.x - b.x, target.y - b.y) <= KASHIMO_DASH_FALLBACK_RANGE) {
+        kashimoHitTarget(b, target, KASHIMO_ATTACK_DAMAGE, 1);
+      }
+      b.kashimoDashActive = false;
+      b.kashimoDashTarget = null;
+    }
+  }
+  if (b.kashimoAttackTimer <= 0 && !b.kashimoDeerLightningCharging) {
+    b.kashimoAttackTimer = KASHIMO_ATTACK_INTERVAL * cdFactor;
+    const target = kashimoTargets(b).sort((a, z) => Math.hypot(a.x - b.x, a.y - b.y) - Math.hypot(z.x - b.x, z.y - b.y))[0];
+    if (target) {
+      const dx = target.x - b.x, dy = target.y - b.y, d = Math.hypot(dx, dy) || 1;
+      b.kashimoDashTarget = target;
+      b.kashimoDashHit = false;
+      b.kashimoDashActive = true;
+      b.kashimoDashTimer = KASHIMO_DASH_TIME;
+      b.kashimoDashVfxTimer = 0;
+      b.vx = (dx / d) * KASHIMO_DASH_SPEED;
+      b.vy = (dy / d) * KASHIMO_DASH_SPEED;
+      b.kashimoFacingAngle = Math.atan2(dy, dx);
+      kashimoEmitDashTrail(b, 1.0);
+      if ((b.kashimoPositiveCharge || 0) >= 5) {
+        target.vx += (b.x - target.x) / d * 180;
+        target.vy += (b.y - target.y) / d * 180;
+      }
+    }
+  }
+}
+function updateKashimoObjects(dt) {
+  if (!state || state.dioWorldGlobalActive) return;
+  state.kashimoDeerOrbs = state.kashimoDeerOrbs || [];
+  // 鹿式電：球狀電磁砲，沿蓄力時鎖定的方向飛行，命中後才造成傷害與麻痺。
+  for (let i = state.kashimoDeerOrbs.length - 1; i >= 0; i--) {
+    const orb = state.kashimoDeerOrbs[i];
+    orb.life -= dt;
+    const stepX = orb.vx * dt, stepY = orb.vy * dt;
+    orb.x += stepX; orb.y += stepY;
+    orb.travel += Math.hypot(stepX, stepY);
+    if (orb.life <= 0 || orb.travel >= KASHIMO_DEER_LIGHTNING_RANGE) {
+      state.hitFlashes.push({ x: orb.x, y: orb.y, r: 34, alpha: 0.65, color: KASHIMO_DEER_LIGHTNING_COLOR, t: 0.25 });
+      state.kashimoDeerOrbs.splice(i, 1);
+      continue;
+    }
+    const owner = state.balls.find(b => b.player === orb.owner && isKashimoBall(b) && b.hp > 0);
+    if (!owner) { state.kashimoDeerOrbs.splice(i, 1); continue; }
+    let impacted = false;
+    for (const target of kashimoTargets(owner)) {
+      if (orb.hitTargets.has(target)) continue;
+      if (Math.hypot(target.x - orb.x, target.y - orb.y) <= orb.radius + getCombatRadius(target)) {
+        orb.hitTargets.add(target);
+        kashimoSkillHit(owner, target, KASHIMO_DEER_LIGHTNING_DAMAGE, KASHIMO_DEER_LIGHTNING_STACKS);
+        target.thunderStunTimer = Math.max(target.thunderStunTimer || 0, KASHIMO_DEER_LIGHTNING_PARALYZE);
+        target.vx = 0; target.vy = 0;
+        state.thunderStunFX = state.thunderStunFX || [];
+        state.thunderStunFX.push({ x: target.x, y: target.y, life: 0.65, maxLife: 0.65 });
+        kashimoEmitBurst(target.x, target.y, { color: '#fff4a8', owner: owner.player, count: 20, speed: 340, r1: 125, rings: 2, tier: 2, kind: 'deer-impact' });
+        impacted = true;
+        break;
+      }
+    }
+    if (impacted) {
+      playHitSound('opm');
+      state.kashimoDeerOrbs.splice(i, 1);
+    }
+  }
+  for (let i = state.kashimoFields.length - 1; i >= 0; i--) {
+    const f = state.kashimoFields[i];
+    f.life -= dt; f.tick -= dt; f.chargeTick -= dt; f.pulse += dt;
+    // 電解轟鳴固定在施放位置，整個 3 秒期間只打擊該圓形範圍。
+    if (f.life <= 0) { state.kashimoFields.splice(i, 1); continue; }
+    const owner = state.balls.find(b => b.player === f.owner && isKashimoBall(b) && b.hp > 0);
+    if (!owner) { state.kashimoFields.splice(i, 1); continue; }
+    const fieldX = Number.isFinite(f.anchorX) ? f.anchorX : f.x;
+    const fieldY = Number.isFinite(f.anchorY) ? f.anchorY : f.y;
+    if (f.tick <= 0) {
+      f.tick = KASHIMO_FIELD_TICK;
+      state.kashimoLightningFX = state.kashimoLightningFX || [];
+      for (let arc = 0; arc < 2; arc++) {
+        const aa = f.pulse * 1.8 + arc * Math.PI + Math.sin(f.pulse * 3 + arc) * 0.25;
+        const rr = KASHIMO_FIELD_RADIUS * (0.78 + 0.16 * Math.sin(f.pulse * 7 + arc));
+        state.kashimoLightningFX.push({
+          x1: fieldX, y1: fieldY,
+          x2: fieldX + Math.cos(aa) * rr,
+          y2: fieldY + Math.sin(aa) * rr,
+          life: 0.24, maxLife: 0.24, owner: owner.player,
+          kind: 'field', power: 1.25, seed: f.pulse * 11 + arc
+        });
+      }
+      for (const target of kashimoTargets(owner)) {
+        if (Math.hypot(target.x - fieldX, target.y - fieldY) <= KASHIMO_FIELD_RADIUS + getCombatRadius(target)) {
+          kashimoSkillHit(owner, target, KASHIMO_FIELD_DAMAGE, 0);
+          state.hitFlashes.push({ x: target.x, y: target.y, r: 16, alpha: 0.7, color: KASHIMO_FIELD_COLOR, t: 0.2 });
+        }
+      }
+    }
+    if (f.chargeTick <= 0) {
+      f.chargeTick = KASHIMO_FIELD_CHARGE_TICK;
+      for (const target of kashimoTargets(owner)) {
+        if (Math.hypot(target.x - fieldX, target.y - fieldY) <= KASHIMO_FIELD_RADIUS + getCombatRadius(target)) kashimoReleaseCharge(owner, target, 1);
+      }
+    }
+  }
+  for (let i = state.kashimoTraps.length - 1; i >= 0; i--) {
+    const tr = state.kashimoTraps[i];
+    tr.pulse += dt;
+    if (tr.spawnFlash != null) tr.spawnFlash = Math.max(0, tr.spawnFlash - dt);
+    if (!tr.hitCooldowns) tr.hitCooldowns = new Map();
+    for (const [target, remaining] of tr.hitCooldowns.entries()) {
+      const next = remaining - dt;
+      if (next <= 0) tr.hitCooldowns.delete(target); else tr.hitCooldowns.set(target, next);
+    }
+    const owner = state.balls.find(b => b.player === tr.owner && isKashimoBall(b) && b.hp > 0);
+    if (!owner || tr.life <= 0) { state.kashimoTraps.splice(i, 1); continue; }
+    for (const target of kashimoTargets(owner)) {
+      const close = kashimoDistanceToSegment(target.x, target.y, owner.x, owner.y, tr.x, tr.y) <= getCombatRadius(target) + KASHIMO_TRAP_RADIUS;
+      if (close && !tr.hitCooldowns.has(target)) {
+        tr.hitCooldowns.set(target, KASHIMO_TRAP_HIT_COOLDOWN);
+        kashimoSkillHit(owner, target, KASHIMO_TRAP_DAMAGE, 1);
+        state.kashimoLightningFX.push({ x1: owner.x, y1: owner.y, x2: tr.x, y2: tr.y, life: 0.32, maxLife: 0.32, owner: owner.player, kind: 'trap', power: 1.55, seed: tr.pulse * 19 + target.x * 0.03 });
+        state.hitFlashes.push({ x: target.x, y: target.y, r: 24, alpha: 0.9, color: KASHIMO_FIELD_COLOR, t: 0.28 });
+      }
+    }
+  }
+  for (let i = state.kashimoLightningFX.length - 1; i >= 0; i--) {
+    const fx = state.kashimoLightningFX[i];
+    fx.life -= dt;
+    if (fx.life <= 0) state.kashimoLightningFX.splice(i, 1);
+  }
+  for (let i = state.kashimoSparks.length - 1; i >= 0; i--) {
+    const p = state.kashimoSparks[i];
+    p.life -= dt;
+    p.x += p.vx * dt; p.y += p.vy * dt;
+    p.vx *= Math.pow(p.drag || 0.93, dt * 60);
+    p.vy *= Math.pow(p.drag || 0.93, dt * 60);
+    if (p.life <= 0) state.kashimoSparks.splice(i, 1);
+  }
+  for (let i = state.kashimoShockwaves.length - 1; i >= 0; i--) {
+    state.kashimoShockwaves[i].life -= dt;
+    if (state.kashimoShockwaves[i].life <= 0) state.kashimoShockwaves.splice(i, 1);
+  }
+  for (let i = state.kashimoScreenFX.length - 1; i >= 0; i--) {
+    state.kashimoScreenFX[i].life -= dt;
+    if (state.kashimoScreenFX[i].life <= 0) state.kashimoScreenFX.splice(i, 1);
+  }
+}
+
 function update(dt) {
   // 時停啟動預判必須先於 Boss 與角色更新，避免冷卻剛好歸零時敵人先偷打一擊。
   primeDioWorldActivations(dt);
@@ -9037,6 +9598,10 @@ function update(dt) {
     state.dioWorldGlobalActive = false;
     state.dioWorldCaster = null;
   }
+
+  // ── 鹿紫雲一／鹿博士：電荷、雷場、陷阱與幻獸琥珀 ──
+  for (const b of state.balls) updateKashimo(b, dt);
+  updateKashimoObjects(dt);
 
   // ── 場地效果 ──
   if (state.arena === 'lava') {
@@ -9862,7 +10427,8 @@ function update(dt) {
         (b.char.type === 'oniichan' && b.hp < ONIICHAN_ENRAGE_HP_THRESHOLD ? ONIICHAN_ENRAGE_SPEED_MULT : 1.0) *
         (b.emSpeedBuffTimer > 0 ? (1 + b.emSpeedBuffPct) : 1.0) *
         (b.emWindPermSpeedBuff ? (1 + EM_WIND_ULT_SPEED_BUFF) : 1.0) *
-        (b.johnnyWoundSlowTimer > 0 ? (b.johnnyWoundSlowFactor || 0.32) : 1.0);
+        (b.johnnyWoundSlowTimer > 0 ? (b.johnnyWoundSlowFactor || 0.32) : 1.0) *
+        (b.char.type === 'kashimo' ? (1 + (b.kashimoPositiveCharge || 0) * KASHIMO_POSITIVE_SPEED_PER) * (b.kashimoAmberActive ? KASHIMO_AMBER_SPEED_MULT : 1.0) : 1.0);
 
       // 最低速度保證（排除技能主動停止的情況）
       const intentionalStop = (b.char.type === 'gunner' && b.gunnerFiring) ||
@@ -9882,7 +10448,8 @@ function update(dt) {
                               (b.char.type === 'pucci' && b.pucciChantActive) ||
                               (b.char.type === 'pucci' && b.pucciHeavenCharging) ||
                               (b.char.type === 'oniichan' && (b.oniichanQuadCharging || b.oniichanQuadSweeping || b.oniichanTideActive)) ||
-                              (b.char.type === 'elementmaster' && b.emUltState === 'casting');
+                              (b.char.type === 'elementmaster' && b.emUltState === 'casting') ||
+                              (b.char.type === 'kashimo' && b.kashimoDeerLightningCharging);
       // 居合衝刺：在移動前直接設速度，確保方向正確
       if (b.char.type === 'samurai' && b.samuraiIaidoing) {
         b.vx = Math.cos(b.samuraiIaidoAngle) * SAMURAI_IAIDO_SPEED;
@@ -9939,6 +10506,13 @@ function update(dt) {
       } else if (odist === 0) {
         b.x += minDist; // 極端狀況：剛好重疊在正中央，直接推開
       }
+    }
+
+    // 鹿紫雲一：撞牆蓄積正電荷（限時停與冷卻凍結外的有效碰撞）
+    if (hitWall && b.char.type === 'kashimo' && b.kashimoWallCd <= 0 && !state.dioWorldGlobalActive && b.cooldownFreezeTimer <= 0) {
+      b.kashimoWallCd = 0.25;
+      kashimoAddPositive(b, 1);
+      state.hitFlashes.push({ x: b.x, y: b.y, r: 22, alpha: 0.9, color: KASHIMO_AMBER_COLOR, t: 0.24 });
     }
 
     // 陷阱大師：碰邊界放置尖刺
@@ -10314,6 +10888,20 @@ function update(dt) {
         }
       });
 
+      // 鹿紫雲一：碰撞敵人時獲得正電荷；只有閃電突刺衝刺中的碰撞才造成普攻傷害。
+      [b0, b1].forEach(kashimo => {
+        const target = kashimo === b0 ? b1 : b0;
+        if (kashimo.char.type !== 'kashimo' || kashimo.hp <= 0 || target.hp <= 0) return;
+        if (kashimo.kashimoCollisionCd <= 0 && !kashimo.pucciDiscFrozen && !kashimo.kashimoDeerLightningCharging) {
+          kashimo.kashimoCollisionCd = KASHIMO_COLLISION_COOLDOWN * kashimoCooldownFactor(kashimo);
+          kashimoAddPositive(kashimo, 1);
+          if (kashimo.kashimoDashActive && kashimo.kashimoDashTarget === target && !kashimo.kashimoDashHit) {
+            kashimoHitTarget(kashimo, target, KASHIMO_ATTACK_DAMAGE, KASHIMO_NEGATIVE_PER_HIT);
+            kashimoEmitBurst(target.x, target.y, { color: '#bdf7ff', owner: kashimo.player, count: 6, speed: 120, r1: 42, rings: 0, tier: 1, kind: 'dash-hit' });
+          }
+        }
+      });
+
       // 元素大師：碰撞到敵人時放置元素圖騰
       [b0, b1].forEach(em => {
         const target = em === b0 ? b1 : b0;
@@ -10496,9 +11084,17 @@ for (let bi = 0; bi < state.balls.length; bi++) {
               state.hitFlashes.push({ x: b.x, y: b.y, r: 20, alpha: 0.8, color: '#f1c40f', t: 0.4 });
             } else {
               b.attackTimer = 0;
-              b.knives--;
-              fireProjectile(b, enemy, 'knife');
-              if (b.knives === 0) b.knifeRecalling = true;
+              // 阿梅在 Ground Pound／懷錶離場期間會暫時不在目標清單，
+              // fireProjectile() 會回傳 null；只有真的生成飛刀後才能扣除刀數，
+              // 否則就會出現「刀數少了，但刀根本沒有飛出去」的假消失。
+              const knifeProjectile = fireProjectile(b, enemy, 'knife');
+              if (knifeProjectile) {
+                b.knives--;
+                if (b.knives === 0) b.knifeRecalling = true;
+              } else {
+                // 保留刀，等目標重新出現後再用下一個完整攻擊間隔重試。
+                b.attackTimer = b.attackInterval;
+              }
             }
         }
     } else if (b.char.type === 'drunk') {
@@ -10563,8 +11159,9 @@ for (let bi = 0; bi < state.balls.length; bi++) {
   
     // 一拳超人
     if (b.char.type === 'opm' && !b.opmPunched) {
+      const opmEnemy = getNearestPlayerEnemyTo(b.x, b.y, b.player);
       b.opmCountdown -= dt;
-      if (b.opmCountdown <= 0) {
+      if (b.opmCountdown <= 0 && opmEnemy) {
       // 麻痺：跳過本次必殺
       if (b.thunderParalyzed > 0) {
         b.thunderParalyzed = 0;
@@ -10576,10 +11173,10 @@ for (let bi = 0; bi < state.balls.length; bi++) {
         state.hitFlashes.push({ x: b.x, y: b.y, r: 22, alpha: 0.8, color: '#f1c40f', t: 0.4 });
       } else {
       b.opmPunched = true;
-      dealDamage(enemy, MAX_HP, { codeKill: true, attackerPlayer: b.player });
+      dealDamage(opmEnemy, MAX_HP, { codeKill: true, attackerPlayer: b.player });
 
       // ── 出拳特效 ──
-      const ex = enemy.x, ey = enemy.y;
+      const ex = opmEnemy.x, ey = opmEnemy.y;
 
       // 1. 衝擊波環（3層）
       for (let r = 0; r < 3; r++) {
@@ -14685,6 +15282,10 @@ waypoints.push({
     for (let bi = 0; bi < state.balls.length; bi++) {
       // 水門的苦無本身沒有傷害，直接穿過所有角色，只在碰牆時插住
       if (p.type === 'kunai') continue;
+      // 阿梅 Ground Pound／懷錶離場／永久消失時不在戰場中，
+      // 飛刀要繼續飛行，不能在不可互動狀態下誤判命中或消耗。
+      const collisionTarget = state.balls[bi];
+      if (p.type === 'knife' && isAmeliaCombatAbsent(collisionTarget)) continue;
       // 未反彈：跳過己方；已反彈：跳過反彈者（武士），打原始 owner
       const skipPlayer = p.reflected ? p.reflectedBy : p.owner;
       if (state.balls[bi].player === skipPlayer) continue;
@@ -14997,6 +15598,7 @@ waypoints.push({
       b.vy = (Math.random() - 0.5) * BASE_SPEED * 2;
       // 解除任何定身/咬擊狀態
       b.itachiBiting = false; b.itachiBiteStep = 0; b.itachiBiteTimer = 0;
+      b.itachiTsukuyomiTarget = null; b.itachiTsukuyomiStabTimer = 0;
       b.itachiPinnedTimer = 0; b.mageFreezeTimer = 0; b.frozenByVampire = false;
       b.invincible = false;
       state.hitFlashes.push({ x: b.x, y: b.y, r: 60, alpha: 1.2, color: '#1a1a1a', t: 0.6 });
@@ -15071,6 +15673,8 @@ waypoints.push({
     // 須佐能乎啟動中：跳過天照/月讀施放（純近戰）
     if (b.itachiSusanooActive) continue;
 
+    // 月讀雙側刺擊已在施放瞬間一次性觸發；定身期間不再重複攻擊。
+
     // 天照CD倒數與發射
     b.itachiAmaterasuTimer -= dt;
     if (b.itachiAmaterasuTimer <= 0) {
@@ -15103,10 +15707,27 @@ waypoints.push({
       if (!(b.thunderParalyzed > 0)) {
         enemy.itachiPinnedTimer = ITACHI_TSUKUYOMI_PIN_DUR;
         enemy.vx = 0; enemy.vy = 0;
+        // 月讀定身成立的瞬間只刺擊一次；左右兩把刀刃共用一次傷害判定。
+        b.itachiTsukuyomiTarget = null;
+        b.itachiTsukuyomiStabTimer = 0;
+        dealDamage(enemy, ITACHI_TSUKUYOMI_STAB_DAMAGE, { attackerPlayer: b.player });
+        const tsukuyomiAngle = Math.atan2(enemy.y - b.y, enemy.x - b.x);
+        state.itachiStabFX = state.itachiStabFX || [];
+        for (const side of [0, Math.PI]) {
+          state.itachiStabFX.push({
+            x: enemy.x, y: enemy.y,
+            angle: tsukuyomiAngle + side,
+            life: 0.28, maxLife: 0.28,
+            phase: (enemy.x * 0.017 + enemy.y * 0.013 + side) % (Math.PI * 2)
+          });
+        }
+        const sideX = Math.cos(tsukuyomiAngle + Math.PI / 2) * 22;
+        const sideY = Math.sin(tsukuyomiAngle + Math.PI / 2) * 22;
+        state.hitFlashes.push({ x: enemy.x + sideX, y: enemy.y + sideY, r: 34, alpha: 1.1, color: '#ff3333', t: 0.28 });
+        state.hitFlashes.push({ x: enemy.x - sideX, y: enemy.y - sideY, r: 34, alpha: 1.1, color: '#ff3333', t: 0.28 });
+        state.hitFlashes.push({ x: enemy.x, y: enemy.y, r: 58, alpha: 0.7, color: '#660000', t: 0.34 });
         if (state.stats) state.stats[b.player].skillUses++;
-        state.hitFlashes.push({ x: enemy.x, y: enemy.y, r: 50, alpha: 1.2, color: '#aa0000', t: 0.5 });
-        state.hitFlashes.push({ x: enemy.x, y: enemy.y, r: 25, alpha: 1.0, color: '#1a0a1a', t: 0.35 });
-        playHitSound('opm');
+        playHitSound('vampire_bite');
       }
     }
   }
@@ -19098,6 +19719,89 @@ function drawAmeliaGroundPoundAirborne(b) {
   ctx.restore();
 }
 
+function drawKashimoReadability() {
+  if (!state || !ctx || !state.balls) return;
+  const kashimos = state.balls.filter(b => isKashimoBall(b) && b.hp > 0);
+  if (!kashimos.length) return;
+  const now = state.elapsed || 0;
+  ctx.save();
+  ctx.textBaseline = 'middle';
+
+  // 電荷只用球旁的小型圖示顯示，避免大型面板遮住角色與特效。
+  for (const b of kashimos) {
+    const positive = Math.max(0, Math.min(KASHIMO_POSITIVE_MAX, Math.floor(b.kashimoPositiveCharge || 0)));
+    const side = b.x > W * 0.68 ? -1 : 1;
+    const badgeX = b.x + side * (b.r + 7);
+    const badgeY = b.y - b.r - 2;
+    ctx.font = '700 10px "Segoe UI Symbol", system-ui, sans-serif';
+    ctx.textAlign = side > 0 ? 'left' : 'right';
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = 'rgba(0,0,0,0.86)';
+    ctx.fillStyle = '#8fefff';
+    ctx.strokeText(`➕${positive}/${KASHIMO_POSITIVE_MAX}`, badgeX, badgeY);
+    ctx.fillText(`➕${positive}/${KASHIMO_POSITIVE_MAX}`, badgeX, badgeY);
+
+    // 鹿式電蓄力時顯示清楚的發射方向與落點預覽，幫助判斷是否瞄準正確。
+    if (b.kashimoDeerLightningCharging) {
+      const angle = Number.isFinite(b.kashimoDeerLightningAngle) ? b.kashimoDeerLightningAngle : 0;
+      const ux = Math.cos(angle), uy = Math.sin(angle);
+      const len = Math.min(230, Math.max(130, Math.hypot(W, H) * 0.24));
+      const x1 = b.x + ux * (b.r + 8), y1 = b.y + uy * (b.r + 8);
+      const x2 = b.x + ux * len, y2 = b.y + uy * len;
+      ctx.globalAlpha = 0.72;
+      ctx.setLineDash([10, 8]);
+      ctx.strokeStyle = '#ffe98a'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.globalAlpha = 1;
+      ctx.strokeStyle = '#fff7bd'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.arc(x2, y2, 7 + Math.sin(now * 12) * 2, 0, Math.PI * 2); ctx.stroke();
+      ctx.font = '700 11px system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#fff1a6';
+      ctx.fillText('鹿式電瞄準', b.x + ux * 90, b.y + uy * 90 - 12);
+    }
+
+    // 幻獸琥珀啟動：只顯示約 0.8 秒的低成本範圍邊界，直接對應實際傷害半徑。
+    if (Number.isFinite(b.kashimoAmberBurstAt) && now - b.kashimoAmberBurstAt < 0.82) {
+      const p = Math.max(0, Math.min(1, (now - b.kashimoAmberBurstAt) / 0.82));
+      const cx = b.kashimoAmberBurstX ?? b.x;
+      const cy = b.kashimoAmberBurstY ?? b.y;
+      const baseR = b.kashimoAmberBurstRadius || KASHIMO_AMBER_RELEASE_RADIUS;
+      const r = baseR * (0.72 + p * 0.28);
+      ctx.globalAlpha = (1 - p) * 0.44;
+      ctx.fillStyle = 'rgba(255,214,104,0.10)';
+      ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
+      ctx.globalAlpha = (1 - p) * 0.92;
+      ctx.strokeStyle = '#ffe68b'; ctx.lineWidth = 3;
+      ctx.setLineDash([14, 8]);
+      ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.globalAlpha = (1 - p) * 0.9;
+      ctx.fillStyle = '#fff1ad'; ctx.font = '700 13px system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(`術式解放幻獸琥珀  ${Math.round(baseR)}px`, cx, cy - r - 14);
+    }
+  }
+
+  // 敵人負電荷同樣只顯示球旁的小型圖示，僅在有層數時顯示。
+  const enemies = state.balls.filter(t => t && t.hp > 0 && (t.kashimoNegativeCharge || 0) > 0);
+  for (const t of enemies) {
+    const negative = Math.max(0, Math.min(KASHIMO_NEGATIVE_MAX, Math.floor(t.kashimoNegativeCharge || 0)));
+    const side = t.x > W * 0.68 ? -1 : 1;
+    const badgeX = t.x + side * (t.r + 7);
+    const badgeY = t.y - t.r - 2;
+    ctx.font = '700 10px "Segoe UI Symbol", system-ui, sans-serif';
+    ctx.textAlign = side > 0 ? 'left' : 'right';
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = 'rgba(0,0,0,0.86)';
+    ctx.fillStyle = negative >= KASHIMO_NEGATIVE_MAX ? '#ffe2ff' : '#d9c7ff';
+    ctx.strokeText(`⛔${negative}/${KASHIMO_NEGATIVE_MAX}`, badgeX, badgeY);
+    ctx.fillText(`⛔${negative}/${KASHIMO_NEGATIVE_MAX}`, badgeX, badgeY);
+  }
+  ctx.restore();
+}
+
 function render() {
   ctx.clearRect(0, 0, W, H);
   if (state && state.bgColor && state.bgColor !== '#000000') {
@@ -20676,6 +21380,198 @@ function render() {
     ctx.restore();
   }
 
+  // 鹿紫雲一：天慧龍級雷場、電湧陷阱、球狀鹿式電與幻獸琥珀特效
+  for (const f of (state.kashimoFields || [])) {
+    const fieldX = Number.isFinite(f.anchorX) ? f.anchorX : f.x;
+    const fieldY = Number.isFinite(f.anchorY) ? f.anchorY : f.y;
+    const phase = (state.elapsed || elapsed) * 3.2 + f.pulse * 2;
+    const pulse = 0.72 + 0.28 * Math.sin(phase);
+    const r = KASHIMO_FIELD_RADIUS;
+    ctx.save();
+    ctx.globalCompositeOperation = 'screen';
+    const grad = ctx.createRadialGradient(fieldX, fieldY, 0, fieldX, fieldY, r * 1.12);
+    grad.addColorStop(0, `rgba(244,240,255,${0.20 + 0.08 * pulse})`);
+    grad.addColorStop(0.3, `rgba(126,92,255,${0.13 + 0.06 * pulse})`);
+    grad.addColorStop(1, 'rgba(35,15,100,0)');
+    ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(fieldX, fieldY, r * 1.12, 0, Math.PI * 2); ctx.fill();
+    for (let ring = 0; ring < 3; ring++) {
+      const rr = r * (0.34 + ring * 0.28) + Math.sin(phase * 0.9 + ring) * 3;
+      ctx.globalAlpha = (0.16 + 0.07 * pulse) * (1 - ring * 0.12);
+      ctx.strokeStyle = ring % 2 ? '#9e8bff' : '#ddd7ff';
+      ctx.shadowColor = '#7d5cff'; ctx.shadowBlur = 7;
+      ctx.lineWidth = ring === 0 ? 2.2 : 0.85;
+      ctx.setLineDash(ring % 2 ? [6, 12] : [18, 9]);
+      ctx.beginPath(); ctx.arc(fieldX, fieldY, rr, phase * (ring % 2 ? -0.16 : 0.12) + ring, phase * (ring % 2 ? -0.16 : 0.12) + Math.PI * 1.25); ctx.stroke();
+    }
+    ctx.setLineDash([]);
+    ctx.globalAlpha = 0.22 + 0.12 * pulse;
+    for (let ray = 0; ray < 4; ray++) {
+      const a = phase * 0.18 + ray * Math.PI / 2;
+      const outer = r * (0.62 + 0.16 * Math.sin(phase + ray));
+      ctx.strokeStyle = ray % 2 ? '#9c8dff' : '#b8efff';
+      ctx.lineWidth = 0.85; ctx.shadowColor = '#7d5cff'; ctx.shadowBlur = 5;
+      drawKashimoJaggedArc(ctx, fieldX, fieldY,
+        fieldX + Math.cos(a) * outer, fieldY + Math.sin(a) * outer,
+        phase + ray * 4.2, 5, 6);
+    }
+    ctx.globalAlpha = 0.3 + 0.12 * pulse;
+    ctx.strokeStyle = '#e7e1ff'; ctx.lineWidth = 1.6; ctx.shadowColor = '#b9a9ff'; ctx.shadowBlur = 8;
+    ctx.beginPath(); ctx.arc(fieldX, fieldY, r * (0.92 + 0.025 * Math.sin(phase * 2)), 0, Math.PI * 2); ctx.stroke();
+    ctx.restore();
+  }
+
+  for (const tr of (state.kashimoTraps || [])) {
+    const phase = (state.elapsed || elapsed) * 4.2 + tr.x * 0.01;
+    const pulse = 0.58 + 0.42 * Math.sin(phase);
+    ctx.save(); ctx.translate(tr.x, tr.y); ctx.globalCompositeOperation = 'screen';
+    const g = ctx.createRadialGradient(0, 0, 2, 0, 0, 58);
+    g.addColorStop(0, 'rgba(255,255,255,0.42)'); g.addColorStop(0.25, 'rgba(158,122,255,0.28)'); g.addColorStop(1, 'rgba(76,29,180,0)');
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0, 0, 58, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = '#cbbdff'; ctx.shadowColor = '#7d5cff'; ctx.shadowBlur = 24; ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.moveTo(0, -32); ctx.lineTo(0, 34); ctx.stroke();
+    ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1.3; ctx.shadowBlur = 9;
+    ctx.beginPath(); ctx.moveTo(-6, -31); ctx.lineTo(6, -31); ctx.moveTo(-5, 28); ctx.lineTo(5, 28); ctx.stroke();
+    for (let ring = 0; ring < 2; ring++) {
+      const rr = 12 + ring * 9 + Math.sin(phase * 0.8 + ring) * 2.4;
+      ctx.globalAlpha = (0.38 + pulse * 0.3) * (1 - ring * 0.09);
+      ctx.strokeStyle = ring % 2 ? '#8cecff' : '#bd9dff'; ctx.lineWidth = ring === 0 ? 2.4 : 1;
+      ctx.setLineDash(ring % 2 ? [3, 6] : [12, 6]);
+      ctx.beginPath(); ctx.arc(0, 0, rr, phase * (ring % 2 ? -0.5 : 0.4) + ring, phase * (ring % 2 ? -0.5 : 0.4) + Math.PI * 1.45); ctx.stroke();
+    }
+    ctx.setLineDash([]); ctx.globalAlpha = 0.9; ctx.fillStyle = '#ffffff'; ctx.font = 'bold 20px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.shadowBlur = 15; ctx.fillText('⚡', 0, -43);
+    for (let s = 0; s < 3; s++) {
+      const a = phase * 0.5 + s * Math.PI / 4, rr = 26 + 8 * Math.sin(phase + s);
+      ctx.globalAlpha = 0.5 + pulse * 0.4; ctx.fillStyle = s % 2 ? '#8cecff' : '#ffffff'; ctx.beginPath(); ctx.arc(Math.cos(a) * rr, Math.sin(a) * rr, 2.5 + pulse * 1.3, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.restore();
+  }
+  // 電湧陷阱的三點連線：使用雙層虛線＋中央能量脈衝，真正命中時再疊加鋸齒雷擊。
+  for (const tr of (state.kashimoTraps || [])) {
+    const owner = state.balls.find(b => b.player === tr.owner && isKashimoBall(b) && b.hp > 0);
+    if (!owner) continue;
+    const phase = (state.elapsed || elapsed) * 8 + tr.x * 0.02;
+    ctx.save(); ctx.globalCompositeOperation = 'screen';
+    ctx.globalAlpha = 0.22 + 0.12 * Math.sin(phase);
+    ctx.setLineDash([10, 9]); ctx.strokeStyle = '#9a7aff'; ctx.shadowColor = '#7d5cff'; ctx.shadowBlur = 15; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(owner.x, owner.y); ctx.lineTo(tr.x, tr.y); ctx.stroke();
+    ctx.globalAlpha = 0.56 + 0.2 * Math.sin(phase * 1.3);
+    ctx.setLineDash([2, 13]); ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(owner.x, owner.y); ctx.lineTo(tr.x, tr.y); ctx.stroke(); ctx.setLineDash([]);
+    const t = (phase * 0.09) % 1, px = owner.x + (tr.x - owner.x) * t, py = owner.y + (tr.y - owner.y) * t;
+    ctx.fillStyle = '#ffffff'; ctx.shadowColor = '#8cecff'; ctx.shadowBlur = 18; ctx.beginPath(); ctx.arc(px, py, 4 + 2 * Math.sin(phase), 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+
+  // 幻獸琥珀：金色電磁波、青白音波、腦內電信號脈衝與分叉電弧全部同時存在。
+  for (const b of (state.balls || [])) {
+    if (!isKashimoBall(b) || !b.kashimoAmberActive || b.hp <= 0) continue;
+    const phase = (state.elapsed || elapsed) * 13 + b.x * 0.01;
+    const pulse = 0.6 + 0.4 * Math.sin(phase);
+    ctx.save(); ctx.globalCompositeOperation = 'screen';
+    const aura = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.r * 4.4);
+    aura.addColorStop(0, `rgba(255,255,238,${0.58 + pulse * 0.2})`);
+    aura.addColorStop(0.18, `rgba(245,215,110,${0.28 + pulse * 0.18})`);
+    aura.addColorStop(0.48, 'rgba(140,235,255,0.12)'); aura.addColorStop(1, 'rgba(245,215,110,0)');
+    ctx.fillStyle = aura; ctx.beginPath(); ctx.arc(b.x, b.y, b.r * 4.4, 0, Math.PI * 2); ctx.fill();
+    for (let ring = 0; ring < 2; ring++) {
+      const rr = b.r + 13 + ring * 8 + Math.sin(phase * 0.7 + ring) * 5;
+      ctx.globalAlpha = (0.2 + pulse * 0.18) * (1 - ring * 0.07);
+      ctx.strokeStyle = ring % 3 === 0 ? '#fff7cf' : (ring % 2 ? '#8cecff' : '#f5d76e');
+      ctx.shadowColor = ring % 2 ? '#8cecff' : '#f5d76e'; ctx.shadowBlur = 12 + ring * 2; ctx.lineWidth = ring % 3 === 0 ? 2.8 : 1.1;
+      ctx.setLineDash(ring % 2 ? [5, 12] : [18, 6]);
+      ctx.beginPath(); ctx.arc(b.x, b.y, rr, phase * (ring % 2 ? -0.35 : 0.23) + ring, phase * (ring % 2 ? -0.35 : 0.23) + Math.PI * (1.12 + ring * 0.1)); ctx.stroke();
+    }
+    ctx.setLineDash([]); ctx.globalAlpha = 0.5 + pulse * 0.28; ctx.strokeStyle = '#8cecff'; ctx.lineWidth = 1.4; ctx.shadowBlur = 12;
+    for (let node = 0; node < 4; node++) {
+      const a = phase * 0.13 + node * Math.PI / 6;
+      const rr = b.r + 36 + 8 * Math.sin(phase * 0.6 + node);
+      const nx = b.x + Math.cos(a) * rr, ny = b.y + Math.sin(a) * rr;
+      ctx.beginPath(); ctx.arc(nx, ny, 3 + 2 * pulse, 0, Math.PI * 2); ctx.stroke();
+      if (node % 2 === 0) {
+        ctx.globalAlpha = 0.26 + pulse * 0.16;
+        drawKashimoJaggedArc(ctx, b.x, b.y, nx, ny, phase + node * 2.7, 12, 7);
+        ctx.globalAlpha = 0.5 + pulse * 0.28;
+      }
+    }
+    ctx.globalAlpha = 0.7 + 0.2 * pulse; ctx.strokeStyle = '#fffbe2'; ctx.lineWidth = 2.2; ctx.shadowColor = '#fff1a4'; ctx.shadowBlur = 24;
+    ctx.beginPath(); ctx.arc(b.x, b.y, b.r + 9 + 3 * Math.sin(phase), 0, Math.PI * 2); ctx.stroke();
+    ctx.restore();
+  }
+
+  // 鹿式電：大型球狀電磁砲，核心、同心音波環、電磁波尾流與前方放射尖峰。
+  for (const orb of (state.kashimoDeerOrbs || [])) {
+    const prog = Math.max(0, orb.life / orb.maxLife);
+    const phase = (state.elapsed || elapsed) * 18 + orb.travel * 0.03;
+    const r = orb.radius * (0.92 + 0.12 * Math.sin(phase));
+    ctx.save(); ctx.globalCompositeOperation = 'screen';
+    const grad = ctx.createRadialGradient(orb.x, orb.y, 0, orb.x, orb.y, r * 2.8);
+    grad.addColorStop(0, `rgba(255,255,255,${0.95 * prog})`); grad.addColorStop(0.18, `rgba(255,244,168,${0.82 * prog})`); grad.addColorStop(0.55, `rgba(140,236,255,${0.28 * prog})`); grad.addColorStop(1, 'rgba(255,226,122,0)');
+    ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(orb.x, orb.y, r * 2.8, 0, Math.PI * 2); ctx.fill();
+    ctx.globalAlpha = prog; ctx.fillStyle = '#fffef0'; ctx.shadowColor = '#ffe27a'; ctx.shadowBlur = 35; ctx.beginPath(); ctx.arc(orb.x, orb.y, r, 0, Math.PI * 2); ctx.fill();
+    for (let ring = 0; ring < 2; ring++) {
+      const rr = r * (1.35 + ring * 0.42) + 4 * Math.sin(phase + ring);
+      ctx.globalAlpha = prog * (0.75 - ring * 0.065); ctx.strokeStyle = ring % 2 ? '#8cecff' : '#fff6b9'; ctx.shadowColor = ring % 2 ? '#8cecff' : '#ffe27a'; ctx.shadowBlur = 14 + ring * 3; ctx.lineWidth = ring === 0 ? 3 : 1.2;
+      ctx.setLineDash(ring % 2 ? [8, 9] : [22, 7]); ctx.beginPath(); ctx.ellipse(orb.x, orb.y, rr * (1 + 0.16 * Math.sin(phase * 0.7 + ring)), rr * (0.46 + ring * 0.08), orb.angle + phase * 0.02, 0, Math.PI * 2); ctx.stroke();
+    }
+    ctx.setLineDash([]); ctx.globalAlpha = prog * 0.88; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2; ctx.shadowBlur = 12;
+    for (let ray = 0; ray < 6; ray++) {
+      const a = orb.angle + phase * 0.08 + ray * Math.PI / 8;
+      const inner = r * 0.8, outer = r * (1.8 + 0.6 * Math.sin(phase * 0.8 + ray));
+      drawKashimoJaggedArc(ctx, orb.x + Math.cos(a) * inner, orb.y + Math.sin(a) * inner, orb.x + Math.cos(a + 0.16) * outer, orb.y + Math.sin(a + 0.16) * outer, phase + ray * 3.2, 13, 6);
+      ctx.strokeStyle = ray % 3 === 0 ? '#ffffff' : '#9eefff'; ctx.lineWidth = ray % 3 === 0 ? 2.2 : 0.9;
+    }
+    ctx.globalAlpha = prog * 0.65; ctx.strokeStyle = '#fff9c8'; ctx.lineWidth = 4; ctx.shadowBlur = 24;
+    ctx.beginPath(); ctx.moveTo(orb.x - Math.cos(orb.angle) * r * 0.6, orb.y - Math.sin(orb.angle) * r * 0.6); ctx.lineTo(orb.x - Math.cos(orb.angle) * (r * 3.7 + 22), orb.y - Math.sin(orb.angle) * (r * 3.7 + 22)); ctx.stroke();
+    ctx.restore();
+  }
+
+  // 陷阱命中與雷場電弧：三層鋸齒線，核心白線＋紫色外暈＋青色分支。
+  for (const fx of (state.kashimoLightningFX || [])) {
+    const prog = Math.max(0, fx.life / fx.maxLife);
+    const isDash = fx.kind === 'dash';
+    const isRelease = fx.kind === 'release';
+    const power = fx.power || (fx.kind === 'field' ? 1.0 : isDash ? 0.72 : 1.35);
+    const primary = fx.color || (fx.kind === 'field' ? '#9a8aff' : '#7d5cff');
+    ctx.save(); ctx.globalCompositeOperation = 'screen'; ctx.globalAlpha = prog;
+    ctx.strokeStyle = primary; ctx.shadowColor = primary;
+    const isDashCore = isDash && !!fx.dashCore;
+    ctx.shadowBlur = isDash ? (isDashCore ? 30 : fx.dashSpeedLine ? 18 : 9) * power : isRelease ? 20 * power : 11 * power;
+    ctx.lineWidth = (isDash ? (isDashCore ? 6.8 : fx.dashSpeedLine ? 4.8 : 2.5) : isRelease ? 4.4 : 3.4) * power;
+    if (isDash) {
+      ctx.beginPath(); ctx.moveTo(fx.x1, fx.y1); ctx.lineTo(fx.x2, fx.y2); ctx.stroke();
+    } else {
+      drawKashimoJaggedArc(ctx, fx.x1, fx.y1, fx.x2, fx.y2, fx.seed || (fx.x1 + fx.y1), KASHIMO_FX_ARC_JITTER * power, fx.kind === 'field' ? 5 : 7);
+    }
+    ctx.strokeStyle = '#ffffff'; ctx.shadowColor = '#ffffff';
+    ctx.shadowBlur = isDash ? (isDashCore ? 9 : 4) : isRelease ? 10 : 5;
+    ctx.lineWidth = (isDash ? (isDashCore ? 2.6 : fx.dashSpeedLine ? 1.75 : 0.9) : isRelease ? 1.8 : 1.2) * power;
+    ctx.beginPath(); ctx.moveTo(fx.x1, fx.y1); ctx.lineTo(fx.x2, fx.y2); ctx.stroke();
+    if (fx.kind !== 'field' && !isDash) {
+      ctx.globalAlpha = prog * 0.72; ctx.strokeStyle = '#8cecff'; ctx.lineWidth = 1.3;
+      drawKashimoJaggedArc(ctx, fx.x1, fx.y1, (fx.x1 + fx.x2) / 2, (fx.y1 + fx.y2) / 2, (fx.seed || 0) + 8.1, 26, 6);
+    }
+    ctx.restore();
+  }
+
+  // 電荷爆發粒子與衝擊波：所有高能量技能共用，但依 kind 呈現不同色調。
+  for (const p of (state.kashimoSparks || [])) {
+    const prog = Math.max(0, p.life / p.maxLife);
+    ctx.save(); ctx.globalCompositeOperation = 'screen'; ctx.globalAlpha = prog;
+    ctx.strokeStyle = p.color; ctx.fillStyle = p.color; ctx.shadowColor = p.color; ctx.shadowBlur = p.glow || 12;
+    const tail = Math.min(18, Math.hypot(p.vx, p.vy) * 0.035);
+    const ang = Math.atan2(p.vy, p.vx);
+    ctx.lineWidth = Math.max(1, p.size * 0.6); ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p.x - Math.cos(ang) * tail, p.y - Math.sin(ang) * tail); ctx.stroke();
+    ctx.beginPath(); ctx.arc(p.x, p.y, p.size * (0.55 + 0.5 * prog), 0, Math.PI * 2); ctx.fill(); ctx.restore();
+  }
+  for (const fx of (state.kashimoShockwaves || [])) {
+    const prog = 1 - Math.max(0, fx.life / fx.maxLife);
+    const ease = 1 - Math.pow(1 - prog, 2);
+    ctx.save(); ctx.globalCompositeOperation = 'screen'; ctx.globalAlpha = Math.max(0, (1 - prog) * 0.95);
+    ctx.strokeStyle = fx.color; ctx.shadowColor = fx.color; ctx.shadowBlur = 26; ctx.lineWidth = Math.max(1, fx.width * (1 - prog * 0.55));
+    ctx.beginPath(); ctx.arc(fx.x, fx.y, fx.r0 + (fx.r1 - fx.r0) * ease, 0, Math.PI * 2); ctx.stroke();
+    ctx.globalAlpha *= 0.42; ctx.lineWidth *= 2.8; ctx.beginPath(); ctx.arc(fx.x, fx.y, fx.r0 + (fx.r1 - fx.r0) * ease * 0.72, 0, Math.PI * 2); ctx.stroke(); ctx.restore();
+  }
+
   // 插牆菜刀
   for (const k of state.wallKnives) {
     ctx.save(); ctx.translate(k.x,k.y); ctx.rotate(k.angle);
@@ -20781,7 +21677,8 @@ function render() {
   }
 
 
-// ── 術式球飛行拖尾（共用：蒼／赫／紫皆可用，依殘影座標畫淡出光點） ──
+drawKashimoReadability();
+  // ── 術式球飛行拖尾（共用：蒼／赫／紫皆可用，依殘影座標畫淡出光點） ──
   function drawGojoTrail(ball, rgb) {    const trail = ball.trail;
     if (!trail || trail.length < 2) return;
     ctx.save();
@@ -22346,17 +23243,34 @@ function render() {
     ctx.restore();
   }
 
-  // 打斷定身瞬間：簡單黃色圈閃一下
+  // 打斷定身瞬間：一般狀態保留黃色圈；鹿紫雲瞬雷改用紫白集中爆發圈與放射電弧。
   if (state.thunderStunFX) {
     for (const fx of state.thunderStunFX) {
-      const prog = fx.life / fx.maxLife;
+      const prog = Math.max(0, fx.life / fx.maxLife);
+      const isKashimoRelease = fx.kind === 'kashimo-release';
       ctx.save();
-      ctx.globalAlpha = prog * 0.8;
-      ctx.strokeStyle = '#f1c40f';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.arc(fx.x, fx.y, RADIUS + 8 + (1 - prog) * 14, 0, Math.PI * 2);
-      ctx.stroke();
+      ctx.globalCompositeOperation = 'screen';
+      if (isKashimoRelease) {
+        const expand = 1 - prog;
+        ctx.globalAlpha = prog * 0.95;
+        ctx.strokeStyle = '#c29cff'; ctx.shadowColor = '#9c6cff'; ctx.shadowBlur = 22; ctx.lineWidth = 4;
+        ctx.beginPath(); ctx.arc(fx.x, fx.y, RADIUS + 10 + expand * 58, 0, Math.PI * 2); ctx.stroke();
+        ctx.globalAlpha = prog * 0.92;
+        ctx.strokeStyle = '#fff4ff'; ctx.shadowColor = '#ffffff'; ctx.shadowBlur = 12; ctx.lineWidth = 1.8;
+        ctx.beginPath(); ctx.arc(fx.x, fx.y, RADIUS + 3 + expand * 28, 0, Math.PI * 2); ctx.stroke();
+        for (let ray = 0; ray < 6; ray++) {
+          const a = ray * Math.PI / 3 + expand * 0.25;
+          const inner = RADIUS * 0.75, outer = RADIUS * (2.0 + expand * 2.0);
+          drawKashimoJaggedArc(ctx,
+            fx.x + Math.cos(a) * inner, fx.y + Math.sin(a) * inner,
+            fx.x + Math.cos(a + 0.12) * outer, fx.y + Math.sin(a + 0.12) * outer,
+            fx.x * 0.07 + fx.y * 0.11 + ray * 4.3, 14 + expand * 10, 7);
+        }
+      } else {
+        ctx.globalAlpha = prog * 0.8;
+        ctx.strokeStyle = '#f1c40f'; ctx.shadowColor = '#f1c40f'; ctx.shadowBlur = 5; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.arc(fx.x, fx.y, RADIUS + 8 + (1 - prog) * 14, 0, Math.PI * 2); ctx.stroke();
+      }
       ctx.restore();
     }
   }
@@ -22413,62 +23327,92 @@ function render() {
     ctx.restore();
   }
 
-  // 宇治波鼬：須佐能乎刺擊刀刃特效
+  // 宇治波鼬：須佐能乎刺擊刀刃特效（高速突刺／殘影／衝擊環）
   if (state.itachiStabFX) {
     for (const fx of state.itachiStabFX) {
       const prog = fx.life / fx.maxLife; // 1→0
-      // 0→1 快速衝出，再慢慢淡出
-      const punch = Math.min(1, (1 - prog) * 4); // 前1/4時間內衝到滿長
-      const extend = punch * (RADIUS * 4.2);
-      const alpha = prog;
+      const age = 1 - prog;
+      const punch = Math.min(1, age * 4.6);
+      const extend = punch * (RADIUS * 5.2);
+      const alpha = Math.max(0, Math.min(1, prog * 1.18));
+      const phase = fx.phase || 0;
       ctx.save();
       ctx.translate(fx.x, fx.y);
       ctx.rotate(fx.angle);
+      ctx.globalCompositeOperation = 'lighter';
       ctx.globalAlpha = alpha;
+
+      // 高速方向線：由身後向外拉出，讓刺擊有明確的速度方向。
+      for (let li = 0; li < 7; li++) {
+        const lane = (li - 3) * 5.5;
+        const back = RADIUS * (1.1 + (li % 3) * 0.22);
+        const len = RADIUS * (2.0 + (li % 4) * 0.55) * (0.35 + punch * 0.9);
+        ctx.beginPath();
+        ctx.moveTo(-back, lane);
+        ctx.lineTo(-back - len, lane * (0.55 + 0.1 * Math.sin(phase + li)));
+        ctx.strokeStyle = li % 2 ? `rgba(255,55,75,${0.34 * alpha})` : `rgba(255,220,230,${0.52 * alpha})`;
+        ctx.lineWidth = li === 3 ? 3.2 : 1.2;
+        ctx.shadowColor = '#ff2038';
+        ctx.shadowBlur = li === 3 ? 14 : 6;
+        ctx.stroke();
+      }
 
       // 衝擊波寬幅紅色閃光（沿刺擊方向的扇形）
       ctx.beginPath();
       ctx.moveTo(0, 0);
-      ctx.arc(0, 0, extend + 20, -0.35, 0.35);
+      ctx.arc(0, 0, extend + 28, -0.38, 0.38);
       ctx.closePath();
-      ctx.fillStyle = `rgba(255,0,0,${0.25*alpha})`;
+      ctx.fillStyle = `rgba(255,20,35,${0.32 * alpha})`;
       ctx.fill();
 
-      // 刀刃主體（大幅加長加粗）
-      ctx.beginPath();
-      ctx.moveTo(RADIUS * 0.5, 0);
-      ctx.lineTo(RADIUS * 0.5 + extend, -9);
-      ctx.lineTo(RADIUS * 0.5 + extend + 26, 0);
-      ctx.lineTo(RADIUS * 0.5 + extend, 9);
-      ctx.closePath();
-      ctx.fillStyle = '#f0f0f0';
-      ctx.shadowColor = '#ff0000'; ctx.shadowBlur = 28;
-      ctx.fill();
-      // 刀刃中線反光
-      ctx.beginPath();
-      ctx.moveTo(RADIUS * 0.5, 0);
-      ctx.lineTo(RADIUS * 0.5 + extend + 18, 0);
-      ctx.strokeStyle = 'rgba(255,255,255,1)';
-      ctx.lineWidth = 3;
-      ctx.shadowBlur = 16;
-      ctx.stroke();
-
-      // 噴濺血線（多道，從刺中點往外炸開）
-      for (let si = 0; si < 5; si++) {
-        const sa = (si - 2) * 0.35;
-        const slen = (extend + 26) + Math.random()*18;
+      // 短暫刀刃殘影，呈現一前一後的高速位移。
+      for (let ri = 1; ri <= 2; ri++) {
+        const ghost = Math.max(0, alpha * (0.22 - ri * 0.055));
+        const ghostLen = extend * (0.78 - ri * 0.12);
         ctx.beginPath();
-        ctx.moveTo(RADIUS * 0.5 + extend, 0);
-        ctx.lineTo(
-          RADIUS * 0.5 + extend + Math.cos(sa)*slen,
-          Math.sin(sa)*slen
-        );
-        ctx.strokeStyle = `rgba(220,0,0,${0.8*alpha})`;
-        ctx.lineWidth = 2;
-        ctx.shadowBlur = 0;
-        ctx.stroke();
+        ctx.moveTo(RADIUS * 0.5 - ri * 10, -ri * 4);
+        ctx.lineTo(RADIUS * 0.5 + ghostLen, -8 - ri * 2);
+        ctx.lineTo(RADIUS * 0.5 + ghostLen + 18, 0);
+        ctx.lineTo(RADIUS * 0.5 + ghostLen, 8 + ri * 2);
+        ctx.closePath();
+        ctx.fillStyle = `rgba(190,0,30,${ghost})`;
+        ctx.shadowColor = '#ff003c'; ctx.shadowBlur = 18;
+        ctx.fill();
       }
 
+      // 刀刃主體
+      ctx.beginPath();
+      ctx.moveTo(RADIUS * 0.5, 0);
+      ctx.lineTo(RADIUS * 0.5 + extend, -10);
+      ctx.lineTo(RADIUS * 0.5 + extend + 30, 0);
+      ctx.lineTo(RADIUS * 0.5 + extend, 10);
+      ctx.closePath();
+      ctx.fillStyle = '#fff5f8';
+      ctx.shadowColor = '#ff1638'; ctx.shadowBlur = 30;
+      ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(RADIUS * 0.5, 0);
+      ctx.lineTo(RADIUS * 0.5 + extend + 22, 0);
+      ctx.strokeStyle = `rgba(255,255,255,${0.98 * alpha})`;
+      ctx.lineWidth = 3.5;
+      ctx.shadowColor = '#ffffff'; ctx.shadowBlur = 12;
+      ctx.stroke();
+
+      // 命中端的爆發環與尖刺，讓命中瞬間不會被角色球體遮住。
+      const tipX = RADIUS * 0.5 + extend + 28;
+      ctx.beginPath(); ctx.arc(tipX, 0, 12 + punch * 18, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(255,70,90,${0.75 * alpha})`;
+      ctx.lineWidth = 2.5; ctx.shadowColor = '#ff2040'; ctx.shadowBlur = 18; ctx.stroke();
+      for (let si = 0; si < 6; si++) {
+        const sa = (Math.PI * 2 / 6) * si + phase;
+        const slen = 18 + punch * 24;
+        ctx.beginPath(); ctx.moveTo(tipX + Math.cos(sa) * 7, Math.sin(sa) * 7);
+        ctx.lineTo(tipX + Math.cos(sa) * slen, Math.sin(sa) * slen);
+        ctx.strokeStyle = `rgba(255,90,110,${0.7 * alpha})`;
+        ctx.lineWidth = 1.5; ctx.stroke();
+      }
+
+      ctx.globalCompositeOperation = 'source-over';
       ctx.globalAlpha = 1;
       ctx.shadowBlur = 0;
       ctx.restore();
@@ -24166,141 +25110,210 @@ function render() {
       ctx.strokeStyle = '#ff0000'; ctx.lineWidth = 1; ctx.stroke();
     }
 
-    // ── 須佐能乎：球外鎧甲特效 ──
+    // ── 須佐能乎：球外鎧甲特效（完全體輪廓／八勾玉／須佐之刃） ──
     if (b.char.type === 'itachi' && b.itachiSusanooActive) {
-      const susPulse = 0.7 + 0.3 * Math.sin(elapsed * 5);
+      const susPulse = 0.72 + 0.28 * Math.sin(elapsed * 5);
       const floatOff = Math.sin(elapsed * 2.2) * 3;
+      const spin = elapsed * 0.18;
       ctx.save();
       ctx.translate(b.x, b.y + floatOff);
+      ctx.globalCompositeOperation = 'lighter';
 
-      // 外暈
-      const sg = ctx.createRadialGradient(0,0,RADIUS*0.6,0,0,RADIUS*3.2);
-      sg.addColorStop(0, `rgba(139,0,0,${0.35*susPulse})`);
+      // 外暈與雙層靈壓環
+      const sg = ctx.createRadialGradient(0,0,RADIUS*0.6,0,0,RADIUS*3.5);
+      sg.addColorStop(0, `rgba(180,0,20,${0.42*susPulse})`);
+      sg.addColorStop(0.35, `rgba(100,0,20,${0.18*susPulse})`);
       sg.addColorStop(1, 'transparent');
-      ctx.beginPath(); ctx.arc(0,0,RADIUS*3.2,0,Math.PI*2);
+      ctx.beginPath(); ctx.arc(0,0,RADIUS*3.5,0,Math.PI*2);
       ctx.fillStyle = sg; ctx.fill();
+      for (let ri = 0; ri < 2; ri++) {
+        ctx.beginPath();
+        ctx.arc(0, 0, RADIUS * (2.55 + ri * 0.34), spin * (ri ? -1 : 1), spin * (ri ? -1 : 1) + Math.PI * 1.55);
+        ctx.strokeStyle = `rgba(${ri ? '255,80,90' : '255,220,220'},${(0.45 - ri * 0.08) * susPulse})`;
+        ctx.lineWidth = 2.5 - ri * 0.6;
+        ctx.shadowColor = '#ff1838'; ctx.shadowBlur = 14;
+        ctx.stroke();
+      }
 
-      // 多邊形鎧甲外殼（六邊形，發光描邊）
-      const shellR = RADIUS * 2.1;
+      // 多邊形鎧甲外殼
+      const shellR = RADIUS * 2.25;
       const sides = 6;
       ctx.beginPath();
       for (let si = 0; si <= sides; si++) {
-        const a2 = (Math.PI*2/sides) * si - Math.PI/2 + elapsed*0.15;
+        const a2 = (Math.PI*2/sides) * si - Math.PI/2 + spin;
         const px = Math.cos(a2)*shellR, py = Math.sin(a2)*shellR;
         if (si === 0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
       }
       ctx.closePath();
-      ctx.fillStyle = `rgba(80,0,0,${0.18*susPulse})`;
+      ctx.fillStyle = `rgba(70,0,18,${0.24*susPulse})`;
       ctx.fill();
-      ctx.strokeStyle = `rgba(220,30,30,${0.85*susPulse})`;
-      ctx.lineWidth = 3;
-      ctx.shadowColor = '#ff0000'; ctx.shadowBlur = 22;
+      ctx.strokeStyle = `rgba(245,40,62,${0.95*susPulse})`;
+      ctx.lineWidth = 3.5;
+      ctx.shadowColor = '#ff002f'; ctx.shadowBlur = 26;
       ctx.stroke();
 
-      // 肋骨狀放射線（外殼頂點連到內圈）
+      // 肋骨放射線與節點
       for (let si = 0; si < sides; si++) {
-        const a2 = (Math.PI*2/sides) * si - Math.PI/2 + elapsed*0.15;
+        const a2 = (Math.PI*2/sides) * si - Math.PI/2 + spin;
         const ox = Math.cos(a2)*shellR, oy = Math.sin(a2)*shellR;
-        const ix = Math.cos(a2)*(RADIUS+4), iy = Math.sin(a2)*(RADIUS+4);
-        ctx.beginPath();
-        ctx.moveTo(ix,iy); ctx.lineTo(ox,oy);
-        ctx.strokeStyle = `rgba(255,60,60,${0.4*susPulse})`;
-        ctx.lineWidth = 1.5;
-        ctx.shadowBlur = 6;
-        ctx.stroke();
+        const ix = Math.cos(a2)*(RADIUS+5), iy = Math.sin(a2)*(RADIUS+5);
+        ctx.beginPath(); ctx.moveTo(ix,iy); ctx.lineTo(ox,oy);
+        ctx.strokeStyle = `rgba(255,92,108,${0.58*susPulse})`;
+        ctx.lineWidth = 1.6; ctx.shadowBlur = 8; ctx.stroke();
+        ctx.beginPath(); ctx.arc(ox, oy, 4.5 + susPulse * 1.5, 0, Math.PI*2);
+        ctx.fillStyle = `rgba(255,225,230,${0.65*susPulse})`; ctx.fill();
       }
 
-      // 內層胸甲護盾（橢圓）
+      // 須佐頭冠與猩紅瞳孔
       ctx.beginPath();
-      ctx.ellipse(0, 0, RADIUS*1.5, RADIUS*1.3, 0, 0, Math.PI*2);
-      ctx.strokeStyle = `rgba(255,100,100,${0.7*susPulse})`;
-      ctx.lineWidth = 2;
-      ctx.shadowColor = '#ff3333'; ctx.shadowBlur = 14;
-      ctx.stroke();
+      ctx.moveTo(-RADIUS*0.72, -RADIUS*1.0);
+      ctx.lineTo(-RADIUS*0.42, -RADIUS*1.62);
+      ctx.lineTo(0, -RADIUS*1.82);
+      ctx.lineTo(RADIUS*0.42, -RADIUS*1.62);
+      ctx.lineTo(RADIUS*0.72, -RADIUS*1.0);
+      ctx.closePath();
+      ctx.fillStyle = `rgba(105,0,20,${0.58*susPulse})`;
+      ctx.strokeStyle = `rgba(255,90,105,${0.9*susPulse})`;
+      ctx.lineWidth = 2.5; ctx.shadowColor = '#ff1838'; ctx.shadowBlur = 18;
+      ctx.fill(); ctx.stroke();
+      ctx.beginPath(); ctx.ellipse(0, -RADIUS*1.18, RADIUS*0.33, RADIUS*0.16, 0, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(255,245,245,${0.8*susPulse})`; ctx.fill();
+      ctx.beginPath(); ctx.arc(0, -RADIUS*1.18, 4.2, 0, Math.PI*2);
+      ctx.fillStyle = '#ff001f'; ctx.shadowColor = '#ff001f'; ctx.shadowBlur = 12; ctx.fill();
 
-      // 雙臂輪廓（左右延伸的弧形塊）
+      // 胸甲與八勾玉輪
+      ctx.beginPath();
+      ctx.ellipse(0, 0, RADIUS*1.55, RADIUS*1.35, 0, 0, Math.PI*2);
+      ctx.strokeStyle = `rgba(255,140,150,${0.78*susPulse})`;
+      ctx.lineWidth = 2.5; ctx.shadowColor = '#ff334f'; ctx.shadowBlur = 16; ctx.stroke();
+      for (let ti = 0; ti < 8; ti++) {
+        const ta = (Math.PI * 2 / 8) * ti - Math.PI/2 - spin * 1.7;
+        const tx = Math.cos(ta) * RADIUS * 1.62, ty = Math.sin(ta) * RADIUS * 1.38;
+        ctx.beginPath(); ctx.arc(tx, ty, 4.2, 0, Math.PI*2);
+        ctx.fillStyle = `rgba(255,225,230,${0.8*susPulse})`; ctx.fill();
+        ctx.strokeStyle = '#ff1738'; ctx.lineWidth = 1.4; ctx.stroke();
+      }
+
+      // 雙臂與須佐之刃：只作視覺輪廓，不改變實際碰撞範圍。
       for (const side of [-1, 1]) {
-        ctx.save();
-        ctx.scale(side, 1);
+        ctx.save(); ctx.scale(side, 1);
         ctx.beginPath();
-        ctx.moveTo(RADIUS*1.2, -RADIUS*0.3);
-        ctx.quadraticCurveTo(RADIUS*2.6, -RADIUS*0.6, RADIUS*2.9, RADIUS*0.2);
-        ctx.quadraticCurveTo(RADIUS*2.5, RADIUS*0.6, RADIUS*1.3, RADIUS*0.5);
+        ctx.moveTo(RADIUS*1.15, -RADIUS*0.35);
+        ctx.quadraticCurveTo(RADIUS*2.8, -RADIUS*0.85, RADIUS*3.05, RADIUS*0.05);
+        ctx.quadraticCurveTo(RADIUS*2.5, RADIUS*0.65, RADIUS*1.2, RADIUS*0.55);
         ctx.closePath();
-        ctx.fillStyle = `rgba(100,0,0,${0.25*susPulse})`;
-        ctx.fill();
-        ctx.strokeStyle = `rgba(255,50,50,${0.6*susPulse})`;
-        ctx.lineWidth = 2;
-        ctx.shadowBlur = 10;
-        ctx.stroke();
+        ctx.fillStyle = `rgba(100,0,18,${0.32*susPulse})`; ctx.fill();
+        ctx.strokeStyle = `rgba(255,58,78,${0.75*susPulse})`; ctx.lineWidth = 2.2;
+        ctx.shadowColor = '#ff1436'; ctx.shadowBlur = 12; ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(RADIUS*2.0, -RADIUS*0.28); ctx.lineTo(RADIUS*3.55, -RADIUS*1.55);
+        ctx.strokeStyle = `rgba(255,245,245,${0.72*susPulse})`; ctx.lineWidth = 4.5; ctx.shadowColor = '#ff5368'; ctx.shadowBlur = 18; ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(RADIUS*2.03, -RADIUS*0.28); ctx.lineTo(RADIUS*3.45, -RADIUS*1.48);
+        ctx.strokeStyle = `rgba(255,255,255,${0.9*susPulse})`; ctx.lineWidth = 1.4; ctx.stroke();
         ctx.restore();
       }
 
+      ctx.globalCompositeOperation = 'source-over';
       ctx.restore();
       ctx.shadowBlur = 0;
 
-      // 剩餘時間倒數環
-      const remainFrac = b.itachiSusanooTimer / ITACHI_SUSANOO_DURATION;
-      ctx.beginPath();
-      ctx.arc(b.x, b.y, RADIUS + 26, -Math.PI/2, -Math.PI/2 + Math.PI*2*remainFrac);
-      ctx.strokeStyle = 'rgba(255,255,255,0.5)';
-      ctx.lineWidth = 2;
-      ctx.stroke();
+      // 剩餘時間倒數環與狀態核心
+      const remainFrac = Math.max(0, Math.min(1, b.itachiSusanooTimer / ITACHI_SUSANOO_DURATION));
+      ctx.beginPath(); ctx.arc(b.x, b.y, RADIUS + 29, -Math.PI/2, -Math.PI/2 + Math.PI*2*remainFrac);
+      ctx.strokeStyle = `rgba(255,${120 + Math.floor(100 * susPulse)},${130 + Math.floor(100 * susPulse)},0.82)`;
+      ctx.lineWidth = 3.5; ctx.shadowColor = '#ff193c'; ctx.shadowBlur = 12; ctx.stroke(); ctx.shadowBlur = 0;
     }
 
-    // ── 工程師：機甲模式裝甲特效 ──
+    // ── 工程師：機甲模式裝甲特效（重裝外骨骼／核心／肩砲／推進器） ──
     if (b.char.type === 'engineer' && b.engMechActive) {
-      const mechPulse = 0.7 + 0.3 * Math.sin(elapsed * 6);
+      const mechPulse = 0.72 + 0.28 * Math.sin(elapsed * 6);
+      const mechSpin = elapsed * 0.22;
       ctx.save();
       ctx.translate(b.x, b.y);
+      ctx.globalCompositeOperation = 'lighter';
 
-      // 外暈
-      const mg = ctx.createRadialGradient(0,0,RADIUS*0.6,0,0,RADIUS*2.8);
-      mg.addColorStop(0, `rgba(58,143,214,${0.3*mechPulse})`);
+      // 外暈與旋轉掃描環
+      const mg = ctx.createRadialGradient(0,0,RADIUS*0.55,0,0,RADIUS*3.2);
+      mg.addColorStop(0, `rgba(40,150,245,${0.42*mechPulse})`);
+      mg.addColorStop(0.42, `rgba(30,90,180,${0.18*mechPulse})`);
       mg.addColorStop(1, 'transparent');
-      ctx.beginPath(); ctx.arc(0,0,RADIUS*2.8,0,Math.PI*2);
+      ctx.beginPath(); ctx.arc(0,0,RADIUS*3.2,0,Math.PI*2);
       ctx.fillStyle = mg; ctx.fill();
+      for (let ri = 0; ri < 2; ri++) {
+        ctx.beginPath();
+        ctx.arc(0, 0, RADIUS * (2.3 + ri * 0.3), mechSpin * (ri ? -1 : 1), mechSpin * (ri ? -1 : 1) + Math.PI * 1.4);
+        ctx.strokeStyle = `rgba(${ri ? '126,230,255' : '235,250,255'},${(0.48 - ri * 0.1) * mechPulse})`;
+        ctx.lineWidth = 2.5 - ri * 0.7; ctx.shadowColor = '#4fcaff'; ctx.shadowBlur = 15; ctx.stroke();
+      }
 
       // 八邊形重裝甲外殼
-      const shellR = RADIUS * 1.85;
+      const shellR = RADIUS * 2.0;
       const sides = 8;
       ctx.beginPath();
       for (let si = 0; si <= sides; si++) {
-        const a2 = (Math.PI*2/sides) * si - Math.PI/2;
+        const a2 = (Math.PI*2/sides) * si - Math.PI/2 + mechSpin;
         const px = Math.cos(a2)*shellR, py = Math.sin(a2)*shellR;
         if (si === 0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
       }
       ctx.closePath();
-      ctx.fillStyle = `rgba(20,40,60,${0.3*mechPulse})`;
+      ctx.fillStyle = `rgba(12,42,72,${0.38*mechPulse})`;
       ctx.fill();
-      ctx.strokeStyle = `rgba(95,208,255,${0.85*mechPulse})`;
-      ctx.lineWidth = 3;
-      ctx.shadowColor = '#5fd0ff'; ctx.shadowBlur = 18;
-      ctx.stroke();
+      ctx.strokeStyle = `rgba(110,220,255,${0.98*mechPulse})`;
+      ctx.lineWidth = 3.5; ctx.shadowColor = '#39c9ff'; ctx.shadowBlur = 24; ctx.stroke();
 
-      // 裝甲接縫線
+      // 裝甲接縫與外殼節點
       for (let si = 0; si < sides; si++) {
-        const a2 = (Math.PI*2/sides) * si - Math.PI/2;
+        const a2 = (Math.PI*2/sides) * si - Math.PI/2 + mechSpin;
         const ox = Math.cos(a2)*shellR, oy = Math.sin(a2)*shellR;
         const ix = Math.cos(a2)*(RADIUS+3), iy = Math.sin(a2)*(RADIUS+3);
-        ctx.beginPath();
-        ctx.moveTo(ix,iy); ctx.lineTo(ox,oy);
-        ctx.strokeStyle = `rgba(174,224,255,${0.35*mechPulse})`;
-        ctx.lineWidth = 1.2;
-        ctx.shadowBlur = 4;
-        ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(ix,iy); ctx.lineTo(ox,oy);
+        ctx.strokeStyle = `rgba(185,240,255,${0.48*mechPulse})`; ctx.lineWidth = 1.4; ctx.shadowBlur = 6; ctx.stroke();
+        ctx.beginPath(); ctx.arc(ox, oy, 3.5 + mechPulse * 1.5, 0, Math.PI*2);
+        ctx.fillStyle = `rgba(230,255,255,${0.75*mechPulse})`; ctx.fill();
       }
 
+      // 機甲頭盔與藍色掃描面板
+      ctx.beginPath();
+      ctx.moveTo(-RADIUS*0.82, -RADIUS*0.72);
+      ctx.lineTo(-RADIUS*0.55, -RADIUS*1.28);
+      ctx.lineTo(RADIUS*0.55, -RADIUS*1.28);
+      ctx.lineTo(RADIUS*0.82, -RADIUS*0.72);
+      ctx.closePath();
+      ctx.fillStyle = `rgba(20,60,95,${0.72*mechPulse})`;
+      ctx.strokeStyle = `rgba(180,245,255,${0.92*mechPulse})`; ctx.lineWidth = 2.4; ctx.shadowColor = '#54d8ff'; ctx.shadowBlur = 15; ctx.fill(); ctx.stroke();
+      ctx.beginPath(); ctx.roundRect(-RADIUS*0.58, -RADIUS*0.92, RADIUS*1.16, RADIUS*0.22, 4);
+      ctx.fillStyle = `rgba(120,235,255,${0.65 + 0.25*mechPulse})`; ctx.shadowColor = '#7eeaff'; ctx.shadowBlur = 12; ctx.fill();
+
+      // 胸口反應爐：核心、同心環與四條電路線
+      ctx.beginPath(); ctx.arc(0, 0, RADIUS*0.7, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(15,50,80,${0.8*mechPulse})`; ctx.strokeStyle = '#8deeff'; ctx.lineWidth = 2.5; ctx.shadowColor = '#20cfff'; ctx.shadowBlur = 20; ctx.fill(); ctx.stroke();
+      ctx.beginPath(); ctx.arc(0, 0, RADIUS*(0.38 + 0.08*mechPulse), 0, Math.PI*2);
+      ctx.fillStyle = `rgba(220,255,255,${0.8*mechPulse})`; ctx.fill();
+      for (let ci = 0; ci < 4; ci++) {
+        const ca = Math.PI * 0.5 * ci + mechSpin;
+        ctx.beginPath(); ctx.moveTo(Math.cos(ca)*RADIUS*0.7, Math.sin(ca)*RADIUS*0.7); ctx.lineTo(Math.cos(ca)*RADIUS*1.55, Math.sin(ca)*RADIUS*1.55);
+        ctx.strokeStyle = `rgba(100,220,255,${0.55*mechPulse})`; ctx.lineWidth = 2; ctx.stroke();
+      }
+
+      // 肩部炮口與低成本推進器光焰
+      for (const side of [-1, 1]) {
+        ctx.save(); ctx.scale(side, 1);
+        ctx.beginPath(); ctx.moveTo(RADIUS*1.15, -RADIUS*0.28); ctx.lineTo(RADIUS*2.35, -RADIUS*0.55); ctx.lineTo(RADIUS*2.55, RADIUS*0.25); ctx.lineTo(RADIUS*1.25, RADIUS*0.5); ctx.closePath();
+        ctx.fillStyle = `rgba(25,80,120,${0.6*mechPulse})`; ctx.strokeStyle = `rgba(130,235,255,${0.85*mechPulse})`; ctx.lineWidth = 2; ctx.shadowColor = '#4fd7ff'; ctx.shadowBlur = 12; ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.arc(RADIUS*2.35, -RADIUS*0.12, RADIUS*0.22, 0, Math.PI*2);
+        ctx.fillStyle = '#e5ffff'; ctx.shadowColor = '#8deeff'; ctx.shadowBlur = 16; ctx.fill();
+        ctx.beginPath(); ctx.moveTo(-RADIUS*1.25, RADIUS*0.3); ctx.lineTo(-RADIUS*2.1, RADIUS*(0.2 + 0.12*Math.sin(elapsed*18)));
+        ctx.strokeStyle = `rgba(120,230,255,${0.55*mechPulse})`; ctx.lineWidth = 5; ctx.shadowColor = '#3acbff'; ctx.shadowBlur = 16; ctx.stroke();
+        ctx.restore();
+      }
+
+      ctx.globalCompositeOperation = 'source-over';
       ctx.restore();
       ctx.shadowBlur = 0;
 
-      // 剩餘時間倒數環
-      const mechRemainFrac = b.engMechTimer / ENGINEER_MECH_DURATION;
-      ctx.beginPath();
-      ctx.arc(b.x, b.y, RADIUS + 22, -Math.PI/2, -Math.PI/2 + Math.PI*2*mechRemainFrac);
-      ctx.strokeStyle = 'rgba(174,224,255,0.6)';
-      ctx.lineWidth = 2;
-      ctx.stroke();
+      // 剩餘時間倒數環與機甲狀態環
+      const mechRemainFrac = Math.max(0, Math.min(1, b.engMechTimer / ENGINEER_MECH_DURATION));
+      ctx.beginPath(); ctx.arc(b.x, b.y, RADIUS + 26, -Math.PI/2, -Math.PI/2 + Math.PI*2*mechRemainFrac);
+      ctx.strokeStyle = `rgba(174,245,255,${0.84 + 0.12*mechPulse})`; ctx.lineWidth = 3; ctx.shadowColor = '#38cfff'; ctx.shadowBlur = 12; ctx.stroke(); ctx.shadowBlur = 0;
     }
 
     // 末代武士：招架光盾
@@ -26616,6 +27629,57 @@ function render() {
         ctx.beginPath(); ctx.arc(tx, ty, 60 * bProg, 0, Math.PI * 2); ctx.fill();
         ctx.restore();
       }
+    }
+  }
+
+
+  // 鹿紫雲「幻獸琥珀」啟動：低亮度、短時間的核心爆發，避免持續全屏白閃造成卡頓。
+  if (state.kashimoScreenFX && state.kashimoScreenFX.length) {
+    for (const fx of state.kashimoScreenFX) {
+      const prog = 1 - Math.max(0, fx.life / fx.maxLife);
+      const cx = fx.x, cy = fx.y;
+      // 瞬雷：集中在目標周圍的白紫雷爆與放射線，避免與幻獸琥珀共用全屏演出。
+      if (fx.kind === 'release') {
+        const releaseFade = Math.max(0, 1 - prog);
+        const radius = 42 + prog * 118;
+        ctx.save(); ctx.globalCompositeOperation = 'screen';
+        const rg = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
+        rg.addColorStop(0, `rgba(255,255,255,${0.92 * releaseFade})`);
+        rg.addColorStop(0.28, `rgba(218,190,255,${0.72 * releaseFade})`);
+        rg.addColorStop(0.72, `rgba(130,92,255,${0.22 * releaseFade})`);
+        rg.addColorStop(1, 'rgba(120,80,255,0)');
+        ctx.fillStyle = rg; ctx.beginPath(); ctx.arc(cx, cy, radius, 0, Math.PI * 2); ctx.fill();
+        ctx.globalAlpha = 0.82 * releaseFade;
+        ctx.strokeStyle = '#f7edff'; ctx.shadowColor = '#9f73ff'; ctx.shadowBlur = 18; ctx.lineWidth = 3.2;
+        ctx.beginPath(); ctx.arc(cx, cy, 18 + prog * 96, 0, Math.PI * 2); ctx.stroke();
+        ctx.globalAlpha = 0.72 * releaseFade; ctx.lineWidth = 2.2; ctx.shadowBlur = 12;
+        for (let ray = 0; ray < 8; ray++) {
+          const a = ray * Math.PI * 2 / 8 + prog * 0.35;
+          const r0 = 20 + prog * 14, r1 = 64 + prog * 92;
+          drawKashimoJaggedArc(ctx, cx + Math.cos(a) * r0, cy + Math.sin(a) * r0, cx + Math.cos(a) * r1, cy + Math.sin(a) * r1, ray * 13.7 + cx * 0.03, 9, 5);
+        }
+        ctx.restore();
+        continue;
+      }
+      const fade = Math.max(0, 1 - prog);
+      ctx.save(); ctx.globalCompositeOperation = 'screen';
+      const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(canvas.width, canvas.height) * 0.48);
+      g.addColorStop(0, `rgba(255,255,238,${0.09 * fade})`);
+      g.addColorStop(0.2, `rgba(245,215,110,${0.055 * fade})`);
+      g.addColorStop(0.58, `rgba(100,220,255,${0.018 * fade})`);
+      g.addColorStop(1, 'rgba(245,215,110,0)');
+      ctx.fillStyle = g; ctx.fillRect(0, 0, canvas.width, canvas.height);
+      const lineCount = 6;
+      ctx.globalAlpha = Math.max(0, 0.16 * fade);
+      for (let i = 0; i < lineCount; i++) {
+        const a = i * Math.PI * 2 / lineCount + prog * 0.22;
+        const r0 = 22 + prog * 28, r1 = r0 + 80 + prog * 170;
+        ctx.strokeStyle = i % 2 ? '#8cecff' : '#fffbe0'; ctx.shadowColor = ctx.strokeStyle; ctx.shadowBlur = 5; ctx.lineWidth = 0.8;
+        ctx.beginPath(); ctx.moveTo(cx + Math.cos(a) * r0, cy + Math.sin(a) * r0); ctx.lineTo(cx + Math.cos(a) * r1, cy + Math.sin(a) * r1); ctx.stroke();
+      }
+      ctx.globalAlpha = Math.max(0, 0.28 * fade); ctx.strokeStyle = '#fffef0'; ctx.shadowColor = '#f5d76e'; ctx.shadowBlur = 10; ctx.lineWidth = 1.8;
+      ctx.beginPath(); ctx.arc(cx, cy, 18 + prog * 110, 0, Math.PI * 2); ctx.stroke();
+      ctx.restore();
     }
   }
 
@@ -30632,7 +31696,11 @@ function showBossPick() {
       </label>
       <div id="boss-pick-boss-hp" style="min-width:260px;padding:10px 18px;border:1px solid rgba(240,200,74,0.38);border-radius:14px;background:rgba(240,200,74,0.08);text-align:center;color:#ffe9a8;line-height:1.65;"></div>
       <div id="boss-pick-progress" style="font-size:0.8rem;color:#f0c84a;"></div>
-      <div id="boss-pick-grid" style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;max-width:900px;max-height:50vh;overflow-y:auto;padding:6px;"></div>
+      <div id="boss-pick-grid-wrap" style="display:flex;align-items:stretch;gap:8px;width:min(94vw,900px);height:min(50vh,420px);min-height:210px;">
+        <div id="boss-pick-grid" style="display:flex;flex-wrap:wrap;align-content:flex-start;gap:10px;justify-content:center;flex:1;min-width:0;overflow-y:auto;padding:6px;border:1px solid rgba(240,200,74,0.18);border-radius:12px;background:rgba(255,255,255,0.025);"></div>
+        <input id="boss-pick-scroll" type="range" min="0" max="0" value="0" step="1" aria-label="Boss挑戰角色列表滑條" title="拖曳滑條瀏覽角色" style="writing-mode:vertical-lr;direction:rtl;width:18px;height:100%;accent-color:#f0c84a;cursor:pointer;">
+      </div>
+      <div style="font-size:0.68rem;color:#9f9a8f;">拖曳右側滑條瀏覽角色，也可直接滾動角色列表。</div>
       <div style="display:flex;gap:10px;">
         <button id="boss-pick-cancel" style="padding:6px 20px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);border-radius:14px;color:#ccc;cursor:pointer;">取消</button>
         <button id="boss-pick-confirm" style="padding:6px 20px;background:rgba(192,57,43,0.35);border:1px solid rgba(192,57,43,0.7);border-radius:14px;color:#fff;cursor:pointer;">開始挑戰</button>
@@ -30643,10 +31711,26 @@ function showBossPick() {
       modal.style.display = 'none';
       document.getElementById('select-screen').style.display = 'flex';
     };
+    const bossGrid = document.getElementById('boss-pick-grid');
+    const bossScroll = document.getElementById('boss-pick-scroll');
+    if (bossGrid && bossScroll) {
+      const syncBossPickScroll = () => {
+        const maxScroll = Math.max(0, bossGrid.scrollHeight - bossGrid.clientHeight);
+        bossScroll.max = String(Math.max(1, Math.ceil(maxScroll)));
+        bossScroll.value = String(Math.min(maxScroll, Math.max(0, bossGrid.scrollTop)));
+        bossScroll.disabled = maxScroll <= 1;
+        bossScroll.style.opacity = maxScroll <= 1 ? '0.35' : '1';
+      };
+      bossGrid.addEventListener('scroll', syncBossPickScroll);
+      bossScroll.addEventListener('input', () => {
+        bossGrid.scrollTop = Number(bossScroll.value) || 0;
+      });
+      window.updateBossPickScroll = syncBossPickScroll;
+    }
     const bossSelect = document.getElementById('boss-pick-boss');
     if (bossSelect) bossSelect.onchange = () => renderBossPickGrid();
     document.getElementById('boss-pick-confirm').onclick = () => {
-      const validPicks = bossPicks.filter(id => id && !isAmeliaCharacterId(id));
+      const validPicks = bossPicks.filter(Boolean);
       if (validPicks.length < 1) return;
       modal.style.display = 'none';
       const selectedBoss = BOSS_CHARACTERS.find(b => b.id === bossSelect?.value) || BOSS_CHARACTERS[0];
@@ -30693,7 +31777,7 @@ function renderBossPickGrid() {
   confirmBtn.style.opacity = chosenCount < 1 ? 0.5 : 1;
 
   grid.innerHTML = '';
-  CHARACTERS.filter(ch => !isAmeliaCharacterId(ch.id)).forEach(ch => {
+  CHARACTERS.forEach(ch => {
     const selectedIdx = bossPicks.indexOf(ch.id);
     const isSelected = selectedIdx !== -1;
     const btn = document.createElement('div');
@@ -30712,16 +31796,18 @@ function renderBossPickGrid() {
     };
     grid.appendChild(btn);
   });
+  if (window.updateBossPickScroll) requestAnimationFrame(window.updateBossPickScroll);
 }
 
 // ──────────────── Boss模式：開戰（借用沙盒引擎的多球/多隊伍戰鬥與HUD邏輯） ────────────────
 function launchBossBattle(teamIds, boss, requestedDefinition = null) {
-  teamIds = (teamIds || []).filter(id => !isAmeliaCharacterId(id));
+  teamIds = (teamIds || []).filter(Boolean);
   if (teamIds.length < 1) {
-    alert('阿梅僅限標準 1v1，無法加入 Boss／團體戰。');
+    alert('至少選擇 1 名角色才能挑戰 Boss。');
     return;
   }
   const bossDefinition = resolveBossDefinition(requestedDefinition || boss) || BOSS_DEFINITIONS.cursed;
+  bossLastBattleConfig = { teamIds: teamIds.slice(), bossDefinitionId: bossDefinition.id };
   const bossCharacterBase = typeof bossDefinition.createCharacter === 'function'
     ? bossDefinition.createCharacter(boss)
     : { ...boss };
@@ -30796,7 +31882,7 @@ function launchBossBattle(teamIds, boss, requestedDefinition = null) {
     projectiles: [], wallKnives: [], minatoKunai: [], minatoTeleportFX: [], hitFlashes: [], damageNumbers: [], batParticles: [], slashMarks: [], traps: [], yiBlackStones: [], yiStoneBurstFX: [], opmFX: [], momoiFanFX: [], gojoKillFX: null, curseSliceKillFX: null, minatoKillFX: null, emTotems: [], emLightningFX: [], emLightningWarn: [], emGolems: [], emUltBanner: null, curseFireFX: [], curseFireBlasts: [], curseFireZones: [], bossDryPowderExtinguishers: [], bossDryPowderBlasts: [], bossDryPowderZones: [], curseSlashFX: [], elapsed: 0,
     arena: 'normal',
     bgColor: selectedBgColor,
-    thunderPillars: [], thunderStrikes: [], smithForgeParticles: [], steveMineDebris: [], summons: [], summonDeathFX: [], summonIdCounter: 1, ameliaTimeTravelQueue: [],
+    thunderPillars: [], thunderStrikes: [], kashimoFields: [], kashimoTraps: [], kashimoLightningFX: [], kashimoDeerOrbs: [], kashimoAmberWaves: [], kashimoSparks: [], kashimoShockwaves: [], kashimoScreenFX: [], smithForgeParticles: [], steveMineDebris: [], summons: [], summonDeathFX: [], summonIdCounter: 1, ameliaTimeTravelQueue: [],
     naoShadows: [], naoPathLines: [], stats: initialStats, samuraiParticles: [], itachiCrowFX: null, itachiStabFX: [], smithSlashFX: [],
     baieSlashFX: [], baieReflectFX: [], steveAxeFX: [], yutaSlashFX: [], nanamiSlashFX: [], nanamiRockFX: [], nanamiWallHitFX: [], nanamiBlackFlashFX: [],
     nanamiMarkBreakFX: [], nanamiCineFX: null, nanamiWallShakeTimer: 0, nanamiWallShakeDur: NANAMI_WALL_SHAKE_DUR, nanamiWallShakeMag: 0,

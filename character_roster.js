@@ -583,4 +583,20 @@ vsQuotes: {
     winQuote: 'Fast and easy... just like your mom!.',
     loseQuote: '（摔打鍵盤的聲音）。'
   },
+  {
+    id: 'kashimo', emoji: '🦌', weapon: '🪄', name: '鹿紫雲一',
+    desc: '400年前的術師。為了與有史以來最強的術師宿儺交手，追尋強者的氣息，來到了這裡。',
+    stats: ['閃電突刺', '電湧陷阱', '電解轟鳴', '瞬雷', '幻獸琥珀／鹿式電'],
+    skills: [
+      `被動「電荷分離」：普攻或技能命中附加${KASHIMO_NEGATIVE_PER_HIT}層負電荷；碰撞敵人或牆壁獲得1層正電荷，正電荷最多${KASHIMO_POSITIVE_MAX}層，每層移速+${KASHIMO_POSITIVE_SPEED_PER * 100}%。負電荷達${KASHIMO_NEGATIVE_MAX}層時觸發瞬雷，造成${KASHIMO_RELEASE_DAMAGE}傷害、麻痺${KASHIMO_RELEASE_PARALYZE}秒並清空負電荷。`,
+      `普攻「閃電突刺」：每${KASHIMO_ATTACK_INTERVAL}秒高速衝向目標，造成${KASHIMO_ATTACK_DAMAGE}傷害並附加負電荷；正電荷達5層時產生磁力拉近目標。`,
+      `技能一「電湧陷阱」：將如意棒插在原地並自由移動；敵人在鹿紫雲與如意棒之間時，紫色雷電造成${KASHIMO_TRAP_DAMAGE}傷害並附加負電荷，同一敵人短時間內不重複觸發。`,
+      `技能二「電解轟鳴」：每${KASHIMO_FIELD_COOLDOWN}秒在自身周圍展開半徑${KASHIMO_FIELD_RADIUS}的雷電場，持續${KASHIMO_FIELD_DURATION}秒；每${KASHIMO_FIELD_TICK}秒造成${KASHIMO_FIELD_DAMAGE}傷害，每秒附加1層負電荷。`,
+      `幻獸琥珀：戰鬥${KASHIMO_AMBER_UNLOCK_TIME}秒後自動釋放正電荷與場上負電荷，對附近敵人造成${KASHIMO_AMBER_RELEASE_DAMAGE_PER_CHARGE}×總電荷傷害；持續${KASHIMO_AMBER_DURATION}秒，移速+100%、普攻與技能 CD 減半、附加雙倍負電荷、不再使用電湧陷阱，並每秒扣${KASHIMO_AMBER_SELF_BLEED_DPS}血。`,
+      `技能三「鹿式電」：僅幻獸琥珀可用，停止移動蓄力${KASHIMO_DEER_LIGHTNING_CHARGE}秒後向前方發射雷電炮擊，造成${KASHIMO_DEER_LIGHTNING_DAMAGE}傷害、麻痺${KASHIMO_DEER_LIGHTNING_PARALYZE}秒並附加${KASHIMO_DEER_LIGHTNING_STACKS}層負電荷；CD ${KASHIMO_DEER_LIGHTNING_COOLDOWN}秒。`
+    ],
+    color: '#b6a0ff', glowColor: 'rgba(125,92,255,0.78)', type: 'kashimo',
+    winQuote: ['白白浪費生命。','很有見地','喂！別讓我太過期待好不好！',],
+    loseQuote: '快給我個痛快吧。'
+  },
 ];

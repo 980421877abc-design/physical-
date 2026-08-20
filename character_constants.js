@@ -18,7 +18,7 @@ const KNIFE_RECALL_SPEED = 300; // 回收速度（px/s）
 const DRUNK_ATTACK_INTERVAL   = 1.75; //攻擊CD
 const DRUNK_DIR_CHANGE_MIN    = 0.3; //最小移動間隔
 const DRUNK_DIR_CHANGE_MAX    = 0.5; //最大移動間隔
-const BOTTLE_SPEED            = 280; //酒瓶移動速度
+const BOTTLE_SPEED            = 300; //酒瓶移動速度
 const BOTTLE_DAMAGE           = 150; //酒瓶傷害
 
 // 暗夜領主常數
@@ -237,6 +237,8 @@ const ITACHI_SUSANOO_DMG_REDUCE = 0.5;   // 須佐能乎減傷比例
 const ITACHI_SUSANOO_BITE_DAMAGE = 50;   // 須佐能乎近戰每擊傷害
 const ITACHI_SUSANOO_BITE_HEAL   = 30;   // 須佐能乎近戰每擊吸血
 const ITACHI_SUSANOO_BITE_INTERVAL = 0.3; // 刺擊CD（秒），避免擦身連續觸發過密
+const ITACHI_TSUKUYOMI_STAB_DAMAGE = ITACHI_SUSANOO_BITE_DAMAGE; // 月讀雙側刺擊沿用須佐每擊傷害
+const ITACHI_TSUKUYOMI_STAB_INTERVAL = ITACHI_SUSANOO_BITE_INTERVAL; // 月讀定身期間刺擊節奏
 const ITACHI_SUSANOO_BITE_COOLDOWN = 0.8;  // 近戰結束CD（秒）
 const ITACHI_SUSANOO_BITE_RANGE  = RADIUS * 2 + 40; // 須佐能乎近戰判定距離（px）
 
@@ -267,13 +269,13 @@ const YUTA_RIKA_PASSIVE_CD_CUT   = 0.5;   // 里香在場時，乙骨非里香�
 const ENGINEER_TURRET_INTERVAL    = 2.4;   // 召喚炮台間隔（秒）
 const ENGINEER_TURRET_LIFETIME    = 8.0;  // 炮台存在時間（秒）
 const ENGINEER_TURRET_FIRE_INTERVAL = 1.1; // 炮台開火間隔（秒）
-const ENGINEER_TURRET_BULLET_DAMAGE = 20;  // 炮台子彈傷害
+const ENGINEER_TURRET_BULLET_DAMAGE = 25;  // 炮台子彈傷害
 const ENGINEER_TURRET_BULLET_SPEED  = 480; // 炮台子彈飛行速度（px/s）
 const ENGINEER_MECH_TURRET_THRESHOLD = 6; // 累積幾個炮台後觸發機甲模式
 const ENGINEER_MECH_DURATION      = 15.0;  // 機甲模式持續時間（秒）
 const ENGINEER_MECH_DMG_REDUCE    = 0.20;  // 機甲模式減傷比例
 const ENGINEER_LASER_INTERVAL     = 1.2;   // 機甲模式雷射發射間隔（秒）
-const ENGINEER_LASER_DAMAGE       = 35;    // 雷射傷害
+const ENGINEER_LASER_DAMAGE       = 50;    // 雷射傷害
 const ENGINEER_LASER_WIDTH        = 26;    // 雷射光束寬度（px）
 const ENGINEER_LASER_RANGE        = 900;   // 雷射長度（px，足以橫跨場地）
 const ENGINEER_LASER_TRAVEL_TIME  = 0.18;  // 雷射判定持續時間（視覺＋判定，秒）
@@ -1136,6 +1138,59 @@ const AMELIA_DETECTIVE_VULN_PER_STACK = 0.05; // 每層使敵人受到的傷害�
 const AMELIA_WATCH_THRESHOLD_EPS   = 0.001;
 const AMELIA_WATCH_DEPARTURE_DURATION = 2.0; // 【阿梅冷卻／時間】懷錶離場動畫（秒）
 const AMELIA_WATCH_DEPARTURE_NOTICE_DURATION = 3.2; // 【阿梅冷卻／時間】懷錶提示預留時間（秒，提示目前停用）
+
+// 鹿紫雲一正式版電荷、電湧陷阱、電解轟鳴、幻獸琥珀與鹿式電常數
+const KASHIMO_ATTACK_INTERVAL        = 2.0;   // 閃電突刺 CD
+const KASHIMO_ATTACK_DAMAGE          = 40;
+const KASHIMO_DASH_SPEED             = 760;
+const KASHIMO_DASH_TIME              = 0.34;
+const KASHIMO_DASH_FALLBACK_RANGE    = 90;
+const KASHIMO_COLLISION_COOLDOWN     = 0.32;
+const KASHIMO_POSITIVE_MAX           = 10;
+const KASHIMO_POSITIVE_SPEED_PER     = 0.05;
+const KASHIMO_NEGATIVE_MAX           = 5;
+const KASHIMO_NEGATIVE_PER_HIT       = 1;
+const KASHIMO_RELEASE_DAMAGE         = 120;   // 瞬雷
+const KASHIMO_RELEASE_PARALYZE       = 1.5;
+const KASHIMO_TRAP_COOLDOWN          = 7.0;   // 電湧陷阱（沿用實驗版原技能 CD）
+const KASHIMO_TRAP_LIFETIME          = Infinity; // 電湧陷阱持續存在，直到鹿紫雲下一次重新插棒
+const KASHIMO_TRAP_HIT_COOLDOWN      = 0.8;   // 同一條雷電對同一敵人的短暫防重複時間
+const KASHIMO_TRAP_DAMAGE            = 26;
+const KASHIMO_TRAP_RADIUS            = 20;
+const KASHIMO_FIELD_COOLDOWN         = 7.0;   // 電解轟鳴
+const KASHIMO_FIELD_DURATION         = 3.0;
+const KASHIMO_FIELD_RADIUS           =  150;
+const KASHIMO_FIELD_TICK             = 0.5;
+const KASHIMO_FIELD_DAMAGE           = 15;
+const KASHIMO_FIELD_CHARGE_TICK      = 1.0;
+const KASHIMO_AMBER_UNLOCK_TIME      = 15.0;
+const KASHIMO_AMBER_DURATION         = 12.0;
+const KASHIMO_AMBER_SPEED_MULT       = 2.0;   // 移速 +100%
+const KASHIMO_AMBER_CD_MULT          = 0.5;   // 普攻與技能 CD 減半
+const KASHIMO_AMBER_NEGATIVE_MULT    = 2;     // 普攻與技能附加雙倍負電荷
+const KASHIMO_AMBER_SELF_BLEED_DPS   = 40;    // 每秒扣血
+const KASHIMO_AMBER_RELEASE_DAMAGE_PER_CHARGE = 30;
+const KASHIMO_AMBER_RELEASE_RADIUS   = KASHIMO_FIELD_RADIUS;
+const KASHIMO_DEER_LIGHTNING_COOLDOWN = 12.0;
+const KASHIMO_DEER_LIGHTNING_CHARGE  = 1.0;
+const KASHIMO_DEER_LIGHTNING_DAMAGE   = 240;   // 鹿式電：大量傷害
+const KASHIMO_DEER_LIGHTNING_RANGE    = 620;   // 鹿式電球最大飛行距離
+const KASHIMO_DEER_LIGHTNING_SPEED    = 920;
+const KASHIMO_DEER_LIGHTNING_RADIUS   = 30;
+const KASHIMO_DEER_LIGHTNING_WIDTH    = 28;
+const KASHIMO_DEER_LIGHTNING_PARALYZE = 1.0;
+const KASHIMO_DEER_LIGHTNING_STACKS   = 2;
+const KASHIMO_FIELD_COLOR             = '#7d5cff';
+const KASHIMO_AMBER_COLOR             = '#f5d76e';
+const KASHIMO_DEER_LIGHTNING_COLOR    = '#ffe27a';
+const KASHIMO_FX_SPARK_COUNT          = 34;
+const KASHIMO_FX_AMBER_SPARK_COUNT    = 88;
+const KASHIMO_FX_SHOCKWAVE_COUNT      = 5;
+const KASHIMO_FX_SCREEN_DURATION      = 0.95;
+const KASHIMO_FX_ARC_JITTER           = 18;
+
+
+
 
 
 const MIN_SPEED          = 100;   // 最低移動速度（技能停止中除外）
