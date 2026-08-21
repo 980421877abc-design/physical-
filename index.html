@@ -29122,6 +29122,17 @@ function sandboxStartBattle() {
     rsqjsBombs: [],
     rsqjsBooks: [],
     rsqjsWaterZones: [],
+    // 沙盒模式也要初始化所有全域角色效果容器；否則更新迴圈第一幀會讀取 undefined 而停止遊戲。
+    kashimoFields: [],
+    kashimoTraps: [],
+    kashimoLightningFX: [],
+    kashimoDeerOrbs: [],
+    kashimoAmberWaves: [],
+    kashimoSparks: [],
+    kashimoShockwaves: [],
+    kashimoScreenFX: [],
+    vampireBats: [],
+    thunderStunFX: [],
   };
 
   updateSandboxHUD();
