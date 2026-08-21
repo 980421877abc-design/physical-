@@ -4527,6 +4527,10 @@ document.querySelectorAll('.speed-btn').forEach(btn => {
 function forfeitGame() {
   if (!gameLoop) return;
   cancelAnimationFrame(gameLoop);
+  if (state) state.matchEnded = true;
+  if (typeof window !== 'undefined' && typeof window.__kinjiEndMatchCleanup === 'function') {
+    window.__kinjiEndMatchCleanup();
+  }
   gameLoop = null;
   const overlay = document.getElementById('overlay');
   const titleEl = document.getElementById('result-title');
@@ -7265,6 +7269,12 @@ function dealDamage(target, dmg, options = {}) {
       state.hitFlashes.push({ x: target.x, y: target.y, r: 52, alpha: 1.1, color: '#ffb347', t: 0.45 });
       state.damageNumbers.push({ x: target.x, y: target.y - 34, value: '鎖血 5 秒', color: '#ffd166', life: 0.9, maxLife: 0.9 });
     }
+  }
+  // 秤金次「模擬連」：抽獎期間的致命傷有機率先被螢幕裂裂效果攔截並復活。
+  // 放在一般生存被動之後、系統級斬殺之前；codeKill／世界斬不會被模擬連攔截。
+  if (!bypassDefense && target.char && target.char.type === 'kinji' && target.hp - actual <= 0 &&
+      typeof window !== 'undefined' && typeof window.__kinjiTrySimulatedReelRevive === 'function') {
+    if (window.__kinjiTrySimulatedReelRevive(target, actual, options)) return 0;
   }
   // 系統殺：若原始傷害本應致命，一拳超人的減傷不應讓他逃過一死
   if (isOpmReduced && dmg >= prevHp) {
@@ -28258,6 +28268,9 @@ function updateHUD() {
 
 function showResult(deadBalls) {
   dummyControlsShow(false);
+  if (typeof window !== 'undefined' && typeof window.__kinjiEndMatchCleanup === 'function') {
+    window.__kinjiEndMatchCleanup();
+  }
   if (state && state.dragonMissionResult) {
     const overlay = document.getElementById('overlay');
     const titleEl = document.getElementById('result-title');
@@ -32037,6 +32050,7 @@ function launchBossBattle(teamIds, boss, requestedDefinition = null) {
     dragonWaves: [],
     dragonBursts: [],
     jackpotFx: [],
+    simulatedReelFx: [],
     domainFlash: 0.75,
     carDoors: [],
     pachinkoPins: [],
@@ -32147,6 +32161,7 @@ function launchBossBattle(teamIds, boss, requestedDefinition = null) {
   const isJackpot = (b) => !!(b?.kinji?.jackpotTimer > 0);
   const basicCooldown = (b) => isJackpot(b) ? KINJI_GATE_JACKPOT_COOLDOWN : KINJI_GATE_COOLDOWN;
   const skillCooldown = (b) => isJackpot(b) ? KINJI_COMBO_JACKPOT_COOLDOWN : KINJI_COMBO_COOLDOWN;
+  const drawPoolFor = (k) => k?.domainNarrowPool ? KINJI_DOMAIN_GUARANTEED_POOL : KINJI_DOMAIN_DRAW_POOL;
 
   function ensureBallState(b) {
     if (!b || b.char?.type !== KINJI_TYPE) return null;
@@ -32158,7 +32173,7 @@ function launchBossBattle(teamIds, boss, requestedDefinition = null) {
     b.kinji = {
       passion: 0,
       gateTimer: KINJI_GATE_COOLDOWN * 0.55,
-      comboTimer: KINJI_COMBO_COOLDOWN * 0.75,
+      comboTimer: 0, // 進場時咒力連擊立即可用；使用後仍依正常冷卻倒數
       comboTarget: null,
       comboIndex: 0,
       comboPunchTimer: 0,
@@ -32176,6 +32191,11 @@ function launchBossBattle(teamIds, boss, requestedDefinition = null) {
       domainInterval: KINJI_DOMAIN_NUMBER_INTERVAL,
       domainFastNext: false,
       domainGuaranteedNext: false,
+      domainNarrowPool: false,
+      domainMissHold: 0,
+      simulatedReelRepeat: false,
+      simulatedReelRevives: 0,
+      simulatedReelFlash: 0,
       jackpotBlocksNextEffects: false,
       domainControlUsed: false,
       jackpotTimer: 0,
@@ -32398,7 +32418,7 @@ function launchBossBattle(teamIds, boss, requestedDefinition = null) {
 
   function beginDomain(b) {
     const k = b.kinji;
-    if (!k || k.domainActive || k.passion < KINJI_DOMAIN_PASSION_COST || isParalyzed(b)) return;
+    if (!k || k.domainActive || k.jackpotTimer > 0 || k.passion < KINJI_DOMAIN_PASSION_COST || isParalyzed(b)) return;
     k.passion = 0;
     k.domainActive = true;
     k.domainElapsed = 0;
@@ -32409,15 +32429,13 @@ function launchBossBattle(teamIds, boss, requestedDefinition = null) {
     k.domainNumbers = [];
     k.reelActive = false;
     k.reelPulse = 0;
-    // 大獎後的下一次領域不吃時短／確變；該次領域結束後才重新依新圖柄判定。
-    const jackpotBlocksNextEffects = !!k.jackpotBlocksNextEffects;
-    k.jackpotBlocksNextEffects = false;
-    if (jackpotBlocksNextEffects) {
-      k.domainFastNext = false;
-      k.domainGuaranteedNext = false;
-    }
-    k.domainInterval = k.domainFastNext ? KINJI_DOMAIN_NUMBER_INTERVAL_FAST : KINJI_DOMAIN_NUMBER_INTERVAL;
+    // 每次新的領域從一般四選項開始；確變／時短只影響領域內的下一組抽獎。
+    k.domainNarrowPool = false;
     k.domainFastNext = false;
+    k.domainGuaranteedNext = false;
+    k.domainMissHold = 0;
+    k.simulatedReelRepeat = false;
+    k.domainInterval = KINJI_DOMAIN_NUMBER_INTERVAL;
     // 先讓多重列車門完成進場，再開始第一碼抽選。
     k.domainNumberTimer = KINJI_DOMAIN_OPEN_DURATION;
     k.pachinkoTimer = 0.05;
@@ -32438,11 +32456,11 @@ function launchBossBattle(teamIds, boss, requestedDefinition = null) {
 
   function drawNumber(b) {
     const k = b.kinji;
+    const pool = drawPoolFor(k);
     if (k.domainNumbers.length === 0) {
-      const n = KINJI_DOMAIN_DRAW_POOL[Math.floor(Math.random() * KINJI_DOMAIN_DRAW_POOL.length)];
-      k.domainNumbers.push(n);
+      k.domainNumbers.push(pool[Math.floor(Math.random() * pool.length)]);
     } else if (k.domainNumbers.length === 1) {
-      // 坐殺博徒規則：前兩個數字必定相同。
+      // 坐殺博徒：前兩個數字必定相同。
       k.domainNumbers.push(k.domainNumbers[0]);
     } else if (k.domainNumbers.length === 2 && !k.domainThirdPending) {
       // 第二碼出現後先停一下，第三碼只在懸念結束時揭曉。
@@ -32452,11 +32470,8 @@ function launchBossBattle(teamIds, boss, requestedDefinition = null) {
       k.reelPulse = 1;
       emitSpark(b.x, b.y, '#fff4b0', 5);
       return;
-    } else if (k.domainGuaranteedNext) {
-      k.domainNumbers.push(k.domainNumbers[0]);
-      k.domainGuaranteedNext = false;
     } else {
-      k.domainNumbers.push(KINJI_DOMAIN_DRAW_POOL[Math.floor(Math.random() * KINJI_DOMAIN_DRAW_POOL.length)]);
+      k.domainNumbers.push(pool[Math.floor(Math.random() * pool.length)]);
     }
     k.domainThirdPending = false;
     k.domainNumberTimer = Math.max(0.12, k.domainInterval);
@@ -32466,7 +32481,7 @@ function launchBossBattle(teamIds, boss, requestedDefinition = null) {
     const root = getStateSafe();
     flash(root, b.x, b.y, 26, '#ffe27d');
     if (k.domainNumbers.length >= KINJI_DOMAIN_MAX_NUMBERS) {
-      // 保留完整結果一小段時間，讓玩家看清是否三連大獎。
+      // 保留三碼結果一小段時間；非大獎會在 resolveDomain 後持續下一組抽獎。
       k.domainResultHold = KINJI_DOMAIN_RESULT_HOLD;
       k.domainNumberTimer = Number.POSITIVE_INFINITY;
     }
@@ -32480,24 +32495,24 @@ function launchBossBattle(teamIds, boss, requestedDefinition = null) {
 
   function resolveDomain(b) {
     const k = b.kinji;
-    const nums = k.domainNumbers.slice(0, 3);
-    // 領域結束即刻清空所有鋼珠，避免殘留物在下一輪繼續碰撞或回血。
+    const nums = k.domainNumbers.slice(0, KINJI_DOMAIN_MAX_NUMBERS);
     clearPachinkoBalls(b);
-    k.domainActive = false;
-    k.domainOpening = false;
-    k.domainOpenElapsed = 0;
     k.domainResultHold = 0;
     k.domainThirdPending = false;
     k.reelActive = false;
     k.reelPulse = 0;
-    k.domainElapsed = 0;
-    k.pachinkoTimer = KINJI_PACHINKO_BALL_COOLDOWN;
     if (nums.length === 3 && nums[0] === nums[1] && nums[1] === nums[2]) {
-      k.jackpotTimer += KINJI_JACKPOT_DURATION;
-      // 中大獎後到下一次領域開始前，不保留也不獲得時短／確變。
+      // 中獎後只保留一段固定咒力充涌時間，不能與下一次大獎疊加。
+      k.jackpotTimer = KINJI_JACKPOT_DURATION;
+      k.domainActive = false;
+      k.domainOpening = false;
+      k.domainOpenElapsed = 0;
+      k.domainElapsed = 0;
+      k.domainNumberTimer = KINJI_DOMAIN_NUMBER_INTERVAL;
+      k.domainMissHold = 0;
+      k.domainNarrowPool = false;
       k.domainFastNext = false;
       k.domainGuaranteedNext = false;
-      k.jackpotBlocksNextEffects = true;
       kinjiVisual.domainFlash = 0.5;
       kinjiVisual.jackpotFx.push({
         x: b.x, y: b.y,
@@ -32507,23 +32522,45 @@ function launchBossBattle(teamIds, boss, requestedDefinition = null) {
         numbers: nums.slice(0, 3),
         spin: Math.random() * Math.PI * 2,
       });
-      // 大獎不是單一閃光，而是「蓄力 → 爆發 → 餘韻」三段式回饋。
       kinjiVisual.impactBursts.push({ x: b.x, y: b.y, life: 0.62, maxLife: 0.62, radius: 78, rays: 18, lowCost: true, color: '#fff0a2' });
       kinjiVisual.domainFlash = 0.72;
       emitSpark(b.x, b.y, '#fff2a1', 12);
       flash(getStateSafe(), b.x, b.y, 110, '#fff2a1');
       shake(getStateSafe(), 9, 0.22);
       hitSound('opm');
-    } else if (nums.length >= 2 && nums[0] % 2 === 0) {
-      k.domainGuaranteedNext = true;
-      k.domainFastNext = false;
-      flash(getStateSafe(), b.x, b.y, 62, '#83d7ff');
-    } else if (nums.length >= 2) {
-      k.domainFastNext = true;
-      k.domainGuaranteedNext = false;
-      flash(getStateSafe(), b.x, b.y, 62, '#d6a4ff');
+    } else {
+      // 未中獎不結束領域：依前兩碼奇偶調整下一組抽獎規則。
+      // 偶數 -> 確變：選項縮成 6、7；奇數 -> 時短：下一組間隔變快。
+      if (nums.length >= 2 && nums[0] % 2 === 0) {
+        k.domainNarrowPool = true;
+        k.domainFastNext = false;
+        k.domainInterval = KINJI_DOMAIN_NUMBER_INTERVAL;
+        flash(getStateSafe(), b.x, b.y, 62, '#83d7ff');
+      } else if (nums.length >= 2) {
+        k.domainNarrowPool = false;
+        k.domainFastNext = true;
+        k.domainInterval = KINJI_DOMAIN_NUMBER_INTERVAL_FAST;
+        flash(getStateSafe(), b.x, b.y, 62, '#d6a4ff');
+      }
+      k.domainActive = true;
+      k.domainOpening = false;
+      k.domainOpenElapsed = 0;
+      k.domainElapsed = 0;
+      k.domainNumbers = nums;
+      k.domainMissHold = Math.random() < KINJI_SIMULATED_REEL_REPEAT_CHANCE
+        ? KINJI_SIMULATED_REEL_REPEAT_DURATION
+        : KINJI_DOMAIN_MISS_HOLD;
+      k.simulatedReelRepeat = k.domainMissHold > KINJI_DOMAIN_MISS_HOLD;
+      k.reelActive = true;
+      k.reelPulse = 1;
+      if (k.simulatedReelRepeat) {
+        kinjiVisual.impactBursts.push({ x: b.x, y: b.y, life: 0.55, maxLife: 0.55, radius: 48, rays: 12, lowCost: true, color: '#bce7ff' });
+        emitSpark(b.x, b.y, '#bce7ff', 10);
+      }
+      k.domainNumberTimer = Number.POSITIVE_INFINITY;
+      k.pachinkoTimer = KINJI_PACHINKO_BALL_COOLDOWN;
     }
-    k.domainNumbers = [];
+    k.domainNumbers = nums;
   }
 
   function holePositions(width, height) {
@@ -32634,6 +32671,26 @@ function launchBossBattle(teamIds, boss, requestedDefinition = null) {
     return b?.maxHp || (typeof MAX_HP !== 'undefined' ? MAX_HP : 1000);
   }
 
+  function trySimulatedReelRevive(target, incomingActual, options = {}) {
+    if (!target || target.char?.type !== KINJI_TYPE || !target.kinji?.domainActive) return false;
+    if (!(incomingActual > 0) || options.codeKill || options.bypassParry || options.worldSlash) return false;
+    const k = target.kinji;
+    if ((k.simulatedReelRevives || 0) >= KINJI_SIMULATED_REEL_MAX_REVIVES) return false;
+    if (Math.random() >= KINJI_SIMULATED_REEL_REVIVE_CHANCE) return false;
+    k.simulatedReelRevives = (k.simulatedReelRevives || 0) + 1;
+    const maxHp = getMaxHp(target);
+    target.hp = Math.max(1, Math.round(maxHp * KINJI_SIMULATED_REEL_REVIVE_HP_RATIO));
+    k.simulatedReelFlash = KINJI_SIMULATED_REEL_FX_DURATION;
+    const root = getStateSafe();
+    kinjiVisual.simulatedReelFx.push({ owner: target, x: target.x, y: target.y, life: KINJI_SIMULATED_REEL_FX_DURATION, maxLife: KINJI_SIMULATED_REEL_FX_DURATION, count: k.simulatedReelRevives });
+    flash(root, target.x, target.y, 118, '#e6f5ff');
+    emitSpark(target.x, target.y, '#dceeff', 24);
+    shake(root, 11, 0.28);
+    addDamageNumber(root, target, `模擬連 ${Math.round(target.hp)}`, '#dceeff');
+    hitSound('opm');
+    return true;
+  }
+
   function updateKinji(b, dt) {
     const k = ensureBallState(b);
     if (!k || b.hp <= 0) return;
@@ -32650,7 +32707,24 @@ function launchBossBattle(teamIds, boss, requestedDefinition = null) {
       }
       if (k.domainActive) {
         k.domainElapsed += dt;
-        if (k.domainOpening) {
+        if (k.domainMissHold > 0) {
+          k.domainMissHold = Math.max(0, k.domainMissHold - dt);
+          if (k.simulatedReelRepeat) {
+            const replayT = KINJI_SIMULATED_REEL_REPEAT_DURATION - k.domainMissHold;
+            k.reelPulse = 0.42 + 0.58 * Math.pow(Math.sin(replayT * 8.0), 2);
+          } else {
+            k.reelPulse = Math.max(k.reelPulse, 0.35);
+          }
+          if (k.domainMissHold <= 0) {
+            k.domainNumbers = [];
+            k.domainThirdPending = false;
+            k.domainResultHold = 0;
+            k.simulatedReelRepeat = false;
+            k.reelActive = false;
+            k.domainNumberTimer = k.domainInterval;
+            k.pachinkoTimer = KINJI_PACHINKO_BALL_COOLDOWN;
+          }
+        } else if (k.domainOpening) {
           k.domainOpenElapsed += dt;
           k.domainNumberTimer -= dt;
           if (k.domainOpenElapsed >= KINJI_DOMAIN_OPEN_DURATION) {
@@ -32670,7 +32744,7 @@ function launchBossBattle(teamIds, boss, requestedDefinition = null) {
             k.pachinkoTimer = KINJI_PACHINKO_BALL_COOLDOWN;
           }
         }
-        if (k.domainElapsed >= KINJI_DOMAIN_DURATION_LIMIT) resolveDomain(b);
+        if (KINJI_DOMAIN_DURATION_LIMIT > 0 && k.domainElapsed >= KINJI_DOMAIN_DURATION_LIMIT) resolveDomain(b);
       } else {
         k.gateTimer -= dt;
         k.comboTimer -= dt;
@@ -32820,6 +32894,10 @@ function launchBossBattle(teamIds, boss, requestedDefinition = null) {
       c.fillStyle = active ? '#fff0ac' : '#e5d4a2'; c.font = 'bold 13px Georgia,serif'; c.textAlign = 'center'; c.textBaseline = 'middle';
       const reelText = nums[i] == null ? (i === 2 && k.domainThirdPending ? '…' : '？') : String(nums[i]);
       c.fillText(reelText, cellX + 9.5, 0);
+    }
+    if (k.simulatedReelRepeat && k.domainMissHold > 0) {
+      c.fillStyle = '#bce7ff'; c.font = '800 8px system-ui,sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle';
+      c.fillText('↻ REPLAY', 0, -18);
     }
     c.restore();
   }
@@ -33036,6 +33114,41 @@ function launchBossBattle(teamIds, boss, requestedDefinition = null) {
     c.restore();
   }
 
+  function drawSimulatedReelFX(c, fx, width, height) {
+    const p = clamp(1 - fx.life / fx.maxLife, 0, 1);
+    const fade = p < 0.18 ? p / 0.18 : 1 - clamp((p - 0.52) / 0.48, 0, 1);
+    const cx = fx.x ?? width * 0.5;
+    const cy = fx.y ?? height * 0.5;
+    c.save();
+    c.globalCompositeOperation = 'screen';
+    c.globalAlpha = 0.62 * fade;
+    c.fillStyle = 'rgba(214,238,255,0.08)';
+    c.fillRect(0, 0, width, height);
+    c.strokeStyle = '#e5f4ff';
+    c.shadowColor = '#9ed7ff';
+    c.shadowBlur = 8;
+    c.lineWidth = 1.8;
+    const rays = 9;
+    for (let i = 0; i < rays; i++) {
+      const a = i * Math.PI * 2 / rays + 0.15;
+      const len = Math.max(width, height) * (0.32 + (i % 3) * 0.08);
+      const sx = cx + Math.cos(a) * 7;
+      const sy = cy + Math.sin(a) * 7;
+      const ex = cx + Math.cos(a) * len;
+      const ey = cy + Math.sin(a) * len;
+      const bend = 9 + (i % 4) * 5;
+      c.beginPath(); c.moveTo(sx, sy);
+      c.lineTo(cx + Math.cos(a) * len * 0.36 + Math.sin(a) * bend, cy + Math.sin(a) * len * 0.36 - Math.cos(a) * bend);
+      c.lineTo(cx + Math.cos(a) * len * 0.68 - Math.sin(a) * bend * 0.6, cy + Math.sin(a) * len * 0.68 + Math.cos(a) * bend * 0.6);
+      c.lineTo(ex, ey); c.stroke();
+    }
+    c.globalAlpha = 0.36 * fade;
+    c.lineWidth = 5;
+    c.strokeStyle = '#6ebfff';
+    c.beginPath(); c.arc(cx, cy, 18 + p * 42, 0, Math.PI * 2); c.stroke();
+    c.restore();
+  }
+
   function drawOverlay(width, height) {
     const c = kinjiVisual.overlayCtx;
     if (!c || !kinjiVisual.overlay) return;
@@ -33150,6 +33263,7 @@ function launchBossBattle(teamIds, boss, requestedDefinition = null) {
       c.save(); c.globalAlpha = Math.min(0.18, kinjiVisual.domainFlash * 0.22); c.fillStyle = '#fff0ad'; c.fillRect(0, 0, width, height); c.restore();
     }
     for (const fx of kinjiVisual.jackpotFx) drawJackpotFX(c, fx, width, height);
+    for (const fx of kinjiVisual.simulatedReelFx) drawSimulatedReelFX(c, fx, width, height);
     // 最後一層只補畫角色球：敵方球也重新繪製，避免列車門 Overlay 讓敵人消失。
     const visibleBalls = (kinjiVisual.root?.balls || []).filter(b => b && b.hp > 0);
     for (const b of visibleBalls) {
@@ -33172,7 +33286,7 @@ function launchBossBattle(teamIds, boss, requestedDefinition = null) {
     // DIO 世界時停期間保留秤金次現有畫面，避免拳影、閘門、領域閃光與 HUD 計時繼續前進。
     const root = getStateSafe();
     if (root?.dioWorldGlobalActive) return;
-    const lists = [kinjiVisual.punches, kinjiVisual.sparks, kinjiVisual.impactBursts, kinjiVisual.comboTexts, kinjiVisual.beamFx, kinjiVisual.dragonComets, kinjiVisual.dragonRings, kinjiVisual.dragonWaves, kinjiVisual.dragonBursts, kinjiVisual.jackpotFx];
+    const lists = [kinjiVisual.punches, kinjiVisual.sparks, kinjiVisual.impactBursts, kinjiVisual.comboTexts, kinjiVisual.beamFx, kinjiVisual.dragonComets, kinjiVisual.dragonRings, kinjiVisual.dragonWaves, kinjiVisual.dragonBursts, kinjiVisual.jackpotFx, kinjiVisual.simulatedReelFx];
     for (const list of lists) {
       for (let i = list.length - 1; i >= 0; i--) {
         list[i].life -= dt;
@@ -33205,11 +33319,67 @@ function launchBossBattle(teamIds, boss, requestedDefinition = null) {
     }
   }
 
+  function clearMatchVisuals(root = getStateSafe()) {
+    if (root?.balls) {
+      for (const b of root.balls) {
+        if (!b?.kinji) continue;
+        const k = b.kinji;
+        k.domainActive = false;
+        k.domainOpening = false;
+        k.domainOpenElapsed = 0;
+        k.domainElapsed = 0;
+        k.domainResultHold = 0;
+        k.domainThirdPending = false;
+        k.reelActive = false;
+        k.reelPulse = 0;
+        k.domainMissHold = 0;
+        k.domainNumbers = [];
+        k.domainNumberTimer = 0;
+        k.jackpotTimer = 0;
+      }
+    }
+    kinjiVisual.gates = [];
+    kinjiVisual.punches = [];
+    kinjiVisual.sparks = [];
+    kinjiVisual.impactBursts = [];
+    kinjiVisual.comboTexts = [];
+    kinjiVisual.beamFx = [];
+    kinjiVisual.balls = [];
+    kinjiVisual.dragonComets = [];
+    kinjiVisual.dragonRings = [];
+    kinjiVisual.dragonWaves = [];
+    kinjiVisual.dragonBursts = [];
+    kinjiVisual.jackpotFx = [];
+    kinjiVisual.simulatedReelFx = [];
+    kinjiVisual.domainFlash = 0;
+    kinjiVisual.carDoors = [];
+    kinjiVisual.pachinkoPins = [];
+    kinjiVisual.decorativeHoles = [];
+    kinjiVisual.starterHole = null;
+    kinjiVisual.active = false;
+    kinjiVisual.last = 0;
+    if (kinjiVisual.overlayCtx && kinjiVisual.overlay) {
+      kinjiVisual.overlayCtx.clearRect(0, 0, kinjiVisual.overlay.width, kinjiVisual.overlay.height);
+    }
+    if (kinjiVisual.overlay) kinjiVisual.overlay.style.display = 'none';
+    if (kinjiVisual.hud) {
+      kinjiVisual.hud.textContent = '';
+      kinjiVisual.hud.style.display = 'none';
+    }
+  }
+
+  if (typeof window !== 'undefined') window.__kinjiEndMatchCleanup = clearMatchVisuals;
+
   function frame(t) {
     const root = getStateSafe();
     const arena = getCanvasSafe();
     if (!root || !arena || !Array.isArray(root.balls)) {
       syncOverlay(false, 350, 350);
+      requestAnimationFrame(frame);
+      return;
+    }
+    if (root.matchEnded) {
+      clearMatchVisuals(root);
       requestAnimationFrame(frame);
       return;
     }
@@ -33227,6 +33397,7 @@ function launchBossBattle(teamIds, boss, requestedDefinition = null) {
       kinjiVisual.dragonWaves = [];
       kinjiVisual.dragonBursts = [];
       kinjiVisual.jackpotFx = [];
+      kinjiVisual.simulatedReelFx = [];
       kinjiVisual.sceneWidth = 0;
       kinjiVisual.sceneHeight = 0;
       kinjiVisual.carDoors = [];
@@ -33248,6 +33419,9 @@ function launchBossBattle(teamIds, boss, requestedDefinition = null) {
     drawOverlay(width, height);
     requestAnimationFrame(frame);
   }
+
+  // 主引擎 dealDamage 透過此橋接呼叫秤金次專屬復活，不改動其他角色傷害路徑。
+  if (typeof window !== 'undefined') window.__kinjiTrySimulatedReelRevive = trySimulatedReelRevive;
 
   function start() {
     setupOverlay();

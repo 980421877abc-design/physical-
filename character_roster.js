@@ -617,8 +617,9 @@ vsQuotes: {
       `被動「粗糙的咒力」：所有攻擊傷害每次獨立產生±1～${KINJI_DAMAGE_SWING_MAX}的傷害浮動。`,
       `普攻「閘門」：造成${KINJI_GATE_DAMAGE}傷害並定身${KINJI_GATE_IMMOBILIZE}秒，CD${KINJI_GATE_COOLDOWN}秒；咒力充涌時CD${KINJI_GATE_JACKPOT_COOLDOWN}秒。`,
       `技能「咒力連擊」：碰撞時,對敵人連續攻擊${KINJI_COMBO_HITS}拳，每拳${KINJI_COMBO_DAMAGE}傷害，CD${KINJI_COMBO_COOLDOWN}秒；咒力充涌時CD${KINJI_COMBO_JACKPOT_COOLDOWN}秒。`,
-      `領域展開「坐殺博徒」：${KINJI_PASSION_MAX}層熱情時自動開啟，前兩個數字必定相同；三數全同進入${KINJI_JACKPOT_DURATION}秒咒力充涌，否則依奇偶獲得確變或時短。`,
-      `「咒力充涌」：每秒恢復${KINJI_JACKPOT_HEAL_PER_SECOND}血，並加速；領域內可發射小鋼珠，命中${KINJI_PACHINKO_BALL_DAMAGE}傷害，小鋼珠進入中獎洞時縮短數字間隔並回復${KINJI_PACHINKO_BALL_HEAL}血。`
+      `領域展開「坐殺博徒」：${KINJI_PASSION_MAX}層熱情時自動開啟；抽獎選項為${KINJI_DOMAIN_DRAW_POOL.join('、')}，每次抽3碼且前兩碼相同，三碼全相同進入${KINJI_JACKPOT_DURATION}秒咒力充涌，未中獎則持續抽下一組。前兩碼為偶數時觸發確變，下一組選項縮為${KINJI_DOMAIN_GUARANTEED_POOL.join('、')}；前兩碼為奇數時觸發時短。`,
+      `「咒力充涌」：每秒恢復${KINJI_JACKPOT_HEAL_PER_SECOND}血，效果未消失前不能再次展開領域；領域內可發射小鋼珠，命中${KINJI_PACHINKO_BALL_DAMAGE}傷害，小鋼珠進入中獎洞時縮短數字間隔並回復${KINJI_PACHINKO_BALL_HEAL}血。`,
+      `技能「模擬連」：抽獎失敗時有機率重播同一段抽獎動畫；抽獎期間遭受致命傷時有${Math.round(KINJI_SIMULATED_REEL_REVIVE_CHANCE * 100)}%機率以最大生命值${Math.round(KINJI_SIMULATED_REEL_REVIVE_HP_RATIO * 100)}%復活，每場最多${KINJI_SIMULATED_REEL_MAX_REVIVES}次。`
     ],
     color: '#f2b632', glowColor: KINJI_DOMAIN_GLOW, type: 'kinji',
     winQuote: ['我愛狂熱，狂熱是賭博，賭博是人生，而愛是支配。','我會憑實力，抓住好運。',],
