@@ -1195,7 +1195,7 @@ const KASHIMO_FX_ARC_JITTER           = 18;
 
 // 秤金次「坐殺博徒」常數
 const KINJI_PASSION_MAX              = 52;
-const KINJI_PASSION_PER_SECOND       = 2;   // 加快熱情累積，讓領域更快進入
+const KINJI_PASSION_PER_SECOND       = 3;   // 加快熱情累積，讓領域更快進入
 const KINJI_PASSION_PER_BASIC_HIT    = 2;
 const KINJI_PASSION_PER_SKILL_HIT    = 4;
 const KINJI_TIME_SHORT_PASSION_MULT   = 2;   // 時短效果期間，熱情獲取翻倍
@@ -1218,7 +1218,7 @@ const KINJI_DOMAIN_FINAL_DELAY        = 1.25; // 第三碼出現前的懸念停�
 const KINJI_DOMAIN_RESULT_HOLD        = 1.35; // 第三碼出現後保留結果，讓玩家看清是否大獎
 const KINJI_DOMAIN_OPEN_DURATION      = 0.95; // 多重列車門進場動畫
 const KINJI_DOMAIN_MAX_NUMBERS        = 3;
-const KINJI_DOMAIN_DRAW_POOL           = [4, 5, 6, 7]; //數字
+const KINJI_DOMAIN_DRAW_POOL           = [ 6, 7]; //數字
 const KINJI_JACKPOT_DURATION          = 7.0;
 	const KINJI_JACKPOT_AURA_RADIUS        = 3.9;  // 充涌外圍綠色咒力半徑
 	const KINJI_JACKPOT_AURA_SPARKS        = 6;    // 少量高辨識度能量節點
