@@ -1193,6 +1193,65 @@ const KASHIMO_FX_ARC_JITTER           = 18;
 
 
 
+// 秤金次「坐殺博徒」常數
+const KINJI_PASSION_MAX              = 52;
+const KINJI_PASSION_PER_SECOND       = 2;   // 加快熱情累積，讓領域更快進入
+const KINJI_PASSION_PER_BASIC_HIT    = 2;
+const KINJI_PASSION_PER_SKILL_HIT    = 4;
+const KINJI_TIME_SHORT_PASSION_MULT   = 2;   // 時短效果期間，熱情獲取翻倍
+const KINJI_DAMAGE_SWING_MAX         = 20;   // 每次傷害獨立套用 ±1～20 的隨機浮動
+const KINJI_GATE_DAMAGE               = 50;
+const KINJI_GATE_COOLDOWN             = 1.5;
+const KINJI_GATE_RANGE_PADDING         = 18;   // 閘門以雙方角色球半徑為基準，再加上少量近身判定裕度
+const KINJI_GATE_HIT_CHANCE            = 1.0;  // 閘門在有效近身範圍內必中；保留常數方便日後調整
+const KINJI_GATE_IMMOBILIZE           = 0.5; // 縮短閘門定身，避免控制時間過長
+const KINJI_GATE_JACKPOT_COOLDOWN     = 1; // 咒力充涌期間更快出手
+const KINJI_COMBO_HITS                = 5;
+const KINJI_COMBO_DAMAGE              = 24;
+const KINJI_COMBO_COOLDOWN            = 4.0;
+const KINJI_COMBO_JACKPOT_COOLDOWN    = 2.0; // 咒力充涌期間更快連打
+const KINJI_DOMAIN_PASSION_COST       = KINJI_PASSION_MAX;
+const KINJI_DOMAIN_FREEZE_DURATION    = 2.0;
+const KINJI_DOMAIN_NUMBER_INTERVAL    = 3; // 領域圖柄節奏加快
+const KINJI_DOMAIN_NUMBER_INTERVAL_FAST = 0.5; // 時短後再加速
+const KINJI_DOMAIN_FINAL_DELAY        = 1.25; // 第三碼出現前的懸念停頓
+const KINJI_DOMAIN_RESULT_HOLD        = 1.35; // 第三碼出現後保留結果，讓玩家看清是否大獎
+const KINJI_DOMAIN_OPEN_DURATION      = 0.95; // 多重列車門進場動畫
+const KINJI_DOMAIN_MAX_NUMBERS        = 3;
+const KINJI_DOMAIN_DRAW_POOL           = [4, 5, 6, 7]; //數字
+const KINJI_JACKPOT_DURATION          = 7.0;
+	const KINJI_JACKPOT_AURA_RADIUS        = 3.9;  // 充涌外圍綠色咒力半徑
+	const KINJI_JACKPOT_AURA_SPARKS        = 6;    // 少量高辨識度能量節點
+	const KINJI_JACKPOT_AURA_PULSE_SPEED   = 10.5; // 綠色咒力脈動速度
+const KINJI_JACKPOT_HEAL_PER_SECOND   = 180; // 回血速率翻倍
+const KINJI_PACHINKO_BALL_COOLDOWN    = 0.8;
+const KINJI_PACHINKO_BALL_DAMAGE      = 20;
+const KINJI_PACHINKO_BALL_HEAL        = 80; // 始動口回血翻倍
+const KINJI_PACHINKO_BALL_SPEED       = 230;
+const KINJI_PACHINKO_BALL_RADIUS      = 7;
+const KINJI_PACHINKO_BALL_LIFETIME    = 18.0;
+const KINJI_DOMAIN_DURATION_LIMIT     = 18.0;
+const KINJI_DOMAIN_COLOR              = '#ffbd38';
+const KINJI_DOMAIN_GLOW               = 'rgba(255,189,56,0.72)';
+// 天慧龍級視覺參數：高密度但限制上限，避免長時間領域造成效能堆積。
+const KINJI_DRAGON_COMET_COUNT         = 10; // 領域只保留少量短暫光粒
+const KINJI_DRAGON_RING_COUNT           = 0;  // 移除常駐旋轉光環，避免遮擋戰場
+const KINJI_DRAGON_WAVE_COUNT           = 1;  // 只保留一圈開場／命中波紋
+const KINJI_DRAGON_PARTICLE_CAP        = 40; // 低負載上限，確保敵我球清楚可見
+const KINJI_DRAGON_COMET_LIFE           = 1.15; // 更快、更銳利的彗星節奏
+const KINJI_DRAGON_BURST_LIFE          = 0.78;
+const KINJI_STATUS_LABEL_WIDTH         = 42; // 保留舊介面；實際改用鹿紫雲式純文字
+const KINJI_STATUS_LABEL_HEIGHT        = 14;
+const KINJI_TRAIN_DOOR_SPEED            = 120; // 行駛中的列車門背景速度
+const KINJI_TRAIN_DOOR_WIDTH            = 76;
+const KINJI_COMBO_HIT_FLASH             = 0.22; // 連打命中閃停／爆閃基準
+const KINJI_SPEED_BOOST_MULT             = 2; // 領域／咒力充涌期間移動加速
+const KINJI_SPEED_TRAIL_COUNT            = 6;    // 加速殘影保留數量
+const KINJI_JACKPOT_FX_DURATION           = 2.35; // 大獎爆發特效展示時間，保留完整蓄力／爆發／餘韻
+const KINJI_JACKPOT_RAY_COUNT              = 16;   // 大獎放射光束數量；降低開獎瞬間單幀負載
+const KINJI_JACKPOT_RING_COUNT             = 2;    // 大獎擴散環數量；保留衝擊感但避免同幀過重
+const KINJI_JACKPOT_SPARK_COUNT            = 8;    // 大獎星芒數量；降低開獎瞬間粒子尖峰
+
 const MIN_SPEED          = 100;   // 最低移動速度（技能停止中除外）
 const BOOST_INTERVAL_MIN = 3;
 const BOOST_INTERVAL_MAX = 5;

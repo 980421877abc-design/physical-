@@ -180,7 +180,7 @@ cursed:'我會親手殺了宿儺，為老師報仇。' ,
  itachi:'你沒有朋友或是家人嗎？',
  tiger:'你背負的罪惡不屬於你，你沒有錯。',
  geto:'真失禮，我們可是純愛阿。',
- 
+ kinji:'狀況好的話，比我還強喔'
  }
   },
   {
@@ -598,5 +598,36 @@ vsQuotes: {
     color: '#b6a0ff', glowColor: 'rgba(125,92,255,0.78)', type: 'kashimo',
     winQuote: ['白白浪費生命。','很有見地','喂！別讓我太過期待好不好！',],
     loseQuote: '快給我個痛快吧。'
+    vsQuotes: {
+      tiger: '宿儺成了後輩？',
+      cursed :'一刻也來不及為五條哀悼，立刻趕到戰場的是',
+      cannondad : '你就是羂索提起的那個人吧。',
+      geto:'我接受你之前的提議',
+      gojo:'如果他死了，下一個換我',
+      yuta:'別去插手！',
+      kinji:['把音樂放大聲點！好好給你送終！','我將在這4分11秒內幹掉你。','不自量力！','透過拖時間取勝，這是弱者的思維'],
+
+  },
+  {
+    id: 'kinji', emoji: '🎰', weapon: '🎟️', name: '秤金次',
+    desc: '東京咒術高專三年級學生，熱愛「狂熱」，認為狂熱就是賭博、賭博就是人生。',
+    stats: ['閘門', '咒力連擊', '坐殺博徒', '小鋼珠'],
+    skills: [
+      `被動「狂熱」：每秒+${KINJI_PASSION_PER_SECOND}層；普攻命中+${KINJI_PASSION_PER_BASIC_HIT}層；技能命中+${KINJI_PASSION_PER_SKILL_HIT}層，最多${KINJI_PASSION_MAX}層。`,
+      `被動「粗糙的咒力」：所有攻擊傷害每次獨立產生±1～${KINJI_DAMAGE_SWING_MAX}的傷害浮動。`,
+      `普攻「閘門」：造成${KINJI_GATE_DAMAGE}傷害並定身${KINJI_GATE_IMMOBILIZE}秒，CD${KINJI_GATE_COOLDOWN}秒；咒力充涌時CD${KINJI_GATE_JACKPOT_COOLDOWN}秒。`,
+      `技能「咒力連擊」：碰撞時,對敵人連續攻擊${KINJI_COMBO_HITS}拳，每拳${KINJI_COMBO_DAMAGE}傷害，CD${KINJI_COMBO_COOLDOWN}秒；咒力充涌時CD${KINJI_COMBO_JACKPOT_COOLDOWN}秒。`,
+      `領域展開「坐殺博徒」：${KINJI_PASSION_MAX}層熱情時自動開啟，前兩個數字必定相同；三數全同進入${KINJI_JACKPOT_DURATION}秒咒力充涌，否則依奇偶獲得確變或時短。`,
+      `「咒力充涌」：每秒恢復${KINJI_JACKPOT_HEAL_PER_SECOND}血，並加速；領域內可發射小鋼珠，命中${KINJI_PACHINKO_BALL_DAMAGE}傷害，小鋼珠進入中獎洞時縮短數字間隔並回復${KINJI_PACHINKO_BALL_HEAL}血。`
+    ],
+    color: '#f2b632', glowColor: KINJI_DOMAIN_GLOW, type: 'kinji',
+    winQuote: ['我愛狂熱，狂熱是賭博，賭博是人生，而愛是支配。','我會憑實力，抓住好運。',],
+    loseQuote: '……這次，運氣不好。',
+    vsQuotes: {
+     kashimo : ['我還是第一次接近瀕死狀態','我是秤金次，也可以叫我金醬喔','適度享受賭博這種事，是不可能的',],
+     tiger:'哪有咒術師不認識五條悟',
+     
+
+    
   },
 ];
