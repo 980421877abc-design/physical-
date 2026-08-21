@@ -1194,8 +1194,8 @@ const KASHIMO_FX_ARC_JITTER           = 18;
 
 
 // 秤金次「坐殺博徒」常數
-const KINJI_PASSION_MAX              = 52;
-const KINJI_PASSION_PER_SECOND       = 3;   // 加快熱情累積，讓領域更快進入
+const KINJI_PASSION_MAX              = 40;
+const KINJI_PASSION_PER_SECOND       = 2;   // 加快熱情累積，讓領域更快進入
 const KINJI_PASSION_PER_BASIC_HIT    = 2;
 const KINJI_PASSION_PER_SKILL_HIT    = 4;
 const KINJI_TIME_SHORT_PASSION_MULT   = 2;   // 時短效果期間，熱情獲取翻倍
@@ -1207,7 +1207,7 @@ const KINJI_GATE_HIT_CHANCE            = 1.0;  // 閘門在有效近身範圍內
 const KINJI_GATE_IMMOBILIZE           = 0.5; // 縮短閘門定身，避免控制時間過長
 const KINJI_GATE_JACKPOT_COOLDOWN     = 1; // 咒力充涌期間更快出手
 const KINJI_COMBO_HITS                = 5;
-const KINJI_COMBO_DAMAGE              = 24;
+const KINJI_COMBO_DAMAGE              = 40;
 const KINJI_COMBO_COOLDOWN            = 4.0;
 const KINJI_COMBO_JACKPOT_COOLDOWN    = 2.0; // 咒力充涌期間更快連打
 const KINJI_DOMAIN_PASSION_COST       = KINJI_PASSION_MAX;
@@ -1223,10 +1223,10 @@ const KINJI_JACKPOT_DURATION          = 7.0;
 	const KINJI_JACKPOT_AURA_RADIUS        = 3.9;  // 充涌外圍綠色咒力半徑
 	const KINJI_JACKPOT_AURA_SPARKS        = 6;    // 少量高辨識度能量節點
 	const KINJI_JACKPOT_AURA_PULSE_SPEED   = 10.5; // 綠色咒力脈動速度
-const KINJI_JACKPOT_HEAL_PER_SECOND   = 180; // 回血速率翻倍
+const KINJI_JACKPOT_HEAL_PER_SECOND   = 200; // 回血速率翻倍
 const KINJI_PACHINKO_BALL_COOLDOWN    = 0.8;
 const KINJI_PACHINKO_BALL_DAMAGE      = 20;
-const KINJI_PACHINKO_BALL_HEAL        = 80; // 始動口回血翻倍
+const KINJI_PACHINKO_BALL_HEAL        = 100; // 始動口回血翻倍
 const KINJI_PACHINKO_BALL_SPEED       = 230;
 const KINJI_PACHINKO_BALL_RADIUS      = 7;
 const KINJI_PACHINKO_BALL_LIFETIME    = 18.0;
