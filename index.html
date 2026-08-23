@@ -2622,9 +2622,9 @@ function curseC(ch, ball) {
 
 // ============================================================================
 </script>
-<script src="character_constants.js?v=tsukuyomi-dual-stab-1"></script>
+<script src="character_constants.js?v=ew-overload-1p5-20260823-1"></script>
 <script src="boss_constants.js"></script>
-<script src="character_roster.js?v=kashimo-deer-icon-2"></script>
+<script src="character_roster.js?v=ew-overload-1p5-roster-20260823-1"></script>
 
 <script>
 // ============================================================================
@@ -4168,6 +4168,7 @@ function runOpmPunchSkill(b, dt) {
 
 // ── 現代最強「蒼／赫」：與本尊一樣共用同一個技能槽與CD，時間到隨機決定這次噴蒼還是赫 ──
 function runGojoDualSkill(b, dt) {
+  const storedProjectiles = customExtraGet(b, 'gojoStoredProjectiles', []);
   // 冷卻計時，時間到就隨機噴一顆蒼或赫（50/50，跟本尊機率一致，只是不含解鎖後的紫）
   b.customExtra.gojoDualTimer = customExtraGet(b, 'gojoDualTimer', GOJO_COOLDOWN) - dt;
   if (b.customExtra.gojoDualTimer <= 0) {
@@ -4185,6 +4186,7 @@ function runGojoDualSkill(b, dt) {
           vy: (ddy/dd) * GOJO_BLUE_SPEED + (Math.random()-0.5)*0.5,
           type: 'blue', r: GOJO_BLUE_RADIUS, frameDmg: GOJO_BLUE_FRAMEDMG,
           active: true, ringAngle: 0, life: GOJO_BLUE_LIFESPAN,
+          storedCount: storedProjectiles.length,
         });
         playHitSound('vampire_bite');
       } else {
@@ -4196,6 +4198,8 @@ function runGojoDualSkill(b, dt) {
           vy: (ddy/dd) * GOJO_RED_SPEED + (Math.random()-0.5)*0.5,
           type: 'red', r: GOJO_BLUE_RADIUS, damage: GOJO_RED_DAMAGE, active: true
         });
+        // 赫發動時重新射出蒼吸入的投射物，並保留原本的赫球。
+        releaseGojoStoredProjectiles(b, storedProjectiles, target);
         playHitSound('knife');
       }
       customMageTeleportProc(b);
@@ -4215,6 +4219,10 @@ function runGojoDualSkill(b, dt) {
 
     // 引力場：把自己（蒼球本身）對周圍角色施力
     applyGojoForce(ball, state.balls, b);
+    // 蒼的無下限術式會牽引並吸入敵方投射物，存到零件版五條自己的儲存庫。
+    applyGojoProjectilePull(ball, state.projectiles, b.player, storedProjectiles);
+    applyGojoProjectilePull(ball, state.getoUltimateProjectiles, b.player, storedProjectiles);
+    ball.storedCount = storedProjectiles.length;
     // 光線引力：射程內敵人被持續拉向蒼球
     for (const f of state.balls) {
       if (f === b) continue;
@@ -4541,8 +4549,8 @@ function forfeitGame() {
   overlay.classList.add('show');
 }
 
-const P1_COLORS ={ chef:'#e84545',drunk:'#7b4cca', opm:'#f5f5f5', vampire:'#8b1a8b', gojo:'#00cfff', cursed:'#c0392b', trapper:'#27ae60', yi:'#e8e8e8', gunner:'#f0c84a', samurai:'#d4af37', mage:'#9b59b6', thunder:'#f1c40f', blacksmith:'#cd7f32', naoya:'#c8c8e8', itachi:'#8b0000', yuta:'#ff6fa5', engineer:'#3a8fd6', cannondad:'#bdbdbd', dio:'#f5d020', tiger:'#cc2200', stargirl:'#ffe066', obito:'#ff6600', fisherman:'#4a90d9', geto:'#5b3a8e', sakiko:'#c9a4d1', joseph:'#2f7dc0', steve:'#4a8f3c',daji:'#e08ac7',yuki:'#f0c84a',wuxing:'#9b8cce',sans:'#e8e8e8',pucci:'#8e6bbf',baie:'#e8c840',rsqjs:'#e84b4b',dragon4:'#c9a959',nanami:'#3d5a80',momoi:'#f2a65a',oniichan:'#c41e3a',minato:'#f4d35e',elementmaster:'#8e6fd6', johnny:'#3b82f6', amelia:'#d6b36a', kashimo:'#b7f7ff', kinji:'#f2b632' };
-const P2_COLORS = { chef:'#ff9f43', drunk:'#48dbfb', opm:'#aaaaaa', vampire:'#cc44cc', gojo:'#7ff8ff', cursed:'#e74c3c', trapper:'#2ecc71', yi:'#cccccc', gunner:'#f0c040', samurai:'#ffe88a', mage:'#d7aefb', thunder:'#ffe066', blacksmith:'#e8a840', naoya:'#aaaacc', itachi:'#ff3333', yuta:'#ffa3c8', engineer:'#7ec8ff', cannondad:'#787878', dio:'#fff066', tiger:'#ff4422', stargirl:'#fff5aa', obito:'#ffaa44', fisherman:'#8ec6ff', geto:'#a678e0', sakiko:'#e8cdf0', joseph:'#6fb8ee', steve:'#8fd96b',daji:'#e8cdf8' ,yuki:'#b8960b',wuxing:'#c3b8e8',sans:'#a8d8f0',pucci:'#c9a8e8',baie:'#a86fe0',rsqjs:'#3fa9e8',dragon4:'#e8d38f',nanami:'#7e9cc4',momoi:'#ffcf8f',oniichan:'#ff5566',minato:'#fff0a3',elementmaster:'#bfa4ff', johnny:'#9fc2ff', amelia:'#f4d37b', kashimo:'#f5d76e', kinji:'#ffe69a'};
+const P1_COLORS ={ chef:'#e84545',drunk:'#7b4cca', opm:'#f5f5f5', vampire:'#8b1a8b', gojo:'#00cfff', cursed:'#c0392b', trapper:'#27ae60', yi:'#e8e8e8', gunner:'#f0c84a', samurai:'#d4af37', mage:'#9b59b6', thunder:'#f1c40f', blacksmith:'#cd7f32', naoya:'#c8c8e8', itachi:'#8b0000', yuta:'#ff6fa5', engineer:'#3a8fd6', cannondad:'#bdbdbd', dio:'#f5d020', tiger:'#cc2200', stargirl:'#ffe066', obito:'#ff6600', fisherman:'#4a90d9', geto:'#5b3a8e', sakiko:'#c9a4d1', joseph:'#2f7dc0', steve:'#4a8f3c',daji:'#e08ac7',yuki:'#f0c84a',wuxing:'#9b8cce',sans:'#e8e8e8',pucci:'#8e6bbf',baie:'#e8c840',rsqjs:'#e84b4b',dragon4:'#c9a959',nanami:'#3d5a80',momoi:'#f2a65a',oniichan:'#c41e3a',minato:'#f4d35e',elementmaster:'#8e6fd6', johnny:'#3b82f6', amelia:'#d6b36a', kashimo:'#b7f7ff', kinji:'#f2b632', ew:'#8f1638', ew_soul:'#ff315f' };
+const P2_COLORS = { chef:'#ff9f43', drunk:'#48dbfb', opm:'#aaaaaa', vampire:'#cc44cc', gojo:'#7ff8ff', cursed:'#e74c3c', trapper:'#2ecc71', yi:'#cccccc', gunner:'#f0c040', samurai:'#ffe88a', mage:'#d7aefb', thunder:'#ffe066', blacksmith:'#e8a840', naoya:'#aaaacc', itachi:'#ff3333', yuta:'#ffa3c8', engineer:'#7ec8ff', cannondad:'#787878', dio:'#fff066', tiger:'#ff4422', stargirl:'#fff5aa', obito:'#ffaa44', fisherman:'#8ec6ff', geto:'#a678e0', sakiko:'#e8cdf0', joseph:'#6fb8ee', steve:'#8fd96b',daji:'#e8cdf8' ,yuki:'#b8960b',wuxing:'#c3b8e8',sans:'#a8d8f0',pucci:'#c9a8e8',baie:'#a86fe0',rsqjs:'#3fa9e8',dragon4:'#e8d38f',nanami:'#7e9cc4',momoi:'#ffcf8f',oniichan:'#ff5566',minato:'#fff0a3',elementmaster:'#bfa4ff', johnny:'#9fc2ff', amelia:'#f4d37b', kashimo:'#f5d76e', kinji:'#ffe69a', ew:'#ff8fb0', ew_soul:'#ff315f'};
 
 // 玩家 1、2 用既有的兩張色表；玩家 3 以上（多人混戰用）用同一顏色做色調偏移，避免撞色。
 // 之後若要幫玩家 3/4 手動指定色表，只要新增 P3_COLORS / P4_COLORS 並在這裡優先讀取即可。
@@ -5404,6 +5412,7 @@ function makeBall(x, y, vx, vy, ch, player, twinRole) {
     ameliaDetectiveFlash: 0,
     attackTimer: 0,
     attackInterval: ch.type === 'chef' ? CHEF_ATTACK_INTERVAL : ch.type === 'yi' ? YI_BLACK_INTERVAL :
+      ch.type === 'ew' ? EW_ATTACK_INTERVAL :
       ch.type === 'custom' ? (ch.parts.basic === 'a_chef' ? CUSTOM_BASIC_CHEF_INTERVAL : ch.parts.basic === 'a_gunner' ? CUSTOM_BASIC_GUNNER_INTERVAL : ch.parts.basic === 'a_smith' ? CUSTOM_SMITH_FORGE_INTERVAL : ch.parts.basic === 'a_yi' ? YI_BLACK_INTERVAL : CUSTOM_BASIC_DRUNK_INTERVAL) :
       ch.type === 'rsqjs' ? RSQJS_BOMB_CD :
       DRUNK_ATTACK_INTERVAL,
@@ -5470,8 +5479,25 @@ gojoCharging: ch.type === 'gojo' ? false : null,
 gojoChargeTimer: ch.type === 'gojo' ? 0 : null,
 gojoHasTriggered: ch.type === 'gojo' ? false : null,
 gojoBalls: ch.type === 'gojo' ? [] : null,
-gojoChargingVisual: ch.type === 'gojo' ? false : null,
-    frozenByVampire: false,     
+	gojoStoredProjectiles: ch.type === 'gojo' ? [] : null,
+	gojoChargingVisual: ch.type === 'gojo' ? false : null,
+    // 維什戴爾（ew）專屬狀態
+    ewBasicAttackCount: ch.type === 'ew' ? 0 : null,
+    ewSkill1Ready: ch.type === 'ew' ? false : null,
+    ewSkill2Timer: ch.type === 'ew' ? EW_SKILL2_INITIAL_COOLDOWN : null,
+    ewSkill2Phase: ch.type === 'ew' ? null : null,
+    ewSkill2PhaseTimer: ch.type === 'ew' ? 0 : null,
+    ewSkill3Unlocked: ch.type === 'ew' ? false : null,
+    ewSkill3FieldTimer: ch.type === 'ew' ? 0 : null,
+    ewSkill3Active: ch.type === 'ew' ? false : null,
+    ewSkill3ShotsLeft: ch.type === 'ew' ? 0 : null,
+    ewSkill3Cooldown: ch.type === 'ew' ? 0 : null,
+    ewWeaponAngle: ch.type === 'ew' ? 0 : null,
+    ewCamouflaged: false,
+    ewCamouflageSource: null,
+    ewRootTimer: 0,
+    frozenByVampire: false,
+     
     frozenTimer: 0,
     dajiCharmedTimer: 0,      // 被妲己魅惑拉近時，暫停自身移動的剩餘時間（任何角色都可能被魅惑）
     boostTimer: randBetween(BOOST_INTERVAL_MIN, BOOST_INTERVAL_MAX),
@@ -6180,6 +6206,8 @@ function startGameCore() {
     summons: [],
     summonDeathFX: [],
     summonIdCounter: 1,
+    ewAftershocks: [],
+    ewExplosionFX: [],
     ameliaTimeTravelQueue: [], ameliaWatchDepartureActive: false, ameliaWatchDeparturePlayer: null,
     naoShadows: [],       // 禪院直哉殘影列表
     naoPathLines: [],     // 路徑預覽線（短暫顯示）
@@ -6257,6 +6285,7 @@ function startGameCore() {
     rsqjsWaterZones: [],      // 紅石青金石：場上水域列表 {x,y,owner,life}
   };
   initializeAmeliaTimeTravelers();
+  initializeEwForBattle();
   // HUD 版面：2人維持原本左右對戰排版，3/4人切換為可換行的多人排版
   const isMulti = playerCount > 2;
   document.getElementById('hud').classList.toggle('multi', isMulti);
@@ -7046,6 +7075,8 @@ function dealDamage(target, dmg, options = {}) {
     if (!options.codeKill && attacker && attacker.player !== state.dioWorldCaster.player) return;
   }
   if (target && target._isSummonTarget) return damageTargetableSummon(target, dmg, options);
+  // ew 迷彩：在死魂靈附近時既不能被鎖敵，也不接受一般傷害入口。
+  if (target && target.ewCamouflaged) return 0;
   // codeKill：真正的代碼殺，只由一拳超人／系統級斬殺使用；穿透完整生存機制。
   const trueDamage = options.trueDamage === true;
   const bypassDefense = options.bypassParry || options.codeKill;
@@ -7598,6 +7629,726 @@ function purgeDeadPlayerEntities(player, deadBall) {
   }
 }
 
+// ── 維什戴爾（ew）戰鬥邏輯 ────────────────────────────────────────────────
+// EW VFX 只使用主 Canvas、短生命週期與固定上限；不建立額外 Canvas，也不生成大量粒子。
+const EW_VFX_MAX = 96;
+function pushEwVfx(type, x, y, options = {}) {
+  if (!state || !Number.isFinite(x) || !Number.isFinite(y)) return null;
+  if (!state.ewVfx) state.ewVfx = [];
+  if (state.ewVfx.length >= EW_VFX_MAX) state.ewVfx.splice(0, state.ewVfx.length - EW_VFX_MAX + 1);
+  const life = Math.max(0.08, Number(options.life) || 0.42);
+  const fx = {
+    type, x, y, life, maxLife: life,
+    r: Math.max(2, Number(options.r) || 18),
+    angle: Number(options.angle) || 0,
+    power: Number(options.power) || 1,
+    index: Number(options.index) || 0,
+    count: Number(options.count) || 1,
+    seed: Number.isFinite(options.seed) ? options.seed : Math.random() * Math.PI * 2
+  };
+  state.ewVfx.push(fx);
+  return fx;
+}
+
+function drawEwShardRing(drawCtx, x, y, radius, progress = 1, rotation = 0, alpha = 1) {
+  const n = 14;
+  drawCtx.save();
+  drawCtx.globalAlpha = alpha;
+  drawCtx.beginPath();
+  for (let i = 0; i < n; i++) {
+    const a = rotation + i * Math.PI * 2 / n;
+    const jag = i % 3 === 0 ? 1.08 : (i % 3 === 1 ? 0.82 : 0.96);
+    const rr = radius * (0.74 + progress * 0.26) * jag;
+    const px = x + Math.cos(a) * rr, py = y + Math.sin(a) * rr;
+    if (i === 0) drawCtx.moveTo(px, py); else drawCtx.lineTo(px, py);
+  }
+  drawCtx.closePath();
+  drawCtx.stroke();
+  drawCtx.restore();
+}
+
+function drawEwGhostMark(drawCtx, x, y, radius, alpha, phase = 0) {
+  const r = Math.max(7, radius);
+  drawCtx.save();
+  drawCtx.translate(x, y);
+  drawCtx.rotate(Math.sin(phase) * 0.04);
+  drawCtx.globalAlpha = alpha;
+  drawCtx.lineWidth = 1.4;
+  drawCtx.beginPath();
+  drawCtx.arc(0, -r * 0.38, r * 0.18, 0, Math.PI * 2);
+  drawCtx.moveTo(-r * 0.24, -r * 0.13);
+  drawCtx.lineTo(-r * 0.42, r * 0.42);
+  drawCtx.lineTo(-r * 0.12, r * 0.28);
+  drawCtx.lineTo(0, r * 0.52);
+  drawCtx.lineTo(r * 0.14, r * 0.28);
+  drawCtx.lineTo(r * 0.42, r * 0.42);
+  drawCtx.lineTo(r * 0.24, -r * 0.13);
+  drawCtx.stroke();
+  drawCtx.restore();
+}
+
+function drawEwHeavyBombard(drawCtx, b, elapsed) {
+  const r = Math.max(12, b.r || RADIUS);
+  const angle = Number.isFinite(b.ewWeaponAngle) ? b.ewWeaponAngle : 0;
+  const dawn = !!b.ewSkill3Active;
+  const overload = b.ewSkill2Phase === 'overload';
+  const pulse = 0.55 + 0.45 * Math.sin(elapsed * (dawn ? 14 : overload ? 10 : 5) + b.player);
+  // 參考圖方向：短、厚、橫向貼球；槍的總長固定，不因技能變成長炮。
+  const backX = -r * 0.58;
+  const railStart = -r * 0.34;
+  const railEnd = r * 0.98;
+  const muzzleX = r * 1.16;
+  const armX = r * 0.38;
+  drawCtx.save();
+  drawCtx.translate(b.x, b.y);
+  drawCtx.rotate(angle);
+  drawCtx.globalAlpha = 0.96;
+  drawCtx.lineCap = 'round'; drawCtx.lineJoin = 'round';
+
+  // 球體後座與短厚槍托，槍身嵌在球面上而不是懸空。
+  drawCtx.fillStyle = '#09030a'; drawCtx.strokeStyle = '#571029'; drawCtx.lineWidth = 2.2;
+  drawCtx.beginPath();
+  drawCtx.moveTo(backX, -r * 0.3); drawCtx.lineTo(-r * 0.08, -r * 0.42);
+  drawCtx.lineTo(r * 0.32, -r * 0.22); drawCtx.lineTo(r * 0.32, r * 0.22);
+  drawCtx.lineTo(-r * 0.08, r * 0.42); drawCtx.lineTo(backX, r * 0.3); drawCtx.closePath();
+  drawCtx.fill(); drawCtx.stroke();
+
+  // 中央主樑：扁平、粗壯、只延伸到球體前方一小段。
+  drawCtx.fillStyle = dawn ? '#25040f' : '#13050c';
+  drawCtx.strokeStyle = dawn ? '#d62b56' : '#8b1a3d'; drawCtx.lineWidth = dawn ? 2.6 : 2;
+  drawCtx.beginPath();
+  drawCtx.moveTo(railStart, -r * 0.22); drawCtx.lineTo(railEnd, -r * 0.2);
+  drawCtx.lineTo(muzzleX, -r * 0.1); drawCtx.lineTo(muzzleX, r * 0.1);
+  drawCtx.lineTo(railEnd, r * 0.2); drawCtx.lineTo(railStart, r * 0.22); drawCtx.closePath();
+  drawCtx.fill(); drawCtx.stroke();
+
+  // 參考圖核心：粗大的上下橫向弩臂與中央立柱，形成重弩輪廓。
+  drawCtx.strokeStyle = overload ? '#ff9b5f' : '#a21c45'; drawCtx.lineWidth = dawn ? 3.4 : 2.8;
+  drawCtx.beginPath();
+  drawCtx.moveTo(armX, -r * 0.16); drawCtx.lineTo(r * 0.72, -r * 0.78); drawCtx.lineTo(r * 1.02, -r * 0.48);
+  drawCtx.moveTo(armX, r * 0.16); drawCtx.lineTo(r * 0.72, r * 0.78); drawCtx.lineTo(r * 1.02, r * 0.48);
+  drawCtx.stroke();
+  drawCtx.strokeStyle = '#320615'; drawCtx.lineWidth = 4;
+  drawCtx.beginPath(); drawCtx.moveTo(r * 0.72, -r * 0.78); drawCtx.lineTo(r * 0.72, r * 0.78); drawCtx.stroke();
+
+  // 紅黑尖刺裝甲與炮口核心，固定在槍口，不增加碰撞物件。
+  drawCtx.fillStyle = '#17030b'; drawCtx.strokeStyle = '#c62250'; drawCtx.lineWidth = 1.6;
+  drawCtx.beginPath();
+  drawCtx.moveTo(r * 0.72, -r * 0.36); drawCtx.lineTo(r * 1.03, -r * 0.5); drawCtx.lineTo(muzzleX + r * 0.08, -r * 0.22);
+  drawCtx.lineTo(muzzleX + r * 0.08, r * 0.22); drawCtx.lineTo(r * 1.03, r * 0.5); drawCtx.lineTo(r * 0.72, r * 0.36); drawCtx.closePath();
+  drawCtx.fill(); drawCtx.stroke();
+  const chamber = drawCtx.createRadialGradient(muzzleX - r * 0.02, 0, 1, muzzleX - r * 0.02, 0, r * 0.34);
+  chamber.addColorStop(0, '#fff6f8'); chamber.addColorStop(0.2, '#ff5a80'); chamber.addColorStop(0.62, '#a30e3e'); chamber.addColorStop(1, '#16020b');
+  drawCtx.fillStyle = chamber; drawCtx.shadowColor = dawn ? '#ff315f' : '#9f1742'; drawCtx.shadowBlur = dawn ? 15 : 7;
+  drawCtx.beginPath(); drawCtx.arc(muzzleX - r * 0.02, 0, r * 0.3 + pulse * 1.1, 0, Math.PI * 2); drawCtx.fill();
+  drawCtx.shadowBlur = 0; drawCtx.strokeStyle = '#ffb9ca'; drawCtx.lineWidth = 1.2; drawCtx.stroke();
+
+  // 細十字導能線只在黎明模式顯示，強化「發射炸彈的重武器」感。
+  if (dawn) {
+    drawCtx.globalAlpha = 0.64 + pulse * 0.26; drawCtx.strokeStyle = '#ffdce5'; drawCtx.lineWidth = 1.15;
+    drawCtx.beginPath(); drawCtx.moveTo(-r * 0.02, 0); drawCtx.lineTo(muzzleX - r * 0.28, 0); drawCtx.stroke();
+  }
+  drawCtx.restore();
+}
+
+function drawEwVfxItem(fx) {
+  if (!fx || !ctx || fx.life <= 0) return;
+  const ratio = Math.max(0, Math.min(1, fx.life / Math.max(0.01, fx.maxLife)));
+  const progress = 1 - ratio;
+  const fade = Math.min(1, ratio * 1.8);
+  const rotation = fx.angle + fx.seed * 0.08;
+  ctx.save();
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  switch (fx.type) {
+    case 'muzzle': {
+      ctx.translate(fx.x, fx.y);
+      ctx.rotate(fx.angle);
+      ctx.globalAlpha = fade * 0.75;
+      ctx.strokeStyle = '#ff7897'; ctx.lineWidth = 2;
+      for (let i = 0; i < 4; i++) {
+        const a = (i - 1.5) * 0.22;
+        ctx.beginPath(); ctx.moveTo(4, 0); ctx.lineTo(18 + progress * 10, Math.tan(a) * 16); ctx.stroke();
+      }
+      ctx.fillStyle = '#ffe6ed';
+      ctx.beginPath(); ctx.arc(2, 0, 3 + (1 - progress) * 4, 0, Math.PI * 2); ctx.fill();
+      break;
+    }
+    case 'dawn_impact': {
+      const burst = Math.min(1, progress * 2.2);
+      const coreR = fx.r * (0.18 + burst * 0.24);
+      const core = ctx.createRadialGradient(fx.x, fx.y, 0, fx.x, fx.y, coreR * 1.8);
+      core.addColorStop(0, `rgba(255,250,252,${0.96 * fade})`);
+      core.addColorStop(0.22, `rgba(255,119,151,${0.92 * fade})`);
+      core.addColorStop(0.68, `rgba(135,11,45,${0.7 * fade})`);
+      core.addColorStop(1, 'rgba(10,1,8,0)');
+      ctx.fillStyle = core; ctx.beginPath(); ctx.arc(fx.x, fx.y, coreR * 1.8, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#ff315f'; ctx.lineWidth = 3.4;
+      drawEwShardRing(ctx, fx.x, fx.y, fx.r * (0.35 + burst * 0.9), burst, rotation, fade);
+      ctx.strokeStyle = '#ffb5c6'; ctx.lineWidth = 1.2;
+      drawEwShardRing(ctx, fx.x, fx.y, fx.r * (0.72 + burst * 0.62), burst, rotation + 0.26, fade * 0.72);
+      ctx.strokeStyle = '#4a071d'; ctx.lineWidth = 4.2;
+      for (let i = 0; i < 9; i++) {
+        const a = rotation + i * Math.PI * 2 / 9;
+        const inner = fx.r * (0.24 + burst * 0.05);
+        const outer = fx.r * (0.78 + burst * (0.42 + (i % 2) * 0.18));
+        ctx.beginPath(); ctx.moveTo(fx.x + Math.cos(a) * inner, fx.y + Math.sin(a) * inner); ctx.lineTo(fx.x + Math.cos(a + 0.035) * outer, fx.y + Math.sin(a + 0.035) * outer); ctx.stroke();
+      }
+      ctx.strokeStyle = '#fff1f5'; ctx.lineWidth = 1.3;
+      for (let i = 0; i < 6; i++) {
+        const a = rotation * 1.3 + i * Math.PI / 3;
+        const glintR = fx.r * (0.52 + (i % 2) * 0.28) * (0.7 + burst * 0.3);
+        const gx = fx.x + Math.cos(a) * glintR, gy = fx.y + Math.sin(a) * glintR;
+        const glint = 3 + burst * 5;
+        ctx.beginPath(); ctx.moveTo(gx - Math.cos(a) * glint, gy - Math.sin(a) * glint); ctx.lineTo(gx + Math.cos(a) * glint, gy + Math.sin(a) * glint); ctx.moveTo(gx - Math.sin(a) * glint * 0.6, gy + Math.cos(a) * glint * 0.6); ctx.lineTo(gx + Math.sin(a) * glint * 0.6, gy - Math.cos(a) * glint * 0.6); ctx.stroke();
+      }
+      break;
+    }
+    case 'impact': {
+      ctx.strokeStyle = '#ff547c'; ctx.lineWidth = 2.4;
+      drawEwShardRing(ctx, fx.x, fx.y, fx.r * (0.55 + progress * 0.7), progress, rotation, fade * 0.85);
+      ctx.strokeStyle = '#ffcad7'; ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.moveTo(fx.x - fx.r * 0.34, fx.y); ctx.lineTo(fx.x + fx.r * 0.34, fx.y); ctx.moveTo(fx.x, fx.y - fx.r * 0.34); ctx.lineTo(fx.x, fx.y + fx.r * 0.34); ctx.stroke();
+      break;
+    }
+    case 'aftershock': {
+      ctx.strokeStyle = '#ff6f91'; ctx.lineWidth = 2.8;
+      drawEwShardRing(ctx, fx.x, fx.y, fx.r * (0.55 + progress * 0.65), progress, rotation, fade * 0.9);
+      ctx.strokeStyle = '#ffb7c8'; ctx.lineWidth = 1;
+      drawEwShardRing(ctx, fx.x, fx.y, fx.r * 0.54, progress, rotation + 0.24, fade * 0.65);
+      break;
+    }
+    case 'gift': {
+      const burst = Math.min(1, progress * 2.4);
+      ctx.fillStyle = `rgba(9, 2, 10, ${0.52 * fade})`;
+      ctx.beginPath(); ctx.arc(fx.x, fx.y, fx.r * (0.18 + burst * 0.5), 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#ff315f'; ctx.lineWidth = 3.2;
+      drawEwShardRing(ctx, fx.x, fx.y, fx.r * (0.42 + burst * 0.7), burst, rotation, fade);
+      ctx.strokeStyle = '#ffbdcc'; ctx.lineWidth = 1.1;
+      for (let i = 0; i < 7; i++) {
+        const a = rotation + i * Math.PI * 2 / 7;
+        const inner = fx.r * 0.35, outer = fx.r * (0.72 + (i % 2) * 0.2) * (0.55 + burst * 0.45);
+        ctx.beginPath(); ctx.moveTo(fx.x + Math.cos(a) * inner, fx.y + Math.sin(a) * inner); ctx.lineTo(fx.x + Math.cos(a + 0.08) * outer, fx.y + Math.sin(a + 0.08) * outer); ctx.stroke();
+      }
+      drawEwGhostMark(ctx, fx.x, fx.y, fx.r * 0.42, fade * 0.6 * (1 - progress), rotation);
+      break;
+    }
+    case 'soul_spawn': {
+      ctx.strokeStyle = '#9e204c'; ctx.lineWidth = 2;
+      drawEwShardRing(ctx, fx.x, fx.y, fx.r * (0.45 + progress * 0.75), progress, rotation, fade * 0.8);
+      ctx.strokeStyle = '#ff557e'; ctx.lineWidth = 1.2;
+      for (let i = 0; i < 5; i++) {
+        const a = rotation + i * Math.PI * 2 / 5;
+        const lift = progress * (10 + i * 2);
+        ctx.beginPath(); ctx.moveTo(fx.x + Math.cos(a) * fx.r * 0.25, fx.y + Math.sin(a) * fx.r * 0.25); ctx.lineTo(fx.x + Math.cos(a) * fx.r * 0.8, fx.y + Math.sin(a) * fx.r * 0.8 - lift); ctx.stroke();
+      }
+      break;
+    }
+    case 'soul_charge': {
+      ctx.strokeStyle = '#ff5d83'; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.arc(fx.x, fx.y, fx.r * (0.4 + progress * 0.55), 0, Math.PI * 2); ctx.stroke();
+      ctx.fillStyle = '#ffb7c8';
+      for (let i = 0; i < 3; i++) {
+        const a = rotation + i * Math.PI * 2 / 3;
+        ctx.beginPath(); ctx.arc(fx.x + Math.cos(a) * fx.r * 0.75, fx.y + Math.sin(a) * fx.r * 0.75, 1.5, 0, Math.PI * 2); ctx.fill();
+      }
+      break;
+    }
+    case 'soul_ready': {
+      ctx.strokeStyle = '#ff315f'; ctx.lineWidth = 2.2;
+      drawEwShardRing(ctx, fx.x, fx.y, fx.r * (0.75 + progress * 0.22), progress, rotation, fade);
+      ctx.strokeStyle = '#ffdce5'; ctx.lineWidth = 1.2;
+      for (let i = 0; i < 5; i++) {
+        const a = rotation + i * Math.PI * 2 / 5;
+        ctx.beginPath(); ctx.moveTo(fx.x + Math.cos(a) * fx.r * 0.72, fx.y + Math.sin(a) * fx.r * 0.72); ctx.lineTo(fx.x + Math.cos(a) * fx.r * 1.05, fx.y + Math.sin(a) * fx.r * 1.05); ctx.stroke();
+      }
+      break;
+    }
+    case 'soul_fire': {
+      ctx.strokeStyle = '#ff315f'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(fx.x - Math.cos(fx.angle) * fx.r * 0.15, fx.y - Math.sin(fx.angle) * fx.r * 0.15); ctx.lineTo(fx.x + Math.cos(fx.angle) * fx.r, fx.y + Math.sin(fx.angle) * fx.r); ctx.stroke();
+      break;
+    }
+    case 'skill1_charge': {
+      ctx.strokeStyle = '#ff6d91'; ctx.lineWidth = 2;
+      drawEwShardRing(ctx, fx.x, fx.y, fx.r * (0.55 + progress * 0.35), progress, rotation, fade);
+      ctx.strokeStyle = '#ffd5df'; ctx.lineWidth = 1.1;
+      const marks = Math.max(1, Math.min(3, fx.index || 3));
+      for (let i = 0; i < marks; i++) {
+        const a = rotation + i * Math.PI * 2 / marks;
+        ctx.beginPath(); ctx.arc(fx.x + Math.cos(a) * fx.r * 0.7, fx.y + Math.sin(a) * fx.r * 0.7, 3.5, 0, Math.PI * 2); ctx.stroke();
+      }
+      break;
+    }
+    case 'skill2_start':
+    case 'overload': {
+      const overload = fx.type === 'overload';
+      ctx.strokeStyle = overload ? '#ff9b5f' : '#ff315f'; ctx.lineWidth = overload ? 2.8 : 2.2;
+      drawEwShardRing(ctx, fx.x, fx.y, fx.r * (0.5 + progress * 0.75), progress, rotation, fade);
+      ctx.strokeStyle = overload ? '#ffcfb0' : '#ffb3c7'; ctx.lineWidth = 1;
+      for (let i = 0; i < (overload ? 6 : 4); i++) {
+        const a = rotation + i * Math.PI * 2 / (overload ? 6 : 4);
+        ctx.beginPath(); ctx.moveTo(fx.x + Math.cos(a) * fx.r * 0.35, fx.y + Math.sin(a) * fx.r * 0.35); ctx.lineTo(fx.x + Math.cos(a + 0.12) * fx.r * (0.9 + progress * 0.3), fx.y + Math.sin(a + 0.12) * fx.r * (0.9 + progress * 0.3)); ctx.stroke();
+      }
+      break;
+    }
+    case 'skill2_end': {
+      ctx.strokeStyle = '#ffb3c7'; ctx.lineWidth = 1.5;
+      drawEwShardRing(ctx, fx.x, fx.y, fx.r * (0.7 + progress * 0.3), progress, rotation, fade * 0.8);
+      break;
+    }
+    case 'dawn_unlock':
+    case 'dawn_start':
+    case 'dawn_end': {
+      const start = fx.type === 'dawn_start';
+      const unlock = fx.type === 'dawn_unlock';
+      ctx.strokeStyle = start ? '#ff315f' : (unlock ? '#ff9ab2' : '#ffcad7');
+      ctx.lineWidth = start ? 3 : 1.8;
+      drawEwShardRing(ctx, fx.x, fx.y, fx.r * (0.42 + progress * (start ? 1.15 : 0.72)), progress, rotation, fade);
+      if (start) {
+        ctx.strokeStyle = '#ff829d'; ctx.lineWidth = 1.3;
+        for (let i = 0; i < 6; i++) {
+          const a = rotation + i * Math.PI / 3;
+          ctx.beginPath(); ctx.moveTo(fx.x + Math.cos(a) * fx.r * 0.25, fx.y + Math.sin(a) * fx.r * 0.25); ctx.lineTo(fx.x + Math.cos(a) * fx.r * (0.9 + progress * 0.5), fx.y + Math.sin(a) * fx.r * (0.9 + progress * 0.5)); ctx.stroke();
+        }
+      }
+      break;
+    }
+    case 'dawn_shot': {
+      const shotPower = 0.72 + Math.min(4, fx.index || 1) * 0.07;
+      ctx.strokeStyle = '#ff557e'; ctx.lineWidth = 2.8;
+      drawEwShardRing(ctx, fx.x, fx.y, fx.r * shotPower * (0.5 + progress * 0.55), progress, rotation, fade * 0.9);
+      ctx.strokeStyle = '#ffe1e8'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(fx.x - fx.r * 0.7, fx.y); ctx.lineTo(fx.x + fx.r * 0.7, fx.y); ctx.stroke();
+      break;
+    }
+  }
+  ctx.restore();
+}
+
+function getEwSoulSummons(ownerPlayer) {
+  return (state && state.summons ? state.summons : []).filter(s =>
+    s && !s._dead && s.kind === 'ew_soul' && s.ownerPlayer === ownerPlayer && s.hp > 0
+  );
+}
+
+function updateEwCamouflage() {
+  if (!state || !state.balls) return;
+  for (const b of state.balls) {
+    if (!b || !b.char || b.char.type !== 'ew' || b.hp <= 0) continue;
+    const source = getEwSoulSummons(b.player).find(s =>
+      Math.hypot(s.x - b.x, s.y - b.y) <= EW_CAMOUFLAGE_RADIUS + s.radius
+    ) || null;
+    b.ewCamouflaged = !!source;
+    b.ewCamouflageSource = source;
+  }
+}
+
+function spawnEwSoulSummon(ownerPlayer, x, y) {
+  if (!state || getEwSoulSummons(ownerPlayer).length >= EW_SOUL_MAX_COUNT) return null;
+  const soul = spawnSummon(ownerPlayer, {
+    kind: 'ew_soul', player: ownerPlayer, owner: ownerPlayer,
+    x, y, vx: 0, vy: 0,
+    radius: EW_SOUL_RADIUS, r: EW_SOUL_RADIUS,
+    hp: EW_SOUL_HP, maxHp: EW_SOUL_HP,
+    color: '#7d173b',
+    showHpBar: true,
+    immovable: true,
+    ai: null,
+    ewSkillCharge: 0,
+    ewSoulAttackTimer: EW_SOUL_BULLET_INTERVAL,
+    ewChargeReadyVisual: false,
+    customDraw(ctx, s) {
+      const ratio = Math.max(0, Math.min(1, s.hp / Math.max(1, s.maxHp)));
+      const charge = Math.max(0, Math.min(1, (s.ewSkillCharge || 0) / EW_SOUL_SKILL_MAX));
+      const drift = Math.sin((state.elapsed || 0) * 3.2 + s.id) * 1.5;
+      ctx.save();
+      ctx.translate(s.x, s.y + drift);
+      ctx.globalAlpha = 0.52 + ratio * 0.38;
+      ctx.fillStyle = '#170711';
+      ctx.strokeStyle = '#8f1638';
+      ctx.lineWidth = 1.4;
+      // 破碎的人形輪廓：比 emoji 更沉重，也不需要貼圖或額外資產。
+      ctx.beginPath();
+      ctx.moveTo(0, -s.radius * 0.92);
+      ctx.lineTo(s.radius * 0.32, -s.radius * 0.58);
+      ctx.lineTo(s.radius * 0.52, s.radius * 0.56);
+      ctx.lineTo(s.radius * 0.18, s.radius * 0.4);
+      ctx.lineTo(0, s.radius * 0.88);
+      ctx.lineTo(-s.radius * 0.22, s.radius * 0.44);
+      ctx.lineTo(-s.radius * 0.58, s.radius * 0.62);
+      ctx.lineTo(-s.radius * 0.38, -s.radius * 0.55);
+      ctx.closePath();
+      ctx.fill(); ctx.stroke();
+      ctx.globalAlpha = 0.42 + charge * 0.46;
+      ctx.strokeStyle = '#ff315f'; ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(-s.radius * 0.22, -s.radius * 0.2); ctx.lineTo(s.radius * 0.18, s.radius * 0.1);
+      ctx.lineTo(-s.radius * 0.08, s.radius * 0.48);
+      ctx.moveTo(s.radius * 0.22, -s.radius * 0.42); ctx.lineTo(s.radius * 0.05, -s.radius * 0.08);
+      ctx.stroke();
+      ctx.fillStyle = '#ffb3c7';
+      ctx.shadowColor = '#ff315f'; ctx.shadowBlur = 5 + charge * 8;
+      ctx.beginPath(); ctx.arc(0, -s.radius * 0.08, 2.4 + charge * 2.2, 0, Math.PI * 2); ctx.fill();
+      ctx.shadowBlur = 0;
+      ctx.globalAlpha = 0.6 + charge * 0.4;
+      ctx.strokeStyle = charge >= 1 ? '#ffdce5' : '#ff6f91'; ctx.lineWidth = charge >= 1 ? 2.3 : 1.5;
+      ctx.beginPath(); ctx.arc(0, 0, s.radius + 4, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * charge); ctx.stroke();
+      ctx.restore();
+      // 五格技力條仍保留，但縮小為資訊提示，不使用文字與大量粒子。
+      const slotW = s.radius * 2.2 / EW_SOUL_SKILL_MAX;
+      for (let i = 0; i < EW_SOUL_SKILL_MAX; i++) {
+        ctx.fillStyle = i < Math.floor(s.ewSkillCharge || 0) ? '#ff4f79' : 'rgba(255,255,255,0.22)';
+        ctx.fillRect(s.x - s.radius * 1.1 + i * slotW, s.y + s.radius + 5, slotW - 1, 3);
+      }
+    },
+    onUpdate(s, dt) {
+      const previousCharge = s.ewSkillCharge || 0;
+      s.ewSkillCharge = Math.min(EW_SOUL_SKILL_MAX, previousCharge + EW_SOUL_SKILL_PER_SECOND * dt);
+      if (Math.floor(s.ewSkillCharge) > Math.floor(previousCharge) && s.ewSkillCharge < EW_SOUL_SKILL_MAX) {
+        pushEwVfx('soul_charge', s.x, s.y, { r: s.radius + 3, life: 0.24, seed: s.id + s.ewSkillCharge });
+      }
+      if (s.ewSkillCharge >= EW_SOUL_SKILL_MAX && !s.ewChargeReadyVisual) {
+        s.ewChargeReadyVisual = true;
+        pushEwVfx('soul_ready', s.x, s.y, { r: s.radius + 7, life: 0.5, seed: s.id });
+      }
+      s.ewSoulAttackTimer = Math.max(0, (s.ewSoulAttackTimer || 0) - dt);
+      if (s.ewSkillCharge < EW_SOUL_SKILL_MAX || s.ewSoulAttackTimer > 0) return;
+      const target = getNearestEnemyTo(s.x, s.y, s.ownerPlayer);
+      if (!target) return;
+      const dx = target.x - s.x, dy = target.y - s.y;
+      const d = Math.hypot(dx, dy) || 1;
+      const shotAngle = Math.atan2(dy, dx);
+      const ownerBall = state.balls.find(b => b.player === s.ownerPlayer && b.char.type === 'ew' && b.hp > 0) || null;
+      const projectile = createProjectile({
+        x: s.x + dx / d * (s.radius + 5), y: s.y + dy / d * (s.radius + 5),
+        vx: dx / d * EW_SOUL_BULLET_SPEED, vy: dy / d * EW_SOUL_BULLET_SPEED,
+        owner: s.ownerPlayer, ownerBall, type: 'ew_soul_bullet',
+        damage: EW_SOUL_BULLET_DAMAGE, r: 7, life: 4.0, color: '#ff315f',
+        angle: shotAngle
+      });
+      projectile.ewSoulBullet = true;
+      addProjectile(projectile);
+      pushEwVfx('soul_fire', s.x, s.y, { r: 22, life: 0.28, angle: shotAngle, seed: s.id });
+      s.ewSkillCharge = Math.floor(Math.random() * (EW_SOUL_RANDOM_SKILL_GAIN_MAX + 1));
+      s.ewChargeReadyVisual = false;
+      s.ewSoulAttackTimer = EW_SOUL_BULLET_INTERVAL;
+      state.hitFlashes.push({ x: s.x, y: s.y, r: 28, alpha: 1, color: '#ff315f', t: 0.25 });
+      playHitSound('knife');
+    },
+    onDeath(s) {
+      if (state.ewExplosionFX) state.ewExplosionFX.push({ type: 'soul_death', x: s.x, y: s.y, r: s.radius, life: 0.45, maxLife: 0.45 });
+    },
+    char: { type: 'ewSoul', color: '#7d173b', glowColor: 'rgba(255,49,95,0.7)' }
+  });
+  if (soul) pushEwVfx('soul_spawn', soul.x, soul.y, { r: soul.radius * 1.4, life: 0.62, seed: soul.id });
+  return soul;
+}
+
+function initializeEwForBattle() {
+  if (!state || !state.balls) return;
+  for (const b of state.balls) {
+    if (b && b.char && b.char.type === 'ew' && b.hp > 0 && getEwSoulSummons(b.player).length === 0) {
+      spawnEwSoulSummon(b.player, b.x + EW_CAMOUFLAGE_RADIUS * 0.45, b.y);
+    }
+  }
+  updateEwCamouflage();
+}
+
+function createEwAttackProjectile(ew, target, damageMult = 1, options = {}) {
+  if (!ew || !target || !Number.isFinite(target.x) || !Number.isFinite(target.y)) return null;
+  const dx = target.x - ew.x, dy = target.y - ew.y;
+  const d = Math.hypot(dx, dy) || 1;
+  const angle = Math.atan2(dy, dx) + (options.spread || 0);
+  const chainOffset = Math.max(0, Number(options.chainOffset) || 0);
+  const rawSpawnX = ew.x + Math.cos(angle) * (ew.r + 6 - chainOffset);
+  const rawSpawnY = ew.y + Math.sin(angle) * (ew.r + 6 - chainOffset);
+  const spawnX = Math.max(WALL + 3, Math.min(W - WALL - 3, rawSpawnX));
+  const spawnY = Math.max(WALL + 3, Math.min(H - WALL - 3, rawSpawnY));
+  const primaryDamage = EW_ATTACK_DAMAGE * damageMult;
+  const projectile = createProjectile({
+    x: spawnX, y: spawnY,
+    vx: Math.cos(angle) * EW_PROJECTILE_SPEED, vy: Math.sin(angle) * EW_PROJECTILE_SPEED,
+    owner: ew.player, ownerBall: ew, type: 'ew_soul_bullet',
+    damage: primaryDamage, r: 9, life: 4.0, color: '#a91543', angle
+  });
+  projectile.ewAttack = true;
+  projectile.ewPrimaryDamage = primaryDamage;
+  projectile.ewBlastRadius = options.radius || EW_ATTACK_RADIUS;
+  projectile.ewAftershockDamage = primaryDamage * (options.aftershockMult ?? EW_AFTERSHOCK_DAMAGE_MULT);
+  projectile.ewAftershockRadius = projectile.ewBlastRadius * EW_AFTERSHOCK_RADIUS_MULT;
+  projectile.ewAftershockCount = 1 + (options.extraAftershocks || 0);
+  projectile.ewAftershockDelay = EW_AFTERSHOCK_DELAY;
+  projectile.ewAftershockGuaranteedGift = !!options.guaranteedGift;
+  projectile.ewDawnBullet = !!options.dawnBullet;
+  projectile.ewChain = !!options.chain;
+  projectile.ewChainId = options.chainId || null;
+  projectile.ewChainIndex = Number.isFinite(options.chainIndex) ? options.chainIndex : 0;
+  projectile.ewChainCount = Number.isFinite(options.chainCount) ? options.chainCount : 1;
+  if (options.dawnBullet) projectile.ewDawnIndex = Number(options.dawnIndex) || 1;
+  pushEwVfx('muzzle', spawnX, spawnY, {
+    r: options.dawnBullet ? 22 : 14,
+    life: options.dawnBullet ? 0.34 : 0.2,
+    angle,
+    seed: projectile.ewChainIndex + (options.dawnIndex || 0) * 0.37
+  });
+  if (options.dawnBullet) {
+    pushEwVfx('dawn_shot', spawnX, spawnY, {
+      r: options.radius || EW_ATTACK_RADIUS,
+      life: 0.4,
+      angle,
+      index: options.dawnIndex || 1,
+      seed: projectile.ewChainIndex + 2
+    });
+  }
+  return addProjectile(projectile);
+}
+
+function fireEwBasicVolley(ew, target, count = 1, damageMult = 1, options = {}) {
+  if (!ew || !target) return 0;
+  let fired = 0;
+  const isChained = !!options.chain;
+  const spreadStep = !isChained && count > 1 ? 0.12 : 0;
+  const chainId = options.chainId || `ew-chain-${ew.player}-${state.elapsed || 0}-${Math.random()}`;
+  const chainSpacing = Number(options.chainSpacing) || EW_SKILL2_CHAIN_SPACING;
+  for (let i = 0; i < count; i++) {
+    // 槍身朝向最近目標；只保存角度，避免每幀重新尋找目標造成額外負擔。
+    ew.ewWeaponAngle = Math.atan2(target.y - ew.y, target.x - ew.x);
+    // 串聯模式仿照喬尼 Act 1：所有彈體採相同角度，按發射順序向 EW 身後排隊。
+    const spread = isChained ? 0 : (count > 1 ? (i - (count - 1) / 2) * spreadStep : 0);
+    // 技能一是「下一發」清算；連發時每一發仍各自檢查，不能整個 volley 共用一次狀態。
+    const usesSkill1 = !!ew.ewSkill1Ready;
+    if (usesSkill1 && i === 0) {
+      pushEwVfx('skill1_charge', ew.x, ew.y, { r: 30, life: 0.48, index: 3, seed: ew.player + 8 });
+    }
+    const created = createEwAttackProjectile(ew, target, damageMult, {
+      ...options,
+      spread,
+      chain: isChained,
+      chainId: isChained ? chainId : null,
+      chainIndex: i,
+      chainCount: count,
+      chainOffset: isChained ? i * chainSpacing : 0,
+      extraAftershocks: usesSkill1 ? EW_SKILL1_EXTRA_AFTERSHOCKS : (options.extraAftershocks || 0),
+      aftershockMult: usesSkill1 ? 0.8 : (options.aftershockMult ?? EW_AFTERSHOCK_DAMAGE_MULT),
+      guaranteedGift: !!options.guaranteedGift,
+      dawnIndex: options.dawnIndex
+    });
+    if (!created) continue;
+    fired++;
+    if (usesSkill1) {
+      ew.ewSkill1Ready = false;
+      ew.ewBasicAttackCount = 0;
+    } else {
+      ew.ewBasicAttackCount = (ew.ewBasicAttackCount || 0) + 1;
+      pushEwVfx('skill1_charge', ew.x, ew.y, { r: 23, life: 0.2, index: ew.ewBasicAttackCount, seed: ew.ewBasicAttackCount + ew.player * 3 });
+      if (ew.ewBasicAttackCount >= EW_SKILL1_ATTACKS_REQUIRED) {
+        ew.ewBasicAttackCount = 0;
+        ew.ewSkill1Ready = true;
+      }
+    }
+  }
+  if (fired && state.stats && state.stats[ew.player]) state.stats[ew.player].skillUses++;
+  return fired;
+}
+
+function attachEwAfterimage(target, ownerPlayer, baseDamage) {
+  if (!target || target.hp <= 0 || target.ewCamouflaged) return false;
+  const now = Number(state?.elapsed) || 0;
+  const existing = target.ewAfterimage;
+  const lastAppliedAt = existing && Number.isFinite(existing.lastAppliedAt)
+    ? existing.lastAppliedAt
+    : (existing && Number.isFinite(existing.appliedAt) ? existing.appliedAt : -Infinity);
+  // 殘影最多一層：最小間隔內不疊加、不刷新；間隔結束後才覆蓋並重新計時。
+  if (existing && existing.expiresAt > now && now - lastAppliedAt < EW_AFTERIMAGE_REAPPLY_INTERVAL) return false;
+  target.ewAfterimage = {
+    ownerPlayer, baseDamage,
+    appliedAt: now,
+    lastAppliedAt: now,
+    expiresAt: now + EW_AFTERIMAGE_DURATION,
+    pulse: Math.random() * Math.PI * 2
+  };
+  return true;
+}
+
+function getEwEnemyTargets(ownerPlayer) {
+  return getAllCombatTargets().filter(target =>
+    target && target.hp > 0 && (target.player ?? target.ownerPlayer ?? target.owner) !== ownerPlayer && !target.ewCamouflaged
+  );
+}
+
+function scheduleEwAftershocks(projectile, x, y) {
+  if (!state.ewAftershocks) state.ewAftershocks = [];
+  const count = Math.max(1, projectile.ewAftershockCount || 1);
+  for (let i = 0; i < count; i++) {
+    state.ewAftershocks.push({
+      x, y,
+      ownerPlayer: projectile.owner,
+      damage: projectile.ewAftershockDamage,
+      baseDamage: projectile.ewPrimaryDamage || projectile.damage || EW_ATTACK_DAMAGE,
+      radius: projectile.ewAftershockRadius || EW_ATTACK_RADIUS * EW_AFTERSHOCK_RADIUS_MULT,
+      delay: (projectile.ewAftershockDelay || EW_AFTERSHOCK_DELAY) + i * EW_AFTERSHOCK_INTERVAL,
+      guaranteedGift: !!projectile.ewAftershockGuaranteedGift,
+      life: 0.55, maxLife: 0.55,
+      dawn: !!projectile.ewDawnBullet,
+      resolved: false
+    });
+  }
+}
+
+function resolveEwImpact(projectile, x, y) {
+  if (!projectile || !state) return;
+  const ownerPlayer = projectile.owner;
+  const primaryRadius = projectile.ewBlastRadius || EW_ATTACK_RADIUS;
+  const primaryDamage = projectile.ewPrimaryDamage || projectile.damage || EW_ATTACK_DAMAGE;
+  const targets = getEwEnemyTargets(ownerPlayer);
+  let hitAny = false;
+  for (const target of targets) {
+    if (Math.hypot(target.x - x, target.y - y) <= primaryRadius + getCombatRadius(target)) {
+      dealDamage(target, primaryDamage, { attackerPlayer: ownerPlayer, attackerBall: projectile.ownerBall });
+      attachEwAfterimage(target, ownerPlayer, primaryDamage);
+      hitAny = true;
+    }
+  }
+  pushEwVfx(projectile.ewDawnBullet ? 'dawn_impact' : 'impact', x, y, { r: primaryRadius, life: projectile.ewDawnBullet ? 0.62 : 0.3, seed: projectile.ewChainIndex + 1, index: projectile.ewDawnIndex || 0 });
+  scheduleEwAftershocks(projectile, x, y);
+  state.hitFlashes.push({ x, y, r: primaryRadius, alpha: 0.75, color: '#ff315f', t: 0.28 });
+  state.hitFlashes.push({ x, y, r: primaryRadius * 0.48, alpha: 0.95, color: '#ffd4df', t: 0.16 });
+  if (hitAny) playHitSound('knife');
+}
+
+function triggerEwAfterimageExplosion(target, effect) {
+  if (!target || !effect || !state) return;
+  const ownerPlayer = effect.ownerPlayer;
+  const centerX = target.x, centerY = target.y;
+  const damage = (effect.baseDamage || EW_ATTACK_DAMAGE) * EW_AFTERIMAGE_EXPLOSION_DAMAGE_MULT;
+  delete target.ewAfterimage;
+  for (const enemy of getEwEnemyTargets(ownerPlayer)) {
+    if (Math.hypot(enemy.x - centerX, enemy.y - centerY) <= EW_AFTERIMAGE_EXPLOSION_RADIUS + getCombatRadius(enemy)) {
+      dealDamage(enemy, damage, { attackerPlayer: ownerPlayer });
+      enemy.ewRootTimer = Math.max(enemy.ewRootTimer || 0, EW_AFTERIMAGE_IMMOBILIZE_DURATION);
+      state.hitFlashes.push({ x: enemy.x, y: enemy.y, r: 18, alpha: 0.8, color: '#ff5d83', t: 0.25 });
+    }
+  }
+  state.ewExplosionFX.push({ type: 'gift', x: centerX, y: centerY, r: EW_AFTERIMAGE_EXPLOSION_RADIUS, life: 0.45, maxLife: 0.45 });
+  pushEwVfx('gift', centerX, centerY, { r: EW_AFTERIMAGE_EXPLOSION_RADIUS, life: 0.46, seed: centerX * 0.01 + centerY * 0.02 });
+  state.hitFlashes.push({ x: centerX, y: centerY, r: EW_AFTERIMAGE_EXPLOSION_RADIUS, alpha: 1.15, color: '#ff2d68', t: 0.45 });
+  playHitSound('opm');
+}
+
+function resolveEwAftershock(effect) {
+  if (!effect || effect.resolved || !state) return;
+  effect.resolved = true;
+  for (const target of getEwEnemyTargets(effect.ownerPlayer)) {
+    if (Math.hypot(target.x - effect.x, target.y - effect.y) <= effect.radius + getCombatRadius(target)) {
+      dealDamage(target, effect.damage, { attackerPlayer: effect.ownerPlayer });
+      const mark = target.ewAfterimage;
+      if (mark && mark.expiresAt > (state.elapsed || 0) && (effect.guaranteedGift || Math.random() < EW_AFTERIMAGE_EXPLOSION_CHANCE)) {
+        triggerEwAfterimageExplosion(target, mark);
+      }
+    }
+  }
+  pushEwVfx(effect.dawn ? 'dawn_impact' : 'aftershock', effect.x, effect.y, { r: effect.radius, life: effect.dawn ? 0.5 : 0.38, seed: effect.x * 0.01 + effect.y * 0.015, index: effect.dawn ? 2 : 0 });
+  state.hitFlashes.push({ x: effect.x, y: effect.y, r: effect.radius, alpha: 0.9, color: '#ff7196', t: 0.3 });
+}
+
+function updateEwObjects(dt) {
+  if (!state) return;
+  if (!state.ewAftershocks) state.ewAftershocks = [];
+  if (!state.ewExplosionFX) state.ewExplosionFX = [];
+  if (!state.ewVfx) state.ewVfx = [];
+  for (const b of state.balls || []) {
+    if (b && (b.ewRootTimer || 0) > 0) {
+      b.ewRootTimer = Math.max(0, b.ewRootTimer - dt);
+      b.vx = 0; b.vy = 0;
+    }
+    if (b && b.ewAfterimage && b.ewAfterimage.expiresAt <= (state.elapsed || 0)) delete b.ewAfterimage;
+  }
+  for (const s of getTargetableSummons()) {
+    if (s.ewAfterimage && s.ewAfterimage.expiresAt <= (state.elapsed || 0)) delete s.ewAfterimage;
+  }
+  for (let i = state.ewAftershocks.length - 1; i >= 0; i--) {
+    const fx = state.ewAftershocks[i];
+    fx.delay -= dt;
+    if (!fx.resolved && fx.delay <= 0) resolveEwAftershock(fx);
+    fx.life -= dt;
+    if (fx.life <= 0) state.ewAftershocks.splice(i, 1);
+  }
+  for (let i = state.ewExplosionFX.length - 1; i >= 0; i--) {
+    state.ewExplosionFX[i].life -= dt;
+    if (state.ewExplosionFX[i].life <= 0) state.ewExplosionFX.splice(i, 1);
+  }
+  for (let i = state.ewVfx.length - 1; i >= 0; i--) {
+    state.ewVfx[i].life -= dt;
+    if (state.ewVfx[i].life <= 0) state.ewVfx.splice(i, 1);
+  }
+}
+
+function updateEwCharacter(b, dt) {
+  if (!b || !b.char || b.char.type !== 'ew' || b.hp <= 0) return;
+  if (b.ewSkill2Timer > 0) b.ewSkill2Timer = Math.max(0, b.ewSkill2Timer - dt);
+  if (b.ewSkill3Cooldown > 0) b.ewSkill3Cooldown = Math.max(0, b.ewSkill3Cooldown - dt);
+  if (b.ewSkill2Phase) {
+    b.ewSkill2PhaseTimer -= dt;
+    if (b.ewSkill2PhaseTimer <= 0) {
+      if (b.ewSkill2Phase === 'saturation') {
+        b.ewSkill2Phase = 'overload';
+        b.ewSkill2PhaseTimer = EW_SKILL2_OVERLOAD_DURATION;
+        b.attackInterval = EW_SKILL2_OVERLOAD_INTERVAL;
+        b.attackTimer = 0;
+        pushEwVfx('overload', b.x, b.y, { r: 42, life: 0.58, seed: b.player + 1 });
+        state.hitFlashes.push({ x: b.x, y: b.y, r: 34, alpha: 1, color: '#9b163f', t: 0.4 });
+      } else {
+        b.ewSkill2Phase = null;
+        b.ewSkill2PhaseTimer = 0;
+        b.ewSkill2Timer = EW_SKILL2_COOLDOWN;
+        b.attackInterval = EW_ATTACK_INTERVAL;
+        b.attackTimer = 0;
+        pushEwVfx('skill2_end', b.x, b.y, { r: 32, life: 0.36, seed: b.player + 2 });
+        state.hitFlashes.push({ x: b.x, y: b.y, r: 28, alpha: 0.75, color: '#ff9fb8', t: 0.3 });
+      }
+    }
+  }
+  const soulCount = getEwSoulSummons(b.player).length;
+  if (!b.ewSkill3Unlocked) {
+    b.ewSkill3FieldTimer = Math.min(EW_SKILL3_UNLOCK_TIME, (b.ewSkill3FieldTimer || 0) + Math.max(0, dt));
+    if (b.ewSkill3FieldTimer >= EW_SKILL3_UNLOCK_TIME) {
+      b.ewSkill3Unlocked = true;
+      pushEwVfx('dawn_unlock', b.x, b.y, { r: 46, life: 0.72, seed: b.player + 4 });
+      state.hitFlashes.push({ x: b.x, y: b.y, r: 42, alpha: 1, color: '#ff8fb0', t: 0.55 });
+    }
+  }
+  if (!b.ewSkill3Active && b.ewSkill3Unlocked && b.ewSkill3Cooldown <= 0 && !b.ewSkill2Phase) {
+    b.ewSkill3Active = true;
+    b.ewSkill3ShotsLeft = EW_SKILL3_SOUL_BULLETS;
+    b.ewSkill3Cooldown = -1;
+    // 爆裂黎明啟動時補召喚兩隻死魂靈；若場上已有召喚物，仍遵守最多三隻上限。
+    const dawnSummonCount = Math.min(EW_SKILL3_SUMMON_COUNT, Math.max(0, EW_SOUL_MAX_COUNT - getEwSoulSummons(b.player).length));
+    for (let i = 0; i < dawnSummonCount; i++) {
+      const spawnAngle = (Math.PI * 2 * i) / Math.max(1, dawnSummonCount) + Math.random() * 0.35;
+      spawnEwSoulSummon(b.player,
+        b.x + Math.cos(spawnAngle) * (EW_CAMOUFLAGE_RADIUS * 0.55),
+        b.y + Math.sin(spawnAngle) * (EW_CAMOUFLAGE_RADIUS * 0.55));
+    }
+    b.vx = 0; b.vy = 0;
+    b.attackInterval = EW_SKILL3_INTERVAL;
+    b.attackTimer = 0;
+    pushEwVfx('dawn_start', b.x, b.y, { r: 52, life: 0.86, seed: b.player + 5 });
+    if (state.stats && state.stats[b.player]) state.stats[b.player].skillUses++;
+    state.hitFlashes.push({ x: b.x, y: b.y, r: 46, alpha: 1.1, color: '#ff315f', t: 0.6 });
+  } else if (!b.ewSkill3Active && !b.ewSkill2Phase && b.ewSkill2Timer <= 0) {
+    b.ewSkill2Phase = 'saturation';
+    b.ewSkill2PhaseTimer = EW_SKILL2_SATURATION_DURATION;
+    b.attackInterval = EW_SKILL2_SATURATION_INTERVAL;
+    b.attackTimer = 0;
+    pushEwVfx('skill2_start', b.x, b.y, { r: 44, life: 0.55, seed: b.player + 6 });
+    if (state.stats && state.stats[b.player]) state.stats[b.player].skillUses++;
+    state.hitFlashes.push({ x: b.x, y: b.y, r: 38, alpha: 1, color: '#ff315f', t: 0.45 });
+  }
+}
+
+// ── 維什戴爾（ew）戰鬥邏輯結束 ────────────────────────────────────────────
+
 // ══════════════════════════════════════════════════════════════════════════
 // 通用「有生命召喚物」框架 (state.summons)
 // ──────────────────────────────────────────────────────────────────────────
@@ -7644,6 +8395,7 @@ function spawnSummon(ownerPlayer, opts) {
     contactCd: 0,          // 通用「碰撞攻擊」冷卻，各角色自行遞減/使用，這裡只保留欄位
     respectsDioWorldFreeze: true,
     invincible: false,
+    immovable: false,      // true = 固定位置，不由通用召喚物 AI 或物理流程移動
     ai: null,              // { mode: 'chase', speed } 之類的內建簡易 AI 設定
     onUpdate: null,        // (summon, dt) => void，自訂每幀邏輯
     onDeath: null,         // (summon) => void，死亡時呼叫一次
@@ -8120,8 +8872,13 @@ function updateSummons(dt) {
       if (!s || s._dead) continue;
       if (s.respectsDioWorldFreeze && state.dioWorldGlobalActive &&
           (!state.dioWorldCaster || state.dioWorldCaster.player !== s.ownerPlayer)) continue;
+      if ((s.ewRootTimer || 0) > 0) {
+        s.ewRootTimer = Math.max(0, s.ewRootTimer - dt);
+        s.vx = 0; s.vy = 0;
+        continue;
+      }
 
-      if (s.ai && s.ai.mode === 'chase') {
+      if (!s.immovable && s.ai && s.ai.mode === 'chase') {
         const enemy = getNearestEnemyTo(s.x, s.y, s.ownerPlayer);
         if (enemy) {
           const dx = enemy.x - s.x, dy = enemy.y - s.y;
@@ -8214,7 +8971,7 @@ function arenaHealDmgAffects(b) {
 }
 
 function getEnemies(b) {
-  return getAllCombatTargets().filter(x => x !== b && (x.player ?? x.ownerPlayer ?? x.owner) !== b.player && x.hp > 0);
+  return getAllCombatTargets().filter(x => x !== b && (x.player ?? x.ownerPlayer ?? x.owner) !== b.player && x.hp > 0 && !x.ewCamouflaged);
 }
 // 歐尼醬被動「咒胎九相圖」：她的血液系攻擊命中後，統一透過這個函式附加中毒（沿用通用 trapDotTimer 機制）
 function applyOniichanPoison(target, casterPlayer) {
@@ -8417,7 +9174,7 @@ function getNearestEnemyTo(x, y, excludePlayer, targetFilter = null) {
   let best = null, bestD = Infinity;
   const candidates = getAllCombatTargets();
   for (const cand of candidates) {
-    if ((cand.player ?? cand.owner) === excludePlayer || cand.hp <= 0) continue;
+    if ((cand.player ?? cand.owner) === excludePlayer || cand.hp <= 0 || cand.ewCamouflaged) continue;
     if (typeof targetFilter === 'function' && !targetFilter(cand)) continue;
     const d = (cand.x - x) * (cand.x - x) + (cand.y - y) * (cand.y - y);
     if (d < bestD) { bestD = d; best = cand; }
@@ -9551,6 +10308,9 @@ function update(dt) {
   // 其餘戰鬥邏輯直接暫停，因此全場技能冷卻、蓄力、投射物、狀態效果與角色行動
   // 都保留在原本剩餘時間；世界斬結束後下一幀會從原位置恢復。
   if (state.bossWorldSlashFX) return;
+  // 維什戴爾：先更新死魂靈附近的迷彩與技能階段，讓本幀後續鎖敵立刻看見狀態。
+  updateEwCamouflage();
+  for (const ewBall of state.balls) updateEwCharacter(ewBall, dt);
   // 天彗龍團體戰：先處理任務計時與單角色復活，避免被一般 1v1 判定提前結束。
   if (state.dragonGroupBattle) {
     const dragonFlowLocked = updateDragonGroupBattle(dt);
@@ -10468,7 +11228,7 @@ function update(dt) {
       }
     }
     // 移動（凍結則不移動；虎天帝超新星蓄力視為被束縛定身，完全不動；被帶土抓進神威空間者完全凍結；冰雪場地凍結同樣完全不動；被妲己魅惑拉近時也暫停自身移動，避免抵銷拉近效果）
-    if (!b.frozenByVampire && !b.obitoInSpace && !(b.char.type === 'vampire' && b.vampireBiting) && !(b.mageFreezeTimer > 0) && !(b.itachiPinnedTimer > 0) && !b.itachiBiting && !b.tigerNovaCharging && !b.curseFireCharging && !(b.thunderStunTimer > 0) && !(b.arenaFrozen > 0) && !(b.getoBoundTimer > 0) && !b.getoUltimateCharging && !(b.beachCurrentSuckTimer > 0) && !b.frozenByJoseph && !(b.char.type === 'joseph' && (b.josephState === 'charging' || b.josephUltimateActive)) && !(b.dajiCharmedTimer > 0) && !(b.sansGravityTimer > 0) && !b.sansUltActive && !(b.pucciGravityTimer > 0) && !(b.char.type === 'minato' && (b.minatoStage2Active || (b.minatoSlashPhase && b.minatoSlashPhase !== 'idle') || (b.minatoRasenganPhase && b.minatoRasenganPhase !== 'idle'))) && !b.dragonStationary) {
+    if (!b.frozenByVampire && !b.obitoInSpace && !(b.char.type === 'vampire' && b.vampireBiting) && !(b.mageFreezeTimer > 0) && !(b.itachiPinnedTimer > 0) && !b.itachiBiting && !(b.ewRootTimer > 0) && !b.tigerNovaCharging && !b.curseFireCharging && !(b.thunderStunTimer > 0) && !(b.arenaFrozen > 0) && !(b.getoBoundTimer > 0) && !b.getoUltimateCharging && !(b.beachCurrentSuckTimer > 0) && !b.frozenByJoseph && !(b.char.type === 'joseph' && (b.josephState === 'charging' || b.josephUltimateActive)) && !(b.dajiCharmedTimer > 0) && !(b.sansGravityTimer > 0) && !b.sansUltActive && !(b.char.type === 'minato' && (b.minatoStage2Active || (b.minatoSlashPhase && b.minatoSlashPhase !== 'idle') || (b.minatoRasenganPhase && b.minatoRasenganPhase !== 'idle'))) && !b.dragonStationary && !(b.char.type === 'ew' && b.ewSkill3Active)) {
       const slowEffect = getStatusEffect(b, 'slow');
       const slowFactor = slowEffect && Number.isFinite(slowEffect.strength) ? slowEffect.strength : CURSE_SLASH_SLOW_FACTOR;
       const speedMul = (slowEffect ? slowFactor : 1.0) * (b.inSandZone ? ARENA_SAND_SLOW_FACTOR : 1.0) *
@@ -10502,7 +11262,8 @@ function update(dt) {
                               (b.char.type === 'pucci' && b.pucciHeavenCharging) ||
                               (b.char.type === 'oniichan' && (b.oniichanQuadCharging || b.oniichanQuadSweeping || b.oniichanTideActive)) ||
                               (b.char.type === 'elementmaster' && b.emUltState === 'casting') ||
-                              (b.char.type === 'kashimo' && b.kashimoDeerLightningCharging);
+                              (b.char.type === 'kashimo' && b.kashimoDeerLightningCharging) ||
+                              (b.char.type === 'ew' && b.ewSkill3Active);
       // 居合衝刺：在移動前直接設速度，確保方向正確
       if (b.char.type === 'samurai' && b.samuraiIaidoing) {
         b.vx = Math.cos(b.samuraiIaidoAngle) * SAMURAI_IAIDO_SPEED;
@@ -11164,6 +11925,44 @@ for (let bi = 0; bi < state.balls.length; bi++) {
               b.attackTimer = 0; fireProjectile(b, enemy, 'bottle');
             }
         }
+    } else if (b.char.type === 'ew') {
+        if (b.attackTimer >= b.attackInterval && enemy) {
+          if (b.thunderParalyzed > 0) {
+            b.thunderParalyzed = 0;
+            b.thunderStunTimer = 0.5;
+            b.vx = 0; b.vy = 0;
+            state.thunderStunFX = state.thunderStunFX || [];
+            state.thunderStunFX.push({ x: b.x, y: b.y, life: 0.5, maxLife: 0.5 });
+            b.attackTimer = 0;
+            state.hitFlashes.push({ x: b.x, y: b.y, r: 20, alpha: 0.8, color: '#f1c40f', t: 0.4 });
+          } else {
+            const isDawn = !!b.ewSkill3Active;
+            const isSaturation = b.ewSkill2Phase === 'saturation';
+            const isOverload = b.ewSkill2Phase === 'overload';
+            const volleyCount = isDawn ? 1 : isSaturation ? EW_SKILL2_SATURATION_VOLLEY_COUNT : isOverload ? EW_SKILL2_OVERLOAD_VOLLEY_COUNT : 1;
+            const damageMult = isDawn ? EW_SKILL3_DAMAGE_MULT : isSaturation ? EW_SKILL2_SATURATION_DAMAGE_MULT : isOverload ? EW_SKILL2_OVERLOAD_DAMAGE_MULT : 1;
+            const attackRadius = isDawn ? EW_ATTACK_RADIUS * EW_SKILL3_SPLASH_RADIUS_MULT : EW_ATTACK_RADIUS;
+            b.attackTimer = 0;
+            const fired = fireEwBasicVolley(b, enemy, volleyCount, damageMult, {
+              radius: attackRadius,
+              guaranteedGift: isDawn,
+              dawnBullet: isDawn,
+              dawnIndex: isDawn ? (EW_SKILL3_SOUL_BULLETS - b.ewSkill3ShotsLeft + 1) : 0,
+              chain: isSaturation || isOverload,
+              chainSpacing: EW_SKILL2_CHAIN_SPACING
+            });
+            if (isDawn && fired > 0) {
+              b.ewSkill3ShotsLeft = Math.max(0, b.ewSkill3ShotsLeft - fired);
+              if (b.ewSkill3ShotsLeft <= 0) {
+                b.ewSkill3Active = false;
+                b.ewSkill3Cooldown = EW_SKILL3_COOLDOWN;
+                b.attackInterval = EW_ATTACK_INTERVAL;
+                pushEwVfx('dawn_end', b.x, b.y, { r: 60, life: 0.62, seed: b.player + 7 });
+                state.hitFlashes.push({ x: b.x, y: b.y, r: 34, alpha: 1, color: '#ffb3c7', t: 0.45 });
+              }
+            }
+          }
+        }
     } else if (b.char.type === 'custom') {
         // 連射零件（a_gunner）改用撞牆裝彈系統，不走一般計時普攻
         if (b.attackTimer >= b.attackInterval && enemy && b.customParts.basic !== 'a_gunner') {
@@ -11451,6 +12250,7 @@ for (let bi = 0; bi < state.balls.length; bi++) {
     if (b.hp <= 0) continue;
     const enemy = getNearestEnemyTo(b.x, b.y, b.player);
     if (b.char.type !== 'gojo') continue;
+    if (!Array.isArray(b.gojoStoredProjectiles)) b.gojoStoredProjectiles = [];
     if (!enemy) continue;
     if ((state.dioWorldGlobalActive && b !== state.dioWorldCaster) || b.obitoInSpace || b.pucciDiscFrozen || isBallInBossDryPowderZone(b)) {
       // 時停中：術式球仍可移動（已在投射物迴圈凍結），但不觸發新技能
@@ -11517,8 +12317,11 @@ for (let bi = 0; bi < state.balls.length; bi++) {
           active:true, stickTimer:0,
           ringAngle: 0,  // 蒼球光圈旋轉角度
           trail: [],     // 飛行軌跡殘影
-          life: sk==='blue' ? GOJO_BLUE_LIFESPAN : undefined // 蒼球存在時間
+          life: sk==='blue' ? GOJO_BLUE_LIFESPAN : undefined, // 蒼球存在時間
+          storedCount: b.gojoStoredProjectiles.length
         });
+        // 赫發動時將蒼吸入的投射物重新釋放，並仍保留原本的赫球攻擊。
+        if (sk === 'red') releaseGojoStoredProjectiles(b, b.gojoStoredProjectiles);
         playHitSound(sk==='red'?'knife':'vampire_bite');
         } // end else (not paralyzed)
       }
@@ -11545,6 +12348,10 @@ for (let bi = 0; bi < state.balls.length; bi++) {
 
       // 每幀持續施力（引力/斥力）
       applyGojoForce(ball, state.balls, b);
+      // 蒼的無下限術式會牽引並吸入敵方投射物，存到五條自己的儲存庫。
+      applyGojoProjectilePull(ball, state.projectiles, b.player, b.gojoStoredProjectiles);
+      applyGojoProjectilePull(ball, state.getoUltimateProjectiles, b.player, b.gojoStoredProjectiles);
+      ball.storedCount = b.gojoStoredProjectiles.length;
 
       // 蒼球：對射程內敵人發射光線引力
       if (ball.type === 'blue') {
@@ -13787,6 +14594,8 @@ for (let bi = 0; bi < state.balls.length; bi++) {
   // 通用召喚物（給未來新角色用，見 spawnSummon 等函式上方的說明）
   updateSummons(dt);
   updateSummonDamageOverTime(dt);
+  updateEwObjects(dt);
+  updateEwCamouflage();
   updateMinato(dt);
 
   for (let bi = 0; bi < state.balls.length; bi++) {
@@ -15148,8 +15957,8 @@ waypoints.push({
       if (b.samuraiParryElapsed >= SAMURAI_PARRY_DURATION) {
         b.samuraiParrying = false;
         b.samuraiParryTimer = SAMURAI_PARRY_INTERVAL;
-        if (!b.samuraiParryHit) {
-          // 時間到且沒碰球 → 發動居合或識滅斬
+        {
+          // 招架結束後無論是擋住投射物、撞到敵人，或沒有命中，都發動居合或識滅斬
           if (b.samuraiNextIsShimetsu) {
             b.samuraiNextIsShimetsu = false;
             b.samuraiIaidoCount = 0;
@@ -15179,11 +15988,6 @@ waypoints.push({
             b.y += b.vy * dt;
             state.hitFlashes.push({ x: b.x, y: b.y, r: 35, alpha: 1.0, color: '#d4af37', t: 0.35 });
           }
-        } else {
-          // 有效招架（碰球或反彈）→ 恢復正常移動
-          const ang = Math.random() * Math.PI * 2;
-          b.vx = Math.cos(ang) * BASE_SPEED;
-          b.vy = Math.sin(ang) * BASE_SPEED;
         }
       }
     }
@@ -15273,6 +16077,10 @@ waypoints.push({
       continue;
     }
     if (p.dioChefFrozen) p.dioChefFrozen = false;
+
+    // 赫釋放的儲存投射物：進入共用更新迴圈後持續追蹤最近敵人。
+    applyGojoStoredHoming(p, dt);
+
     // 技巧3：追蹤鴿子 — 稍微轉向敵方球
     if (p.type === 'dove' && Number(p.mageTrick) === 3) {
       const target = getNearestEnemyTo(p.x, p.y, p.owner);
@@ -15344,7 +16152,7 @@ waypoints.push({
       const skipPlayer = p.reflected ? p.reflectedBy : p.owner;
       if (projectileTargets[bi].player === skipPlayer) continue;
       const b = projectileTargets[bi];
-      if (b.hp <= 0) continue;
+      if (b.hp <= 0 || b.ewCamouflaged) continue;
       // 帶土虛影/轉移/空間階段：投射物穿透；被抓進空間的敵人也穿透
       if ((b.char && b.char.type === 'obito' &&
           ['ghost','teleporting','in_space','grabbing','returning'].includes(b.obitoKamuiPhase)) ||
@@ -15392,6 +16200,19 @@ waypoints.push({
           state.hitFlashes.push({ x: b.x, y: b.y, r: 18, alpha: 0.9, color: '#ffffff', t: 0.2 });
           playHitSound('samurai_parry');
           continue; // 繼續飛
+        }
+        if (p.type === 'ew_soul_bullet' && p.ewAttack) {
+          resolveEwImpact(p, b.x, b.y);
+          state.projectiles.splice(i, 1);
+          removed = true; break;
+        } else if (p.type === 'ew_soul_bullet' && p.ewSoulBullet) {
+          dealDamage(b, p.damage, { attackerPlayer: p.owner });
+          attachEwAfterimage(b, p.owner, p.damage);
+          pushEwVfx('impact', b.x, b.y, { r: 18, life: 0.24, angle: p.angle || 0, seed: p.owner + 3 });
+          state.hitFlashes.push({ x: b.x, y: b.y, r: 22, alpha: 1, color: '#ff315f', t: 0.25 });
+          playHitSound('knife');
+          state.projectiles.splice(i, 1);
+          removed = true; break;
         }
         if (p.type === 'knife') {
           if (!p.hitTargets) p.hitTargets = new Set();
@@ -15608,7 +16429,10 @@ waypoints.push({
     const hitWall = p.x < WALL || p.x > W-WALL || p.y < WALL || p.y > H-WALL;
     if (hitWall) {
       createJohnnyWoundForProjectile(p, p.x, p.y);
-      if (p.type === 'flashbang') {
+      if (p.type === 'ew_soul_bullet' && p.ewAttack) {
+        resolveEwImpact(p, p.x, p.y);
+        state.projectiles.splice(i, 1);
+      } else if (p.type === 'flashbang') {
         p.x = Math.max(WALL, Math.min(W - WALL, p.x));
         p.y = Math.max(WALL, Math.min(H - WALL, p.y));
         detonateGunnerFlashbang(p.x, p.y, p.owner, GUNNER_FLASH_WALL_DAMAGE, GUNNER_FLASH_WALL_RADIUS);
@@ -19381,6 +20205,116 @@ function applyGojoForce(ball, fighters, owner) {
     // 赫球不再持續施加斥力，改為命中時直接擊退（見碰撞判定處）
   }
 }
+
+// 蒼的引力場：把敵方投射物的速度逐幀彎向蒼球，進入核心後吸入儲存；釋放時再交給赫重新發射。
+function applyGojoProjectilePull(ball, projectiles, ownerPlayer, storage) {
+  if (!ball || ball.type !== 'blue' || !Array.isArray(projectiles) || !Array.isArray(storage)) return;
+  for (let i = projectiles.length - 1; i >= 0; i--) {
+    const p = projectiles[i];
+    if (!p || !Number.isFinite(p.x) || !Number.isFinite(p.y)) continue;
+    const projectileOwner = p.owner != null ? p.owner : (p.ownerBall && p.ownerBall.player);
+    if (projectileOwner === ownerPlayer) continue; // 不牽引自己的投射物
+    const dx = p.x - ball.x, dy = p.y - ball.y;
+    const d = Math.sqrt(dx * dx + dy * dy) || 1;
+    if (d > GOJO_BLUE_PROJECTILE_PULL_RANGE) continue;
+
+    const pull = GOJO_BLUE_PROJECTILE_PULL_FORCE * (1 - d / GOJO_BLUE_PROJECTILE_PULL_RANGE);
+    p.vx -= (dx / d) * pull;
+    p.vy -= (dy / d) * pull;
+
+    // 蒼不是單純改變軌道：投射物進入核心後會被吸走，轉存為赫可重新釋放的彈藥。
+    const captureRadius = (ball.r || GOJO_BLUE_RADIUS) + (p.r || 8) + 4;
+    if (d > captureRadius || storage.length >= GOJO_BLUE_PROJECTILE_CAPTURE_MAX) continue;
+    storage.push({
+      type: p.type || 'bullet',
+      damage: Number.isFinite(p.damage) ? p.damage : 0,
+      r: Number.isFinite(p.r) ? p.r : 8,
+      color: p.color || '#ffffff',
+      speed: Math.max(180, Math.hypot(p.vx, p.vy) || 420),
+      life: Number.isFinite(p.life) ? Math.max(0.5, p.life) : Infinity,
+      mageTrick: p.mageTrick,
+      doveWallBounce: p.doveWallBounce,
+      sourceWasReflected: !!p.reflected
+    });
+    // 飛刀被蒼收走後視為已回到廚神手中；赫釋放的是五條重新接管的副本。
+    if (p.type === 'knife') {
+      const chefBall = p.ownerBall && p.ownerBall.char && p.ownerBall.char.type === 'chef' ? p.ownerBall : null;
+      if (chefBall) {
+        chefBall.knives = Math.min((chefBall.knives || 0) + 1, KNIFE_MAX_COUNT);
+        const wallLeft = state.wallKnives.filter(k => k.ownerBall ? k.ownerBall === chefBall : k.owner === chefBall.player).length;
+        if (chefBall.knives >= KNIFE_MAX_COUNT && wallLeft === 0) {
+          chefBall.knifeRecalling = false;
+          chefBall.attackTimer = chefBall.attackInterval;
+        }
+      }
+    }
+    projectiles.splice(i, 1);
+    state.hitFlashes.push({ x: ball.x, y: ball.y, r: 24, alpha: 1.1, color: '#b8f5ff', t: 0.3 });
+    state.hitFlashes.push({ x: ball.x, y: ball.y, r: 12, alpha: 0.9, color: '#ffffff', t: 0.18 });
+    playHitSound('vampire_bite');
+  }
+}
+
+function applyGojoStoredHoming(projectile, dt) {
+  if (!projectile || !projectile.gojoStoredHoming || projectile.gojoStoredHomingTimer <= 0) return;
+  projectile.gojoStoredHomingTimer -= dt;
+  const target = getNearestEnemyTo(projectile.x, projectile.y, projectile.owner);
+  if (!target || !Number.isFinite(target.x) || !Number.isFinite(target.y)) return;
+
+  const desiredAngle = Math.atan2(target.y - projectile.y, target.x - projectile.x);
+  const currentAngle = Math.atan2(projectile.vy, projectile.vx);
+  let angleDiff = desiredAngle - currentAngle;
+  while (angleDiff > Math.PI) angleDiff -= Math.PI * 2;
+  while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
+  const maxTurn = GOJO_RED_STORED_HOMING_TURN * dt;
+  const appliedTurn = Math.max(-maxTurn, Math.min(maxTurn, angleDiff));
+  const nextAngle = currentAngle + appliedTurn;
+  const speed = Math.max(180, Math.hypot(projectile.vx, projectile.vy) || 420);
+  projectile.vx = Math.cos(nextAngle) * speed;
+  projectile.vy = Math.sin(nextAngle) * speed;
+  projectile.angle = nextAngle;
+}
+
+function releaseGojoStoredProjectiles(gojo, storage, target) {
+  if (!gojo || !Array.isArray(storage) || storage.length === 0) return 0;
+  const captured = storage.splice(0, storage.length);
+  const aimTarget = target || getNearestEnemyTo(gojo.x, gojo.y, gojo.player);
+  const baseAngle = aimTarget ? Math.atan2(aimTarget.y - gojo.y, aimTarget.x - gojo.x) : 0;
+  const spread = captured.length > 1 ? Math.min(0.65, 0.12 * (captured.length - 1)) : 0;
+
+  captured.forEach((stored, index) => {
+    const offset = captured.length > 1 ? (index - (captured.length - 1) / 2) * (spread / (captured.length - 1)) : 0;
+    const angle = baseAngle + offset;
+    const speed = Math.max(180, stored.speed || 420);
+    const projectile = {
+      x: gojo.x + Math.cos(angle) * (RADIUS + 8),
+      y: gojo.y + Math.sin(angle) * (RADIUS + 8),
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      owner: gojo.player,
+      ownerBall: gojo,
+      type: stored.type || 'bullet',
+      damage: Number.isFinite(stored.damage) ? stored.damage : 0,
+      r: Number.isFinite(stored.r) ? stored.r : 8,
+      // 重新釋放時給足追蹤存活時間；不能沿用原彈藥即將結束的剩餘生命，否則會剛生成就消失。
+      life: Number.isFinite(stored.life)
+        ? Math.max(stored.life, GOJO_RED_STORED_HOMING_DURATION + 0.25)
+        : Infinity,
+      angle,
+      color: stored.color || gojo.char.color,
+      gojoStoredHoming: true,
+      gojoStoredHomingTimer: GOJO_RED_STORED_HOMING_DURATION
+    };
+    if (stored.mageTrick != null) projectile.mageTrick = stored.mageTrick;
+    if (stored.doveWallBounce) projectile.doveWallBounce = true;
+    if (stored.type === 'knife' || stored.type === 'shimetsu') projectile.hitTargets = new Set();
+    addProjectile(projectile);
+  });
+
+  state.hitFlashes.push({ x: gojo.x, y: gojo.y, r: 48, alpha: 1.2, color: '#ff6666', t: 0.42 });
+  playHitSound('opm');
+  return captured.length;
+}
 // 生成蝙蝠粒子
 function spawnBatParticles(x, y, color, count) {
   for (let i = 0; i < count; i++) {
@@ -19856,6 +20790,100 @@ function drawKashimoReadability() {
     ctx.fillText(`⛔${negative}/${KASHIMO_NEGATIVE_MAX}`, badgeX, badgeY);
   }
   ctx.restore();
+}
+
+function drawEwCombatFX() {
+  if (!state) return;
+  const now = state.elapsed || 0;
+  // 角色狀態光語言：每個 EW 只畫少量幾何線段，不建立全螢幕後處理。
+  for (const b of state.balls || []) {
+    if (!b || b.hp <= 0 || !b.char || b.char.type !== 'ew') continue;
+    const phase = b.ewSkill2Phase;
+    const pulse = 0.5 + 0.5 * Math.sin(now * (phase === 'overload' ? 18 : 10) + b.player);
+    ctx.save();
+    if (b.ewSkill3Active) {
+      ctx.strokeStyle = '#ff315f'; ctx.lineWidth = 2.2;
+      drawEwShardRing(ctx, b.x, b.y, 30 + pulse * 8, pulse, now * 0.7 + b.player, 0.56 + pulse * 0.26);
+      ctx.strokeStyle = '#ffb3c7'; ctx.lineWidth = 1;
+      for (let i = 0; i < 5; i++) {
+        const a = now * 0.35 + i * Math.PI * 2 / 5;
+        ctx.beginPath(); ctx.moveTo(b.x + Math.cos(a) * 20, b.y + Math.sin(a) * 20); ctx.lineTo(b.x + Math.cos(a) * 34, b.y + Math.sin(a) * 34); ctx.stroke();
+      }
+    } else if (phase === 'saturation' || phase === 'overload') {
+      ctx.strokeStyle = phase === 'overload' ? '#ff9b5f' : '#ff547c';
+      ctx.lineWidth = phase === 'overload' ? 2.2 : 1.7;
+      drawEwShardRing(ctx, b.x, b.y, 25 + pulse * 5, pulse, -now * (phase === 'overload' ? 1.1 : 0.55), 0.42 + pulse * 0.22);
+    } else if (b.ewSkill1Ready) {
+      ctx.strokeStyle = '#ffd5df'; ctx.lineWidth = 1.5;
+      drawEwShardRing(ctx, b.x, b.y, 23 + pulse * 3, pulse, now * 0.3 + b.player, 0.7);
+    }
+    ctx.restore();
+    if (b.ewCamouflaged) {
+      drawEwGhostMark(ctx, b.x - 3, b.y + 2, 15, 0.13 + pulse * 0.06, now * 2.4 + b.player);
+    }
+  }
+  // 殘影：低透明、帶移動延遲的錯位人形，不用巨大圖示或文字遮住目標。
+  for (const target of getAllCombatTargets()) {
+    const mark = target && target.ewAfterimage;
+    if (!mark || mark.expiresAt <= now) continue;
+    const pulse = 0.65 + 0.35 * Math.sin(now * 9 + (mark.pulse || 0));
+    const lagX = Math.max(-5, Math.min(5, -(target.vx || 0) * 0.018));
+    const lagY = Math.max(-5, Math.min(5, -(target.vy || 0) * 0.018));
+    ctx.save();
+    ctx.strokeStyle = '#ff5d83'; ctx.shadowColor = '#ff174f'; ctx.shadowBlur = 7;
+    ctx.lineWidth = 1.4;
+    ctx.setLineDash([4, 5]);
+    ctx.beginPath(); ctx.arc(target.x, target.y, getCombatRadius(target) + 7 + pulse * 2, mark.pulse, mark.pulse + Math.PI * 1.35); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
+    drawEwGhostMark(ctx, target.x + lagX, target.y + lagY, getCombatRadius(target) * 0.9, 0.2 + pulse * 0.08, now * 5 + (mark.pulse || 0));
+    drawEwGhostMark(ctx, target.x - lagX * 0.55, target.y - lagY * 0.55, getCombatRadius(target) * 0.78, 0.08 + pulse * 0.04, now * 5.5 + 1.4);
+  }
+  // 餘震預警與落點波紋
+  for (const fx of state.ewAftershocks || []) {
+    ctx.save();
+    if (!fx.resolved) {
+      const pulse = 0.45 + 0.25 * Math.sin(now * 16 + fx.x * 0.01);
+      ctx.globalAlpha = pulse;
+      ctx.strokeStyle = '#ff9ab2'; ctx.lineWidth = 1.5; ctx.setLineDash([5, 4]);
+      ctx.beginPath(); ctx.arc(fx.x, fx.y, fx.radius, 0, Math.PI * 2); ctx.stroke();
+      ctx.setLineDash([]);
+    } else {
+      const ratio = Math.max(0, Math.min(1, fx.life / fx.maxLife));
+      ctx.globalAlpha = ratio * 0.9;
+      ctx.strokeStyle = '#ff6d92'; ctx.shadowColor = '#ff315f'; ctx.shadowBlur = 12; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.arc(fx.x, fx.y, fx.radius * (1.18 - ratio * 0.18), 0, Math.PI * 2); ctx.stroke();
+    }
+    ctx.restore();
+  }
+  // 升級後的 EW VFX：單一陣列、短生命週期、最多 96 個事件。
+  for (const fx of state.ewVfx || []) drawEwVfxItem(fx);
+  // 好禮爆炸與死魂靈死亡特效（保留原本輕量 fallback 層）
+  for (const fx of state.ewExplosionFX || []) {
+    if (fx.type !== 'soul_death') continue;
+    const ratio = Math.max(0, Math.min(1, fx.life / fx.maxLife));
+    ctx.save();
+    ctx.globalAlpha = ratio;
+    ctx.strokeStyle = fx.type === 'gift' ? '#ff315f' : '#ff9ab2';
+    ctx.shadowColor = ctx.strokeStyle; ctx.shadowBlur = 18; ctx.lineWidth = fx.type === 'gift' ? 4 : 2.5;
+    ctx.beginPath(); ctx.arc(fx.x, fx.y, fx.r * (1 + (1 - ratio) * 0.35), 0, Math.PI * 2); ctx.stroke();
+    ctx.restore();
+  }
+  // 死魂靈附近的迷彩範圍提示
+  for (const b of state.balls || []) {
+    if (!b || b.hp <= 0 || b.char.type !== 'ew' || !b.ewCamouflaged) continue;
+    const source = b.ewCamouflageSource;
+    ctx.save();
+    ctx.globalAlpha = 0.18 + 0.08 * Math.sin(now * 8);
+    ctx.fillStyle = '#8f1638';
+    ctx.beginPath(); ctx.arc(b.x, b.y, EW_CAMOUFLAGE_RADIUS, 0, Math.PI * 2); ctx.fill();
+    ctx.globalAlpha = 0.9;
+    ctx.strokeStyle = '#ffbed0'; ctx.shadowColor = '#ff315f'; ctx.shadowBlur = 12; ctx.lineWidth = 1.5;
+    ctx.setLineDash([7, 5]); ctx.beginPath(); ctx.arc(b.x, b.y, EW_CAMOUFLAGE_RADIUS, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]);
+    ctx.font = 'bold 11px sans-serif'; ctx.fillStyle = '#ffd4df'; ctx.textAlign = 'center';
+    ctx.fillText(source ? '迷彩' : '', b.x, b.y + EW_CAMOUFLAGE_RADIUS + 14);
+    ctx.restore();
+  }
 }
 
 function render() {
@@ -21811,6 +22839,15 @@ drawKashimoReadability();
     bg.addColorStop(1, '#0066aa');
     ctx.fillStyle = bg;
     ctx.beginPath(); ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI*2); ctx.fill();
+    // 儲存庫提示：蒼球上方顯示目前已吸入的投射物數量。
+    const storedCount = Number(ball.storedCount) || 0;
+    if (storedCount > 0) {
+      ctx.shadowColor = '#ffffff'; ctx.shadowBlur = 6;
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 11px sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(`×${storedCount}`, ball.x, ball.y - ball.r - 10);
+    }
     ctx.restore();
   }
 
@@ -21950,7 +22987,61 @@ drawKashimoReadability();
     ctx.rotate(p.angle);
     ctx.filter = `drop-shadow(0 0 3px ${p.color}88)`;
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    if (p.type === 'johnny_act1') {
+    if (p.gojoStoredHoming && p.gojoStoredHomingTimer > 0) {
+      const homingPulse = 0.5 + 0.5 * Math.sin(elapsed * 18);
+      ctx.save();
+      ctx.filter = 'none';
+      ctx.strokeStyle = `rgba(255, 92, 236, ${0.7 + homingPulse * 0.3})`;
+      ctx.shadowColor = '#ff5cec';
+      ctx.shadowBlur = 12;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(0, 0, (p.r || 8) + 6 + homingPulse * 2, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    }
+    if (p.type === 'ew_soul_bullet') {
+      ctx.filter = 'none';
+      const soulColor = p.ewSoulBullet ? '#ff315f' : p.ewDawnBullet ? '#ff8fb0' : '#a91543';
+      const soulGlow = p.ewSoulBullet ? '#ff315f' : p.ewDawnBullet ? '#ff8fb0' : '#ff174f';
+      ctx.shadowColor = soulGlow; ctx.shadowBlur = p.ewSoulBullet ? 16 : 13;
+      if (p.ewChain) {
+        // 串聯彈的本體之間以同色光束相連；彈體仍各自碰撞、各自觸發餘震。
+        ctx.save();
+        ctx.globalAlpha = 0.72;
+        ctx.strokeStyle = p.ewDawnBullet ? '#ff8fb0' : '#d52d62';
+        ctx.shadowColor = soulGlow; ctx.shadowBlur = 10; ctx.lineWidth = 5; ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(-EW_SKILL2_CHAIN_SPACING + 5, 0); ctx.lineTo(-10, 0); ctx.stroke();
+        ctx.restore();
+      }
+      const tail = ctx.createLinearGradient(-30, 0, -3, 0);
+      tail.addColorStop(0, 'rgba(255,49,95,0)');
+      tail.addColorStop(1, p.ewSoulBullet ? 'rgba(255,49,95,0.85)' : 'rgba(169,21,67,0.8)');
+      ctx.fillStyle = tail;
+      ctx.beginPath(); ctx.moveTo(-3, -2.5); ctx.lineTo(-30, -0.7); ctx.lineTo(-30, 0.7); ctx.lineTo(-3, 2.5); ctx.closePath(); ctx.fill();
+      const soulGrad = ctx.createRadialGradient(-2, -2, 1, 0, 0, p.ewSoulBullet ? 9 : 10);
+      soulGrad.addColorStop(0, '#fff4f7');
+      soulGrad.addColorStop(0.3, soulColor);
+      soulGrad.addColorStop(1, '#4d0d28');
+      ctx.fillStyle = soulGrad;
+      ctx.beginPath(); ctx.arc(0, 0, p.ewSoulBullet ? 7 : 9, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#ffb3c7'; ctx.lineWidth = 1.4; ctx.stroke();
+      if (p.ewDawnBullet) {
+        // 黎明死魂彈：重弩射出的紅黑炸彈頭，尖刺只作為外觀，不改 hitbox。
+        ctx.fillStyle = '#21030e'; ctx.strokeStyle = '#8d173d'; ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        for (let i = 0; i < 8; i++) {
+          const a = i * Math.PI / 4;
+          const rr = i % 2 === 0 ? 12 : 7.2;
+          const px = Math.cos(a) * rr, py = Math.sin(a) * rr;
+          if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+        }
+        ctx.closePath(); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = '#ff315f'; ctx.shadowColor = '#ff315f'; ctx.shadowBlur = 8;
+        ctx.beginPath(); ctx.arc(0, 0, 3.2, 0, Math.PI * 2); ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+    } else if (p.type === 'johnny_act1') {
       ctx.filter = 'none';
       const g = ctx.createRadialGradient(0, 0, 0, 0, 0, 11);
       g.addColorStop(0, '#e8f5ff'); g.addColorStop(0.35, '#4da6ff'); g.addColorStop(1, '#0755d8');
@@ -24121,6 +25212,7 @@ drawKashimoReadability();
   }
   // 領主眷屬已在上方以 🦇 繪製；此處不再重複繪製。
   drawSummons();
+  drawEwCombatFX();
   drawRegisteredBosses();
   drawElementMasterUpgradeFX();
 
@@ -25737,6 +26829,7 @@ drawKashimoReadability();
     }
 
     // 角色圖示（emoji 或圖片）
+    if (b.char.type === 'ew' && b.ewSkill3Active) drawEwHeavyBombard(ctx, b, elapsed);
     ctx.font = `${b.r*1.1}px serif`; ctx.textAlign='center'; ctx.textBaseline='middle';
     if (b.char.isTwin && b.char.twinRoles) {
       const roleData = b.char.twinRoles[b.twinRole] || b.char.twinRoles[Object.keys(b.char.twinRoles)[0]];
@@ -28013,11 +29106,20 @@ function updateHUD() {
       if (b.yiBlackCount >= YI_BLACK_MAX) return `⬜ 白旗蓄力中 ${nextIn}s`;
       if (b.yiArenaActive) return `⬛ ${stoneCount}/${YI_BLACK_MAX} 🏟️${b.yiArenaTimer.toFixed(1)}s`;
       return `⬛ ${stoneCount}/${YI_BLACK_MAX} 棋 ${nextIn}s`;
+    } else if (b.char.type === 'ew') {
+      const soulCount = getEwSoulSummons(b.player).length;
+      if (b.ewSkill3Active) return `💣 爆裂黎明　死魂彈 ${b.ewSkill3ShotsLeft}/${EW_SKILL3_SOUL_BULLETS}`;
+      if (b.ewSkill2Phase === 'saturation') return `💣 飽和復仇 ${Math.max(0, b.ewSkill2PhaseTimer).toFixed(1)}s　👻${soulCount}/${EW_SOUL_MAX_COUNT}`;
+      if (b.ewSkill2Phase === 'overload') return `⚠️ 過載 ${Math.max(0, b.ewSkill2PhaseTimer).toFixed(1)}s　👻${soulCount}/${EW_SOUL_MAX_COUNT}`;
+      const skill2Txt = b.ewSkill2Timer > 0 ? `技能二${Math.ceil(b.ewSkill2Timer)}s` : '技能二✓';
+      const skill3Txt = b.ewSkill3Unlocked ? (b.ewSkill3Cooldown > 0 ? `爆裂${Math.ceil(b.ewSkill3Cooldown)}s` : '爆裂✓') : `爆裂🔒${Math.ceil(Math.max(0, EW_SKILL3_UNLOCK_TIME - (b.ewSkill3FieldTimer || 0)))}s`;
+      return `💣 餘震${b.ewSkill1Ready ? '✓' : `${b.ewBasicAttackCount}/${EW_SKILL1_ATTACKS_REQUIRED}`}　👻${soulCount}/${EW_SOUL_MAX_COUNT}　${skill2Txt}　${skill3Txt}`;
     } else if (b.char.type === 'gojo') {
       if (b.gojoCharging) return `🔵 蓄力虛式 ${b.gojoChargeTimer ? b.gojoChargeTimer.toFixed(1) : ''}s`;
       const cdLeft = Math.max(0, b.gojoCooldown || 0).toFixed(1);
       const mode = b.gojoUnlocked ? '六眼解放' : '術式';
-      return `✨ ${mode} CD:${cdLeft}s`;
+      const stored = Array.isArray(b.gojoStoredProjectiles) ? b.gojoStoredProjectiles.length : 0;
+      return `✨ ${mode} CD:${cdLeft}s 蒼庫:${stored}/${GOJO_BLUE_PROJECTILE_CAPTURE_MAX}`;
     } else if (b.char.type === 'gunner') {
       if (b.gunnerFiring) return `🔫 連射中！`;
       if (hasStatusEffect(b, 'cooldownFreeze')) return `⏳ 冷卻凍結 ${getStatusEffect(b, 'cooldownFreeze').remaining.toFixed(1)}s`;
@@ -29060,6 +30162,9 @@ function sandboxStartBattle() {
     summons: [],
     summonDeathFX: [],
     summonIdCounter: 1,
+    ewAftershocks: [],
+    ewExplosionFX: [],
+    ewVfx: [],
     ameliaTimeTravelQueue: [], ameliaWatchDepartureActive: false, ameliaWatchDeparturePlayer: null,
     naoShadows: [],
     naoPathLines: [],
@@ -31972,7 +33077,7 @@ function launchBossBattle(teamIds, boss, requestedDefinition = null) {
     projectiles: [], wallKnives: [], minatoKunai: [], minatoTeleportFX: [], hitFlashes: [], damageNumbers: [], batParticles: [], slashMarks: [], traps: [], yiBlackStones: [], yiStoneBurstFX: [], opmFX: [], momoiFanFX: [], gojoKillFX: null, curseSliceKillFX: null, minatoKillFX: null, emTotems: [], emLightningFX: [], emLightningWarn: [], emGolems: [], emUltBanner: null, curseFireFX: [], curseFireBlasts: [], curseFireZones: [], bossDryPowderExtinguishers: [], bossDryPowderBlasts: [], bossDryPowderZones: [], curseSlashFX: [], elapsed: 0,
     arena: 'normal',
     bgColor: selectedBgColor,
-    thunderPillars: [], thunderStrikes: [], kashimoFields: [], kashimoTraps: [], kashimoLightningFX: [], kashimoDeerOrbs: [], kashimoAmberWaves: [], kashimoSparks: [], kashimoShockwaves: [], kashimoScreenFX: [], smithForgeParticles: [], steveMineDebris: [], summons: [], summonDeathFX: [], summonIdCounter: 1, ameliaTimeTravelQueue: [],
+    thunderPillars: [], thunderStrikes: [], kashimoFields: [], kashimoTraps: [], kashimoLightningFX: [], kashimoDeerOrbs: [], kashimoAmberWaves: [], kashimoSparks: [], kashimoShockwaves: [], kashimoScreenFX: [], smithForgeParticles: [], steveMineDebris: [], summons: [], summonDeathFX: [], summonIdCounter: 1, ewAftershocks: [], ewExplosionFX: [], ewVfx: [], ameliaTimeTravelQueue: [],
     naoShadows: [], naoPathLines: [], stats: initialStats, samuraiParticles: [], itachiCrowFX: null, itachiStabFX: [], smithSlashFX: [],
     baieSlashFX: [], baieReflectFX: [], steveAxeFX: [], yutaSlashFX: [], nanamiSlashFX: [], nanamiRockFX: [], nanamiWallHitFX: [], nanamiBlackFlashFX: [],
     nanamiMarkBreakFX: [], nanamiCineFX: null, nanamiWallShakeTimer: 0, nanamiWallShakeDur: NANAMI_WALL_SHAKE_DUR, nanamiWallShakeMag: 0,

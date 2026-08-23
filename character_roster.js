@@ -36,7 +36,7 @@ const CHARACTERS = [
     id: 'vampire', emoji: '🧛', weapon: '🦇', name: '暗夜領主',
     desc: '​「永生是份詛咒，而你們的鮮血，是唯一的解藥。」​隱匿於古老古堡中的暗夜領主。他視人類為螻蟻，卻又迷戀那流淌在血管中的溫熱與甘甜。優雅的禮服下，隱藏著撕裂黑夜的致命爪牙。',
     stats: ['咬擊 ', '蝙蝠狂襲'],
-    skills: [`咬擊：碰到敵人時鎖定撕咬，造成${VAMPIRE_BITE_DAMAGE}傷害×${VAMPIRE_BITE_COUNT}段並吸血${VAMPIRE_BITE_HEAL}×${VAMPIRE_BITE_COUNT}，敵人被咬期間無法移動。`, `蝙蝠狂襲：高速衝向敵人，CD${VAMPIRE_DASH_INTERVAL}秒。`],
+    skills: [`咬擊：碰到敵人時鎖定撕咬，造成${VAMPIRE_BITE_DAMAGE}傷害×${VAMPIRE_BITE_COUNT}段並吸血${VAMPIRE_BITE_HEAL}×${VAMPIRE_BITE_COUNT}，敵人被咬期間無法移動。`, `蝙蝠狂襲：高速衝向敵人，CD${VAMPIRE_DASH_INTERVAL}秒。','領主眷屬：身旁圍繞蝙蝠，會自動追縱敵人並吸血'],
     color: '#8b1a8b', glowColor: 'rgba(139,26,139,0.6)', type: 'vampire',
   winQuote: '我跨越過時代，如獸般的姿態。',
   loseQuote: '……鮮血先流盡了。'
@@ -45,7 +45,7 @@ const CHARACTERS = [
   id: 'gojo', emoji: '😎', weapon: '🔵', name: '現代最強',
   desc: '​「放心吧，因為我是最強的。」​戰場上最令人絕望的對手。可一旦他拉下眼罩，迎來的便是敵人的末日。他能使用「無下限術式」將對手玩弄於股掌之間。',
   stats: ['蒼', '赫', '紫', ],
-  skills: [`順轉「蒼」：帶引力的術式，可穿透並造成持續傷害。CD${GOJO_COOLDOWN}s`, `反轉「赫」：帶斥力的術式，造成${GOJO_RED_DAMAGE}傷害，CD${GOJO_COOLDOWN}s。`, `大招「虛式紫」：血量降至${GOJO_HP_THRESHOLD}後蓄力${GOJO_CHARGE_TIME}秒釋放，對碰到的敵人造成${GOJO_PURPLE_FRAMEDMG}傷害/幀。`],
+  skills: [`順轉「蒼」：帶引力的術式，可穿透並吸走${GOJO_BLUE_PROJECTILE_PULL_RANGE}px內的敵方投射物，最多儲存${GOJO_BLUE_PROJECTILE_CAPTURE_MAX}顆，並造成持續傷害。CD${GOJO_COOLDOWN}s`, `反轉「赫」：帶斥力的術式，造成${GOJO_RED_DAMAGE}傷害，並釋放蒼所儲存的投射物；釋放出的投射物會追蹤敵人${GOJO_RED_STORED_HOMING_DURATION}秒，CD${GOJO_COOLDOWN}s。`, `大招「虛式紫」：血量降至${GOJO_HP_THRESHOLD}後蓄力${GOJO_CHARGE_TIME}秒釋放，對碰到的敵人造成${GOJO_PURPLE_FRAMEDMG}傷害/幀。`],
   color: '#00cfff', glowColor: 'rgba(0,207,255,0.6)', type: 'gojo',
   winQuote: '沒錯，是五條贏了。',
   loseQuote: '沒能讓你感到盡興真是抱歉。',
@@ -628,5 +628,22 @@ vsQuotes: {
      kashimo: ['我還是第一次接近瀕死狀態','我是秤金次，也可以叫我金醬喔','適度享受賭博這種事，是不可能的'],
      tiger: '哪有咒術師不認識五條悟'
     }
+  },
+  {
+    id: 'ew', emoji: '💣', weapon: '👻', name: '維什戴爾',image: 'image/ew.png',
+    desc: '「維什戴爾」，就把名字簽這裡，對吧？殿下告訴我，這個名字的意思是「許願一個家」，但我從不許願。啊？字太醜？還輪不到你來指指點點，今天又要炸誰呢？',
+    stats: ['祖宗發射器', '好禮', '死魂靈的餘息', '定點清算', '飽和復仇', '爆裂黎明'],
+    skills: [
+      `特性「祖宗發射器」：靈魂彈在${EW_ATTACK_RADIUS}px範圍內造成主傷害${EW_ATTACK_DAMAGE}，並在${EW_AFTERSHOCK_DELAY}s後以${Math.round(EW_AFTERSHOCK_DAMAGE_MULT * 100)}%傷害發生餘震；餘震範圍為主範圍的${Math.round(EW_AFTERSHOCK_RADIUS_MULT * 100)}%。命中牆壁也會觸發範圍傷害。`,
+      `被動「好禮」：命中敵人附著殘影；每個目標最多 1 層，同一目標重新附加需間隔至少${EW_AFTERIMAGE_REAPPLY_INTERVAL}s。殘影受到餘震時有${Math.round(EW_AFTERIMAGE_EXPLOSION_CHANCE * 100)}%機率爆炸，對周圍敵人造成${EW_AFTERIMAGE_EXPLOSION_DAMAGE_MULT}倍主傷害並定身${EW_AFTERIMAGE_IMMOBILIZE_DURATION}s。`,
+      `被動「死魂靈的餘息」：進場召喚 1 隻死魂靈；死魂靈周圍${EW_CAMOUFLAGE_RADIUS}px內的維什戴爾進入迷彩，不會被鎖定且不受傷害，場上最多存在${EW_SOUL_MAX_COUNT}隻。`,
+      `死魂靈：召喚物生命${EW_SOUL_HP}；每秒獲得${EW_SOUL_SKILL_PER_SECOND}技力，滿${EW_SOUL_SKILL_MAX}技力時發射紅色子彈，造成${EW_SOUL_BULLET_DAMAGE}傷害並附著殘影，攻擊後隨機回復0～${EW_SOUL_RANDOM_SKILL_GAIN_MAX}技力。`,
+      `技能一「定點清算」：每${EW_SKILL1_ATTACKS_REQUIRED}次普攻後，下次普攻額外造成${EW_SKILL1_EXTRA_AFTERSHOCKS}次餘震，餘震傷害提高至主傷害的80%。`,
+      `技能二「飽和復仇」：普攻間隔由${EW_ATTACK_INTERVAL}s減少${(EW_ATTACK_INTERVAL - EW_SKILL2_SATURATION_INTERVAL).toFixed(1)}秒至${EW_SKILL2_SATURATION_INTERVAL}s，改為像喬尼 Act 1 一樣沿同一方向串聯的${EW_SKILL2_SATURATION_VOLLEY_COUNT}連發，每發造成${EW_SKILL2_SATURATION_DAMAGE_MULT}倍傷害，持續${EW_SKILL2_SATURATION_DURATION}s；之後進入${EW_SKILL2_OVERLOAD_DURATION}s過載，改為同樣串聯的${EW_SKILL2_OVERLOAD_VOLLEY_COUNT}連發、每發${EW_SKILL2_OVERLOAD_DAMAGE_MULT}倍傷害，技能CD${EW_SKILL2_COOLDOWN}s。每一發仍獨立觸發餘震、殘影與技能一計數。`,
+      `技能三「爆裂黎明」：ew 在場上累積${EW_SKILL3_UNLOCK_TIME}秒後解鎖，並召喚${EW_SKILL3_SUMMON_COUNT}隻死魂靈（場上最多${EW_SOUL_MAX_COUNT}隻）；停止移動並獲得${EW_SKILL3_SOUL_BULLETS}發死魂彈，普攻造成${EW_SKILL3_DAMAGE_MULT}倍傷害、攻擊間隔${EW_SKILL3_INTERVAL}s、濺射範圍擴大${EW_SKILL3_SPLASH_RADIUS_MULT}倍，且每發必定觸發好禮；全部射完後才進入${EW_SKILL3_COOLDOWN}s CD。`
+    ],
+    color: '#8f1638', glowColor: 'rgba(255,60,105,0.65)', type: 'ew',
+    winQuote: '真可憐，今天輪到你倒霉。',
+    loseQuote: '或許今天我們都會死在這裡。'
   },
 ];

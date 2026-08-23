@@ -59,12 +59,18 @@ const GOJO_BLUE_RING_R     = 32;    // 蒼球光圈半徑
 const GOJO_BLUE_RAY_RANGE  = 130;   // 蒼球光線射程
 const GOJO_BLUE_RAY_FORCE  = 10;    // 蒼球光線引力強度
 const GOJO_BLUE_LIFESPAN   = 2.0;   // 蒼球存在時間（秒），超時自動消失
+const GOJO_BLUE_PROJECTILE_PULL_RANGE = 180; // 蒼吸引敵方投射物的作用範圍（px）
+const GOJO_BLUE_PROJECTILE_PULL_FORCE = 10;  // 每幀施加在敵方投射物上的引力速度（px/frame）
+const GOJO_BLUE_PROJECTILE_CAPTURE_MAX = 8; // 蒼每場最多儲存的敵方投射物數量
+const GOJO_RED_STORED_HOMING_TURN = 5.5; // 赫釋放投射物的追蹤角速度（rad/s）
+const GOJO_RED_STORED_HOMING_DURATION = 4.0; // 赫釋放投射物的追蹤持續時間（秒）
 const GOJO_PURPLE_RADIUS   = 24;    // 紫球半徑
 const GOJO_CHARGE_TIME     = 1.5;   // 虛式蓄力時間（秒）
 const GOJO_FORCE           = 10;    // 引力/斥力強度（碰撞區域）
 const GOJO_FORCE_RANGE     = 100;   // 引力/斥力作用範圍
 const GOJO_HP_THRESHOLD    = 850;   // 觸發虛式的血量門檻
 const GOJO_PURPLE_CHANCE   = 0.10;  // 解鎖後紫出現機率
+
 
 // 詛咒之王常數
 const CURSE_SLASH_INTERVAL    = 4.0;   // 解：斬痕發動間隔（秒）
@@ -1260,6 +1266,53 @@ const KINJI_JACKPOT_FX_DURATION           = 2.35; // 大獎爆發特效展示時
 const KINJI_JACKPOT_RAY_COUNT              = 16;   // 大獎放射光束數量；降低開獎瞬間單幀負載
 const KINJI_JACKPOT_RING_COUNT             = 2;    // 大獎擴散環數量；保留衝擊感但避免同幀過重
 const KINJI_JACKPOT_SPARK_COUNT            = 8;    // 大獎星芒數量；降低開獎瞬間粒子尖峰
+
+
+// 維什戴爾（ew）與死魂靈常數
+const EW_ATTACK_INTERVAL = 2.0; // 普攻間隔（秒）
+const EW_ATTACK_DAMAGE = 50; // 靈魂彈主傷害
+const EW_PROJECTILE_SPEED = 330; // 靈魂彈速度（px/s）
+const EW_ATTACK_RADIUS = 50; // 主攻擊範圍半徑
+const EW_AFTERSHOCK_DAMAGE_MULT = 0.5; // 餘震傷害＝主傷害的一半
+const EW_AFTERSHOCK_RADIUS_MULT = 0.9; // 餘震範圍＝主攻擊範圍的0.9倍
+const EW_AFTERSHOCK_DELAY = 0.16; // 主爆後第一道餘震延遲（秒）
+const EW_AFTERSHOCK_INTERVAL = 0.12; // 額外餘震之間的間隔（秒）
+const EW_AFTERIMAGE_DURATION = 6.0; // 殘影持續時間（秒）
+const EW_AFTERIMAGE_REAPPLY_INTERVAL = 0.5; // 同一目標重新附加殘影的最小間隔（秒）
+const EW_AFTERIMAGE_EXPLOSION_CHANCE = 0.20; // 餘震觸發殘影爆炸機率
+const EW_AFTERIMAGE_EXPLOSION_DAMAGE_MULT = 1.2; // 殘影爆炸傷害倍率（以主攻擊傷害為基準）
+const EW_AFTERIMAGE_EXPLOSION_RADIUS = 70; // 殘影爆炸範圍
+const EW_AFTERIMAGE_IMMOBILIZE_DURATION = 0.5; // 殘影爆炸定身時間
+const EW_CAMOUFLAGE_RADIUS = 70; // 死魂靈給 ew 迷彩的範圍
+const EW_SOUL_HP = 700; // 死魂靈生命值
+const EW_SOUL_RADIUS = 20; // 死魂靈碰撞半徑
+const EW_SOUL_MAX_COUNT = 3; // 死魂靈上限
+const EW_SKILL3_SUMMON_COUNT = 2; // 爆裂黎明觸發時額外召喚數量
+const EW_SOUL_SKILL_MAX = 5; // 死魂靈技力上限
+const EW_SOUL_SKILL_PER_SECOND = 1; // 死魂靈每秒技力
+const EW_SOUL_BULLET_DAMAGE = 30; // 死魂靈紅色子彈傷害
+const EW_SOUL_BULLET_SPEED = 360; // 死魂靈紅色子彈速度
+const EW_SOUL_BULLET_INTERVAL = 0.35; // 死魂靈發射後內置間隔
+const EW_SOUL_RANDOM_SKILL_GAIN_MAX = 2; // 死魂靈攻擊後隨機補回0~2技力
+const EW_SKILL1_ATTACKS_REQUIRED = 3; // 技能一每幾次普攻觸發一次
+const EW_SKILL1_EXTRA_AFTERSHOCKS = 2; // 技能一額外餘震數量
+const EW_SKILL2_INITIAL_COOLDOWN = 8.0; // 技能二初始冷卻
+const EW_SKILL2_COOLDOWN = 8.0; // 技能二完成後冷卻
+const EW_SKILL2_SATURATION_DURATION = 8.0; // 飽和復仇持續時間
+const EW_SKILL2_SATURATION_VOLLEY_COUNT = 3; // 飽和復仇每次普攻發數
+const EW_SKILL2_SATURATION_DAMAGE_MULT = 0.8; // 飽和復仇每發傷害倍率
+const EW_SKILL2_SATURATION_INTERVAL = 1.5; // 飽和復仇：原本 2 秒減少 0.5 秒＝1.5 秒
+const EW_SKILL2_OVERLOAD_DURATION = 4.0; // 過載持續時間
+const EW_SKILL2_OVERLOAD_VOLLEY_COUNT = 4; // 過載每次普攻發數
+const EW_SKILL2_OVERLOAD_DAMAGE_MULT = 0.4; // 過載每發傷害倍率
+const EW_SKILL2_OVERLOAD_INTERVAL = 1.0; // 過載普攻間隔
+const EW_SKILL2_CHAIN_SPACING = 22; // 飽和／過載連發的串聯間距（px）
+const EW_SKILL3_UNLOCK_TIME = 20.0; // ew 在場累積 20 秒後解鎖爆裂黎明
+const EW_SKILL3_SOUL_BULLETS = 5; // 爆裂黎明死魂彈數量
+const EW_SKILL3_DAMAGE_MULT = 2.0; // 爆裂黎明普攻傷害倍率
+const EW_SKILL3_INTERVAL = 2.5; // 爆裂黎明攻擊間隔
+const EW_SKILL3_SPLASH_RADIUS_MULT = 2.5; // 爆裂黎明濺射範圍倍率
+const EW_SKILL3_COOLDOWN = 15.0; // 爆裂黎明完成後冷卻
 
 const MIN_SPEED          = 100;   // 最低移動速度（技能停止中除外）
 const BOOST_INTERVAL_MIN = 3;
