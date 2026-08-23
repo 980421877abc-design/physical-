@@ -172,6 +172,17 @@ const SAMURAI_IAIDO_DURATION   = 0.18;  // 居合衝刺持續時間（秒）
 const SAMURAI_SHIMETSU_DAMAGE  = 140;   // 識滅斬每道傷害
 const SAMURAI_SHIMETSU_COUNT   = 4;     // 識滅斬道數
 const SAMURAI_IAIDO_MAX        = 4;     // 累積幾次居合觸發識滅斬
+const SAMURAI_ACTION_FAILSAFE  = 2.75;  // 技能狀態最多持續秒數，避免旗標異常導致永久定身
+
+// 末代武士 VFX 升級參數（只影響畫面，不改變傷害／判定／冷卻）
+const SAMURAI_VFX_PARTICLE_CAP       = 220;  // 場上同時存在的武士粒子上限
+const SAMURAI_VFX_PARRY_SPARKS       = 18;   // 招架啟動／反彈時的火花數
+const SAMURAI_VFX_IAIDO_SPARKS       = 14;   // 居合啟動／命中時的刀氣數
+const SAMURAI_VFX_SHIMETSU_SPARKS    = 22;   // 識滅斬每道斬波的噴濺數
+const SAMURAI_VFX_IAIDO_TRAIL_GAP    = 0.032; // 居合殘影取樣間隔（秒）
+const SAMURAI_VFX_SHIMETSU_TRAIL_GAP = 0.045; // 識滅斬拖尾取樣間隔（秒）
+const SAMURAI_VFX_PARRY_RING_LIFE    = 0.62;  // 招架環展開時間（秒）
+const SAMURAI_VFX_HIT_STOP_FLASH     = 0.16;  // 命中白芯閃光時間（秒）
 
 // 魔術師常數
 const MAGE_DOVE_INTERVAL       = 1.25;   // 丟鴿子CD（秒）
@@ -1446,4 +1457,3 @@ const DRAGON4_ROLES = [
 ];
 
 const RSQJS_BOMB_IMAGE = 'image/tnt-bomb.png';
-
