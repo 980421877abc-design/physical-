@@ -36,7 +36,7 @@ const CHARACTERS = [
     id: 'vampire', emoji: '🧛', weapon: '🦇', name: '暗夜領主',
     desc: '​「永生是份詛咒，而你們的鮮血，是唯一的解藥。」​隱匿於古老古堡中的暗夜領主。他視人類為螻蟻，卻又迷戀那流淌在血管中的溫熱與甘甜。優雅的禮服下，隱藏著撕裂黑夜的致命爪牙。',
     stats: ['咬擊 ', '蝙蝠狂襲'],
-    skills: [`咬擊：碰到敵人時鎖定撕咬，造成${VAMPIRE_BITE_DAMAGE}傷害×${VAMPIRE_BITE_COUNT}段並吸血${VAMPIRE_BITE_HEAL}×${VAMPIRE_BITE_COUNT}，敵人被咬期間無法移動。`, `蝙蝠狂襲：高速衝向敵人，CD${VAMPIRE_DASH_INTERVAL}秒。','領主眷屬：身旁圍繞蝙蝠，會自動追縱敵人並吸血'],
+    skills: [`咬擊：碰到敵人時鎖定撕咬，造成${VAMPIRE_BITE_DAMAGE}傷害×${VAMPIRE_BITE_COUNT}段並吸血${VAMPIRE_BITE_HEAL}×${VAMPIRE_BITE_COUNT}，敵人被咬期間無法移動。`, `蝙蝠狂襲：高速衝向敵人，CD${VAMPIRE_DASH_INTERVAL}秒。`, `領主眷屬：身旁圍繞蝙蝠，會自動追縱敵人並吸血`],
     color: '#8b1a8b', glowColor: 'rgba(139,26,139,0.6)', type: 'vampire',
   winQuote: '我跨越過時代，如獸般的姿態。',
   loseQuote: '……鮮血先流盡了。'
