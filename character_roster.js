@@ -649,7 +649,7 @@ vsQuotes: {
   {
     id: 'otis', emoji: '🔮', weapon: '🔫', name: '魔彈射手・奧提斯',image: 'image/otis.png',
 
-    desc: `每${OTIS_LOCK_INTERVAL}秒鎖定一名目標；鎖定期間只顯示由遠而近收束的準心，經過${OTIS_PORTAL_DELAY}秒後才在射擊瞬間開啟固定尺寸傳送門。七發完成後重新循環。`,
+    desc: `「這枚神奇的子彈，能命中你指定的任何目標。」為了追求更極致、絕不落空的絕對力量，他選擇與深淵中的惡魔簽訂契約。惡魔給了他七發魔彈，前六發能隨心所欲擊中任何目標，在絕望與詛咒中，獵人迷失了自我，徘徊到這裡。`,
     stats: ['射擊開始', '必中', '致命的子彈', '七發循環'],
     skills: [
       `「射擊開始」：每${OTIS_LOCK_INTERVAL}秒進行一次攻擊／鎖定。鎖定期間不會提前生成傳送門，只顯示由${OTIS_FX_RETICLE_START_RADIUS}px收束至${OTIS_FX_RETICLE_END_RADIUS}px的準心；倒數完成的射擊瞬間才在目標外側${OTIS_PORTAL_TARGET_OFFSET}px生成固定尺寸深藍傳送門並射出魔彈。每7發後重新計數。`,
