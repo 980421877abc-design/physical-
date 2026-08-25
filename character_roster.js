@@ -646,4 +646,20 @@ vsQuotes: {
     winQuote: '真可憐，今天輪到你倒霉。',
     loseQuote: '或許今天我們都會死在這裡。'
   },
+  {
+    id: 'otis', emoji: '🔮', weapon: '🔫', name: '魔彈射手・奧提斯',image: 'image/otis.png',
+
+    desc: `每${OTIS_LOCK_INTERVAL}秒鎖定一名目標；鎖定期間只顯示由遠而近收束的準心，經過${OTIS_PORTAL_DELAY}秒後才在射擊瞬間開啟固定尺寸傳送門。七發完成後重新循環。`,
+    stats: ['射擊開始', '必中', '致命的子彈', '七發循環'],
+    skills: [
+      `「射擊開始」：每${OTIS_LOCK_INTERVAL}秒進行一次攻擊／鎖定。鎖定期間不會提前生成傳送門，只顯示由${OTIS_FX_RETICLE_START_RADIUS}px收束至${OTIS_FX_RETICLE_END_RADIUS}px的準心；倒數完成的射擊瞬間才在目標外側${OTIS_PORTAL_TARGET_OFFSET}px生成固定尺寸深藍傳送門並射出魔彈。每7發後重新計數。`,
+      `「必中」：魔彈不受牙 ACT3、迷彩、無敵、神威等一般躲避／無敵狀態影響；七發魔彈的飛行路徑都不會命中奧提斯本人，奧斯提自己只會受到第七發自鎖所造成的虛擬血條破碎。`,
+      `「致命的子彈」：基礎傷害${OTIS_BASE_DAMAGE}，1～7發傷害倍率依序為${OTIS_SHOT_DAMAGE_MULTIPLIERS.slice(1).join('／')}；魔彈會穿過飛行路徑上的所有敵我單位，但跳過射手本體。第二發造成${OTIS_PARALYZE_DURATION}秒麻痺；第三發造成${OTIS_WEAKEN_DURATION}秒浸水／虛弱（輸出倍率${OTIS_WEAKEN_MULT}）並附加${OTIS_BURN_STACKS_PER_HIT}層燒傷；燒傷每秒依層數跳傷害、永久保留至戰鬥結束，上限${OTIS_BURN_MAX_STACKS}層。第四發附加${OTIS_VULN_STACKS_PER_HIT}層易傷，每層受到傷害增加${OTIS_VULN_PER_STACK * 100}%，上限${OTIS_VULN_MAX_STACKS}層。第五發附加${OTIS_BURN_STACKS_PER_HIT}層燒傷，並使造成傷害永久-${OTIS_PERMANENT_ATTACK_PENALTY}、受到傷害永久+${OTIS_PERMANENT_DAMAGE_TAKEN_BONUS}。`,
+      `第六魔彈：目標每${OTIS_EXTRA_BURN_TRIGGER_STACKS}層燒傷追加1次魔彈攻擊，最多${OTIS_EXTRA_BULLET_MAX}次；追加彈不會再次連鎖，不會改寫七發循環。`,
+      `第七魔彈・詛咒：優先鎖定一名己方隊友；沒有隊友時鎖定自身血條。射擊瞬間直接累積1層「血條破碎」，不扣自身HP，達${OTIS_SELF_SHATTER_THRESHOLD}層後視作死亡。`
+    ],
+    color: '#5b2cff', glowColor: 'rgba(112,76,255,0.78)', type: 'otis',
+    winQuote: '這枚神奇的子彈，能命中你指定的任何目標。',
+    loseQuote: '我很清楚。如果這子彈有窮盡的一天，最后一顆子彈只會將我貫穿。'
+  },
 ];

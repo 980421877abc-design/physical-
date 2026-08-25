@@ -3,6 +3,7 @@
 // ============================================================================
 
 // USER CONFIG 3/3：角色數值
+const STANDARD_DOT_TICK_INTERVAL = 1.0; // DPS／每秒傷害效果的離散結算間隔（秒）
 // 目前依角色順序排列；只需修改各角色區段內的傷害、CD、速度、範圍與持續時間。
 // 帶有 FX／VFX／PARTICLE／TRAIL／GLOW 字樣的項目屬於視覺特效，平時不要修改。
 // ============================================================================
@@ -1281,7 +1282,7 @@ const KINJI_JACKPOT_SPARK_COUNT            = 8;    // 大獎星芒數量；降�
 
 // 維什戴爾（ew）與死魂靈常數
 const EW_ATTACK_INTERVAL = 2.0; // 普攻間隔（秒）
-const EW_ATTACK_DAMAGE = 50; // 靈魂彈主傷害
+const EW_ATTACK_DAMAGE = 40; // 靈魂彈主傷害
 const EW_PROJECTILE_SPEED = 330; // 靈魂彈速度（px/s）
 const EW_ATTACK_RADIUS = 50; // 主攻擊範圍半徑
 const EW_AFTERSHOCK_DAMAGE_MULT = 0.5; // 餘震傷害＝主傷害的一半
@@ -1294,8 +1295,8 @@ const EW_AFTERIMAGE_EXPLOSION_CHANCE = 0.20; // 餘震觸發殘影爆炸機率
 const EW_AFTERIMAGE_EXPLOSION_DAMAGE_MULT = 1.2; // 殘影爆炸傷害倍率（以主攻擊傷害為基準）
 const EW_AFTERIMAGE_EXPLOSION_RADIUS = 70; // 殘影爆炸範圍
 const EW_AFTERIMAGE_IMMOBILIZE_DURATION = 0.5; // 殘影爆炸定身時間
-const EW_CAMOUFLAGE_RADIUS = 70; // 死魂靈給 ew 迷彩的範圍
-const EW_SOUL_HP = 700; // 死魂靈生命值
+const EW_CAMOUFLAGE_RADIUS = 50; // 死魂靈給 ew 迷彩的範圍
+const EW_SOUL_HP = 400; // 死魂靈生命值
 const EW_SOUL_RADIUS = 20; // 死魂靈碰撞半徑
 const EW_SOUL_MAX_COUNT = 3; // 死魂靈上限
 const EW_SKILL3_SUMMON_COUNT = 2; // 爆裂黎明觸發時額外召喚數量
@@ -1324,6 +1325,55 @@ const EW_SKILL3_DAMAGE_MULT = 2.0; // 爆裂黎明普攻傷害倍率
 const EW_SKILL3_INTERVAL = 2.5; // 爆裂黎明攻擊間隔
 const EW_SKILL3_SPLASH_RADIUS_MULT = 2.5; // 爆裂黎明濺射範圍倍率
 const EW_SKILL3_COOLDOWN = 15.0; // 爆裂黎明完成後冷卻
+
+
+// ══════ 魔彈射手・奧提斯（Otis）專屬常數 ══════
+const OTIS_BASE_DAMAGE                 = 70;   // 魔彈基礎傷害
+const OTIS_LOCK_INTERVAL               = 2.0;  // 每次攻擊／鎖定間隔 3 秒
+const OTIS_PORTAL_DELAY                = 2.0;  // 鎖定後幾秒在目標旁開門並射擊
+const OTIS_PORTAL_TARGET_OFFSET          = 88.0; // 傳送門與目標中心的固定距離
+const OTIS_PORTAL_LIFE                 = 0.5; // 傳送門視覺壽命
+const OTIS_BULLET_SPEED                = 900;  // 魔彈飛行速度（px/s）
+const OTIS_BULLET_RADIUS               = 10;    // 魔彈碰撞半徑
+const OTIS_BULLET_LIFETIME             = 5;  // 魔彈最長飛行時間
+const OTIS_BULLET_PATH_PAD             = 3;    // 掃掠路徑額外命中寬度
+const OTIS_SHOT_DAMAGE_MULTIPLIERS     = [0, 1.2, 1.1, 1.2, 1.3, 1.3, 1.0, 1.0];
+const OTIS_PARALYZE_DURATION           = 2.0;  // 第二魔彈麻痺
+const OTIS_WEAKEN_DURATION             = 2.0;  // 第三魔彈浸水／虛弱
+const OTIS_WEAKEN_MULT                 = 0.7;  // 虛弱期間輸出倍率（-30%）
+const OTIS_BURN_STACKS_PER_HIT         = 10;   // 第三／第五魔彈附加燒傷層數
+const OTIS_BURN_DURATION               = Infinity; // 燒傷永久持續至本場戰鬥結束
+const OTIS_BURN_MAX_STACKS             = 50;   // 避免多輪循環後無限膨脹
+const OTIS_BURN_TICK_DAMAGE_PER_STACK  = 1;    // 每秒依燒傷層數跳血
+const OTIS_VULN_STACKS_PER_HIT          = 3;    // 第四魔彈附加易傷層數
+const OTIS_VULN_MAX_STACKS              = 12;   // 易傷永久層數上限
+const OTIS_VULN_PER_STACK               = 0.05; // 每層受到傷害增加5%
+const OTIS_PERMANENT_ATTACK_PENALTY     = 4;   // 第五魔彈：造成傷害永久-4
+const OTIS_PERMANENT_DAMAGE_TAKEN_BONUS = 4;   // 第五魔彈：受到傷害永久+4
+const OTIS_EXTRA_BURN_TRIGGER_STACKS    = 7;   // 第六魔彈每幾層燒傷觸發一次追加魔彈
+const OTIS_EXTRA_BULLET_MAX             = 3;   // 第六魔彈追加攻擊上限
+const OTIS_SELF_SHATTER_THRESHOLD      = 3;   // 第七魔彈無隊友時血條破碎層數
+// 奧提斯 E.G.O. 風格視覺常數：全部使用 Canvas 幾何，限制常駐事件數避免高負載。
+const OTIS_FX_PORTAL_MAX              = 40;
+const OTIS_FX_RIFT_MAX                = 64;
+const OTIS_FX_RIFT_LIFE               = 0.42;
+const OTIS_FX_SCREEN_PULSE_LIFE       = 0.16;
+const OTIS_FX_PARTICLE_CAP            = 6;
+const OTIS_FX_PORTAL_WIDTH             = 18;   // 直立法陣半寬，固定不隨發數增加
+const OTIS_FX_PORTAL_HEIGHT            = 76;   // 直立法陣半高，固定不隨發數增加
+const OTIS_GUN_LENGTH                  = 42;   // 奧提斯手持魔彈槍長度
+const OTIS_GUN_RECOIL_TIME              = 0.22; // 開槍後座動畫秒數
+const OTIS_GUN_FLASH_TIME               = 0.22; // 槍口閃光秒數
+const OTIS_FX_BULLET_TRAIL_MAX        = 20;   // 每顆魔彈最多保留的軌跡節點，控制低負載
+const OTIS_FX_BULLET_TRAIL_LIFE       = 1.05; // 軌跡殘痕存活時間，讓經過位置更清楚
+const OTIS_FX_BLOOD_CRACK_LENGTH      = 16;   // 血條碎痕向外延伸長度
+const OTIS_FX_BULLET_TRAIL_TAIL     = 206;  // 強制可見的魔彈能量長尾
+const OTIS_FX_BLOOD_SHATTER_LIFE    = 0.72; // 血量破碎爆裂特效秒數
+const OTIS_FX_RETICLE_MAX             = 64;   // 鎖定準心上限
+const OTIS_FX_RETICLE_START_RADIUS    = 108;   // 準心由遠處開始
+const OTIS_FX_RETICLE_END_RADIUS      = 24;   // 準心最後收縮到目標附近
+const OTIS_FX_RETICLE_LIFE            = 0.12; // 射擊瞬間準心收束殘影
+
 
 const MIN_SPEED          = 100;   // 最低移動速度（技能停止中除外）
 const BOOST_INTERVAL_MIN = 3;

@@ -1542,7 +1542,7 @@
     </div>
   </div>
 
-  <h1><img src="/manus-storage/arena-battle-mark_daea114b.png" alt="" style="width:1.25em;height:1.25em;object-fit:contain;vertical-align:-0.24em;margin-right:.26em;filter:drop-shadow(0 0 8px rgba(212,175,55,.42))">競技場對決</h1>
+  <h1>競技場對決</h1>
   <p class="subtitle">ARENA · BATTLE · CHAMPIONSHIP</p>
   <button class="roster-btn" id="roster-btn">📖 角色圖鑑</button>
   <button class="roster-btn boss-codex-btn" id="boss-codex-btn">📜 Boss 懸賞圖鑑</button>
@@ -2624,9 +2624,9 @@ function curseC(ch, ball) {
 
 // ============================================================================
 </script>
-<script src="character_constants.js?v=ew-overload-1p5-20260823-1"></script>
+<script src="character_constants.js?v=otis-codex-sync-20260824-21"></script>
 <script src="boss_constants.js"></script>
-<script src="character_roster.js?v=ew-overload-1p5-roster-20260823-1"></script>
+<script src="character_roster.js?v=otis-codex-sync-roster-20260824-21"></script>
 
 <script>
 // ============================================================================
@@ -4009,11 +4009,15 @@ function customSummonRika(b) {
           s.rikaCannonWarning = false;
           s.rikaCannonFiring = true;
           s.rikaCannonElapsed = 0;
+          s.rikaCannonTickTimer = STANDARD_DOT_TICK_INTERVAL;
           state.hitFlashes.push({ x: s.x, y: s.y, r: 55, alpha: 1.2, color: '#ff9fc6', t: 0.5 });
           playHitSound('opm');
         }
       } else if (s.rikaCannonFiring) {
         s.rikaCannonElapsed += dt2;
+        s.rikaCannonTickTimer = (Number.isFinite(s.rikaCannonTickTimer) ? s.rikaCannonTickTimer : STANDARD_DOT_TICK_INTERVAL) - dt2;
+        const rikaCannonDamageReady = s.rikaCannonTickTimer <= 0;
+        if (rikaCannonDamageReady) s.rikaCannonTickTimer += STANDARD_DOT_TICK_INTERVAL;
         const ang = s.rikaCannonAngle;
         const dx = Math.cos(ang), dy = Math.sin(ang);
         for (const foe of getEnemies(owner)) {
@@ -4022,7 +4026,7 @@ function customSummonRika(b) {
           if (proj > 0) {
             const perp = Math.abs(ex * dy - ey * dx);
             if (perp < YUTA_RIKA_CANNON_RANGE) {
-              dealDamage(foe, YUTA_RIKA_CANNON_DPS * dt2, {
+              if (rikaCannonDamageReady) dealDamage(foe, YUTA_RIKA_CANNON_DPS, {
                 attackerPlayer: s.ownerPlayer,
                 continuousDamage: true
               });
@@ -4552,8 +4556,8 @@ function forfeitGame() {
   overlay.classList.add('show');
 }
 
-const P1_COLORS ={ chef:'#e84545',drunk:'#7b4cca', opm:'#f5f5f5', vampire:'#8b1a8b', gojo:'#00cfff', cursed:'#c0392b', trapper:'#27ae60', yi:'#e8e8e8', gunner:'#f0c84a', samurai:'#d4af37', mage:'#9b59b6', thunder:'#f1c40f', blacksmith:'#cd7f32', naoya:'#c8c8e8', itachi:'#8b0000', yuta:'#ff6fa5', engineer:'#3a8fd6', cannondad:'#bdbdbd', dio:'#f5d020', tiger:'#cc2200', stargirl:'#ffe066', obito:'#ff6600', fisherman:'#4a90d9', geto:'#5b3a8e', sakiko:'#c9a4d1', joseph:'#2f7dc0', steve:'#4a8f3c',daji:'#e08ac7',yuki:'#f0c84a',wuxing:'#9b8cce',sans:'#e8e8e8',pucci:'#8e6bbf',baie:'#e8c840',rsqjs:'#e84b4b',dragon4:'#c9a959',nanami:'#3d5a80',momoi:'#f2a65a',oniichan:'#c41e3a',minato:'#f4d35e',elementmaster:'#8e6fd6', johnny:'#3b82f6', amelia:'#d6b36a', kashimo:'#b7f7ff', kinji:'#f2b632', ew:'#8f1638', ew_soul:'#ff315f' };
-const P2_COLORS = { chef:'#ff9f43', drunk:'#48dbfb', opm:'#aaaaaa', vampire:'#cc44cc', gojo:'#7ff8ff', cursed:'#e74c3c', trapper:'#2ecc71', yi:'#cccccc', gunner:'#f0c040', samurai:'#ffe88a', mage:'#d7aefb', thunder:'#ffe066', blacksmith:'#e8a840', naoya:'#aaaacc', itachi:'#ff3333', yuta:'#ffa3c8', engineer:'#7ec8ff', cannondad:'#787878', dio:'#fff066', tiger:'#ff4422', stargirl:'#fff5aa', obito:'#ffaa44', fisherman:'#8ec6ff', geto:'#a678e0', sakiko:'#e8cdf0', joseph:'#6fb8ee', steve:'#8fd96b',daji:'#e8cdf8' ,yuki:'#b8960b',wuxing:'#c3b8e8',sans:'#a8d8f0',pucci:'#c9a8e8',baie:'#a86fe0',rsqjs:'#3fa9e8',dragon4:'#e8d38f',nanami:'#7e9cc4',momoi:'#ffcf8f',oniichan:'#ff5566',minato:'#fff0a3',elementmaster:'#bfa4ff', johnny:'#9fc2ff', amelia:'#f4d37b', kashimo:'#f5d76e', kinji:'#ffe69a', ew:'#ff8fb0', ew_soul:'#ff315f'};
+const P1_COLORS ={ chef:'#e84545',drunk:'#7b4cca', opm:'#f5f5f5', vampire:'#8b1a8b', gojo:'#00cfff', cursed:'#c0392b', trapper:'#27ae60', yi:'#e8e8e8', gunner:'#f0c84a', samurai:'#d4af37', mage:'#9b59b6', thunder:'#f1c40f', blacksmith:'#cd7f32', naoya:'#c8c8e8', itachi:'#8b0000', yuta:'#ff6fa5', engineer:'#3a8fd6', cannondad:'#bdbdbd', dio:'#f5d020', tiger:'#cc2200', stargirl:'#ffe066', obito:'#ff6600', fisherman:'#4a90d9', geto:'#5b3a8e', sakiko:'#c9a4d1', joseph:'#2f7dc0', steve:'#4a8f3c',daji:'#e08ac7',yuki:'#f0c84a',wuxing:'#9b8cce',sans:'#e8e8e8',pucci:'#8e6bbf',baie:'#e8c840',rsqjs:'#e84b4b',dragon4:'#c9a959',nanami:'#3d5a80',momoi:'#f2a65a',oniichan:'#c41e3a',minato:'#f4d35e',elementmaster:'#8e6fd6', johnny:'#3b82f6', amelia:'#d6b36a', kashimo:'#b7f7ff', kinji:'#f2b632', ew:'#8f1638', ew_soul:'#ff315f', otis:'#5b2cff' };
+const P2_COLORS = { chef:'#ff9f43', drunk:'#48dbfb', opm:'#aaaaaa', vampire:'#cc44cc', gojo:'#7ff8ff', cursed:'#e74c3c', trapper:'#2ecc71', yi:'#cccccc', gunner:'#f0c040', samurai:'#ffe88a', mage:'#d7aefb', thunder:'#ffe066', blacksmith:'#e8a840', naoya:'#aaaacc', itachi:'#ff3333', yuta:'#ffa3c8', engineer:'#7ec8ff', cannondad:'#787878', dio:'#fff066', tiger:'#ff4422', stargirl:'#fff5aa', obito:'#ffaa44', fisherman:'#8ec6ff', geto:'#a678e0', sakiko:'#e8cdf0', joseph:'#6fb8ee', steve:'#8fd96b',daji:'#e8cdf8' ,yuki:'#b8960b',wuxing:'#c3b8e8',sans:'#a8d8f0',pucci:'#c9a8e8',baie:'#a86fe0',rsqjs:'#3fa9e8',dragon4:'#e8d38f',nanami:'#7e9cc4',momoi:'#ffcf8f',oniichan:'#ff5566',minato:'#fff0a3',elementmaster:'#bfa4ff', johnny:'#9fc2ff', amelia:'#f4d37b', kashimo:'#f5d76e', kinji:'#ffe69a', ew:'#ff8fb0', ew_soul:'#ff315f', otis:'#9b83ff'};
 
 // 玩家 1、2 用既有的兩張色表；玩家 3 以上（多人混戰用）用同一顏色做色調偏移，避免撞色。
 // 之後若要幫玩家 3/4 手動指定色表，只要新增 P3_COLORS / P4_COLORS 並在這裡優先讀取即可。
@@ -4974,6 +4978,11 @@ const PROGRESS_HANDLERS = {
       barColor: b.char.color
     };
   },
+  otis(b) {
+    const queued = (b.otisPendingShots || []).length;
+    const progress = ((b.otisShotNumber || 0) % 7) / 7;
+    return { atFrac: Math.max(0, Math.min(1, progress)), barColor: queued > 0 ? '#9b83ff' : b.char.color };
+  },
   elementmaster(b) {
     if (b.emUltState === 'casting') return { atFrac: 1 - Math.max(0, Math.min(1, (b.emUltCastTimer || 0) / EM_ULT_CAST_TIME)), barColor: '#ffffff' };
     return {
@@ -5042,6 +5051,8 @@ function transformWuxing(ball) {
     'frozenByJoseph', 'frozenByJosephTimer',
     'weakenTimer', 'weakenMult',
     'emVulnTimer', 'emVulnPct', 'emBurnTimer', 'emBurnDps', 'emBurnOwnerPlayer', 'emShieldHp',
+    'otisBurnStacks', 'otisBurnTimer', 'otisBurnTickTimer', 'otisBurnOwnerPlayer',
+    'otisVulnStacks', 'otisDamagePenalty', 'otisDamageTakenBonus',
     'statusEffects',
   ];
   const preserved = {};
@@ -5053,6 +5064,11 @@ function transformWuxing(ball) {
   Object.assign(ball, fresh, preserved);
   ball.hp = healedHp;
   ball.char = newCh;
+  // 變身不能繼承舊形態的瞬時無敵；makeBall 只會建立新欄位，舊 ball 上的欄位仍會被 Object.assign 保留。
+  // 無形的新形態必須重新走該形態自己的技能流程，避免土圖騰／蓄力／大招無敵永久殘留。
+  ball.invincible = false;
+  ball.invincibleTimer = 0;
+  ball.emEarthInvulTimer = 0;
   ball.wuxingBaseChar = baseChar;             // 繼續標記自己是無形，下次還能再變身
   ball.wuxingTimer = WUXING_TRANSFORM_INTERVAL;
   ball.wuxingFlash = 0.5;
@@ -5268,8 +5284,8 @@ function syncLegacyStatusEffects(target) {
   mirror('immobilize', Math.max(target.mageFreezeTimer || 0, target.itachiPinnedTimer || 0, target.getoBoundTimer || 0), {
     sourceFields: ['mageFreezeTimer', 'itachiPinnedTimer', 'getoBoundTimer'],
   });
-  mirror('paralysis', Math.max(target.thunderParalyzed || 0, target.thunderStunTimer || 0), {
-    sourceFields: ['thunderParalyzed', 'thunderStunTimer'],
+  mirror('paralysis', Math.max(target.thunderParalyzed || 0, target.thunderStunTimer || 0, target.otisParalysisTimer || 0), {
+    sourceFields: ['thunderParalyzed', 'thunderStunTimer', 'otisParalysisTimer'],
   });
   mirror('fullFreeze', Math.max(target.arenaFrozen || 0, target.frozenTimer || 0, target.frozenByJosephTimer || 0, target.pucciDiscFrozen ? 1 : 0), {
     sourceFields: ['arenaFrozen', 'frozenTimer', 'frozenByJosephTimer', 'pucciDiscFrozen'],
@@ -5281,13 +5297,16 @@ function syncLegacyStatusEffects(target) {
   });
   mirror('banish', target.obitoInSpaceTimer, { source: 'obito' });
   mirror('weaken', target.weakenTimer, { damageMultiplier: target.weakenMult });
-  mirror('vulnerable', target.emVulnTimer, { damageTakenMultiplier: 1 + (target.emVulnPct || 0) });
+  const otisVulnMultiplier = 1 + (target.otisVulnStacks || 0) * OTIS_VULN_PER_STACK;
+  mirror('vulnerable', Math.max(target.emVulnTimer || 0, (target.otisVulnStacks || 0) > 0 ? 1 : 0), {
+    damageTakenMultiplier: (1 + (target.emVulnPct || 0)) * otisVulnMultiplier
+  });
   mirror('mark', target.itachiMarked ? 1 : 0, { source: 'itachi' });
 
   const dotSources = [
     ['curse', target.curseDotTimer], ['trap', target.trapDotTimer],
     ['geto', target.getoDotTimer], ['daji', target.dajiBurnTimer],
-    ['elementmaster', target.emBurnTimer], ['fisher', target.fisherRedTimer],
+    ['elementmaster', target.emBurnTimer], ['otis', target.otisBurnTimer], ['fisher', target.fisherRedTimer],
     ['tigerBleedPool', (target.tigerBleedPool || 0) > 0 ? 1 : 0],
     ['ripple', (target.rippleStacks || 0) > 0 ? 1 : 0],
   ];
@@ -5484,6 +5503,23 @@ gojoHasTriggered: ch.type === 'gojo' ? false : null,
 gojoBalls: ch.type === 'gojo' ? [] : null,
 	gojoStoredProjectiles: ch.type === 'gojo' ? [] : null,
 	gojoChargingVisual: ch.type === 'gojo' ? false : null,
+    // 魔彈射手・奧提斯專屬狀態
+    otisLockTimer: ch.type === 'otis' ? OTIS_LOCK_INTERVAL : null,
+    otisShotNumber: ch.type === 'otis' ? 0 : null,
+    otisPendingShots: ch.type === 'otis' ? [] : null,
+    otisBloodShatterStacks: ch.type === 'otis' ? 0 : null,
+    otisGunAngle: ch.type === 'otis' ? 0 : null,
+    otisGunKickTimer: ch.type === 'otis' ? 0 : null,
+    otisGunFlashTimer: ch.type === 'otis' ? 0 : null,
+    // 奧提斯附加在任何目標上的狀態
+    otisBurnStacks: 0,
+    otisBurnTimer: 0,
+    otisBurnTickTimer: 0,
+    otisBurnOwnerPlayer: null,
+    otisParalysisTimer: 0,
+    otisVulnStacks: 0,
+    otisDamagePenalty: 0,
+    otisDamageTakenBonus: 0,
     // 維什戴爾（ew）專屬狀態
     ewBasicAttackCount: ch.type === 'ew' ? 0 : null,
     ewSkill1Ready: ch.type === 'ew' ? false : null,
@@ -6198,7 +6234,7 @@ function startGameCore() {
   state = {
     playerCount,
     balls: twinBallGroups.flat(),
-    projectiles: [], wallKnives: [], minatoKunai: [], minatoTeleportFX: [], hitFlashes: [], damageNumbers: [], batParticles: [], vampireBats: [], johnnyObserveFX: [], johnnyGoldenRectFX: [], slashMarks: [], traps: [], yiBlackStones: [], yiStoneBurstFX: [], opmFX: [], momoiFanFX: [], gojoKillFX: null, curseSliceKillFX: null, minatoKillFX: null, emTotems: [], emLightningFX: [], emLightningWarn: [], emGolems: [], emUltBanner: null, curseFireFX: [], curseFireBlasts: [], curseFireZones: [], bossDryPowderExtinguishers: [], bossDryPowderBlasts: [], bossDryPowderZones: [], curseSlashFX: [], elapsed: 0,
+    projectiles: [], otisMagicBullets: [], otisReticles: [], otisPortals: [], otisRifts: [], otisScreenPulse: 0, wallKnives: [], minatoKunai: [], minatoTeleportFX: [], hitFlashes: [], damageNumbers: [], batParticles: [], vampireBats: [], johnnyObserveFX: [], johnnyGoldenRectFX: [], slashMarks: [], traps: [], yiBlackStones: [], yiStoneBurstFX: [], opmFX: [], momoiFanFX: [], gojoKillFX: null, curseSliceKillFX: null, minatoKillFX: null, emTotems: [], emLightningFX: [], emLightningWarn: [], emGolems: [], emUltBanner: null, curseFireFX: [], curseFireBlasts: [], curseFireZones: [], bossDryPowderExtinguishers: [], bossDryPowderBlasts: [], bossDryPowderZones: [], curseSlashFX: [], elapsed: 0,
     arena: selectedArena,
     bgColor: selectedBgColor,
     thunderPillars: [],
@@ -7069,18 +7105,24 @@ function triggerAmeliaWatchDefeat(target) {
   }
 }
 
+// 通用迷彩：目前 EW 使用 ewCamouflaged；其他角色或效果可直接設定 camouflaged。
+function isCamouflagedTarget(target) {
+  return !!(target && (target.camouflaged === true || target.ewCamouflaged === true));
+}
+
 function dealDamage(target, dmg, options = {}) {
+  const otisSureHit = options.otisSureHit === true;
   // 世界時停的最後一道保護：即使某個角色的攻擊入口漏掉個別 frozen guard，
   // 非 DIO 施放者仍不能在時停中對任何目標造成傷害；DIO 自己的攻擊則保留。
   if (state && state.dioWorldGlobalActive && state.dioWorldCaster) {
     const attacker = options.attackerBall || (options.attackerPlayer != null
       ? state.balls.find(ball => ball && ball.player === options.attackerPlayer)
       : null);
-    if (!options.codeKill && attacker && attacker.player !== state.dioWorldCaster.player) return;
+    if (!options.codeKill && !otisSureHit && attacker && attacker.player !== state.dioWorldCaster.player) return;
   }
   if (target && target._isSummonTarget) return damageTargetableSummon(target, dmg, options);
   // ew 迷彩：在死魂靈附近時既不能被鎖敵，也不接受一般傷害入口。
-  if (target && target.ewCamouflaged) return 0;
+  if (isCamouflagedTarget(target) && !options.worldSlash && !otisSureHit) return 0;
   // codeKill：真正的代碼殺，只由一拳超人／系統級斬殺使用；穿透完整生存機制。
   const trueDamage = options.trueDamage === true;
   const bypassDefense = options.bypassParry || options.codeKill;
@@ -7092,29 +7134,29 @@ function dealDamage(target, dmg, options = {}) {
     if (atkBallForBossBoost) dmg *= BOSS_BATTLE_DAMAGE_BOOST_MULT;
   }
   // 彗星升空期間：無敵、無法鎖定、沒有碰撞體積；只有系統級 codeKill 可穿透。
-  if (target.dragonCometAirborne && !options.codeKill) return;
+  if (target.dragonCometAirborne && !options.codeKill && !otisSureHit) return;
   // 無敵狀態（擊殺動畫播放中）不受傷
-  if (target.invincible && !options.codeKill) return;
+  if (target.invincible && !options.codeKill && !otisSureHit) return;
   // Johnny ACT4 發射黃金迴旋期間短暫無敵。
   // 宿儺世界斬是系統級斬殺，必須穿透 Johnny ACT4 的一般發射無敵。
-  if (target.char && target.char.type === 'johnny' && (target.johnnyAct4FiringTimer || 0) > 0 && !options.worldSlash && !options.codeKill) return;
+  if (target.char && target.char.type === 'johnny' && (target.johnnyAct4FiringTimer || 0) > 0 && !options.worldSlash && !options.codeKill && !otisSureHit) return;
   // Johnny ACT3 躲入牆體期間不受傷；離開牆體後恢復正常受傷。
-  if (target.char && target.char.type === 'johnny' && target.johnnyAct3Hiding && !options.codeKill) return;
+  if (target.char && target.char.type === 'johnny' && target.johnnyAct3Hiding && !options.codeKill && !otisSureHit) return;
   // 風奧義「烈風・絕地暴渦」：發動者受到攻擊時有機率閃避整次傷害。
   // 系統必殺（bypassParry）不受此閃避影響；MISS 不會扣血，也不會觸發後續受傷效果。
   if (target.emUltUsed && target.emUltElement === 'wind' &&
-      !bypassDefense && Math.random() < EM_WIND_ULT_MISS_CHANCE) {
+      !bypassDefense && !otisSureHit && Math.random() < EM_WIND_ULT_MISS_CHANCE) {
     if (state) {
       state.hitFlashes.push({ x: target.x, y: target.y, r: target.r + 10, alpha: 0.55, color: '#b9f7a5', t: 0.22 });
     }
     return;
   }
   // 原身宿儺逐詞詠唱世界斬時，第二條血暫時鎖定，避免演出期間被直接打斷。
-  if (target.bossWorldSlashCasting && !options.codeKill) return;
+  if (target.bossWorldSlashCasting && !options.codeKill && !otisSureHit) return;
   // Sans 受傷無敵：剛挨過一下之後短暫無敵，避免同一瞬間被多重「單次攻擊」疊加扣光「次數血條」
   // 持續性傷害（電網／大砲光柱／灼燒／毒圈等每幀持續判定，options.continuousDamage）不受此無敵影響，
   // 否則這類技能對Sans幾乎完全失效（每幀都會被無敵擋掉）
-  if (target.char && target.char.type === 'sans' && target.sansHitIframeTimer > 0 && !bypassDefense && !options.continuousDamage) return;
+  if (target.char && target.char.type === 'sans' && target.sansHitIframeTimer > 0 && !bypassDefense && !otisSureHit && !options.continuousDamage) return;
   // Sans 持續傷害頻率限制：這類技能的DPS數值是照一般1200血量設計的，若逐幀全額命中，
   // Sans的23格血會在不到1秒內被燒光。改成同一持續傷害來源每隔一小段時間才真正扣一次血。
   if (target.char && target.char.type === 'sans' && options.continuousDamage && !bypassDefense) {
@@ -7123,13 +7165,13 @@ function dealDamage(target, dmg, options = {}) {
   }
   // 帶土虛影/轉移階段：本體無敵（虛影取代本體承受攻擊，但不扣血）
   if (target.char && target.char.type === 'obito' &&
-      ['ghost','teleporting','in_space','grabbing','returning'].includes(target.obitoKamuiPhase) && !options.codeKill) return;
+      ['ghost','teleporting','in_space','grabbing','returning'].includes(target.obitoKamuiPhase) && !options.codeKill && !otisSureHit) return;
   // 帶土虛化態：不受傷
-  if (target.char && target.char.type === 'obito' && target.obitoPhasing && !options.codeKill) return;
+  if (target.char && target.char.type === 'obito' && target.obitoPhasing && !options.codeKill && !otisSureHit) return;
   // 被帶土抓進神威空間的敵人：在空間裡免疫主場地攻擊
-  if (target.obitoInSpace && !bypassDefense) return;
+  if (target.obitoInSpace && !bypassDefense && !otisSureHit) return;
   // 波風水門「防反」狀態：這次傷害完全無效，並瞬移到攻擊者身旁一腳反擊
-  if (target.char && target.char.type === 'minato' && target.minatoParryTimer > 0 && !bypassDefense) {
+  if (target.char && target.char.type === 'minato' && target.minatoParryTimer > 0 && !bypassDefense && !otisSureHit) {
     const attacker = options.attackerPlayer != null ? state.balls.find(x => x.player === options.attackerPlayer && x.hp > 0) : null;
     if (attacker && attacker !== target) {
       const ang = Math.atan2(attacker.y - target.y, attacker.x - target.x) || 0;
@@ -7229,6 +7271,10 @@ function dealDamage(target, dmg, options = {}) {
     }
   }
   let rawAmount = dmg * mul;
+  const flatAttacker = options.attackerBall || (options.attackerPlayer != null && state ? state.balls.find(x => x.player === options.attackerPlayer) : null);
+  if (flatAttacker && !bypassDefense && flatAttacker.otisDamagePenalty > 0) rawAmount = Math.max(0, rawAmount - flatAttacker.otisDamagePenalty);
+  if (target.otisDamageTakenBonus > 0 && !bypassDefense) rawAmount += target.otisDamageTakenBonus;
+  if (target.otisVulnStacks > 0 && !bypassDefense) rawAmount *= 1 + Math.min(OTIS_VULN_MAX_STACKS, target.otisVulnStacks) * OTIS_VULN_PER_STACK;
   // Sans 被動「次數血條」：無論實際傷害多少，每次受傷固定只扣1點（真正的系統殺 bypassParry 除外）
   if (target.char && target.char.type === 'sans' && !bypassDefense) {
     rawAmount = Math.min(rawAmount, 1);
@@ -7254,13 +7300,13 @@ function dealDamage(target, dmg, options = {}) {
     }
   }
   // 火奧義「瀕死鎖血」：鎖血期間維持 1 HP，不再承受會改變血量的傷害。
-  if (target.char && target.char.type === 'elementmaster' && (target.emFireLastStandTimer || 0) > 0 && !bypassDefense) {
+  if (target.char && target.char.type === 'elementmaster' && (target.emFireLastStandTimer || 0) > 0 && !bypassDefense && !otisSureHit) {
     target.hp = 1;
     if (state) state.hitFlashes.push({ x: target.x, y: target.y, r: 28, alpha: 0.65, color: '#ffb347', t: 0.18 });
     return;
   }
   // 元素大師土奧義「岩甲護盾」：優先用護盾吸收傷害
-  if (target.emShieldHp > 0 && rawAmount > 0 && !bypassDefense) {
+  if (target.emShieldHp > 0 && rawAmount > 0 && !bypassDefense && !otisSureHit) {
     const shielded = Math.min(target.emShieldHp, rawAmount);
     target.emShieldHp -= shielded;
     rawAmount -= shielded;
@@ -7487,6 +7533,9 @@ function purgeDeadPlayerEntities(player, deadBall) {
   if (!state) return;
   // 飛行中、尚未命中的投射物（箭矢/子彈/刀/鴿子/魚/血流針…全部共用這個陣列）
   if (state.projectiles) state.projectiles = state.projectiles.filter(p => p.owner !== player);
+  if (state.otisMagicBullets) state.otisMagicBullets = state.otisMagicBullets.filter(p => p.owner !== player);
+  if (state.otisPortals) state.otisPortals = state.otisPortals.filter(p => p.owner !== player);
+  if (state.otisRifts) state.otisRifts = state.otisRifts.filter(r => r.owner !== player);
   // 持續存在的裝置／機關
   if (state.traps) state.traps = state.traps.filter(t => t.owner !== player);
   if (state.emTotems) state.emTotems = state.emTotems.filter(t => t.owner !== player);
@@ -7950,9 +7999,15 @@ function updateEwCamouflage() {
 
 function spawnEwSoulSummon(ownerPlayer, x, y) {
   if (!state || getEwSoulSummons(ownerPlayer).length >= EW_SOUL_MAX_COUNT) return null;
+  // 初始死魂靈與爆裂黎明補召都可能靠近牆邊；以召喚物自身半徑留出安全邊界，禁止生成在場外。
+  const soulRadius = Math.max(1, Number(EW_SOUL_RADIUS) || 20);
+  const minX = WALL + soulRadius, maxX = W - WALL - soulRadius;
+  const minY = WALL + soulRadius, maxY = H - WALL - soulRadius;
+  const safeX = Math.max(minX, Math.min(maxX, Number.isFinite(Number(x)) ? Number(x) : W / 2));
+  const safeY = Math.max(minY, Math.min(maxY, Number.isFinite(Number(y)) ? Number(y) : H / 2));
   const soul = spawnSummon(ownerPlayer, {
     kind: 'ew_soul', player: ownerPlayer, owner: ownerPlayer,
-    x, y, vx: 0, vy: 0,
+    x: safeX, y: safeY, vx: 0, vy: 0,
     radius: EW_SOUL_RADIUS, r: EW_SOUL_RADIUS,
     hp: EW_SOUL_HP, maxHp: EW_SOUL_HP,
     color: '#7d173b',
@@ -8500,7 +8555,8 @@ function spawnGetoSpiritSummon(ownerPlayer, x, y) {
 function damageTargetableSummon(target, dmg, options = {}) {
   if (!target || target._dead || target.hp <= 0) return 0;
   const codeKill = options.codeKill === true;
-  if (target.invincible && !codeKill) return 0;
+  const otisSureHit = options.otisSureHit === true;
+  if (target.invincible && !codeKill && !otisSureHit) return 0;
   let amount = Math.max(0, Number(dmg) || 0);
   if (state && options.attackerPlayer != null && !codeKill) {
     const attacker = state.balls.find(x => x.player === options.attackerPlayer && x.hp > 0);
@@ -8509,6 +8565,10 @@ function damageTargetableSummon(target, dmg, options = {}) {
     if (bossBoost) amount *= BOSS_BATTLE_DAMAGE_BOOST_MULT;
   }
   if (target.emVulnTimer > 0 && !codeKill) amount *= 1 + (target.emVulnPct || 0);
+  if (target.otisVulnStacks > 0 && !codeKill) amount *= 1 + Math.min(OTIS_VULN_MAX_STACKS, target.otisVulnStacks) * OTIS_VULN_PER_STACK;
+  const summonAttacker = options.attackerBall || (state && options.attackerPlayer != null ? state.balls.find(x => x.player === options.attackerPlayer) : null);
+  if (summonAttacker && !codeKill && summonAttacker.otisDamagePenalty > 0) amount = Math.max(0, amount - summonAttacker.otisDamagePenalty);
+  if (target.otisDamageTakenBonus > 0 && !codeKill) amount += target.otisDamageTakenBonus;
   const previousHp = Math.max(0, Number(target.hp) || 0);
   const actual = codeKill ? previousHp : Math.min(previousHp, amount);
   if (actual <= 0) return 0;
@@ -8876,6 +8936,10 @@ function updateSummons(dt) {
       if (!s || s._dead) continue;
       if (s.respectsDioWorldFreeze && state.dioWorldGlobalActive &&
           (!state.dioWorldCaster || state.dioWorldCaster.player !== s.ownerPlayer)) continue;
+      if ((s.otisParalysisTimer || 0) > 0) {
+        s.vx = 0; s.vy = 0;
+        continue;
+      }
       if ((s.ewRootTimer || 0) > 0) {
         s.ewRootTimer = Math.max(0, s.ewRootTimer - dt);
         s.vx = 0; s.vy = 0;
@@ -9058,13 +9122,16 @@ function getTargetableGetoSummons() {
     };
     // 一般 DOT 與狀態欄位也連回夏油 owner，讓代理物件重建不會遺失狀態。
     for (const field of [
-      'curseDotTimer','curseDotDmg','curseDotOwnerPlayer',
-      'trapDotTimer','trapDotDps','trapDotOwnerPlayer',
-      'emBurnTimer','emBurnDps','emBurnOwnerPlayer','emVulnTimer','emVulnPct',
+      'curseDotTimer','curseDotDmg','curseDotOwnerPlayer','curseDotTickTimer',
+      'trapDotTimer','trapDotDps','trapDotOwnerPlayer','trapDotTickTimer',
+      'emBurnTimer','emBurnDps','emBurnOwnerPlayer','emBurnTickTimer','emVulnTimer','emVulnPct',
       'getoDotTimer','getoDotDmg','getoDotTickTimer','getoDotOwnerPlayer',
       'dajiBurnTimer','dajiBurnTick','dajiBurnOwnerPlayer',
       'fisherRedTimer','fisherRedOwnerPlayer',
-      'rippleStacks','rippleTickTimer','rippleOwnerPlayer','tigerBleedPool'
+      'rippleStacks','rippleTickTimer','rippleOwnerPlayer','tigerBleedPool',
+      'otisBurnStacks','otisBurnTimer','otisBurnTickTimer','otisBurnOwnerPlayer','otisParalysisTimer',
+      'otisVulnStacks','otisDamagePenalty','otisDamageTakenBonus',
+      'weakenTimer','weakenMult'
     ]) bindSummonProxyField(target, owner, field);
     targets.push(target);
   }
@@ -9092,11 +9159,387 @@ function isAmeliaCombatAbsent(b) {
 function getAllCombatTargets() {
   return state ? state.balls.filter(b => !(b && b.dragonCometAirborne) && !isAmeliaCombatAbsent(b)).concat(getTargetableSummons()) : [];
 }
+// 每秒傷害統一以一秒離散 tick 結算；每幀只倒數，不把 DPS 當成每幀傷害。
+function consumeStandardDotTick(target, timerField, dt) {
+  if (!target) return false;
+  if (!Number.isFinite(target[timerField])) target[timerField] = STANDARD_DOT_TICK_INTERVAL;
+  target[timerField] -= Math.max(0, Number(dt) || 0);
+  if (target[timerField] > 0) return false;
+  target[timerField] += STANDARD_DOT_TICK_INTERVAL;
+  if (target[timerField] < 0) target[timerField] = 0;
+  return true;
+}
+// ══════════════════════════════════════════════════════════════════════════════
+// 魔彈射手・奧提斯
+// 這套投射物刻意獨立於一般 state.projectiles：它需要穿過敵我所有單位、
+// 不受迷彩／無敵等一般防禦擋下，並且同一發沿掃掠路徑對多個目標各命中一次。
+// ══════════════════════════════════════════════════════════════════════════════
+function getOtisTargetKey(target) {
+  if (target && target.char && target.char.type === 'getoSpecial' && target.getoSpecialOwner) {
+    return `geto-special-${target.getoSpecialOwner.player}`;
+  }
+  return target;
+}
+
+function getOtisCombatTargets() {
+  if (!state) return [];
+  const targets = state.balls.filter(b => b && b.hp > 0 && !isAmeliaCombatAbsent(b));
+  for (const summon of getTargetableSummons()) {
+    if (summon && summon.hp > 0 && !summon._dead) targets.push(summon);
+  }
+  return targets;
+}
+
+function findOtisTargetByKey(key) {
+  return getOtisCombatTargets().find(target => getOtisTargetKey(target) === key) || null;
+}
+
+function chooseOtisTarget(otis, shotNumber) {
+  const candidates = getOtisCombatTargets();
+  if (shotNumber === 7) {
+    const ally = candidates
+      .filter(target => target !== otis && (target.player ?? target.ownerPlayer ?? target.owner) === otis.player)
+      .sort((a, b) => Math.hypot(a.x - otis.x, a.y - otis.y) - Math.hypot(b.x - otis.x, b.y - otis.y))[0];
+    return ally || otis;
+  }
+  return candidates
+    .filter(target => (target.player ?? target.ownerPlayer ?? target.owner) !== otis.player)
+    .sort((a, b) => Math.hypot(a.x - otis.x, a.y - otis.y) - Math.hypot(b.x - otis.x, b.y - otis.y))[0] || null;
+}
+
+function applyOtisBurn(target, ownerPlayer) {
+  if (!target) return;
+  target.otisBurnStacks = Math.min(OTIS_BURN_MAX_STACKS, (target.otisBurnStacks || 0) + OTIS_BURN_STACKS_PER_HIT);
+  target.otisBurnTimer = Math.max(target.otisBurnTimer || 0, OTIS_BURN_DURATION);
+  target.otisBurnTickTimer = STANDARD_DOT_TICK_INTERVAL;
+  target.otisBurnOwnerPlayer = ownerPlayer;
+}
+
+function applyOtisParalysis(target) {
+  if (!target) return;
+  target.otisParalysisTimer = Math.max(target.otisParalysisTimer || 0, OTIS_PARALYZE_DURATION);
+  if (!target._isSummonTarget) {
+    target.thunderParalyzed = Math.max(target.thunderParalyzed || 0, OTIS_PARALYZE_DURATION);
+    target.thunderStunTimer = Math.max(target.thunderStunTimer || 0, 0.5);
+    target.vx = 0; target.vy = 0;
+  }
+}
+
+function applyOtisVulnerability(target) {
+  if (!target) return;
+  target.otisVulnStacks = Math.min(OTIS_VULN_MAX_STACKS, (target.otisVulnStacks || 0) + OTIS_VULN_STACKS_PER_HIT);
+}
+
+function applyOtisPermanentCurse(target) {
+  if (!target) return;
+  target.otisDamagePenalty = (target.otisDamagePenalty || 0) + OTIS_PERMANENT_ATTACK_PENALTY;
+  target.otisDamageTakenBonus = (target.otisDamageTakenBonus || 0) + OTIS_PERMANENT_DAMAGE_TAKEN_BONUS;
+}
+
+function tickOtisTargetStatus(target, dt) {
+  if (!target || !Number.isFinite(dt) || dt <= 0) return;
+  // 燒傷是永久層數：只要本場戰鬥已附著層數，就持續每秒結算，直到戰鬥重置。
+  if ((target.otisBurnStacks || 0) > 0) {
+    target.otisBurnTimer = OTIS_BURN_DURATION;
+    if (consumeStandardDotTick(target, 'otisBurnTickTimer', dt)) {
+      dealDamage(target, target.otisBurnStacks * OTIS_BURN_TICK_DAMAGE_PER_STACK, {
+        attackerPlayer: target.otisBurnOwnerPlayer, continuousDamage: true
+      });
+    }
+  }
+  if (target.otisParalysisTimer > 0) {
+    target.otisParalysisTimer = Math.max(0, target.otisParalysisTimer - dt);
+  }
+  // 召喚物沒有玩家球的共用 weaken 倒數迴圈，第三發的浸水在此獨立收尾。
+  if (target._isSummonTarget && target.weakenTimer > 0) {
+    target.weakenTimer = Math.max(0, target.weakenTimer - dt);
+    if (target.weakenTimer <= 0) target.weakenMult = 1;
+  }
+}
+
+function pointToSegmentDistance(px, py, x1, y1, x2, y2) {
+  const dx = x2 - x1, dy = y2 - y1;
+  const len2 = dx * dx + dy * dy;
+  const t = len2 > 0 ? Math.max(0, Math.min(1, ((px - x1) * dx + (py - y1) * dy) / len2)) : 0;
+  return Math.hypot(px - (x1 + dx * t), py - (y1 + dy * t));
+}
+
+function createOtisBullet(ownerBall, originX, originY, targetX, targetY, shotNumber, extraBullet = false) {
+  if (!ownerBall || !Number.isFinite(originX) || !Number.isFinite(originY)) return null;
+  let dx = targetX - originX, dy = targetY - originY;
+  let d = Math.hypot(dx, dy);
+  if (d < 0.001) {
+    const fallbackAngle = (shotNumber * 0.83 + ownerBall.player * 1.17 + (extraBullet ? 0.41 : 0)) % (Math.PI * 2);
+    dx = Math.cos(fallbackAngle); dy = Math.sin(fallbackAngle); d = 1;
+  }
+  const nx = dx / d, ny = dy / d;
+  const bullet = {
+    x: originX, y: originY,
+    vx: nx * OTIS_BULLET_SPEED, vy: ny * OTIS_BULLET_SPEED,
+    angle: Math.atan2(ny, nx),
+    owner: ownerBall.player, ownerBall, shotNumber,
+    damage: OTIS_BASE_DAMAGE * (OTIS_SHOT_DAMAGE_MULTIPLIERS[shotNumber] || 1),
+    r: OTIS_BULLET_RADIUS, life: OTIS_BULLET_LIFETIME,
+    hitKeys: new Set(), sourceTargetKey: null, extraBullet, trail: [],
+  };
+  state.otisMagicBullets.push(bullet);
+  return bullet;
+}
+
+function fireOtisLockedShot(entry) {
+  if (!entry || !state) return;
+  const ownerBall = entry.ownerBall && entry.ownerBall.hp > 0 ? entry.ownerBall : state.balls.find(b => b.player === entry.owner && b.hp > 0);
+  if (!ownerBall) return;
+  const lockedTarget = findOtisTargetByKey(entry.targetKey);
+  const selfCurse = entry.shotNumber === 7 && (entry.selfCurse === true || lockedTarget === ownerBall);
+  const tx = lockedTarget && Number.isFinite(lockedTarget.x) ? lockedTarget.x : entry.lockedX;
+  const ty = lockedTarget && Number.isFinite(lockedTarget.y) ? lockedTarget.y : entry.lockedY;
+  let dx = tx - ownerBall.x, dy = ty - ownerBall.y;
+  let d = Math.hypot(dx, dy);
+  if (d < 0.001) {
+    const fallbackAngle = (entry.shotNumber * 0.83 + ownerBall.player * 1.17) % (Math.PI * 2);
+    dx = Math.cos(fallbackAngle); dy = Math.sin(fallbackAngle); d = 1;
+  }
+  const nx = dx / d, ny = dy / d;
+  // 自鎖第七發不是把子彈射進自己的球體：血條是虛擬目標，魔彈從射手前方往外飛。
+  const shotNx = selfCurse ? Math.cos((entry.shotNumber * 0.83 + ownerBall.player * 1.17) % (Math.PI * 2)) : nx;
+  const shotNy = selfCurse ? Math.sin((entry.shotNumber * 0.83 + ownerBall.player * 1.17) % (Math.PI * 2)) : ny;
+  const portalOffset = Math.max(OTIS_PORTAL_TARGET_OFFSET || 88, 88);
+  const portalX = Math.max(WALL + 18, Math.min(W - WALL - 18, selfCurse ? ownerBall.x + shotNx * portalOffset : tx - nx * portalOffset));
+  const portalY = Math.max(WALL + 18, Math.min(H - WALL - 18, selfCurse ? ownerBall.y + shotNy * portalOffset : ty - ny * portalOffset));
+  const portalAngle = Math.atan2(selfCurse ? shotNy : ny, selfCurse ? shotNx : nx);
+  ownerBall.otisGunAngle = portalAngle;
+  ownerBall.otisGunKickTimer = OTIS_GUN_RECOIL_TIME;
+  ownerBall.otisGunFlashTimer = OTIS_GUN_FLASH_TIME;
+  // 傳送門只在真正射擊的這一刻建立，不再把門體提前放在鎖定期間。
+  const firedPortal = {
+    phase: 'fire', x: portalX, y: portalY, angle: portalAngle, shotNumber: entry.shotNumber,
+    owner: entry.owner, life: OTIS_PORTAL_LIFE, maxLife: OTIS_PORTAL_LIFE,
+    burst: 0.34, burstMax: 0.34, seed: (entry.owner + 1) * 31.17 + entry.shotNumber * 8.3
+  };
+  if (state.otisPortals.length < OTIS_FX_PORTAL_MAX) state.otisPortals.push(firedPortal);
+  const bulletTargetX = selfCurse ? ownerBall.x + shotNx * (portalOffset + 220) : tx + nx * 220;
+  const bulletTargetY = selfCurse ? ownerBall.y + shotNy * (portalOffset + 220) : ty + ny * 220;
+  // 自鎖血條是虛擬目標：在第七發開門／出彈的瞬間直接結算，
+  // 不依賴魔彈後續飛行、碰撞掃掠或木偶模式的更新順序，確保每輪都會累積血條破碎。
+  if (selfCurse) triggerOtisBloodShatter(ownerBall);
+  const bullet = createOtisBullet(ownerBall, portalX, portalY, bulletTargetX, bulletTargetY, entry.shotNumber, false);
+  if (bullet) {
+    bullet.sourceTargetKey = entry.targetKey;
+    bullet.selfCurseActive = false;
+    bullet.selfCurseTriggerDelay = 0;
+    bullet.selfCurseTriggered = true;
+  }
+  state.hitFlashes.push({ x: portalX, y: portalY, r: 25, alpha: 0.8, color: '#744cff', t: 0.28 });
+  playHitSound('knife');
+}
+
+function updateOtisCharacter(otis, dt) {
+  if (!otis || !otis.char || otis.char.type !== 'otis' || otis.hp <= 0) return;
+  otis.otisGunKickTimer = Math.max(0, (otis.otisGunKickTimer || 0) - dt);
+  otis.otisGunFlashTimer = Math.max(0, (otis.otisGunFlashTimer || 0) - dt);
+  otis.otisBloodShatterFlash = Math.max(0, (otis.otisBloodShatterFlash || 0) - dt);
+  const frozen = (state.dioWorldGlobalActive && otis !== state.dioWorldCaster) || otis.obitoInSpace ||
+    otis.pucciDiscFrozen || isBallInBossDryPowderZone(otis) || hasStatusEffect(otis, 'cooldownFreeze');
+  if (frozen || otis.thunderParalyzed > 0 || otis.otisParalysisTimer > 0) return;
+  if (!Number.isFinite(otis.otisLockTimer)) otis.otisLockTimer = OTIS_LOCK_INTERVAL;
+  otis.otisLockTimer -= dt;
+  if (otis.otisLockTimer > 0) return;
+  otis.otisLockTimer += OTIS_LOCK_INTERVAL;
+  const nextShot = ((otis.otisShotNumber || 0) % 7) + 1;
+  const target = chooseOtisTarget(otis, nextShot);
+  if (!target) return;
+  otis.otisGunAngle = Math.atan2(target.y - otis.y, target.x - otis.x);
+  otis.otisShotNumber = nextShot % 7;
+  otis.otisPendingShots = otis.otisPendingShots || [];
+  const targetKey = getOtisTargetKey(target);
+  otis.otisPendingShots.push({
+    owner: otis.player, ownerBall: otis, shotNumber: nextShot,
+    // 在鎖定當下固定記錄第七發是否為自鎖，避免木偶模式或目標狀態變化讓發射瞬間遺失自鎖語意。
+    selfCurse: nextShot === 7 && target === otis,
+    targetKey, lockedX: target.x, lockedY: target.y,
+    delay: OTIS_PORTAL_DELAY
+  });
+  // 鎖定期間只顯示由遠而近的準心；傳送門要等到 fireOtisLockedShot 才出現。
+  state.otisReticles = state.otisReticles || [];
+  if (state.otisReticles.length < OTIS_FX_RETICLE_MAX) {
+    state.otisReticles.push({
+      x: target.x, y: target.y, targetKey, shotNumber: nextShot, owner: otis.player,
+      delay: OTIS_PORTAL_DELAY, maxDelay: OTIS_PORTAL_DELAY,
+      angle: Math.atan2(target.y - otis.y, target.x - otis.x),
+      seed: (otis.player + 1) * 19.73 + nextShot * 4.11,
+      life: OTIS_PORTAL_DELAY + (OTIS_FX_RETICLE_LIFE || 0.12)
+    });
+  }
+  state.hitFlashes.push({ x: target.x, y: target.y, r: 12, alpha: 0.42, color: '#8fbaff', t: 0.18 });
+}
+
+function spawnOtisRift(x, y, angle, shotNumber, owner) {
+  if (!state || !Number.isFinite(x) || !Number.isFinite(y)) return;
+  state.otisRifts = state.otisRifts || [];
+  if (state.otisRifts.length >= OTIS_FX_RIFT_MAX) state.otisRifts.splice(0, state.otisRifts.length - OTIS_FX_RIFT_MAX + 1);
+  state.otisRifts.push({
+    x, y, angle: angle || 0, shotNumber: shotNumber || 1, owner,
+    life: OTIS_FX_RIFT_LIFE, maxLife: OTIS_FX_RIFT_LIFE,
+    radius: 12 + (shotNumber || 1) * 1.8,
+    seed: (x * 0.017 + y * 0.031 + (shotNumber || 1) * 4.7) % 1000
+  });
+}
+
+function triggerOtisBloodShatter(ownerBall) {
+  if (!ownerBall || ownerBall.hp <= 0 || !state) return;
+  ownerBall.otisBloodShatterStacks = (ownerBall.otisBloodShatterStacks || 0) + 1;
+  ownerBall.otisBloodShatterFlash = OTIS_FX_BLOOD_SHATTER_LIFE || 0.72;
+  state.damageNumbers.push({ x: ownerBall.x, y: ownerBall.y - 32, value: `血條破碎 ${ownerBall.otisBloodShatterStacks}/${OTIS_SELF_SHATTER_THRESHOLD}`, color: '#ff6b9d', life: 0.95, maxLife: 0.95, scale: 0.9 });
+  state.hitFlashes.push({ x: ownerBall.x, y: ownerBall.y, r: 28, alpha: 0.9, color: '#ff3d78', t: 0.32 });
+  if (ownerBall.otisBloodShatterStacks >= OTIS_SELF_SHATTER_THRESHOLD && ownerBall.hp > 0) {
+    ownerBall.hp = 0; ownerBall.vx = 0; ownerBall.vy = 0;
+    state.hitFlashes.push({ x: ownerBall.x, y: ownerBall.y, r: 64, alpha: 1.0, color: '#ff1f66', t: 0.7 });
+    state.damageNumbers.push({ x: ownerBall.x, y: ownerBall.y - 58, value: '血條破碎', color: '#ff285e', life: 1.35, maxLife: 1.35, scale: 1.2 });
+    purgeDeadPlayerEntities(ownerBall.player, ownerBall);
+  }
+}
+
+function resolveOtisBulletHit(bullet, target) {
+  if (!bullet || !target || target.hp <= 0) return;
+  const shot = bullet.shotNumber;
+  const ownerBall = bullet.ownerBall;
+  const selfCurseHit = shot === 7 && bullet.selfCurseActive === true && ownerBall && target === ownerBall;
+  // 第七發自鎖的血條破碎由虛擬血條命中觸發，正常路徑不會再把射手當作實體命中目標。
+  if (selfCurseHit) {
+    triggerOtisBloodShatter(ownerBall);
+    return;
+  }
+  // 第七發若是鎖定隊友，路徑掃到射手也完全忽略，不扣 HP、不加血量破碎、不套任何效果。
+  if (shot === 7 && ownerBall && target === ownerBall) return;
+  dealDamage(target, bullet.damage, {
+    attackerPlayer: bullet.owner, attackerBall: ownerBall, otisSureHit: true
+  });
+  if (shot === 2) {
+    applyOtisParalysis(target);
+  } else if (shot === 3) {
+    target.weakenTimer = Math.max(target.weakenTimer || 0, OTIS_WEAKEN_DURATION);
+    target.weakenMult = Math.min(target.weakenMult == null ? 1 : target.weakenMult, OTIS_WEAKEN_MULT);
+    applyOtisBurn(target, bullet.owner);
+  } else if (shot === 4) {
+    applyOtisVulnerability(target);
+  } else if (shot === 5) {
+    applyOtisBurn(target, bullet.owner);
+    applyOtisPermanentCurse(target);
+  } else if (shot === 6 && !bullet.extraBullet && target.otisBurnStacks > 0 && target.hp > 0) {
+    const extraCount = Math.min(OTIS_EXTRA_BULLET_MAX, Math.floor(target.otisBurnStacks / OTIS_EXTRA_BURN_TRIGGER_STACKS));
+    // 多發追加魔彈共用一個追加門；只分散彈道，不重複建立多個門體。
+    const extraBaseAngle = Math.atan2(target.y - ownerBall.y, target.x - ownerBall.x);
+    const extraBaseNx = Math.cos(extraBaseAngle), extraBaseNy = Math.sin(extraBaseAngle);
+    const extraPortalOffset = Math.max(OTIS_PORTAL_TARGET_OFFSET || 88, 88);
+    const extraPortalX = Math.max(WALL + 18, Math.min(W - WALL - 18, target.x - extraBaseNx * extraPortalOffset));
+    const extraPortalY = Math.max(WALL + 18, Math.min(H - WALL - 18, target.y - extraBaseNy * extraPortalOffset));
+    if (state.otisPortals.length < OTIS_FX_PORTAL_MAX) {
+      state.otisPortals.push({
+        phase: 'fire', x: extraPortalX, y: extraPortalY, angle: extraBaseAngle,
+        shotNumber: 6, owner: bullet.owner, life: OTIS_PORTAL_LIFE * 0.82,
+        maxLife: OTIS_PORTAL_LIFE * 0.82, burst: 0.28, burstMax: 0.28,
+        extra: true, seed: (bullet.owner + 2) * 17.4 + extraCount * 3.7
+      });
+    }
+    for (let i = 0; i < extraCount; i++) {
+      const extraAngle = extraBaseAngle + (i - (extraCount - 1) / 2) * 0.13;
+      const extraNx = Math.cos(extraAngle), extraNy = Math.sin(extraAngle);
+      const extra = createOtisBullet(ownerBall, extraPortalX, extraPortalY,
+        target.x + extraNx * 220, target.y + extraNy * 220, 6, true);
+      if (extra) extra.sourceTargetKey = getOtisTargetKey(target);
+    }
+    if (extraCount > 0) {
+      state.otisScreenPulse = Math.max(state.otisScreenPulse || 0, OTIS_FX_SCREEN_PULSE_LIFE + extraCount * 0.035);
+      state.hitFlashes.push({ x: target.x, y: target.y, r: 30 + extraCount * 5, alpha: 0.8, color: '#315cff', t: 0.35 });
+    }
+  }
+}
+
+function updateOtisProjectiles(dt) {
+  if (!state) return;
+  // 鎖定期間只更新準心位置與收縮進度，這裡不會建立傳送門。
+  state.otisReticles = state.otisReticles || [];
+  for (let i = state.otisReticles.length - 1; i >= 0; i--) {
+    const reticle = state.otisReticles[i];
+    if (!reticle) { state.otisReticles.splice(i, 1); continue; }
+    reticle.delay = Math.max(0, (reticle.delay || 0) - dt);
+    reticle.life = Math.max(0, (reticle.life || 0) - dt);
+    const liveTarget = findOtisTargetByKey(reticle.targetKey);
+    if (liveTarget && Number.isFinite(liveTarget.x) && Number.isFinite(liveTarget.y)) {
+      reticle.x = liveTarget.x;
+      reticle.y = liveTarget.y;
+      const owner = state.balls.find(b => b && b.player === reticle.owner && b.hp > 0);
+      if (owner) reticle.angle = Math.atan2(liveTarget.y - owner.y, liveTarget.x - owner.x);
+    }
+    if (reticle.delay <= 0 || reticle.life <= 0) state.otisReticles.splice(i, 1);
+  }
+  for (let i = (state.otisPortals || []).length - 1; i >= 0; i--) {
+    const portal = state.otisPortals[i];
+    portal.life -= dt;
+    if (portal.burst > 0) portal.burst -= dt;
+    if (portal.life <= 0) state.otisPortals.splice(i, 1);
+  }
+  if (Number.isFinite(state.otisScreenPulse)) state.otisScreenPulse = Math.max(0, state.otisScreenPulse - dt);
+  for (let i = (state.otisRifts || []).length - 1; i >= 0; i--) {
+    const rift = state.otisRifts[i];
+    rift.life -= dt;
+    if (rift.life <= 0) state.otisRifts.splice(i, 1);
+  }
+  if (state.dioWorldGlobalActive) return;
+  for (let i = (state.otisMagicBullets || []).length - 1; i >= 0; i--) {
+    const bullet = state.otisMagicBullets[i];
+    if (!bullet) { state.otisMagicBullets.splice(i, 1); continue; }
+    const prevX = bullet.x, prevY = bullet.y;
+    bullet.trail = Array.isArray(bullet.trail) ? bullet.trail : [];
+    for (const point of bullet.trail) point.life = (point.life || 0) - dt;
+    while (bullet.trail.length && bullet.trail[0].life <= 0) bullet.trail.shift();
+    bullet.trail.push({ x: prevX, y: prevY, angle: Math.atan2(bullet.vy, bullet.vx), life: OTIS_FX_BULLET_TRAIL_LIFE });
+    if (bullet.trail.length > OTIS_FX_BULLET_TRAIL_MAX) bullet.trail.splice(0, bullet.trail.length - OTIS_FX_BULLET_TRAIL_MAX);
+    bullet.x += bullet.vx * dt; bullet.y += bullet.vy * dt;
+    bullet.life -= dt;
+    bullet.angle = Math.atan2(bullet.vy, bullet.vx);
+    for (const target of getOtisCombatTargets()) {
+      const key = getOtisTargetKey(target);
+      // 七發魔彈都不能命中奧提斯本體；第七發血條是獨立的虛擬目標。
+      if (target === bullet.ownerBall) continue;
+      if (bullet.hitKeys.has(key) || target.hp <= 0) continue;
+      const hitRadius = bullet.r + getCombatRadius(target) + OTIS_BULLET_PATH_PAD;
+      if (pointToSegmentDistance(target.x, target.y, prevX, prevY, bullet.x, bullet.y) <= hitRadius) {
+        bullet.hitKeys.add(key);
+        spawnOtisRift(target.x, target.y, bullet.angle, bullet.shotNumber, bullet.owner);
+        if (bullet.shotNumber === 6) state.otisScreenPulse = Math.max(state.otisScreenPulse || 0, 0.12);
+        resolveOtisBulletHit(bullet, target);
+      }
+    }
+    const hitWall = bullet.x < WALL || bullet.x > W - WALL || bullet.y < WALL || bullet.y > H - WALL;
+    if (bullet.life <= 0 || hitWall) state.otisMagicBullets.splice(i, 1);
+  }
+  for (const otis of state.balls) {
+    if (!otis || otis.char.type !== 'otis' || otis.hp <= 0) continue;
+    const queue = otis.otisPendingShots || [];
+    for (let qi = queue.length - 1; qi >= 0; qi--) {
+      const entry = queue[qi];
+      if (!entry) { queue.splice(qi, 1); continue; }
+      const paused = (state.dioWorldGlobalActive && otis !== state.dioWorldCaster) || otis.obitoInSpace ||
+        otis.pucciDiscFrozen || isBallInBossDryPowderZone(otis) || hasStatusEffect(otis, 'cooldownFreeze');
+      if (paused) continue;
+      entry.delay -= dt;
+      if (entry.delay <= 0) {
+        fireOtisLockedShot(entry);
+        queue.splice(qi, 1);
+      }
+    }
+  }
+}
+
+
 // 統一更新召喚物身上的舊式 DOT／延遲傷害欄位。
 function updateSummonDamageOverTime(dt) {
   for (const target of getTargetableSummons()) {
     if (!target || target.hp <= 0) continue;
     if (state.dioWorldGlobalActive && state.dioWorldCaster && target.player !== state.dioWorldCaster.player) continue;
+    tickOtisTargetStatus(target, dt);
 
     if (target.emVulnTimer > 0) {
       target.emVulnTimer -= dt;
@@ -9104,19 +9547,25 @@ function updateSummonDamageOverTime(dt) {
     }
     if (target.curseDotTimer > 0) {
       target.curseDotTimer -= dt;
-      dealDamage(target, target.curseDotDmg * dt, { attackerPlayer: target.curseDotOwnerPlayer, continuousDamage: true });
+      if (consumeStandardDotTick(target, 'curseDotTickTimer', dt)) {
+        dealDamage(target, target.curseDotDmg, { attackerPlayer: target.curseDotOwnerPlayer, continuousDamage: true });
+      }
       if (target.curseDotTimer <= 0) { target.curseDotTimer = 0; target.curseDotDmg = 0; }
       if (Math.random() < 0.3) state.hitFlashes.push({ x: target.x + randBetween(-15, 15), y: target.y + randBetween(-15, 15), r: 8, alpha: 0.7, color: '#c0392b', t: 0.4 });
     }
     if (target.trapDotTimer > 0) {
       target.trapDotTimer -= dt;
-      dealDamage(target, target.trapDotDps * dt, { attackerPlayer: target.trapDotOwnerPlayer, continuousDamage: true });
+      if (consumeStandardDotTick(target, 'trapDotTickTimer', dt)) {
+        dealDamage(target, target.trapDotDps, { attackerPlayer: target.trapDotOwnerPlayer, continuousDamage: true });
+      }
       if (target.trapDotTimer <= 0) { target.trapDotTimer = 0; target.trapDotDps = 0; }
       if (Math.random() < 0.25) state.hitFlashes.push({ x: target.x + randBetween(-12, 12), y: target.y + randBetween(-12, 12), r: 7, alpha: 0.7, color: '#2ecc71', t: 0.35 });
     }
     if (target.emBurnTimer > 0) {
       target.emBurnTimer -= dt;
-      dealDamage(target, target.emBurnDps * dt, { attackerPlayer: target.emBurnOwnerPlayer, continuousDamage: true });
+      if (consumeStandardDotTick(target, 'emBurnTickTimer', dt)) {
+        dealDamage(target, target.emBurnDps, { attackerPlayer: target.emBurnOwnerPlayer, continuousDamage: true });
+      }
       if (target.emBurnTimer <= 0) { target.emBurnTimer = 0; target.emBurnDps = 0; }
       if (Math.random() < 0.25) state.hitFlashes.push({ x: target.x + randBetween(-10, 10), y: target.y + randBetween(-10, 10), r: 6, alpha: 0.7, color: '#ff8a3d', t: 0.3 });
     }
@@ -9200,10 +9649,10 @@ function getNearestPlayerEnemyTo(x, y, excludePlayer) {
 function yukiTriggerPhoenix(b) {
   const mult = 1 + (b.yukiGravityStacks || 0) * YUKI_GRAVITY_DMG_PER_STACK;
   let hitAny = false;
-  for (const enemy of state.balls) {
+  for (const enemy of getAllCombatTargets()) {
     if (enemy.player === b.player || enemy.hp <= 0) continue;
     const d = Math.hypot(enemy.x - b.x, enemy.y - b.y);
-    if (d < YUKI_PHOENIX_RADIUS + RADIUS) {
+    if (d < YUKI_PHOENIX_RADIUS + getCombatRadius(enemy)) {
       dealDamage(enemy, YUKI_PHOENIX_DAMAGE * mult, { attackerPlayer: b.player });
       hitAny = true;
       state.hitFlashes.push({ x: enemy.x, y: enemy.y, r: 16, alpha: 0.8, color: '#c39bd3', t: 0.3 });
@@ -9774,7 +10223,10 @@ function primeDioWorldActivations(dt) {
   const activeDio = state.balls.find(b => b && b.hp > 0 && b.char && b.char.type === 'dio' && b.dioWorldActive);
   state.dioWorldGlobalActive = !!activeDio;
   state.dioWorldCaster = activeDio || null;
+  // 已有施放者時不再讓另一個 DIO 同幀啟動第二個世界，避免快照與布刀計時器互相重置。
+  if (state.dioWorldGlobalActive) return;
   for (const b of state.balls) {
+    if (state.dioWorldGlobalActive) break;
     if (!b || b.hp <= 0 || !b.char || b.char.type !== 'dio' || b.dioWorldActive) continue;
     // 與正式 DIO 邏輯相同：被定身、光碟／乾粉凍結或冷卻凍結時不能開世界。
     if ((b.thunderParalyzed || 0) > 0 || b.pucciDiscFrozen || isBallInBossDryPowderZone(b) || hasStatusEffect(b, 'cooldownFreeze')) continue;
@@ -10423,7 +10875,13 @@ function update(dt) {
   if (state.arena === 'lava') {
     for (const b of state.balls) {
       if (b.hp <= 0) continue; // 已死亡不再有任何行為
-      if (arenaHealDmgAffects(b)) dealDamage(b, ARENA_LAVA_DMG_PER_SEC * dt, { continuousDamage: true });
+      if (arenaHealDmgAffects(b)) {
+        b.arenaLavaDamageTickTimer = (Number.isFinite(b.arenaLavaDamageTickTimer) ? b.arenaLavaDamageTickTimer : STANDARD_DOT_TICK_INTERVAL) - dt;
+        if (b.arenaLavaDamageTickTimer <= 0) {
+          b.arenaLavaDamageTickTimer += STANDARD_DOT_TICK_INTERVAL;
+          dealDamage(b, ARENA_LAVA_DMG_PER_SEC, { continuousDamage: true });
+        }
+      }
     }
   }
 
@@ -10517,6 +10975,7 @@ function update(dt) {
   for (const b of state.balls) {
     // 已死亡：不再有任何行動（攻擊、技能CD、移動判定全部跳過）
     if (b.hp <= 0) continue;
+    tickOtisTargetStatus(b, dt);
     // 被帶土抓進神威空間：完全時停（不能攻擊、CD不流動、不移動、不受牆壁判定）
     if (b.obitoInSpace) continue;
     // 阿梅 Ground Pound／懷錶消失：隱身期間完全離開戰場，倒數到期才在敵人附近落下。
@@ -10525,6 +10984,8 @@ function update(dt) {
     // 木偶訓練模式：木偶固定不動，不會有任何主動行為
     if (b.isDummy) { b.vx = 0; b.vy = 0; continue; }
     if (b.char && b.char.type === 'amelia') updateAmeliaCombat(b, dt);
+    if (b.char && b.char.type === 'otis') updateOtisCharacter(b, dt);
+    if (b.otisParalysisTimer > 0) { b.vx = 0; b.vy = 0; continue; }
     if (b.ameliaPermanentGone || b.ameliaGroundPoundTimer > 0) continue;
     b.trail.push({ x: b.x, y: b.y });
     if (b.trail.length > 18) b.trail.shift();
@@ -10947,7 +11408,9 @@ function update(dt) {
     // 詛咒 dot 傷害（捌）
     if (b.curseDotTimer > 0) {
       b.curseDotTimer -= dt;
-      dealDamage(b, b.curseDotDmg * dt, { attackerPlayer: b.curseDotOwnerPlayer, continuousDamage: true });
+      if (consumeStandardDotTick(b, 'curseDotTickTimer', dt)) {
+        dealDamage(b, b.curseDotDmg, { attackerPlayer: b.curseDotOwnerPlayer, continuousDamage: true });
+      }
       if (b.curseDotTimer <= 0) { b.curseDotTimer = 0; b.curseDotDmg = 0; }
       // 紅色詛咒粒子
       if (Math.random() < 0.3) state.hitFlashes.push({ x: b.x+randBetween(-15,15), y: b.y+randBetween(-15,15), r: 8, alpha: 0.7, color: '#c0392b', t: 0.4 });
@@ -11163,14 +11626,10 @@ function update(dt) {
       }
     }
 
-    // 麻痺計時器倒數（麻痺本身不定身，只影響技能觸發）
+    // 奧提斯第二發麻痺只依自身 2 秒計時器結束；不在每幀重設 0.5 秒定身或重複生成特效。
     if (b.thunderParalyzed > 0) {
-      b.thunderParalyzed -= dt;
-      if (b.thunderParalyzed < 0) b.thunderParalyzed = 0;
-      b.thunderStunTimer = 0.5; // 打斷定身 0.5 秒
+      b.thunderParalyzed = Math.max(0, b.thunderParalyzed - dt);
       b.vx = 0; b.vy = 0;
-      state.thunderStunFX = state.thunderStunFX || [];
-      state.thunderStunFX.push({ x: b.x, y: b.y, life: 0.5, maxLife: 0.5 });
     }
 
     // 打斷定身計時器
@@ -11466,12 +11925,17 @@ function update(dt) {
           const u = state.beachUrchins[ui];
           if (Math.hypot(b.x - u.x, b.y - u.y) < RADIUS + ARENA_BEACH_URCHIN_R) {
             b.beachUrchinDot = ARENA_BEACH_URCHIN_DOT_DUR;
+            b.beachUrchinDotTickTimer = STANDARD_DOT_TICK_INTERVAL;
             state.hitFlashes.push({ x: b.x, y: b.y, r: 16, alpha: 0.8, color: '#7a3fb0', t: 0.3 });
             state.beachUrchins.splice(ui, 1);
           }
         }
         if (b.beachUrchinDot > 0) {
-          dealDamage(b, ARENA_BEACH_URCHIN_DPS * dt, { continuousDamage: true });
+          b.beachUrchinDotTickTimer = (Number.isFinite(b.beachUrchinDotTickTimer) ? b.beachUrchinDotTickTimer : STANDARD_DOT_TICK_INTERVAL) - dt;
+          if (b.beachUrchinDotTickTimer <= 0) {
+            b.beachUrchinDotTickTimer += STANDARD_DOT_TICK_INTERVAL;
+            dealDamage(b, ARENA_BEACH_URCHIN_DPS, { continuousDamage: true });
+          }
           b.beachUrchinDot -= dt;
           if (b.beachUrchinDot < 0) b.beachUrchinDot = 0;
         }
@@ -11875,7 +12339,7 @@ for (let bi = 0; bi < state.balls.length; bi++) {
     const b = state.balls[bi], enemy = getNearestEnemyTo(b.x, b.y, b.player);
     if (b.hp <= 0) continue;
     // 時停／場地控制／冷卻凍結期間不累積攻擊計時器；角色本身仍可依既有移動邏輯移動。
-    if ((state.dioWorldGlobalActive && b !== state.dioWorldCaster) || b.obitoInSpace || (b.arenaFrozen > 0) || b.pucciDiscFrozen || isBallInBossDryPowderZone(b) || hasStatusEffect(b, 'cooldownFreeze')) {
+    if ((state.dioWorldGlobalActive && b !== state.dioWorldCaster) || b.obitoInSpace || (b.arenaFrozen > 0) || b.pucciDiscFrozen || isBallInBossDryPowderZone(b) || hasStatusEffect(b, 'cooldownFreeze') || b.otisParalysisTimer > 0) {
       // 不累積 attackTimer；各技能計時器也凍結，但不改變 vx／vy。
       continue;
     }
@@ -11971,6 +12435,9 @@ for (let bi = 0; bi < state.balls.length; bi++) {
             }
           }
         }
+    } else if (b.char.type === 'otis') {
+        // 奧提斯由 updateOtisCharacter() 管理鎖定與延遲傳送門，不走一般單目標投射物。
+        b.attackTimer = 0;
     } else if (b.char.type === 'custom') {
         // 連射零件（a_gunner）改用撞牆裝彈系統，不走一般計時普攻
         if (b.attackTimer >= b.attackInterval && enemy && b.customParts.basic !== 'a_gunner') {
@@ -12165,7 +12632,7 @@ for (let bi = 0; bi < state.balls.length; bi++) {
           b.vy = Math.sin(ang) * BASE_SPEED;
         } else {
           // 還在倒數中才造成傷害：領域是範圍效果，範圍內「所有」敵人都會受到傷害，不只鎖定最近的一位
-          for (const foe of state.balls) {
+          for (const foe of getAllCombatTargets()) {
             if (foe.player === b.player || foe.hp <= 0) continue;
             const ddx = foe.x - b.x, ddy = foe.y - b.y;
             const dd = Math.sqrt(ddx*ddx + ddy*ddy);
@@ -13337,7 +13804,9 @@ for (let bi = 0; bi < state.balls.length; bi++) {
     if (b.hp <= 0) continue; // 已死亡不再有任何行為
     if (b.trapDotTimer > 0) {
       b.trapDotTimer -= dt;
-      dealDamage(b, b.trapDotDps * dt, { attackerPlayer: b.trapDotOwnerPlayer, continuousDamage: true });
+      if (consumeStandardDotTick(b, 'trapDotTickTimer', dt)) {
+        dealDamage(b, b.trapDotDps, { attackerPlayer: b.trapDotOwnerPlayer, continuousDamage: true });
+      }
       if (b.trapDotTimer <= 0) { b.trapDotTimer = 0; b.trapDotDps = 0; }
       if (Math.random() < 0.25) {
         state.hitFlashes.push({ x: b.x + randBetween(-12,12), y: b.y + randBetween(-12,12), r: 7, alpha: 0.7, color: '#2ecc71', t: 0.35 });
@@ -13360,7 +13829,9 @@ for (let bi = 0; bi < state.balls.length; bi++) {
     }
     if (b.emBurnTimer > 0) {
       b.emBurnTimer -= dt;
-      dealDamage(b, b.emBurnDps * dt, { attackerPlayer: b.emBurnOwnerPlayer, continuousDamage: true });
+      if (consumeStandardDotTick(b, 'emBurnTickTimer', dt)) {
+        dealDamage(b, b.emBurnDps, { attackerPlayer: b.emBurnOwnerPlayer, continuousDamage: true });
+      }
       if (b.emBurnTimer <= 0) { b.emBurnTimer = 0; b.emBurnDps = 0; }
       if (Math.random() < 0.25) {
         state.hitFlashes.push({ x: b.x + randBetween(-10, 10), y: b.y + randBetween(-10, 10), r: 6, alpha: 0.7, color: '#ff8a3d', t: 0.3 });
@@ -13440,7 +13911,7 @@ for (let bi = 0; bi < state.balls.length; bi++) {
             r: 6 + Math.random() * 5, alpha: 0.6, color: '#cdeeff', t: 0.25
           });
         }
-        for (const foe of state.balls) {
+        for (const foe of getAllCombatTargets()) {
           if (foe.player === b.player || foe.hp <= 0) continue;
           if (bl.isWave && bl.hitSet.has(foe)) continue; // 海嘯貫穿：同一目標不重複觸發
           const hitR = bl.isWave ? EM_WATER_ULT_WAVE_WIDTH : EM_BULLET_RADIUS;
@@ -13575,7 +14046,8 @@ for (let bi = 0; bi < state.balls.length; bi++) {
         const gy = Math.min(H - RADIUS - ENGINEER_GRID_HALF, Math.max(RADIUS + ENGINEER_GRID_HALF, enemy.y + randBetween(-25, 25)));
         state.engGrids.push({
           x: gx, y: gy, owner: b.player,
-          life: ENGINEER_GRID_LIFETIME, maxLife: ENGINEER_GRID_LIFETIME
+          life: ENGINEER_GRID_LIFETIME, maxLife: ENGINEER_GRID_LIFETIME,
+          damageTickTimer: STANDARD_DOT_TICK_INTERVAL
         });
         playHitSound('thunder');
         state.hitFlashes.push({ x: gx, y: gy, r: 30, alpha: 0.8, color: '#5fd0ff', t: 0.4 });
@@ -13639,7 +14111,7 @@ for (let bi = 0; bi < state.balls.length; bi++) {
             const dirs = [[1,0],[-1,0],[0,1],[0,-1]];
             for (const [dx, dy] of dirs) {
               state.emLightningFX.push({ x0: b.x, y0: b.y, dx, dy, life: 0.3, maxLife: 0.3, owner: b.player, seed: Math.random() * 1000 });
-              for (const foe of state.balls) {
+              for (const foe of getAllCombatTargets()) {
                 if (foe.player === b.player || foe.hp <= 0) continue;
                 let onRay = false;
                 if (dx !== 0) onRay = Math.abs(foe.y - b.y) < EM_ELEC_MASTER_BOLT_HALFWIDTH && Math.sign(foe.x - b.x || 1) === dx;
@@ -13772,7 +14244,7 @@ for (let bi = 0; bi < state.balls.length; bi++) {
             const spAng = (sp / 14) * Math.PI * 2;
             state.hitFlashes.push({ x: b.x + Math.cos(spAng) * EM_FIRE_ULT_BURST_RADIUS * 0.7, y: b.y + Math.sin(spAng) * EM_FIRE_ULT_BURST_RADIUS * 0.7, r: 8, alpha: 0.9, color: '#ffb347', t: 0.3 });
           }
-          for (const foe of state.balls) {
+          for (const foe of getAllCombatTargets()) {
             if (foe.player === b.player || foe.hp <= 0) continue;
             const dd = Math.hypot(foe.x - b.x, foe.y - b.y);
             if (dd < EM_FIRE_ULT_BURST_RADIUS) {
@@ -13788,7 +14260,7 @@ for (let bi = 0; bi < state.balls.length; bi++) {
           state.emGolems.push({ x: b.x, y: b.y, owner: b.player, hopTimer: 0, hitCooldown: 0, targetX: b.x, targetY: b.y, cracks: [] });
         } else if (bestEl === 'wind') {
           b.emWindPermSpeedBuff = true;
-          for (const foe of state.balls) {
+          for (const foe of getAllCombatTargets()) {
             if (foe.player === b.player || foe.hp <= 0) continue;
             const dx = b.x - foe.x, dy = b.y - foe.y;
             const dd = Math.hypot(dx, dy) || 1;
@@ -13819,7 +14291,7 @@ for (let bi = 0; bi < state.balls.length; bi++) {
 
     // ── 風奧義：領域持續傷害＋減速 ──
     if (b.emUltUsed && b.emUltElement === 'wind') {
-      for (const foe of state.balls) {
+      for (const foe of getAllCombatTargets()) {
         if (foe.player === b.player || foe.hp <= 0) continue;
         const dd = Math.hypot(foe.x - b.x, foe.y - b.y);
         if (dd < EM_WIND_ULT_DOMAIN_RADIUS) {
@@ -13832,7 +14304,7 @@ for (let bi = 0; bi < state.balls.length; bi++) {
       b.emWindDomainTickTimer -= dt;
       if (b.emWindDomainTickTimer <= 0) {
         b.emWindDomainTickTimer = EM_WIND_ULT_TICK_INTERVAL;
-        for (const foe of state.balls) {
+        for (const foe of getAllCombatTargets()) {
           if (foe.player === b.player || foe.hp <= 0) continue;
           const dd = Math.hypot(foe.x - b.x, foe.y - b.y);
           if (dd < EM_WIND_ULT_DOMAIN_RADIUS) {
@@ -13846,7 +14318,7 @@ for (let bi = 0; bi < state.balls.length; bi++) {
       b.emWindPullTimer -= dt;
       if (b.emWindPullTimer <= 0) {
         b.emWindPullTimer = EM_WIND_ULT_PULL_INTERVAL;
-        for (const foe of state.balls) {
+        for (const foe of getAllCombatTargets()) {
           if (foe.player === b.player || foe.hp <= 0) continue;
           const dd = Math.hypot(foe.x - b.x, foe.y - b.y);
           if (dd < EM_WIND_ULT_DOMAIN_RADIUS) {
@@ -13887,9 +14359,9 @@ for (let bi = 0; bi < state.balls.length; bi++) {
         state.hitFlashes.push({ x: sx + Math.cos(spAng) * 26, y: sy + Math.sin(spAng) * 26, r: 4, alpha: 0.8, color: '#fff2a8', t: 0.25 });
       }
       playHitSound('thunder');
-      for (const foe of state.balls) {
+      for (const foe of getAllCombatTargets()) {
         if (foe.player === ownerPlayer || foe.hp <= 0) continue;
-        if (Math.hypot(foe.x - sx, foe.y - sy) < EM_ELEC_ULT_STRIKE_RADIUS) {
+        if (Math.hypot(foe.x - sx, foe.y - sy) < EM_ELEC_ULT_STRIKE_RADIUS + getCombatRadius(foe) - RADIUS) {
           dealDamage(foe, EM_ELEC_ULT_STRIKE_DMG, { attackerPlayer: ownerPlayer });
           foe.thunderParalyzed = Math.max(foe.thunderParalyzed || 0, EM_ELEC_ULT_STRIKE_PARALYZE);
         }
@@ -13944,7 +14416,7 @@ for (let bi = 0; bi < state.balls.length; bi++) {
         state.hitFlashes.push({ x: golem.x, y: golem.y + EM_EARTH_ULT_GOLEM_RADIUS * 0.4, r: EM_EARTH_ULT_GOLEM_RADIUS * 1.3, alpha: 0.4, color: '#8a6a45', t: 0.25 });
       }
     }
-    for (const foe of state.balls) {
+    for (const foe of getAllCombatTargets()) {
       if (foe.player === golem.owner || foe.hp <= 0) continue;
       if (golem.hitCooldown > 0) continue;
       const dd = Math.hypot(foe.x - golem.x, foe.y - golem.y);
@@ -14213,9 +14685,9 @@ for (let bi = 0; bi < state.balls.length; bi++) {
       tb.life -= dt;
       if (tb.life <= 0) { tb.active = false; continue; }
       if (tb.x < ONIICHAN_TRACK_RADIUS || tb.x > W - ONIICHAN_TRACK_RADIUS || tb.y < ONIICHAN_TRACK_RADIUS || tb.y > H - ONIICHAN_TRACK_RADIUS) { tb.active = false; continue; }
-      for (const foe of state.balls) {
+      for (const foe of getAllCombatTargets()) {
         if (foe.player === b.player || foe.hp <= 0) continue;
-        if (Math.hypot(foe.x - tb.x, foe.y - tb.y) < RADIUS + ONIICHAN_TRACK_RADIUS) {
+        if (Math.hypot(foe.x - tb.x, foe.y - tb.y) < getCombatRadius(foe) + ONIICHAN_TRACK_RADIUS) {
           dealDamage(foe, ONIICHAN_TRACK_DAMAGE, { attackerPlayer: b.player });
           applyOniichanPoison(foe, b.player);
           state.hitFlashes.push({ x: tb.x, y: tb.y, r: 20, alpha: 0.9, color: '#c41e3a', t: 0.25 });
@@ -14251,6 +14723,7 @@ for (let bi = 0; bi < state.balls.length; bi++) {
         b.oniichanQuadCharging = false;
         b.oniichanQuadSweeping = true;
         b.oniichanQuadSweepTimer = 0;
+        b.oniichanQuadDamageTickTimer = STANDARD_DOT_TICK_INTERVAL;
         b.oniichanQuadCooldown = ONIICHAN_QUAD_COOLDOWN;
         playHitSound('opm');
       }
@@ -14259,13 +14732,16 @@ for (let bi = 0; bi < state.balls.length; bi++) {
       b.oniichanQuadSweepTimer += dt;
       const frac = Math.min(1, b.oniichanQuadSweepTimer / ONIICHAN_QUAD_SWEEP_DURATION);
       const curAngle = b.oniichanQuadStartAngle + frac * (Math.PI / 2);
+      b.oniichanQuadDamageTickTimer = (Number.isFinite(b.oniichanQuadDamageTickTimer) ? b.oniichanQuadDamageTickTimer : STANDARD_DOT_TICK_INTERVAL) - dt;
+      const quadDamageReady = b.oniichanQuadDamageTickTimer <= 0;
+      if (quadDamageReady) b.oniichanQuadDamageTickTimer += STANDARD_DOT_TICK_INTERVAL;
       for (const foe of getEnemies(b)) {
         const fdx = foe.x - b.x, fdy = foe.y - b.y;
         const cos = Math.cos(curAngle), sin = Math.sin(curAngle);
         const localX = fdx * cos + fdy * sin;
         const localY = -fdx * sin + fdy * cos;
         if (localX > 0 && localX < ONIICHAN_QUAD_RANGE && Math.abs(localY) < ONIICHAN_QUAD_HALFWIDTH + RADIUS) {
-          dealDamage(foe, ONIICHAN_QUAD_DPS * dt, { attackerPlayer: b.player, continuousDamage: true });
+          if (quadDamageReady) dealDamage(foe, ONIICHAN_QUAD_DPS, { attackerPlayer: b.player, continuousDamage: true });
           applyOniichanPoison(foe, b.player);
         }
       }
@@ -14341,9 +14817,9 @@ for (let bi = 0; bi < state.balls.length; bi++) {
     m.life -= dt;
     if (m.life <= 0) { state.oniichanMines.splice(i, 1); continue; }
     let mineHit = false;
-    for (const foe of state.balls) {
+    for (const foe of getAllCombatTargets()) {
       if (foe.player === m.owner || foe.hp <= 0) continue;
-      if (Math.hypot(foe.x - m.x, foe.y - m.y) < RADIUS + ONIICHAN_MINE_RADIUS) {
+      if (Math.hypot(foe.x - m.x, foe.y - m.y) < getCombatRadius(foe) + ONIICHAN_MINE_RADIUS) {
         dealDamage(foe, ONIICHAN_MINE_DAMAGE, { attackerPlayer: m.owner });
         applyOniichanPoison(foe, m.owner);
         state.hitFlashes.push({ x: m.x, y: m.y, r: 34, alpha: 1, color: '#c41e3a', t: 0.35 });
@@ -14364,9 +14840,9 @@ for (let bi = 0; bi < state.balls.length; bi++) {
     sp.x += sp.vx * dt; sp.y += sp.vy * dt;
     if (sp.x < -20 || sp.x > W + 20 || sp.y < -20 || sp.y > H + 20) { state.oniichanSpikes.splice(i, 1); continue; }
     let spikeHit = false;
-    for (const foe of state.balls) {
+    for (const foe of getAllCombatTargets()) {
       if (foe.player === sp.owner || foe.hp <= 0) continue;
-      if (Math.hypot(foe.x - sp.x, foe.y - sp.y) < RADIUS + ONIICHAN_SPIKE_RADIUS) {
+      if (Math.hypot(foe.x - sp.x, foe.y - sp.y) < getCombatRadius(foe) + ONIICHAN_SPIKE_RADIUS) {
         dealDamage(foe, ONIICHAN_SPIKE_DAMAGE, { attackerPlayer: sp.owner });
         applyOniichanPoison(foe, sp.owner);
         state.hitFlashes.push({ x: sp.x, y: sp.y, r: 18, alpha: 0.9, color: '#c41e3a', t: 0.25 });
@@ -14381,7 +14857,7 @@ for (let bi = 0; bi < state.balls.length; bi++) {
     const wv = state.oniichanTideWaves[i];
     wv.r += ONIICHAN_TIDE_WAVE_SPEED * dt;
     if (wv.r > ONIICHAN_TIDE_WAVE_MAX_R) { state.oniichanTideWaves.splice(i, 1); continue; }
-    for (const foe of state.balls) {
+    for (const foe of getAllCombatTargets()) {
       if (foe.player === wv.owner || foe.hp <= 0 || wv.hitSet.has(foe)) continue;
       const wd = Math.hypot(foe.x - wv.x, foe.y - wv.y);
       if (Math.abs(wd - wv.r) < 16 + RADIUS) {
@@ -14426,13 +14902,16 @@ for (let bi = 0; bi < state.balls.length; bi++) {
     if (g.life <= 0) { state.engGrids.splice(i, 1); continue; }
     const ax1 = g.x - ENGINEER_GRID_HALF, ax2 = g.x + ENGINEER_GRID_HALF;
     const ay1 = g.y - ENGINEER_GRID_HALF, ay2 = g.y + ENGINEER_GRID_HALF;
-    for (const ball of state.balls) {
+    g.damageTickTimer = (Number.isFinite(g.damageTickTimer) ? g.damageTickTimer : STANDARD_DOT_TICK_INTERVAL) - dt;
+    const gridDamageReady = g.damageTickTimer <= 0;
+    if (gridDamageReady) g.damageTickTimer += STANDARD_DOT_TICK_INTERVAL;
+    for (const ball of getAllCombatTargets()) {
       if (ball.player === g.owner) continue;
       if (ball.x > ax1 && ball.x < ax2 && ball.y > ay1 && ball.y < ay2) {
-        // 定身（重用通用定身欄位）並持續造成傷害
-        ball.itachiPinnedTimer = Math.max(ball.itachiPinnedTimer, ENGINEER_GRID_STUN_BUFFER);
+        // 定身（重用通用定身欄位）並每秒結算一次 DPS
+        ball.itachiPinnedTimer = Math.max(ball.itachiPinnedTimer || 0, ENGINEER_GRID_STUN_BUFFER);
         ball.vx = 0; ball.vy = 0;
-        dealDamage(ball, ENGINEER_GRID_DPS * dt, { attackerPlayer: g.owner, continuousDamage: true });
+        if (gridDamageReady) dealDamage(ball, ENGINEER_GRID_DPS, { attackerPlayer: g.owner, continuousDamage: true });
         if (Math.random() < 0.4) {
           state.hitFlashes.push({ x: ball.x + randBetween(-14,14), y: ball.y + randBetween(-14,14), r: 6, alpha: 0.7, color: '#5fd0ff', t: 0.2 });
         }
@@ -14602,6 +15081,7 @@ for (let bi = 0; bi < state.balls.length; bi++) {
   // 通用召喚物（給未來新角色用，見 spawnSummon 等函式上方的說明）
   updateSummons(dt);
   updateSummonDamageOverTime(dt);
+  updateOtisProjectiles(dt);
   updateEwObjects(dt);
   updateEwCamouflage();
   updateMinato(dt);
@@ -14932,7 +15412,7 @@ for (let bi = 0; bi < state.balls.length; bi++) {
       b.rsqjsWaterTimer -= dt;
       if (b.rsqjsWaterTimer <= 0) {
         b.rsqjsWaterTimer = RSQJS_WATER_INTERVAL;
-        state.rsqjsWaterZones.push({ x: enemy.x, y: enemy.y, owner: b.player, life: RSQJS_WATER_DURATION });
+        state.rsqjsWaterZones.push({ x: enemy.x, y: enemy.y, owner: b.player, life: RSQJS_WATER_DURATION, damageTickTimer: STANDARD_DOT_TICK_INTERVAL });
         state.hitFlashes.push({ x: enemy.x, y: enemy.y, r: RSQJS_WATER_RADIUS, alpha: 0.5, color: '#3fa9e8', t: 0.5 });
         playHitSound('bottle');
       }
@@ -14942,7 +15422,7 @@ for (let bi = 0; bi < state.balls.length; bi++) {
       b.rsqjsWaterTimer -= dt;
       if (b.rsqjsWaterTimer <= 0) {
         b.rsqjsWaterTimer = RSQJS_WATER_INTERVAL;
-        state.rsqjsWaterZones.push({ x: enemy.x, y: enemy.y, owner: b.player, life: RSQJS_WATER_DURATION });
+        state.rsqjsWaterZones.push({ x: enemy.x, y: enemy.y, owner: b.player, life: RSQJS_WATER_DURATION, damageTickTimer: STANDARD_DOT_TICK_INTERVAL });
         state.hitFlashes.push({ x: enemy.x, y: enemy.y, r: RSQJS_WATER_RADIUS, alpha: 0.5, color: '#3fa9e8', t: 0.5 });
         playHitSound('bottle');
       }
@@ -15029,7 +15509,7 @@ for (let bi = 0; bi < state.balls.length; bi++) {
       const owner = state.balls.find(x => x.player === bomb.owner && x.char.type === 'rsqjs');
       const e = (owner && owner.rsqjsEnchant) || { protect: 0, damage: 0 };
       const maxDmg = RSQJS_BOMB_MAX_DMG + (e.damage || 0) * RSQJS_ENCHANT_DMG_PER_LV;
-      for (const target of state.balls) {
+      for (const target of getAllCombatTargets()) {
         if (target.hp <= 0 || target.player === bomb.owner) continue;
         const d = Math.hypot(target.x - bomb.x, target.y - bomb.y);
         if (d < RSQJS_BOMB_RADIUS + RADIUS) {
@@ -15060,10 +15540,13 @@ for (let bi = 0; bi < state.balls.length; bi++) {
     if (!wz) continue;
     wz.life -= dt;
     if (wz.life <= 0) { state.rsqjsWaterZones.splice(i, 1); continue; }
-    for (const target of state.balls) {
+    wz.damageTickTimer = (Number.isFinite(wz.damageTickTimer) ? wz.damageTickTimer : STANDARD_DOT_TICK_INTERVAL) - dt;
+    const waterDamageReady = wz.damageTickTimer <= 0;
+    if (waterDamageReady) wz.damageTickTimer += STANDARD_DOT_TICK_INTERVAL;
+    for (const target of getAllCombatTargets()) {
       if (target.hp <= 0 || target.player === wz.owner) continue;
-      if (Math.hypot(target.x - wz.x, target.y - wz.y) < RSQJS_WATER_RADIUS) {
-        dealDamage(target, RSQJS_WATER_DPS * dt, { attackerPlayer: wz.owner, continuousDamage: true });
+      if (Math.hypot(target.x - wz.x, target.y - wz.y) < RSQJS_WATER_RADIUS + getCombatRadius(target) - RADIUS) {
+        if (waterDamageReady) dealDamage(target, RSQJS_WATER_DPS, { attackerPlayer: wz.owner, continuousDamage: true });
         target.vx *= (1 - RSQJS_WATER_SLOW * dt * 3);
         target.vy *= (1 - RSQJS_WATER_SLOW * dt * 3);
       }
@@ -15578,7 +16061,7 @@ waypoints.push({
         b.sansBones.splice(boneI, 1); continue;
       }
       if (bone.tickTimer <= 0) {
-        for (const target of state.balls) {
+        for (const target of getAllCombatTargets()) {
           if (target.hp <= 0 || target.player === b.player) continue;
           const bd = Math.hypot(bone.x - target.x, bone.y - target.y);
           if (bd < getCombatRadius(target) + 8) {
@@ -15763,7 +16246,7 @@ waypoints.push({
       // 沿窄域射線尋找第一個命中的目標，以其位置作為爆心；若全都落空，爆心落在射程盡頭
       let hitDist = fz.length;
       const cosA = Math.cos(fz.angle), sinA = Math.sin(fz.angle);
-      for (const target of state.balls) {
+      for (const target of getAllCombatTargets()) {
         if (target.hp <= 0 || target.player === fz.owner) continue;
         const dx = target.x - fz.x, dy = target.y - fz.y;
         const localX = dx * cosA + dy * sinA;
@@ -15773,9 +16256,9 @@ waypoints.push({
       const blastX = fz.x + cosA * hitDist, blastY = fz.y + sinA * hitDist;
       const blastR = (fz.blastR != null ? fz.blastR : CURSE_KAMADO_BLAST_R) * (fz.scale || 1);
       // 巨大爆炸：波及爆心周圍所有敵方角色（不只是射線上那一個）
-      for (const target of state.balls) {
+      for (const target of getAllCombatTargets()) {
         if (target.hp <= 0 || target.player === fz.owner) continue;
-        if (Math.hypot(target.x - blastX, target.y - blastY) <= blastR + (target.r || RADIUS)) {
+        if (Math.hypot(target.x - blastX, target.y - blastY) <= blastR + getCombatRadius(target)) {
           dealDamage(target, fz.damage, { attackerPlayer: fz.owner });
           state.hitFlashes.push({ x: target.x, y: target.y, r: 40, alpha: 1, color: '#ff3311', t: 0.4 });
           state.hitFlashes.push({ x: target.x, y: target.y, r: 22, alpha: 0.9, color: '#ffdd44', t: 0.25 });
@@ -15810,7 +16293,7 @@ waypoints.push({
       // 4. 留下持續灼燒的燃燒地面
       state.curseFireZones.push({
         x: blastX, y: blastY, r: blastR * 1.25,
-        owner: fz.owner, life: zoneDur, maxLife: zoneDur, tickTimer: 0, dps: zoneDps
+        owner: fz.owner, life: zoneDur, maxLife: zoneDur, tickTimer: STANDARD_DOT_TICK_INTERVAL, dps: zoneDps
       });
       playHitSound('opm');
       fz.exploded = true;
@@ -15827,11 +16310,11 @@ waypoints.push({
     if (zone.life <= 0) { state.curseFireZones.splice(i, 1); continue; }
     zone.tickTimer -= dt;
     if (zone.tickTimer <= 0) {
-      zone.tickTimer = 0.5;
+      zone.tickTimer = STANDARD_DOT_TICK_INTERVAL;
       for (const target of getAllCombatTargets()) {
         if (target.hp <= 0 || target.player === zone.owner) continue;
         if (Math.hypot(target.x - zone.x, target.y - zone.y) <= zone.r + (target.r || RADIUS)) {
-          dealDamage(target, (zone.dps != null ? zone.dps : CURSE_KAMADO_ZONE_DPS) * 0.5, { attackerPlayer: zone.owner, continuousDamage: true });
+          dealDamage(target, (zone.dps != null ? zone.dps : CURSE_KAMADO_ZONE_DPS), { attackerPlayer: zone.owner, continuousDamage: true });
           state.hitFlashes.push({ x: target.x, y: target.y, r: 16, alpha: 0.6, color: '#ff5522', t: 0.3 });
         }
       }
@@ -16818,21 +17301,26 @@ waypoints.push({
           b.yutaRikaCannonWarning = false;
           b.yutaRikaCannonFiring = true;
           b.yutaRikaCannonElapsed = 0;
+          b.yutaRikaCannonTickTimer = STANDARD_DOT_TICK_INTERVAL;
           playHitSound('opm');
         }
       } else if (b.yutaRikaCannonFiring) {
         b.yutaRikaCannonElapsed += dt;
-        // 判定敵人到光柱（射線）的垂直距離（與視覺光柱寬度對齊：半寬=YUTA_RIKA_CANNON_RANGE）
-        // 光柱為範圍攻擊：掃到範圍內「所有」敵人，而不只是最近的那一個
-        const ang = b.yutaRikaCannonAngle;
-        const dx = Math.cos(ang), dy = Math.sin(ang);
-        for (const foe of getEnemies(b)) {
-          const ex = foe.x - rikaX, ey = foe.y - rikaY;
-          const proj = ex * dx + ey * dy; // 沿光柱方向的投影長度
-          if (proj > 0) {
-            const perp = Math.abs(ex * dy - ey * dx); // 垂直距離
-            if (perp < YUTA_RIKA_CANNON_RANGE) {
-              dealDamage(foe, YUTA_RIKA_CANNON_DPS * dt, { attackerPlayer: b.player, continuousDamage: true });
+        b.yutaRikaCannonTickTimer = (Number.isFinite(b.yutaRikaCannonTickTimer) ? b.yutaRikaCannonTickTimer : STANDARD_DOT_TICK_INTERVAL) - dt;
+        if (b.yutaRikaCannonTickTimer <= 0) {
+          b.yutaRikaCannonTickTimer += STANDARD_DOT_TICK_INTERVAL;
+          // 判定敵人到光柱（射線）的垂直距離（與視覺光柱寬度對齊：半寬=YUTA_RIKA_CANNON_RANGE）
+          // 光柱為範圍攻擊：掃到範圍內「所有」敵人，而不只是最近的那一個
+          const ang = b.yutaRikaCannonAngle;
+          const dx = Math.cos(ang), dy = Math.sin(ang);
+          for (const foe of getEnemies(b)) {
+            const ex = foe.x - rikaX, ey = foe.y - rikaY;
+            const proj = ex * dx + ey * dy; // 沿光柱方向的投影長度
+            if (proj > 0) {
+              const perp = Math.abs(ex * dy - ey * dx); // 垂直距離
+              if (perp < YUTA_RIKA_CANNON_RANGE) {
+                dealDamage(foe, YUTA_RIKA_CANNON_DPS, { attackerPlayer: b.player, continuousDamage: true });
+              }
             }
           }
         }
@@ -17295,6 +17783,8 @@ waypoints.push({
   for (const b of state.balls) {
     if (b.hp <= 0) continue; // 已死亡不再有任何行為
     if (b.char.type !== 'dio') continue;
+    // 非施放者在他人時停中完全凍結，不能繼續自己的布刀／吃麵包流程。
+    if (state.dioWorldGlobalActive && state.dioWorldCaster && b !== state.dioWorldCaster) continue;
     const enemy = getNearestEnemyTo(b.x, b.y, b.player);
     if (!enemy) continue;
 
@@ -17388,7 +17878,7 @@ waypoints.push({
     }
 
     // 世界：自動施放（CD完成時觸發，非HIGH狀態；光碟凍結時不觸發）
-    if (!b.dioWorldActive && b.dioWorldCooldownTimer <= 0 && !b.pucciDiscFrozen && !isBallInBossDryPowderZone(b)) {
+    if (!b.dioWorldActive && !state.dioWorldGlobalActive && b.dioWorldCooldownTimer <= 0 && !b.pucciDiscFrozen && !isBallInBossDryPowderZone(b)) {
       if (b.thunderParalyzed > 0) {
         b.thunderParalyzed = 0;
         b.thunderStunTimer = 0.5; // 打斷定身 0.5 秒
@@ -17414,7 +17904,8 @@ waypoints.push({
     if (b.dioWorldActive) {
       b.dioWorldTimer -= dt;
 
-      if (!b.dioWorldKnifeTimer || b.dioWorldKnifeTimer <= 0) {
+      if (!Number.isFinite(b.dioWorldKnifeTimer)) b.dioWorldKnifeTimer = 0;
+      if (b.dioWorldKnifeTimer <= 0) {
         b.dioWorldKnifeTimer = DIO_WORLD_KNIFE_INTERVAL;
         const ang = Math.atan2(enemy.y - b.y, enemy.x - b.x);
         addProjectile({
@@ -17538,10 +18029,13 @@ waypoints.push({
     if (b.dragon4PendulumChannelTimer > 0) {
       b.vx = 0; b.vy = 0;
       b.dragon4PendulumChannelTimer -= dt;
+      b.dragon4PendulumDamageTickTimer = (Number.isFinite(b.dragon4PendulumDamageTickTimer) ? b.dragon4PendulumDamageTickTimer : STANDARD_DOT_TICK_INTERVAL) - dt;
+      const pendulumDamageReady = b.dragon4PendulumDamageTickTimer <= 0;
+      if (pendulumDamageReady) b.dragon4PendulumDamageTickTimer += STANDARD_DOT_TICK_INTERVAL;
       const foe = state.balls.find(x => x === b.dragon4PendulumTarget);
-      if (foe && foe.hp > 0) {
+      if (foe && foe.hp > 0 && pendulumDamageReady) {
         const dmgMul = b.dragon4AtkBuffTimer > 0 ? (1 + DRAGON4_WING_BUFF_MULT) : 1;
-        dealDamage(foe, DRAGON4_PENDULUM_DPS * dt * dmgMul, { attackerPlayer: b.player, continuousDamage: true });
+        dealDamage(foe, DRAGON4_PENDULUM_DPS * dmgMul, { attackerPlayer: b.player, continuousDamage: true });
       }
       if (b.dragon4PendulumChannelTimer <= 0) {
         b.dragon4PendulumChannelTimer = 0;
@@ -17586,6 +18080,7 @@ waypoints.push({
     if (b.char.quadRole === 'pendulum') {
       b.dragon4SkillTimer = DRAGON4_PENDULUM_CD * cdMul;
       b.dragon4PendulumChannelTimer = DRAGON4_PENDULUM_DURATION;
+      b.dragon4PendulumDamageTickTimer = STANDARD_DOT_TICK_INTERVAL;
       b.dragon4PendulumTarget = enemy;
       b.vx = 0; b.vy = 0;
       if (state.stats) state.stats[b.player].skillUses++;
@@ -18570,11 +19065,15 @@ waypoints.push({
   for (const b of state.balls) {
     if (b.hp <= 0) continue; // 已死亡不再有任何行為
     if ((b.tigerBleedPool || 0) > 0) {
-      const bleedTick = Math.min(b.tigerBleedPool, TIGER_BLEED_DPS * dt);
-      const bleedPrevHp = b.hp;
-      b.hp = Math.max(0, b.hp - bleedTick);
-      if (bleedPrevHp > 0 && b.hp <= 0 && !(b.twinPartner && b.twinPartner.hp > 0)) purgeDeadPlayerEntities(b.player, b);
-      b.tigerBleedPool -= bleedTick;
+      b.tigerBleedTickTimer = (Number.isFinite(b.tigerBleedTickTimer) ? b.tigerBleedTickTimer : STANDARD_DOT_TICK_INTERVAL) - dt;
+      if (b.tigerBleedTickTimer <= 0) {
+        b.tigerBleedTickTimer += STANDARD_DOT_TICK_INTERVAL;
+        const bleedTick = Math.min(b.tigerBleedPool, TIGER_BLEED_DPS);
+        const bleedPrevHp = b.hp;
+        b.hp = Math.max(0, b.hp - bleedTick);
+        if (bleedPrevHp > 0 && b.hp <= 0 && !(b.twinPartner && b.twinPartner.hp > 0)) purgeDeadPlayerEntities(b.player, b);
+        b.tigerBleedPool -= bleedTick;
+      }
       if (b.tigerBleedPool < 0) b.tigerBleedPool = 0;
       // 流血特效：紅色粒子
       if (Math.random() < 0.3) {
@@ -20148,6 +20647,7 @@ if (!b.sakikoDualActive) {
             b.yukiGravityStacks = 0;
             b.yukiPlasmaActive = true;
             b.yukiPlasmaTimer = YUKI_PLASMA_DURATION;
+            b.yukiPlasmaDamageTickTimer = STANDARD_DOT_TICK_INTERVAL;
             b.yukiStarWrathTimer = YUKI_STARWRATH_INTERVAL;
             b.yukiBlackHoleUsedThisPlasma = false;
             state.hitFlashes.push({ x: b.x, y: b.y, r: 60, alpha: 1, color: '#2c0735', t: 0.6 });
@@ -20159,9 +20659,13 @@ if (!b.sakikoDualActive) {
 
     // 「星漿體」狀態：每秒扣血 + 星之怒（每2.5秒拉近敵人並釋放兩次鳳輪）+ 判定假想黑洞發動
     if (b.yukiPlasmaActive) {
-      const prevHp = b.hp;
-      b.hp = Math.max(0, b.hp - YUKI_PLASMA_HP_DPS * dt);
-      if (prevHp > 0 && b.hp <= 0) purgeDeadPlayerEntities(b.player, b);
+      b.yukiPlasmaDamageTickTimer = (Number.isFinite(b.yukiPlasmaDamageTickTimer) ? b.yukiPlasmaDamageTickTimer : STANDARD_DOT_TICK_INTERVAL) - dt;
+      if (b.yukiPlasmaDamageTickTimer <= 0) {
+        b.yukiPlasmaDamageTickTimer += STANDARD_DOT_TICK_INTERVAL;
+        const prevHp = b.hp;
+        b.hp = Math.max(0, b.hp - YUKI_PLASMA_HP_DPS);
+        if (prevHp > 0 && b.hp <= 0) purgeDeadPlayerEntities(b.player, b);
+      }
 
       b.yukiStarWrathTimer -= dt;
       if (b.yukiStarWrathTimer <= 0 && b.hp > 0) {
@@ -20184,6 +20688,7 @@ if (!b.sakikoDualActive) {
         if (anyLow) {
           b.yukiBlackHoleActive = true;
           b.yukiBlackHoleTimer = YUKI_BLACKHOLE_DURATION;
+          b.yukiBlackHoleDamageTickTimer = STANDARD_DOT_TICK_INTERVAL;
           b.yukiBlackHoleUsedThisPlasma = true;
           state.hitFlashes.push({ x: b.x, y: b.y, r: 90, alpha: 1, color: '#000000', t: 0.8 });
           playHitSound('curse_slash');
@@ -20199,13 +20704,16 @@ if (!b.sakikoDualActive) {
     // 假想黑洞持續效果：吸入敵人並造成持續傷害；結束後由基自身扣血
     if (b.yukiBlackHoleActive) {
       b.yukiBlackHoleTimer -= dt;
+      b.yukiBlackHoleDamageTickTimer = (Number.isFinite(b.yukiBlackHoleDamageTickTimer) ? b.yukiBlackHoleDamageTickTimer : STANDARD_DOT_TICK_INTERVAL) - dt;
+      const blackHoleDamageReady = b.yukiBlackHoleDamageTickTimer <= 0;
+      if (blackHoleDamageReady) b.yukiBlackHoleDamageTickTimer += STANDARD_DOT_TICK_INTERVAL;
       for (const enemy of getAllCombatTargets()) {
         if (enemy.player === b.player || enemy.hp <= 0) continue;
         const dx = b.x - enemy.x, dy = b.y - enemy.y;
         const d = Math.hypot(dx, dy) || 1;
         const pull = Math.min(d, YUKI_BLACKHOLE_PULL_SPEED * dt);
         enemy.x += (dx / d) * pull; enemy.y += (dy / d) * pull;
-        dealDamage(enemy, YUKI_BLACKHOLE_DPS * dt, { attackerPlayer: b.player, continuousDamage: true });
+        if (blackHoleDamageReady) dealDamage(enemy, YUKI_BLACKHOLE_DPS, { attackerPlayer: b.player, continuousDamage: true });
       }
       if (b.yukiBlackHoleTimer <= 0) {
         b.yukiBlackHoleActive = false;
@@ -21135,6 +21643,561 @@ function drawEwCombatFX() {
     ctx.fillText(source ? '迷彩' : '', b.x, b.y + EW_CAMOUFLAGE_RADIUS + 14);
     ctx.restore();
   }
+}
+
+function otisFxHash(seed) {
+  const x = Math.sin(Number(seed) * 12.9898) * 43758.5453;
+  return x - Math.floor(x);
+}
+
+function otisFxShotAccent(shot) {
+  return ({
+    1: '#2557d6', 2: '#4c8dff', 3: '#6d356a', 4: '#3d6df2',
+    5: '#182b79', 6: '#668cff', 7: '#d8eaff'
+  })[shot] || '#315cff';
+}
+
+function drawOtisReticleGeometry(ctx, reticle, now) {
+  if (!ctx || !reticle) return;
+  const maxDelay = Math.max(0.001, reticle.maxDelay || OTIS_PORTAL_DELAY || 3);
+  const progress = Math.max(0, Math.min(1, 1 - (reticle.delay || 0) / maxDelay));
+  const ease = progress * progress * (3 - 2 * progress);
+  const far = OTIS_FX_RETICLE_START_RADIUS || 92;
+  const near = OTIS_FX_RETICLE_END_RADIUS || 28;
+  const radius = far + (near - far) * ease;
+  const collapse = progress > 0.72 ? (progress - 0.72) / 0.28 : 0;
+  const pulse = 0.82 + 0.18 * Math.sin(now * 18 + (reticle.seed || 0));
+  const alpha = Math.min(1, 0.62 + progress * 0.34) * (0.92 + pulse * 0.12);
+  const shot = Math.max(1, Math.min(7, reticle.shotNumber || 1));
+  const accent = otisFxShotAccent(shot);
+  const seed = reticle.seed || shot * 3.17;
+  ctx.save();
+  ctx.translate(reticle.x, reticle.y);
+  ctx.rotate((reticle.angle || 0) * 0.12 + now * 0.12);
+  ctx.globalCompositeOperation = 'lighter';
+  ctx.lineCap = 'round';
+
+  // 由遠而近的外圈：鎖定越接近完成，準心越貼近目標。
+  ctx.globalAlpha = alpha * 0.28;
+  ctx.fillStyle = '#3d7dff'; ctx.shadowColor = '#2f76ff'; ctx.shadowBlur = 26;
+  ctx.beginPath(); ctx.arc(0, 0, radius + 7 + pulse * 3, 0, Math.PI * 2); ctx.fill();
+  ctx.globalAlpha = alpha * 0.78;
+  ctx.strokeStyle = '#4f8cff'; ctx.shadowColor = '#2f76ff'; ctx.shadowBlur = 20; ctx.lineWidth = 2.25;
+  ctx.setLineDash([9, 6]);
+  ctx.beginPath(); ctx.arc(0, 0, radius, 0, Math.PI * 2); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // 八個外側鎖定刻度，讓遠距離準心仍能清楚辨識。
+  ctx.globalAlpha = alpha * 0.92;
+  ctx.strokeStyle = '#75b4ff'; ctx.shadowColor = accent; ctx.shadowBlur = 13; ctx.lineWidth = 1.8;
+  for (let i = 0; i < 8; i++) {
+    const a = i * Math.PI / 4 + seed * 0.02;
+    const tickIn = radius + 3;
+    const tickOut = radius + (i % 2 ? 10 : 15);
+    ctx.beginPath();
+    ctx.moveTo(Math.cos(a) * tickIn, Math.sin(a) * tickIn);
+    ctx.lineTo(Math.cos(a) * tickOut, Math.sin(a) * tickOut);
+    ctx.stroke();
+  }
+
+  // 四組由外向內收束的準心刻線。
+  ctx.globalAlpha = alpha;
+  ctx.strokeStyle = '#b9dcff'; ctx.shadowColor = accent; ctx.shadowBlur = 14; ctx.lineWidth = 2.15;
+  for (let i = 0; i < 4; i++) {
+    const a = i * Math.PI / 2 + seed * 0.03;
+    const gap = radius * (0.18 + collapse * 0.05);
+    const arm = radius * (0.21 + progress * 0.07);
+    const x0 = Math.cos(a) * gap, y0 = Math.sin(a) * gap;
+    const x1 = Math.cos(a) * (gap + arm), y1 = Math.sin(a) * (gap + arm);
+    ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(Math.cos(a + 0.12) * (gap + arm * 0.74), Math.sin(a + 0.12) * (gap + arm * 0.74)); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(Math.cos(a - 0.12) * (gap + arm * 0.74), Math.sin(a - 0.12) * (gap + arm * 0.74)); ctx.stroke();
+  }
+
+  ctx.globalAlpha = alpha * (0.72 + progress * 0.28);
+  ctx.strokeStyle = '#d9efff'; ctx.shadowColor = '#6aa8ff'; ctx.shadowBlur = 18; ctx.lineWidth = 1.8 + collapse * 2.6;
+  ctx.beginPath(); ctx.arc(0, 0, near * (0.78 - collapse * 0.16), 0, Math.PI * 2); ctx.stroke();
+  ctx.fillStyle = '#eff9ff'; ctx.shadowBlur = 22;
+  ctx.beginPath(); ctx.arc(0, 0, 3.0 + progress * 2.8 + collapse * 2.4, 0, Math.PI * 2); ctx.fill();
+
+  // 倒數最後一瞬間的收束十字，之後同幀由傳送門接手.
+  if (collapse > 0) {
+    ctx.globalAlpha = collapse * (0.82 + pulse * 0.18);
+    ctx.strokeStyle = '#ffffff'; ctx.shadowColor = '#72b7ff'; ctx.shadowBlur = 24; ctx.lineWidth = 2.4;
+    ctx.beginPath(); ctx.moveTo(-near * 0.82, 0); ctx.lineTo(near * 0.82, 0); ctx.moveTo(0, -near * 0.82); ctx.lineTo(0, near * 0.82); ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function drawOtisPortalGeometry(ctx, portal, now) {
+  const shot = Math.max(1, Math.min(7, portal.shotNumber || 1));
+  const isLock = portal.phase === 'lock';
+  const rawProgress = isLock
+    ? Math.max(0, Math.min(1, portal.lockProgress != null ? portal.lockProgress : 1 - (portal.delay || 0) / OTIS_PORTAL_DELAY))
+    : 1 - Math.max(0, Math.min(1, portal.life / Math.max(0.001, portal.maxLife || 1)));
+  const pulse = 0.82 + 0.18 * Math.sin(now * (isLock ? 8 : 15) + (portal.seed || shot));
+  const doom = shot === 7;
+  const extra = portal.extra === true;
+  const burst = !isLock && portal.burst > 0 ? Math.max(0, portal.burst / Math.max(0.001, portal.burstMax || 0.34)) : 0;
+
+  // 傳送門固定為「薄而直立」的多重法陣；發數只增加符文／裂痕／亮度，不再改變門體尺寸。
+  const entranceScale = isLock ? 0.72 + rawProgress * 0.28 : 1;
+  const portalW = (OTIS_FX_PORTAL_WIDTH || 18) * entranceScale;
+  const portalH = (OTIS_FX_PORTAL_HEIGHT || 76) * entranceScale;
+  const accent = otisFxShotAccent(shot);
+  const edge = doom ? '#8dbdff' : (shot >= 5 ? '#4d7ff3' : '#3990ff');
+  const alpha = Math.max(0.1, Math.min(1, (isLock ? 0.54 + rawProgress * 0.36 : 0.78 + burst * 0.22) * (0.82 + pulse * 0.18)));
+  const seed = portal.seed || shot * 7.13;
+  // 追加門只作為低負載的火力殘影，不與主門使用同等細節量。
+  const ringLimit = extra ? 2 : 3;
+  const runeCount = extra ? 0 : 4 + Math.min(shot, 2);
+  const crackCount = extra ? 1 : (doom ? 6 : (shot >= 5 ? 4 : (shot >= 4 ? 3 : 1)));
+
+  ctx.save();
+  ctx.translate(portal.x, portal.y);
+  ctx.globalCompositeOperation = 'lighter';
+  ctx.globalAlpha = alpha;
+
+  // 狹長的黑藍空間孔洞：不是圓形能量球，而是站立在目標旁的異常裂口。
+  const aura = ctx.createRadialGradient(0, 0, 3, 0, 0, portalH * 1.12);
+  aura.addColorStop(0, doom ? 'rgba(1,4,18,0.96)' : 'rgba(2,8,28,0.9)');
+  aura.addColorStop(0.5, 'rgba(11,49,150,0.44)');
+  aura.addColorStop(0.82, 'rgba(17,77,205,0.16)');
+  aura.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = aura;
+  ctx.beginPath(); ctx.ellipse(0, 0, portalW * 2.25, portalH * 1.08, 0, 0, Math.PI * 2); ctx.fill();
+
+  ctx.fillStyle = doom ? '#01030e' : '#020817';
+  ctx.shadowColor = '#1f5dff'; ctx.shadowBlur = 18 + burst * 14;
+  ctx.beginPath(); ctx.ellipse(0, 0, portalW * 0.66, portalH * 0.86, 0, 0, Math.PI * 2); ctx.fill();
+
+  // 多層法陣輪廓：外框維持垂直橢圓，內部圓環才各自旋轉。
+  const rings = [
+    [1.00, 1.00, 2.2, edge],
+    [0.82, 0.90, 1.35, '#6fa8ff'],
+    [0.62, 0.76, 1.05, '#2d68df'],
+    [0.43, 0.60, 0.9, '#b9dcff']
+  ];
+  for (let ring = 0; ring < Math.min(ringLimit, rings.length); ring++) {
+    const [rw, rh, line, color] = rings[ring];
+    ctx.save();
+    ctx.rotate((ring % 2 ? -1 : 1) * (now * (0.72 + ring * 0.16) + seed * 0.025));
+    ctx.strokeStyle = color;
+    ctx.lineWidth = line + (doom && ring === 0 ? 0.8 : 0);
+    ctx.shadowColor = edge; ctx.shadowBlur = 7 + ring * 3 + burst * 8;
+    ctx.setLineDash(ring === 0 ? [] : [4 + ring * 2, 3 + ring]);
+    ctx.beginPath(); ctx.ellipse(0, 0, portalW * rw, portalH * rh, 0, 0, Math.PI * 2); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
+  }
+
+  // 中央法陣軸線與交錯弧線，模擬參考圖中的細密藍色魔法紋路。
+  ctx.strokeStyle = `rgba(177,220,255,${0.48 + rawProgress * 0.3})`;
+  ctx.lineWidth = 0.85;
+  ctx.beginPath();
+  ctx.moveTo(0, -portalH * 0.86); ctx.lineTo(0, portalH * 0.86);
+  ctx.moveTo(-portalW * 0.55, 0); ctx.lineTo(portalW * 0.55, 0);
+  ctx.stroke();
+  for (let i = 0; i < (extra ? 0 : 2); i++) {
+    ctx.save(); ctx.rotate(i * Math.PI / 3 + now * (i % 2 ? -0.5 : 0.5));
+    ctx.strokeStyle = i === 1 ? '#cbe6ff' : '#397fe9';
+    ctx.lineWidth = 0.72;
+    ctx.beginPath(); ctx.ellipse(0, 0, portalW * (0.35 + i * 0.12), portalH * (0.48 + i * 0.12), 0, -1.15, 1.15); ctx.stroke();
+    ctx.restore();
+  }
+
+  // 鎖定中的符文與目標十字；只增加細節，不把門體越做越大。
+  if (isLock) {
+    const runeRadius = portalH * 0.94;
+    for (let i = 0; i < runeCount; i++) {
+      const a = i / runeCount * Math.PI * 2 + now * 0.34;
+      const rx = Math.cos(a) * portalW * 1.34;
+      const ry = Math.sin(a) * runeRadius;
+      const rw = 2.2 + (i % 3) * 1.2;
+      ctx.save(); ctx.translate(rx, ry); ctx.rotate(a + Math.PI / 2);
+      ctx.strokeStyle = i % 3 === 0 ? '#e0f1ff' : '#6ea8ff';
+      ctx.globalAlpha = alpha * (0.48 + rawProgress * 0.45);
+      ctx.lineWidth = 0.8;
+      ctx.beginPath(); ctx.moveTo(-rw, 0); ctx.lineTo(0, -rw * 0.65); ctx.lineTo(rw, 0); ctx.lineTo(0, rw * 0.65); ctx.closePath(); ctx.stroke();
+      ctx.restore();
+    }
+    ctx.globalAlpha = alpha;
+    ctx.strokeStyle = `rgba(220,240,255,${0.5 + rawProgress * 0.4})`;
+    ctx.lineWidth = 1.05;
+    ctx.beginPath(); ctx.moveTo(-portalW * 0.52, 0); ctx.lineTo(portalW * 0.52, 0); ctx.moveTo(0, -portalH * 0.30); ctx.lineTo(0, portalH * 0.30); ctx.stroke();
+  }
+
+  // 第四發後增加裂痕與黑藍壓迫感；裂痕數量增加，但每條長度仍受固定門高限制。
+  ctx.strokeStyle = doom ? '#315fcb' : (shot >= 5 ? '#1b347e' : '#2764c6');
+  ctx.lineWidth = doom ? 1.65 : 1.05;
+  for (let i = 0; i < crackCount; i++) {
+    const a = i * 2.399 + seed * 0.04;
+    const len = portalH * (0.12 + otisFxHash(i * 3.7 + seed) * 0.18);
+    const sx = Math.cos(a) * portalW * (0.82 + otisFxHash(i + seed) * 0.4);
+    const sy = Math.sin(a) * portalH * (0.55 + otisFxHash(i + 4.4) * 0.3);
+    ctx.beginPath(); ctx.moveTo(sx, sy);
+    ctx.lineTo(sx + Math.cos(a) * len * 0.5 + Math.sin(a * 3) * 2, sy + Math.sin(a) * len * 0.42);
+    ctx.lineTo(sx + Math.cos(a) * len, sy + Math.sin(a) * len * 0.8); ctx.stroke();
+  }
+
+  // 發射瞬間：門體仍固定，中心孔洞短暫收縮後亮起，讓攻擊明確「從門裡出現」。
+  if (!isLock && burst > 0) {
+    ctx.globalAlpha = alpha * (0.55 + burst * 0.45);
+    ctx.strokeStyle = '#e4f3ff'; ctx.shadowColor = '#68a9ff'; ctx.shadowBlur = 18;
+    ctx.lineWidth = 1.5 + burst * 1.7;
+    ctx.beginPath(); ctx.ellipse(0, 0, portalW * (0.34 + burst * 0.18), portalH * (0.68 + burst * 0.12), 0, 0, Math.PI * 2); ctx.stroke();
+    for (let i = 0; i < (extra ? 1 : 3); i++) {
+      const a = i * Math.PI * 0.4 + seed;
+      ctx.beginPath(); ctx.moveTo(Math.cos(a) * portalW * 0.18, Math.sin(a) * portalH * 0.34); ctx.lineTo(Math.cos(a) * portalW * 0.9, Math.sin(a) * portalH * 0.98); ctx.stroke();
+    }
+  }
+
+  // 低數量定點粒子，隨發數只提高密度，不建立大量常駐粒子物件。
+  const particleCount = extra ? 1 : Math.min(OTIS_FX_PARTICLE_CAP, 2 + Math.min(shot, 3));
+  ctx.fillStyle = '#c5e4ff'; ctx.shadowColor = '#397dff'; ctx.shadowBlur = 8;
+  for (let i = 0; i < particleCount; i++) {
+    const a = now * (0.55 + i * 0.08) + i * 2.11 + seed;
+    const rr = 0.92 + 0.2 * otisFxHash(i + seed);
+    const px = Math.cos(a) * portalW * 1.55 * rr;
+    const py = Math.sin(a) * portalH * 1.02 * rr;
+    const pr = 0.9 + 1.15 * otisFxHash(i * 9.1 + seed);
+    ctx.globalAlpha = alpha * (0.25 + 0.5 * (0.5 + 0.5 * Math.sin(now * 11 + i)));
+    ctx.beginPath(); ctx.arc(px, py, pr, 0, Math.PI * 2); ctx.fill();
+  }
+  ctx.restore();
+}
+
+function drawOtisRift(ctx, rift, now) {
+  const prog = Math.max(0, Math.min(1, rift.life / Math.max(0.001, rift.maxLife || OTIS_FX_RIFT_LIFE)));
+  const fade = prog * prog;
+  const rr = (rift.radius || 14) * (1.15 - prog * 0.18);
+  ctx.save();
+  ctx.translate(rift.x, rift.y);
+  ctx.rotate(rift.angle || 0);
+  ctx.globalCompositeOperation = 'lighter';
+  ctx.globalAlpha = fade * 0.82;
+  ctx.strokeStyle = rift.shotNumber >= 5 ? '#3154b7' : '#4d86ff';
+  ctx.shadowColor = '#2864ff'; ctx.shadowBlur = 12;
+  ctx.lineWidth = 2.1;
+  ctx.beginPath(); ctx.moveTo(-rr * 1.5, 0); ctx.lineTo(-rr * 0.45, -rr * 0.28); ctx.lineTo(rr * 0.2, rr * 0.18); ctx.lineTo(rr * 1.45, -rr * 0.12); ctx.stroke();
+  ctx.strokeStyle = '#b9d8ff'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(-rr * 0.8, rr * 0.42); ctx.lineTo(-rr * 0.12, -rr * 0.5); ctx.lineTo(rr * 0.78, rr * 0.34); ctx.stroke();
+  ctx.strokeStyle = '#182a72'; ctx.lineWidth = 1.5;
+  for (let i = 0; i < 3; i++) {
+    const a = now * (1.4 + i * 0.2) + (rift.seed || 0) + i * 2.0;
+    ctx.beginPath(); ctx.arc(0, 0, rr * (0.45 + i * 0.18), a, a + 0.58); ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function drawOtisMagicBullet(ctx, bullet, now) {
+  const shot = Math.max(1, Math.min(7, bullet.shotNumber || 1));
+  const accent = otisFxShotAccent(shot);
+  const core = shot === 7 ? '#e2f2ff' : (shot === 3 ? '#527edb' : '#477dff');
+  const length = bullet.extraBullet ? 42 : 60 + shot * 2;
+  const width = bullet.extraBullet ? 2.4 : 3.0 + (shot >= 6 ? 1.2 : 0);
+
+  // 高對比能量長尾：用深藍外暈、亮藍主線與冷白內芯，讓高速魔彈的經過路徑一眼可見。
+  const bulletAngle = Number.isFinite(bullet.angle) ? bullet.angle : Math.atan2(bullet.vy || 0, bullet.vx || 1);
+  const tailLength = OTIS_FX_BULLET_TRAIL_TAIL || 206;
+  const tailPulse = 0.82 + 0.18 * Math.sin(now * 24 + shot * 1.7);
+  const tailStartX = bullet.x - Math.cos(bulletAngle) * tailLength;
+  const tailStartY = bullet.y - Math.sin(bulletAngle) * tailLength;
+  const tailEndX = bullet.x - Math.cos(bulletAngle) * 4;
+  const tailEndY = bullet.y - Math.sin(bulletAngle) * 4;
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  ctx.lineCap = 'round';
+  ctx.globalAlpha = (bullet.extraBullet ? 0.42 : 0.58) * tailPulse;
+  ctx.strokeStyle = '#163fc3'; ctx.shadowColor = '#1d55ff'; ctx.shadowBlur = 24;
+  ctx.lineWidth = bullet.extraBullet ? 8 : 12;
+  ctx.beginPath(); ctx.moveTo(tailStartX, tailStartY); ctx.lineTo(tailEndX, tailEndY); ctx.stroke();
+  ctx.globalAlpha = 0.86 * tailPulse;
+  ctx.strokeStyle = '#3f82ff'; ctx.shadowColor = accent; ctx.shadowBlur = 16;
+  ctx.lineWidth = bullet.extraBullet ? 4.4 : 6.2;
+  ctx.beginPath(); ctx.moveTo(tailStartX, tailStartY); ctx.lineTo(tailEndX, tailEndY); ctx.stroke();
+  ctx.globalAlpha = 0.96 * tailPulse;
+  ctx.strokeStyle = '#e7f4ff'; ctx.shadowColor = '#a8d1ff'; ctx.shadowBlur = 9;
+  ctx.lineWidth = bullet.extraBullet ? 1.4 : 2.1;
+  ctx.beginPath(); ctx.moveTo(tailStartX, tailStartY); ctx.lineTo(tailEndX, tailEndY); ctx.stroke();
+
+  // 分段空間切痕：不是單純光線，而是清楚可辨的斷裂刀口。
+  const cutCount = bullet.extraBullet ? 3 : 5;
+  const perpX = -Math.sin(bulletAngle), perpY = Math.cos(bulletAngle);
+  for (let j = 1; j <= cutCount; j++) {
+    const distance = tailLength * (j / (cutCount + 1));
+    const px = bullet.x - Math.cos(bulletAngle) * distance;
+    const py = bullet.y - Math.sin(bulletAngle) * distance;
+    const cross = (bullet.extraBullet ? 5 : 7) + j * 1.2;
+    const shear = Math.sin(now * 13 + j * 2.3 + shot) * 2.2;
+    ctx.globalAlpha = (0.58 - j * 0.045) * tailPulse;
+    ctx.strokeStyle = j % 2 ? '#9fcaff' : '#568cff'; ctx.shadowColor = '#4a8dff'; ctx.shadowBlur = 11;
+    ctx.lineWidth = bullet.extraBullet ? 1.2 : 1.65;
+    ctx.beginPath();
+    ctx.moveTo(px - perpX * cross - Math.cos(bulletAngle) * shear, py - perpY * cross - Math.sin(bulletAngle) * shear);
+    ctx.lineTo(px + perpX * cross - Math.cos(bulletAngle) * shear, py + perpY * cross - Math.sin(bulletAngle) * shear);
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  // 實際飛行路徑殘痕：以少量節點繪製寬外暈與冷白內芯，保留清晰度但不堆疊粒子。
+  const trail = Array.isArray(bullet.trail) ? bullet.trail : [];
+  if (trail.length) {
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.lineCap = 'round';
+    const oldest = trail[0];
+    const trailAge = Math.max(0, Math.min(1, (oldest.life || 0) / Math.max(0.001, OTIS_FX_BULLET_TRAIL_LIFE)));
+    ctx.globalAlpha = trailAge * 0.28;
+    ctx.strokeStyle = '#245be0'; ctx.shadowColor = '#397cff'; ctx.shadowBlur = 18;
+    ctx.lineWidth = bullet.extraBullet ? 5.5 : 7.5;
+    ctx.beginPath(); ctx.moveTo(oldest.x, oldest.y); ctx.lineTo(bullet.x, bullet.y); ctx.stroke();
+    for (let i = 0; i < trail.length; i++) {
+      const p = trail[i];
+      const next = trail[i + 1] || { x: bullet.x, y: bullet.y };
+      const age = Math.max(0, Math.min(1, (p.life || 0) / Math.max(0.001, OTIS_FX_BULLET_TRAIL_LIFE)));
+      const along = (i + 1) / trail.length;
+      ctx.globalAlpha = age * (0.42 + along * 0.38);
+      ctx.strokeStyle = shot >= 5 ? '#6e9cff' : '#4e8dff';
+      ctx.shadowColor = accent; ctx.shadowBlur = 10 + along * 8;
+      ctx.lineWidth = bullet.extraBullet ? 1.8 + along * 1.3 : 2.2 + along * 2.2;
+      ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(next.x, next.y); ctx.stroke();
+      ctx.globalAlpha = age * (0.62 + along * 0.3);
+      ctx.strokeStyle = '#e0f0ff'; ctx.shadowColor = '#a4d1ff'; ctx.shadowBlur = 7;
+      ctx.lineWidth = bullet.extraBullet ? 0.75 + along * 0.5 : 0.95 + along * 0.8;
+      ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(next.x, next.y); ctx.stroke();
+      if (i % 4 === 0) {
+        const a = (p.angle || bullet.angle || 0) + Math.PI / 2;
+        const size = bullet.extraBullet ? 3.5 : 5.5 + along * 2;
+        ctx.globalAlpha = age * 0.76;
+        ctx.strokeStyle = '#b9dcff'; ctx.shadowColor = '#5d9bff'; ctx.shadowBlur = 9;
+        ctx.lineWidth = 1.05;
+        ctx.beginPath();
+        ctx.moveTo(p.x - Math.cos(a) * size, p.y - Math.sin(a) * size);
+        ctx.lineTo(p.x + Math.cos(a) * size, p.y + Math.sin(a) * size);
+        ctx.stroke();
+      }
+    }
+    ctx.restore();
+  }
+
+  ctx.save();
+  ctx.translate(bullet.x, bullet.y);
+  ctx.rotate(bullet.angle || 0);
+  ctx.globalCompositeOperation = 'lighter';
+  ctx.globalAlpha = 0.9;
+
+  const tail = ctx.createLinearGradient(-length, 0, 3, 0);
+  tail.addColorStop(0, 'rgba(18,35,115,0)');
+  tail.addColorStop(0.48, 'rgba(31,76,205,0.18)');
+  tail.addColorStop(0.88, `${accent}aa`);
+  tail.addColorStop(1, '#b7d5ff');
+  ctx.fillStyle = tail;
+  ctx.shadowColor = '#245bff'; ctx.shadowBlur = 14;
+  ctx.beginPath(); ctx.moveTo(-length, 0); ctx.lineTo(-8, -width); ctx.lineTo(5, 0); ctx.lineTo(-8, width); ctx.closePath(); ctx.fill();
+  ctx.strokeStyle = 'rgba(125,177,255,0.62)'; ctx.lineWidth = 0.9;
+  ctx.beginPath(); ctx.moveTo(-length * 0.92, -width * 1.8); ctx.lineTo(-4, -1); ctx.moveTo(-length * 0.92, width * 1.8); ctx.lineTo(-4, 1); ctx.stroke();
+
+  // 細長、銳利的魔彈本體，不畫成普通圓形子彈。
+  const body = ctx.createLinearGradient(-9, -4, 16, 4);
+  body.addColorStop(0, '#050a22'); body.addColorStop(0.42, '#172d83'); body.addColorStop(0.82, core); body.addColorStop(1, '#e2f2ff');
+  ctx.fillStyle = body; ctx.shadowColor = accent; ctx.shadowBlur = 18;
+  ctx.beginPath(); ctx.moveTo(17, 0); ctx.lineTo(2, -4.1); ctx.lineTo(-10, -1.7); ctx.lineTo(-7, 0); ctx.lineTo(-10, 1.7); ctx.lineTo(2, 4.1); ctx.closePath(); ctx.fill();
+  ctx.strokeStyle = '#d2e7ff'; ctx.lineWidth = 0.85;
+  ctx.beginPath(); ctx.moveTo(-7, 0); ctx.lineTo(15, 0); ctx.stroke();
+  ctx.fillStyle = '#f2f8ff'; ctx.shadowColor = '#9ec6ff'; ctx.shadowBlur = 10;
+  ctx.beginPath(); ctx.arc(14, 0, 1.65 + (shot >= 6 ? 0.8 : 0), 0, Math.PI * 2); ctx.fill();
+
+  // 子彈周圍的細小空間符號與黑藍殘影。
+  ctx.strokeStyle = `${accent}bb`; ctx.lineWidth = 0.75;
+  ctx.beginPath(); ctx.arc(-2, 0, 6 + 1.2 * Math.sin(now * 18 + shot), -0.55, 0.55); ctx.stroke();
+  ctx.restore();
+}
+
+
+function drawOtisBloodShatterCracks(drawCtx, b) {
+  if (!drawCtx || !b || !b.char || b.char.type !== 'otis') return;
+  const stacks = Math.max(0, Math.min(OTIS_SELF_SHATTER_THRESHOLD || 3, b.otisBloodShatterStacks || 0));
+  if (!stacks) return;
+  const threshold = Math.max(1, OTIS_SELF_SHATTER_THRESHOLD || 3);
+  const outer = (b.r || RADIUS) + 4;
+  const reach = OTIS_FX_BLOOD_CRACK_LENGTH || 16;
+  const now = (typeof state !== 'undefined' && state && Number.isFinite(state.elapsed)) ? state.elapsed : ((typeof elapsed !== 'undefined') ? elapsed : 0);
+  const flash = Math.max(0, Math.min(1, (b.otisBloodShatterFlash || 0) / Math.max(0.001, OTIS_FX_BLOOD_SHATTER_LIFE || 0.72)));
+  drawCtx.save();
+  drawCtx.translate(b.x, b.y);
+  drawCtx.globalCompositeOperation = 'lighter';
+  drawCtx.lineCap = 'round';
+
+  // 生命條外側的破碎環：即使數字提示消失，裂解狀態仍然清楚可見。
+  const ringRadius = outer + 8 + Math.sin(now * 8) * 1.5;
+  for (let i = 0; i < threshold; i++) {
+    const center = -Math.PI / 2 + ((i + 0.5) / threshold) * Math.PI * 2;
+    const gap = 0.14 + (i < stacks ? 0.04 : 0);
+    drawCtx.strokeStyle = i < stacks ? `rgba(255,48,112,${0.72 + flash * 0.25})` : 'rgba(128,34,74,0.25)';
+    drawCtx.shadowColor = i < stacks ? '#ff2f78' : '#8d2558';
+    drawCtx.shadowBlur = i < stacks ? 12 + flash * 10 : 3;
+    drawCtx.lineWidth = i < stacks ? 2.8 + flash * 1.7 : 1;
+    drawCtx.beginPath();
+    drawCtx.arc(0, 0, ringRadius, center + gap, center + Math.PI * 2 / threshold - gap);
+    drawCtx.stroke();
+  }
+
+  // 從生命條裂口向外爆開的鋸齒碎痕。
+  for (let i = 0; i < stacks; i++) {
+    const a = -Math.PI / 2 + ((i + 0.35) / threshold) * Math.PI * 2;
+    const wobble = Math.sin((i + 1) * 7.13) * 0.035;
+    const a0 = a + wobble;
+    const midR = outer + reach * 0.44;
+    const endR = outer + reach;
+    const am = a0 + (i % 2 ? 0.1 : -0.08);
+    const ae = a0 + (i % 2 ? -0.05 : 0.08);
+    drawCtx.strokeStyle = `rgba(255,62,126,${0.8 + flash * 0.18})`;
+    drawCtx.shadowColor = '#ff3d86'; drawCtx.shadowBlur = 10 + flash * 8;
+    drawCtx.lineWidth = 2.4 + flash * 1.4;
+    drawCtx.beginPath();
+    drawCtx.moveTo(Math.cos(a0) * (outer - 1), Math.sin(a0) * (outer - 1));
+    drawCtx.lineTo(Math.cos(am) * midR, Math.sin(am) * midR);
+    drawCtx.lineTo(Math.cos(ae) * endR, Math.sin(ae) * endR);
+    drawCtx.stroke();
+    drawCtx.strokeStyle = 'rgba(255,232,242,0.95)'; drawCtx.shadowBlur = 5; drawCtx.lineWidth = 0.9;
+    drawCtx.beginPath();
+    drawCtx.moveTo(Math.cos(a0) * (outer - 2), Math.sin(a0) * (outer - 2));
+    drawCtx.lineTo(Math.cos(am) * (outer + reach * 0.35), Math.sin(am) * (outer + reach * 0.35));
+    drawCtx.stroke();
+  }
+
+  // 剛被第七發擊中時，追加一圈向外炸裂的紅粉碎片與十字閃光。
+  if (flash > 0) {
+    const count = 12;
+    for (let i = 0; i < count; i++) {
+      const a = i * Math.PI * 2 / count + now * 0.65;
+      const r0 = outer + 4 + (1 - flash) * 8;
+      const r1 = r0 + 8 + flash * 20 + (i % 3) * 4;
+      drawCtx.globalAlpha = flash * (0.45 + (i % 3) * 0.12);
+      drawCtx.strokeStyle = i % 3 === 0 ? '#fff1f7' : '#ff397f';
+      drawCtx.shadowColor = '#ff2d75'; drawCtx.shadowBlur = 9;
+      drawCtx.lineWidth = i % 3 === 0 ? 1.6 : 1.1;
+      drawCtx.beginPath();
+      drawCtx.moveTo(Math.cos(a) * r0, Math.sin(a) * r0);
+      drawCtx.lineTo(Math.cos(a + 0.08) * r1, Math.sin(a + 0.08) * r1);
+      drawCtx.stroke();
+    }
+    drawCtx.globalAlpha = flash * 0.85;
+    drawCtx.strokeStyle = '#ffeaf3'; drawCtx.shadowColor = '#ff3d86'; drawCtx.shadowBlur = 18; drawCtx.lineWidth = 2.2;
+    drawCtx.beginPath(); drawCtx.moveTo(-outer - 8, 0); drawCtx.lineTo(outer + 8, 0); drawCtx.moveTo(0, -outer - 8); drawCtx.lineTo(0, outer + 8); drawCtx.stroke();
+  }
+  drawCtx.restore();
+}
+
+
+function drawOtisGun(drawCtx, b, now) {
+  if (!drawCtx || !b || !b.char || b.char.type !== 'otis' || b.hp <= 0) return;
+  const pending = (b.otisPendingShots || []).find(entry => entry && entry.ownerBall === b) || null;
+  const liveTarget = pending ? findOtisTargetByKey(pending.targetKey) : null;
+  let aimAngle = Number.isFinite(b.otisGunAngle) ? b.otisGunAngle : 0;
+  if (liveTarget && Number.isFinite(liveTarget.x) && Number.isFinite(liveTarget.y)) {
+    aimAngle = Math.atan2(liveTarget.y - b.y, liveTarget.x - b.x);
+    b.otisGunAngle = aimAngle;
+  }
+  if (!Number.isFinite(aimAngle)) aimAngle = Math.atan2(b.vy || 0, b.vx || 1);
+
+  const charge = pending ? Math.max(0, Math.min(1, 1 - (pending.delay || 0) / Math.max(0.001, OTIS_PORTAL_DELAY))) : 0;
+  const recoil = Math.max(0, Math.min(1, (b.otisGunKickTimer || 0) / Math.max(0.001, OTIS_GUN_RECOIL_TIME)));
+  const flash = Math.max(0, Math.min(1, (b.otisGunFlashTimer || 0) / Math.max(0.001, OTIS_GUN_FLASH_TIME)));
+  const shot = pending ? Math.max(1, Math.min(7, pending.shotNumber || 1)) : Math.max(1, ((b.otisShotNumber || 0) % 7) + 1);
+  const gunLength = OTIS_GUN_LENGTH || 34;
+  const lift = pending ? (0.5 + charge * 0.5) : 0.32;
+  const muzzleX = gunLength + 8 - recoil * 7;
+  const handY = -b.r * (0.18 + lift * 0.12);
+  const pulse = 0.72 + 0.28 * Math.sin(now * (pending ? 11 : 4) + b.player * 1.7);
+
+  drawCtx.save();
+  drawCtx.translate(b.x, b.y);
+  drawCtx.rotate(aimAngle);
+  drawCtx.translate(-recoil * 7, handY);
+  drawCtx.rotate(-0.06 + (1 - lift) * 0.08 + recoil * 0.07);
+  drawCtx.globalCompositeOperation = 'source-over';
+
+  // 持槍手臂與雙手：讓角色不是只有飄浮槍械，而是明確握住武器。
+  drawCtx.globalAlpha = 0.9;
+  drawCtx.strokeStyle = '#171d3b'; drawCtx.shadowColor = '#315bca'; drawCtx.shadowBlur = 5; drawCtx.lineWidth = 5;
+  drawCtx.lineCap = 'round';
+  drawCtx.beginPath(); drawCtx.moveTo(-b.r * 0.48, 5); drawCtx.lineTo(6, 0); drawCtx.lineTo(13, 1); drawCtx.stroke();
+  drawCtx.strokeStyle = '#687db5'; drawCtx.lineWidth = 1.25; drawCtx.shadowBlur = 0;
+  drawCtx.beginPath(); drawCtx.moveTo(-b.r * 0.46, 5); drawCtx.lineTo(6, 0); drawCtx.lineTo(13, 1); drawCtx.stroke();
+
+  // 魔彈槍：深藍黑槍身、細長槍管、能量膛室與亮藍刻線。
+  const gunGrad = drawCtx.createLinearGradient(-8, -7, gunLength, 5);
+  gunGrad.addColorStop(0, '#050817'); gunGrad.addColorStop(0.42, '#111b43'); gunGrad.addColorStop(0.78, '#1d3f98'); gunGrad.addColorStop(1, '#5f9cff');
+  drawCtx.fillStyle = gunGrad; drawCtx.strokeStyle = '#7db5ff'; drawCtx.shadowColor = '#2f70ff'; drawCtx.shadowBlur = 10 + charge * 9;
+  drawCtx.lineWidth = 1.2;
+  drawCtx.beginPath();
+  drawCtx.moveTo(-8, -5); drawCtx.lineTo(10, -6.5); drawCtx.lineTo(gunLength - 2, -3.2); drawCtx.lineTo(gunLength + 2, -1.4);
+  drawCtx.lineTo(gunLength + 2, 2.2); drawCtx.lineTo(11, 3.6); drawCtx.lineTo(-8, 2.5); drawCtx.closePath(); drawCtx.fill(); drawCtx.stroke();
+
+  // 握把與扳機。
+  drawCtx.fillStyle = '#080d24'; drawCtx.strokeStyle = '#4e76c9'; drawCtx.lineWidth = 1;
+  drawCtx.beginPath(); drawCtx.moveTo(-2, 2); drawCtx.lineTo(7, 2); drawCtx.lineTo(3, 15); drawCtx.lineTo(-5, 12); drawCtx.closePath(); drawCtx.fill(); drawCtx.stroke();
+  drawCtx.strokeStyle = '#b8d8ff'; drawCtx.lineWidth = 1;
+  drawCtx.beginPath(); drawCtx.arc(5, 1, 3.2, 0.25, 2.3); drawCtx.stroke();
+
+  // 能量膛室與槍口環。
+  drawCtx.fillStyle = `rgba(95,160,255,${0.35 + charge * 0.45})`; drawCtx.shadowColor = '#5f9cff'; drawCtx.shadowBlur = 16;
+  drawCtx.beginPath(); drawCtx.arc(10, -1.5, 4.5 + charge * 1.2, 0, Math.PI * 2); drawCtx.fill();
+  drawCtx.strokeStyle = '#d5ecff'; drawCtx.lineWidth = 1.2; drawCtx.shadowBlur = 7;
+  drawCtx.beginPath(); drawCtx.moveTo(11, -4); drawCtx.lineTo(gunLength - 3, -2.1); drawCtx.moveTo(11, 1); drawCtx.lineTo(gunLength - 2, 1.3); drawCtx.stroke();
+  drawCtx.strokeStyle = '#9bc8ff'; drawCtx.lineWidth = 2.1;
+  drawCtx.beginPath(); drawCtx.ellipse(gunLength + 1, 0, 3.4, 5.2, 0, 0, Math.PI * 2); drawCtx.stroke();
+
+  // 鎖定蓄力時槍身符文與膛室脈衝。
+  if (pending) {
+    drawCtx.globalAlpha = 0.48 + charge * 0.48;
+    drawCtx.strokeStyle = shot >= 5 ? '#8faeff' : '#6a9dff'; drawCtx.lineWidth = 0.85; drawCtx.setLineDash([3, 2]);
+    drawCtx.beginPath(); drawCtx.arc(10, -1.5, 7 + charge * 3, -0.8, 2.1); drawCtx.stroke(); drawCtx.setLineDash([]);
+    drawCtx.fillStyle = '#d9efff'; drawCtx.beginPath(); drawCtx.arc(10, -1.5, 1.2 + pulse * 0.8, 0, Math.PI * 2); drawCtx.fill();
+  }
+
+  // 發射瞬間的槍口閃光與後座：以槍口爆發、扇形能量與多道冷白切線明確表現開槍。
+  if (flash > 0) {
+    drawCtx.globalCompositeOperation = 'lighter';
+    drawCtx.globalAlpha = Math.min(1, flash * 1.25);
+    const blast = 13 + (1 - flash) * 22;
+    const muzzleGlow = drawCtx.createRadialGradient(muzzleX, 0, 0, muzzleX, 0, blast);
+    muzzleGlow.addColorStop(0, '#ffffff'); muzzleGlow.addColorStop(0.22, '#c6e7ff'); muzzleGlow.addColorStop(0.62, 'rgba(71,145,255,0.7)'); muzzleGlow.addColorStop(1, 'rgba(25,74,206,0)');
+    drawCtx.fillStyle = muzzleGlow; drawCtx.shadowColor = '#63adff'; drawCtx.shadowBlur = 24;
+    drawCtx.beginPath(); drawCtx.arc(muzzleX, 0, blast, 0, Math.PI * 2); drawCtx.fill();
+    drawCtx.fillStyle = '#f5fbff'; drawCtx.shadowColor = '#b7dcff'; drawCtx.shadowBlur = 14;
+    drawCtx.beginPath(); drawCtx.moveTo(muzzleX + 9, 0); drawCtx.lineTo(muzzleX - 2, -5.5); drawCtx.lineTo(muzzleX - 1, 0); drawCtx.lineTo(muzzleX - 2, 5.5); drawCtx.closePath(); drawCtx.fill();
+    drawCtx.strokeStyle = '#eaf7ff'; drawCtx.shadowColor = '#579fff'; drawCtx.shadowBlur = 18; drawCtx.lineWidth = 2.2;
+    for (let i = 0; i < 10; i++) {
+      const a = i * Math.PI * 2 / 10 + now * 3;
+      const inner = 4 + (i % 2) * 2;
+      const outer = 16 + (1 - flash) * 22 + (i % 3) * 4;
+      drawCtx.beginPath();
+      drawCtx.moveTo(muzzleX + Math.cos(a) * inner, Math.sin(a) * inner * 0.55);
+      drawCtx.lineTo(muzzleX + Math.cos(a) * outer, Math.sin(a) * outer * 0.55);
+      drawCtx.stroke();
+    }
+  }
+  drawCtx.restore();
+}
+
+function drawOtisVisualFX() {
+  if (!state) return;
+  const now = elapsed || state.elapsed || 0;
+  if ((state.otisScreenPulse || 0) > 0) {
+    const pulse = Math.min(1, state.otisScreenPulse / Math.max(0.001, OTIS_FX_SCREEN_PULSE_LIFE));
+    ctx.save();
+    ctx.globalCompositeOperation = 'screen';
+    ctx.globalAlpha = pulse * 0.09;
+    ctx.fillStyle = '#163dba'; ctx.fillRect(0, 0, W, H);
+    ctx.restore();
+  }
+  for (const reticle of (state.otisReticles || [])) drawOtisReticleGeometry(ctx, reticle, now);
+  for (const portal of (state.otisPortals || [])) drawOtisPortalGeometry(ctx, portal, now);
+  for (const rift of (state.otisRifts || [])) drawOtisRift(ctx, rift, now);
+  for (const bullet of (state.otisMagicBullets || [])) drawOtisMagicBullet(ctx, bullet, now);
 }
 
 function render() {
@@ -23264,6 +24327,9 @@ drawKashimoReadability();
       drawGojoRedBall(ball);
     }
   }
+  // 奧提斯 E.G.O. 視覺層：深藍空間裂口、鎖定符文、魔彈殘痕與命中裂痕。
+  drawOtisVisualFX();
+
   // 投射物
   for (const p of state.projectiles) {
     ctx.save();
@@ -27080,6 +28146,8 @@ drawKashimoReadability();
     ctx.beginPath(); ctx.arc(b.x,b.y,glowR,0,Math.PI*2);
     ctx.fillStyle = glow; ctx.fill();
 
+    // 奧提斯槍械放在球體本體之前繪製；球體會覆蓋握把與手臂內側，槍管只在外側露出，避免擋住角色。
+    if (b.char.type === 'otis') drawOtisGun(ctx, b, elapsed);
     // 球體本體（半徑改讀 b.r，讓 ch.radius 自訂體型的角色/Boss 能真正畫成對應大小，一般角色 b.r 仍等於預設 RADIUS，畫面不變）
     ctx.beginPath(); ctx.arc(b.x,b.y,b.r,0,Math.PI*2);
     ctx.fillStyle = '#0d1117'; ctx.fill();
@@ -27166,6 +28234,8 @@ drawKashimoReadability();
     const hpFrac = getBallMaxHp(b) ? b.hp / getBallMaxHp(b) : 0;
     ctx.beginPath(); ctx.arc(b.x,b.y,b.r+4,-Math.PI/2,-Math.PI/2+Math.PI*2*hpFrac);
     ctx.strokeStyle = (b.char.isTwin && b.char.twinRoles && b.char.twinRoles[b.twinRole]) ? b.char.twinRoles[b.twinRole].color : b.char.color; ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.stroke();
+    // 第七發自鎖的「血條破碎」直接刻在生命條圓弧上，不再只顯示文字提示。
+    if (b.char.type === 'otis' && (b.otisBloodShatterStacks || 0) > 0) drawOtisBloodShatterCracks(ctx, b);
 
     // 時空旅人：在召喚體正下方顯示小型目前／最大血量數字。
     if (b.char.type === 'amelia' && b.ameliaIsClone) drawAmeliaTravelerHpBadge(b);
@@ -27198,6 +28268,19 @@ drawKashimoReadability();
       }
     }
 
+    // 奧提斯附加效果：顯示燒傷／易傷／永久詛咒層數。
+    if (b.hp > 0 && (b.otisBurnStacks > 0 || b.otisVulnStacks > 0 || b.otisDamagePenalty > 0 || b.otisDamageTakenBonus > 0)) {
+      const tags = [];
+      if (b.otisBurnStacks > 0) tags.push(`🔥${b.otisBurnStacks}`);
+      if (b.otisVulnStacks > 0) tags.push(`🎯${b.otisVulnStacks}`);
+      if (b.otisDamagePenalty > 0 || b.otisDamageTakenBonus > 0) tags.push(`⚠️-${b.otisDamagePenalty || 0}/+${b.otisDamageTakenBonus || 0}`);
+      ctx.save(); ctx.font = 'bold 10px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillStyle = 'rgba(16,10,35,0.82)'; ctx.strokeStyle = 'rgba(190,160,255,0.72)'; ctx.lineWidth = 1;
+      const label = tags.join(' '), labelY = b.y + b.r + 18, labelW = ctx.measureText(label).width + 8;
+      ctx.beginPath(); ctx.roundRect(b.x - labelW / 2, labelY - 7, labelW, 14, 4); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#e5d8ff'; ctx.fillText(label, b.x, labelY); ctx.restore();
+    }
+
     // 角色圖示（emoji 或圖片）
     if (b.char.type === 'ew' && b.ewSkill3Active) drawEwHeavyBombard(ctx, b, elapsed);
     ctx.font = `${b.r*1.1}px serif`; ctx.textAlign='center'; ctx.textBaseline='middle';
@@ -27207,7 +28290,6 @@ drawKashimoReadability();
     } else {
       drawCharIcon(ctx, b.char, b.x, b.y, b.r * 1.8);
     }
-
     // 阿梅放大鏡揮擊：用向前伸出的透鏡與弧形揮擊軌跡表現實際攻擊動作。
     if (b.char.type === 'amelia' && (b.ameliaMeleeTimer || 0) > AMELIA_MELEE_INTERVAL - AMELIA_MELEE_ANIMATION_TIME) {
       const swingProgress = Math.max(0, Math.min(1, (AMELIA_MELEE_INTERVAL - b.ameliaMeleeTimer) / AMELIA_MELEE_ANIMATION_TIME));
@@ -29484,6 +30566,12 @@ function updateHUD() {
       const skill2Txt = b.ewSkill2Timer > 0 ? `技能二${Math.ceil(b.ewSkill2Timer)}s` : '技能二✓';
       const skill3Txt = b.ewSkill3Unlocked ? (b.ewSkill3Cooldown > 0 ? `爆裂${Math.ceil(b.ewSkill3Cooldown)}s` : '爆裂✓') : `爆裂🔒${Math.ceil(Math.max(0, EW_SKILL3_UNLOCK_TIME - (b.ewSkill3FieldTimer || 0)))}s`;
       return `💣 餘震${b.ewSkill1Ready ? '✓' : `${b.ewBasicAttackCount}/${EW_SKILL1_ATTACKS_REQUIRED}`}　👻${soulCount}/${EW_SOUL_MAX_COUNT}　${skill2Txt}　${skill3Txt}`;
+    } else if (b.char.type === 'otis') {
+      const next = ((b.otisShotNumber || 0) % 7) + 1;
+      const queue = (b.otisPendingShots || []).length;
+      const reticles = (state.otisReticles || []).filter(r => r && r.owner === b.player).length;
+      const curse = (b.otisBloodShatterStacks || 0) > 0 ? `　🩸血條破碎${b.otisBloodShatterStacks}/${OTIS_SELF_SHATTER_THRESHOLD}` : '';
+      return `🔫 魔彈循環 ${next}/7　準心${reticles}　鎖定佇列${queue}　下一鎖定${Math.max(0, b.otisLockTimer || 0).toFixed(1)}s${curse}`;
     } else if (b.char.type === 'gojo') {
       if (b.gojoCharging) return `🔵 蓄力虛式 ${b.gojoChargeTimer ? b.gojoChargeTimer.toFixed(1) : ''}s`;
       const cdLeft = Math.max(0, b.gojoCooldown || 0).toFixed(1);
@@ -30522,7 +31610,7 @@ function sandboxStartBattle() {
   state = {
     playerCount: activeTeams.length,
     balls: allBalls,
-    projectiles: [], wallKnives: [], minatoKunai: [], minatoTeleportFX: [], hitFlashes: [], damageNumbers: [], batParticles: [], slashMarks: [], traps: [], yiBlackStones: [], yiStoneBurstFX: [], opmFX: [], momoiFanFX: [], gojoKillFX: null, curseSliceKillFX: null, minatoKillFX: null, emTotems: [], emLightningFX: [], emLightningWarn: [], emGolems: [], emUltBanner: null, curseFireFX: [], curseFireBlasts: [], curseFireZones: [], bossDryPowderExtinguishers: [], bossDryPowderBlasts: [], bossDryPowderZones: [], curseSlashFX: [], elapsed: 0,
+    projectiles: [], otisMagicBullets: [], otisReticles: [], otisPortals: [], otisRifts: [], otisScreenPulse: 0, wallKnives: [], minatoKunai: [], minatoTeleportFX: [], hitFlashes: [], damageNumbers: [], batParticles: [], slashMarks: [], traps: [], yiBlackStones: [], yiStoneBurstFX: [], opmFX: [], momoiFanFX: [], gojoKillFX: null, curseSliceKillFX: null, minatoKillFX: null, emTotems: [], emLightningFX: [], emLightningWarn: [], emGolems: [], emUltBanner: null, curseFireFX: [], curseFireBlasts: [], curseFireZones: [], bossDryPowderExtinguishers: [], bossDryPowderBlasts: [], bossDryPowderZones: [], curseSlashFX: [], elapsed: 0,
     arena: arenaId,
     bgColor: selectedBgColor,
     thunderPillars: [],
@@ -31141,6 +32229,7 @@ function resolveBossWorldSlash(sukuna) {
   sukuna.bossWorldSlashCasting = false;
   for (const target of state.balls) {
     if (target.player === sukuna.player || target.hp <= 0) continue;
+    // bypassParry + worldSlash 讓世界斬維持必中，並穿透通用迷彩；其他一般攻擊仍會被迷彩擋下。
     // bypassParry 讓世界斬在完成詠唱後必中、秒殺當下仍在場的角色。
     // 動態傳入目標目前生命值；bypassParry 讓通用傷害流程執行真正的系統秒殺。
     dealDamage(target, target.hp, {
@@ -33444,7 +34533,7 @@ function launchBossBattle(teamIds, boss, requestedDefinition = null) {
   state = {
     playerCount: 2,
     balls: allBalls,
-    projectiles: [], wallKnives: [], minatoKunai: [], minatoTeleportFX: [], hitFlashes: [], damageNumbers: [], batParticles: [], slashMarks: [], traps: [], yiBlackStones: [], yiStoneBurstFX: [], opmFX: [], momoiFanFX: [], gojoKillFX: null, curseSliceKillFX: null, minatoKillFX: null, emTotems: [], emLightningFX: [], emLightningWarn: [], emGolems: [], emUltBanner: null, curseFireFX: [], curseFireBlasts: [], curseFireZones: [], bossDryPowderExtinguishers: [], bossDryPowderBlasts: [], bossDryPowderZones: [], curseSlashFX: [], elapsed: 0,
+    projectiles: [], otisMagicBullets: [], otisReticles: [], otisPortals: [], otisRifts: [], otisScreenPulse: 0, wallKnives: [], minatoKunai: [], minatoTeleportFX: [], hitFlashes: [], damageNumbers: [], batParticles: [], slashMarks: [], traps: [], yiBlackStones: [], yiStoneBurstFX: [], opmFX: [], momoiFanFX: [], gojoKillFX: null, curseSliceKillFX: null, minatoKillFX: null, emTotems: [], emLightningFX: [], emLightningWarn: [], emGolems: [], emUltBanner: null, curseFireFX: [], curseFireBlasts: [], curseFireZones: [], bossDryPowderExtinguishers: [], bossDryPowderBlasts: [], bossDryPowderZones: [], curseSlashFX: [], elapsed: 0,
     arena: 'normal',
     bgColor: selectedBgColor,
     thunderPillars: [], thunderStrikes: [], kashimoFields: [], kashimoTraps: [], kashimoLightningFX: [], kashimoDeerOrbs: [], kashimoAmberWaves: [], kashimoSparks: [], kashimoShockwaves: [], kashimoScreenFX: [], smithForgeParticles: [], steveMineDebris: [], summons: [], summonDeathFX: [], summonIdCounter: 1, ewAftershocks: [], ewExplosionFX: [], ewVfx: [], ameliaTimeTravelQueue: [],
