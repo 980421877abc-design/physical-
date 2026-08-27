@@ -10,20 +10,20 @@ const STANDARD_DOT_TICK_INTERVAL = 1.0; // DPS／每秒傷害效果的離散結�
 //廚師常數
 const CHEF_ATTACK_INTERVAL = 2.0; //攻擊CD
 
-const KNIFE_SPEED          = 300; //刀子移動速度
+const KNIFE_SPEED          = 350; //刀子移動速度
 const KNIFE_DAMAGE         = 130; //刀子傷害
 const KNIFE_MAX_COUNT      = 2; //刀子上限
-const KNIFE_RECALL_SPEED = 300; // 回收速度（px/s）
+const KNIFE_RECALL_SPEED = 350; // 回收速度（px/s）
 
 //酒鬼常數
 const DRUNK_ATTACK_INTERVAL   = 1.75; //攻擊CD
 const DRUNK_DIR_CHANGE_MIN    = 0.3; //最小移動間隔
 const DRUNK_DIR_CHANGE_MAX    = 0.5; //最大移動間隔
-const BOTTLE_SPEED            = 300; //酒瓶移動速度
+const BOTTLE_SPEED            = 350; //酒瓶移動速度
 const BOTTLE_DAMAGE           = 150; //酒瓶傷害
 
 // 暗夜領主常數
-const VAMPIRE_BITE_DAMAGE     = 20;   // 每次咬擊傷害，避免四段連咬過痛
+const VAMPIRE_BITE_DAMAGE     = 22;   // 每次咬擊傷害，避免四段連咬過痛
 const VAMPIRE_BITE_HEAL       = 22;   // 每次咬擊回血
 const VAMPIRE_BITE_COUNT      = 4;    // 咬擊次數
 const VAMPIRE_BITE_INTERVAL   = 0.20; // 每次咬擊間隔（秒）
@@ -33,8 +33,8 @@ const VAMPIRE_DASH_DURATION   = 0.45; // 衝刺最長持續時間（秒）
 
 // 暗夜領主「領主眷屬」
 const VAMPIRE_BAT_COUNT = 2;
-const VAMPIRE_BAT_DAMAGE = 10;
-const VAMPIRE_BAT_HEAL = 5;
+const VAMPIRE_BAT_DAMAGE = 20;
+const VAMPIRE_BAT_HEAL = 10;
 const VAMPIRE_BAT_COOLDOWN = 5;
 const VAMPIRE_BAT_SPEED = 200;
 
@@ -60,13 +60,13 @@ const GOJO_BLUE_RING_R     = 32;    // 蒼球光圈半徑
 const GOJO_BLUE_RAY_RANGE  = 130;   // 蒼球光線射程
 const GOJO_BLUE_RAY_FORCE  = 10;    // 蒼球光線引力強度
 const GOJO_BLUE_LIFESPAN   = 2.0;   // 蒼球存在時間（秒），超時自動消失
-const GOJO_BLUE_PROJECTILE_PULL_RANGE = 180; // 蒼吸引敵方投射物的作用範圍（px）
+const GOJO_BLUE_PROJECTILE_PULL_RANGE = 250; // 蒼吸引敵方投射物的作用範圍（px）
 const GOJO_BLUE_PROJECTILE_PULL_FORCE = 10;  // 每幀施加在敵方投射物上的引力速度（px/frame）
 const GOJO_BLUE_PROJECTILE_CAPTURE_MAX = 8; // 蒼每場最多儲存的敵方投射物數量
 const GOJO_RED_STORED_HOMING_TURN = 5.5; // 赫釋放投射物的追蹤角速度（rad/s）
 const GOJO_RED_STORED_HOMING_DURATION = 4.0; // 赫釋放投射物的追蹤持續時間（秒）
 const GOJO_PURPLE_RADIUS   = 24;    // 紫球半徑
-const GOJO_CHARGE_TIME     = 1.5;   // 虛式蓄力時間（秒）
+const GOJO_CHARGE_TIME     = 1.0;   // 虛式蓄力時間（秒）
 const GOJO_FORCE           = 10;    // 引力/斥力強度（碰撞區域）
 const GOJO_FORCE_RANGE     = 100;   // 引力/斥力作用範圍
 const GOJO_HP_THRESHOLD    = 850;   // 觸發虛式的血量門檻
@@ -74,9 +74,9 @@ const GOJO_PURPLE_CHANCE   = 0.10;  // 解鎖後紫出現機率
 
 
 // 詛咒之王常數
-const CURSE_SLASH_INTERVAL    = 4.0;   // 解：斬痕發動間隔（秒）
+const CURSE_SLASH_INTERVAL    = 3.5;   // 解：斬痕發動間隔（秒）
 const CURSE_SLASH_DAMAGE      = 150;   // 解：斬痕傷害
-const CURSE_SLASH_SLOW_FACTOR = 0.6;   // 解：緩速倍率（剩幾成速度）
+const CURSE_SLASH_SLOW_FACTOR = 0.4;   // 解：緩速倍率（剩幾成速度）
 const CURSE_SLASH_SLOW_DUR    = 2.0;   // 解：緩速持續時間（秒）
 const CURSE_SLASH_WARN_DUR    = 0.5;   // 解：預警箭頭持續時間（秒）
 const CURSE_SLASH_PROJECTILE_SPEED = 2000; // 解：飛斬速度（px/s）
@@ -126,24 +126,52 @@ const CURSE_STATS = {
 const TRAP_DAMAGE          = 60;     // 尖刺碰撞傷害
 const TRAP_DOT_DPS         = 40;     // 尖刺 dot 每秒傷害
 const TRAP_DOT_DURATION    = 1.0;    // 尖刺 dot 持續時間（秒）
-const TRAP_MAX_COUNT       = 6;      // 最多同時存在幾個尖刺
+const TRAP_MAX_COUNT       = 8;      // 最多同時存在幾個尖刺
 const TRAP_CHAIN_INTERVAL  = 3.0;    // 鎖鏈間隔（秒）
-const TRAP_CHAIN_PULL_SPD  = 200;    // 鎖鏈拉扯速度（px/s）
+const TRAP_CHAIN_PULL_SPD  = 250;    // 鎖鏈拉扯速度（px/s）
 const TRAP_CHAIN_PULL_DUR  = 0.7;    // 拉扯最長持續（秒）
 const TRAP_HIT_COOLDOWN    = 1.2;    // 同一個尖刺再次傷害的CD（秒）
 
-// 奕常數
-const YI_BLACK_DAMAGE       = 50;    // 黑棋傷害
-const YI_BLACK_INTERVAL     = 1.5;   // 黑棋落子間隔（秒）
-const YI_BLACK_MAX          = 4;     // 觸發白旗所需黑棋數
-const YI_BLACK_RADIUS       = 10;    // 黑棋顯示半徑（px）
-const YI_WHITE_DAMAGE       = 200;   // 白旗爆炸傷害
-const YI_WHITE_PULL_SPEED   = 650;   // 黑棋吸引速度（px/s）
-const YI_WHITE_PULL_DUR     = 0.5;   // 吸引持續時間（秒）
-const YI_WHITE_EXPLODE_RAD  = 60;    // 爆炸判定半徑（px）
-const YI_ARENA_HP           = 600;   // 觸發小競技場的血量門檻
-const YI_ARENA_SIZE         = 100;   // 小競技場半邊長（px）
-const YI_ARENA_DURATION     = 10.0;   // 小競技場持續時間（秒）
+// 奕常數：棋盤型重做
+const YI_BLACK_DAMAGE       = 0;     // 普通棋子本身不造成傷害
+const YI_BLACK_INTERVAL     = 2.0;   // 每 2 秒落下一對棋子
+const YI_BLACK_MAX          = 0;     // 舊白旗計數保留相容，不再使用
+const YI_BLACK_RADIUS       = 7;     // 棋子顯示半徑（px）：縮小棋子，避免遮住放大的格線
+const YI_GRID_LINE_COUNT    = 9;     // 9×9 交叉點棋盤
+const YI_GRID_SPACING       = 42;    // 350px 標準場地的基準交叉點間距
+const YI_GRID_REFERENCE_FIELD = 350; // 棋盤自適應的基準場地短邊
+const YI_GRID_MIN_SPACING  = 20;     // 小場地仍可容納 9×9 棋盤的最低格距
+const YI_GRID_MAX_SPACING  = 96;     // 大場地的格距上限，避免畫面過度疏散
+const YI_GRID_BOARD_MARGIN = 6;      // 棋盤距離場地邊界的最小保留邊距
+const YI_GRID_LINE_CELLS   = 4;      // 連星攻擊沿線延伸的格數
+const YI_GRID_TRIGGER_RADIUS = 20;   // 敵人碰到棋子的觸發半徑（px）
+const YI_GRID_LINE_TOLERANCE = 28;   // 舊版固定容許距離（動態幾何會優先使用格距比例）
+const YI_GRID_LINE_RANGE    = 168;   // 舊版像素 fallback；實戰以動態格距×格數為準
+const YI_MINE_DAMAGE        = 100;   // 連星每次引爆傷害
+const YI_LINK_DAMAGE_BONUS  = 0.10; // 料敵先機：每個連線棋子 +10%
+const YI_LINK_MAX_STACKS    = 3;     // 料敵先機最多三層
+const YI_ADVANTAGE_SLOW_FACTOR = 0.5; // 取勢：敵人速度降至50%
+const YI_ADVANTAGE_SLOW_DURATION = 2.0;
+const YI_HEAVEN_COUNT        = 5;    // 天下劫每次五枚神之一手
+const YI_HEAVEN_DAMAGE       = 70;   // 神之一手範圍爆炸傷害
+const YI_HEAVEN_RADIUS       = 55;   // 神之一手引爆範圍
+const YI_HEAVEN_ARM_OFFSET   = 2;    // 中心到四方附棋的棋盤步數；中間保留一格空交叉點
+const YI_HEAVEN_STONE_INTERVAL = 0.18; // 同一組內，中心棋與四方附棋的逐顆落子間隔
+const YI_STONE_ACTIVATION_DELAY = 0.5; // 棋子落下後需等待 1 秒才可激活
+const YI_HEAVEN_PLACE_INTERVAL = 2.0; // 天下劫每組神之一手的逐組落子間隔
+const YI_HEAVEN_COOLDOWN     = 18.0; // 天下劫使用間隔
+const YI_HEAVEN_FORCE_TIME   = 20.0; // 20 秒未觸發則立即施放
+const YI_HEAVEN_VFX_INTRO    = 1.35; // 天下劫啟動時的威嚴展開脈衝（秒）
+const YI_HEAVEN_VFX_AFTERGLOW = 1.80; // 五組棋子落完後保留的王座餘光（秒）
+const YI_HEAVEN_VFX_RADIUS   = 108;  // 奕身周圍的棋局王座光場半徑（px）
+// 舊常數保留，避免舊 HUD／存檔讀取時出現未定義；新奕流程不再使用小競技場。
+const YI_WHITE_DAMAGE       = 200;
+const YI_WHITE_PULL_SPEED   = 650;
+const YI_WHITE_PULL_DUR     = 0.5;
+const YI_WHITE_EXPLODE_RAD  = 60;
+const YI_ARENA_HP           = 600;
+const YI_ARENA_SIZE         = 100;
+const YI_ARENA_DURATION     = 10.0;
 
 // 無名槍手常數
 const GUNNER_MAG_SIZE          = 6;     // 彈夾上限（撞牆幾次後開始連射）
@@ -157,38 +185,43 @@ const GUNNER_FLASH_INTERVAL    = 8.0;   // 閃光彈CD（秒）
 const GUNNER_FLASH_DAMAGE      = 80;   // 閃光彈傷害
 const GUNNER_FLASH_RADIUS      = 110;   // 閃光彈命中角色時的爆炸半徑（px）
 const GUNNER_FLASH_WALL_DAMAGE = 80;   // 閃光彈撞牆時的範圍傷害
-const GUNNER_FLASH_WALL_RADIUS = 125;  // 閃光彈撞牆時的爆炸半徑（px）
+const GUNNER_FLASH_WALL_RADIUS = 160;  // 閃光彈撞牆時的爆炸半徑（px）
 const GUNNER_FLASH_COOLDOWN_FREEZE_DUR = 2.5;   // 閃光彈冷卻凍結持續時間（秒）
-const GUNNER_FLASH_SPEED       = 400;   // 閃光彈飛行速度（px/s）
+const GUNNER_FLASH_SLOW_FACTOR = 0.5;   // 閃光彈額外緩速：速度降至50%
+const GUNNER_FLASH_SLOW_DURATION = 2.0; // 閃光彈額外緩速持續時間（秒）
+const GUNNER_EXTRA_RELOAD_INTERVAL = 2.5; // 額外裝填週期（秒）
+const GUNNER_EXTRA_RELOAD_COUNT = 2;       // 每次額外裝填子彈數
+const GUNNER_FLASH_SPEED       = 480;   // 閃光彈飛行速度（px/s）
 //武士常數
 
 const SAMURAI_PARRY_INTERVAL   = 2.0;  // 招架CD（秒）
 const SAMURAI_PARRY_DURATION   = 1.5;   // 招架持續時間（秒）
-const SAMURAI_PARRY_REFLECT_MUL = 1.2;  // 反彈傷害倍率
+const SAMURAI_PARRY_REFLECT_MUL = 1.5;  // 反彈傷害倍率
 const SAMURAI_PARRY_BUMP_DMG   = 100;   // 招架中碰到敵人球的傷害
 const SAMURAI_PARRY_DMG_REDUCE = 0.7;   // 招架期間減傷比例（減少70%，只受到30%傷害）
-const SAMURAI_IAIDO_DAMAGE     = 120;   // 居合傷害
-const SAMURAI_IAIDO_SPEED      = 900;   // 居合衝刺速度
+const SAMURAI_IAIDO_DAMAGE     = 150;   // 居合傷害
+const SAMURAI_IAIDO_SPEED      = 1200;   // 居合衝刺速度
 const SAMURAI_IAIDO_DURATION   = 0.18;  // 居合衝刺持續時間（秒）
-const SAMURAI_SHIMETSU_DAMAGE  = 140;   // 識滅斬每道傷害
+const SAMURAI_SHIMETSU_DAMAGE  = 150;   // 識滅斬每道傷害
 const SAMURAI_SHIMETSU_COUNT   = 4;     // 識滅斬道數
 const SAMURAI_IAIDO_MAX        = 4;     // 累積幾次居合觸發識滅斬
 const SAMURAI_ACTION_FAILSAFE  = 2.75;  // 技能狀態最多持續秒數，避免旗標異常導致永久定身
 
 // 末代武士 VFX 升級參數（只影響畫面，不改變傷害／判定／冷卻）
 const SAMURAI_VFX_PARTICLE_CAP       = 220;  // 場上同時存在的武士粒子上限
-const SAMURAI_VFX_PARRY_SPARKS       = 18;   // 招架啟動／反彈時的火花數
-const SAMURAI_VFX_IAIDO_SPARKS       = 14;   // 居合啟動／命中時的刀氣數
-const SAMURAI_VFX_SHIMETSU_SPARKS    = 22;   // 識滅斬每道斬波的噴濺數
+const SAMURAI_VFX_PARRY_SPARKS       = 14;   // 招架啟動／反彈時的火花數
+const SAMURAI_VFX_IAIDO_SPARKS       = 10;   // 居合啟動／命中時的刀氣數
+const SAMURAI_VFX_SHIMETSU_SPARKS    = 18;   // 識滅斬每道斬波的噴濺數
 const SAMURAI_VFX_IAIDO_TRAIL_GAP    = 0.032; // 居合殘影取樣間隔（秒）
 const SAMURAI_VFX_SHIMETSU_TRAIL_GAP = 0.045; // 識滅斬拖尾取樣間隔（秒）
 const SAMURAI_VFX_PARRY_RING_LIFE    = 0.62;  // 招架環展開時間（秒）
 const SAMURAI_VFX_HIT_STOP_FLASH     = 0.16;  // 命中白芯閃光時間（秒）
 
 // 魔術師常數
-const MAGE_DOVE_INTERVAL       = 1.25;   // 丟鴿子CD（秒）
+const MAGE_DOVE_INTERVAL       = 1.5;   // 丟鴿子CD（秒）
 const MAGE_DOVE_DAMAGE         = 80;    // 鴿子傷害
 const MAGE_DOVE_SPEED          = 350;   // 鴿子飛行速度（px/s）
+const MAGE_CONJURE_PROJECTILES = ['curseword', 'amaterasu', 'dove', 'knife', 'bottle', 'ew_dawn', 'johnny_act2']; // 無中生有：沿用既有角色投射物
 const MAGE_TELEPORT_DELAY      = 0.15;  // 丟鴿子後瞬移延遲（秒）
 const MAGE_TRICK_HIT_COUNT     = 3;     // 命中幾次後觸發魔術技巧
 const MAGE_TRICK_HEAL          = 120;   // 技巧1：回血量
@@ -196,7 +229,7 @@ const MAGE_TRICK_HOMING_TURN   = 300;   // 技巧3：追蹤轉向強度（px/s²
 const MAGE_TRICK_FREEZE_DUR    = 1.5;   // 技巧4：定身持續秒數
 
 // 雷電法王常數
-const THUNDER_PILLAR_MAX          = 7;        // 最多同時存在幾個閃電柱
+const THUNDER_PILLAR_MAX          = 8;        // 最多同時存在幾個閃電柱
 const THUNDER_PILLAR_RADIUS       = 14;       // 閃電柱半圓半徑（顯示用）
 const THUNDER_STRIKE_INTERVAL     = 1.8;      // 閃電連線發射間隔（秒）
 const THUNDER_STRIKE_DAMAGE       = 20;       // 每條閃電連線傷害（每條獨立計算）
@@ -212,7 +245,7 @@ const THUNDER_SPAWN_FX_R          = 24;       // 放置柱子閃光半徑
 
 
 // 鍛造師常數
-const SMITH_FORGE_INTERVAL_BASE   = 1.3;   // 初始鍛造間隔（秒）
+const SMITH_FORGE_INTERVAL_BASE   = 1.2;   // 初始鍛造間隔（秒）
 const SMITH_FORGE_INTERVAL_MIN    = 0.3;   // 最快鍛造間隔（秒）
 const SMITH_FORGE_ACCEL           = 0.15;  // 每次鍛造後間隔縮短比率（越鍛越快）
 const SMITH_FORGE_DMG_PER_STACK   = 10;     // 每層鍛造加傷（永久疊加，不重置）
@@ -228,27 +261,29 @@ const NAOBITO_DASH_SPEED          = 600;   // 衝刺速度（px/s）
 const NAOBITO_WAYPOINT_COUNT      = 6;     // 每次路徑中繼點數量
 const NAOBITO_SHADOW_LIFETIME     = 3;   // 殘影存活時間（秒）
 const NAOBITO_SHADOW_MAX          = 6;     // 最多同時存在殘影數
-const NAOBITO_SHADOW_DAMAGE       = 20;    // 殘影接觸傷害
+const NAOBITO_SHADOW_DAMAGE       = 30;    // 殘影接觸傷害
 const NAOBITO_SHADOW_HIT_RADIUS   = 20;    // 殘影命中判定半徑（px）
 const NAOBITO_SHADOW_HIT_COOLDOWN = 0.5;   // 同一殘影再次傷害CD（秒）
-const NAOBITO_KYOUSEI_THRESHOLD   = 6;     // 凶星軌跡觸發所需殘影數
+const NAOBITO_KYOUSEI_THRESHOLD   = 4;     // 凶星軌跡觸發所需殘影數
 const NAOBITO_KYOUSEI_PIERCE_DMG  = 60;    // 凶星軌跡本體穿刺傷害
-const NAOBITO_KYOUSEI_SHADOW_DMG  = 20;    // 凶星軌跡每殘影傷害
-const NAOBITO_KYOUSEI_SPEED       = 550;   // 凶星軌跡衝刺速度（px/s）
+const NAOBITO_KYOUSEI_SHADOW_DMG  = 30;    // 凶星軌跡每殘影傷害
+const NAOBITO_KYOUSEI_SPEED       = 650;   // 凶星軌跡衝刺速度（px/s）
 const NAOBITO_KYOUSEI_COOLDOWN    = 5.0;   // 凶星軌跡觸發後CD（秒）
-const NAOBITO_PATH_DEVIATION      = 100;   // 路徑中繼點偏移量（px）
-const NAOBITO_RETREAT_DISTANCE    = 100;   // 接近敵人後，遠離的距離（px）
+const NAOBITO_PATH_DEVIATION      = 80;   // 路徑中繼點偏移量（px）
+const NAOBITO_RETREAT_DISTANCE    = 20;   // 接近敵人後，遠離的距離（px）
 const NAOBITO_DASH_MAX_DURATION   = 2.0;   // 單次衝刺最大持續時間（秒），超時強制結束避免卡住
+const NAOBITO_CONTACT_IMMOBILIZE_DURATION = 1.0; // 投射法術移動碰撞：命中對手後定身秒數
+const NAOBITO_CONTACT_COOLDOWN   = 0.75;  // 同一次接觸的防重複觸發間隔（秒）
 
 
 // 宇治波鼬常數
 const ITACHI_AMATERASU_INTERVAL = 2.0;   // 天照CD（秒）
-const ITACHI_AMATERASU_SPEED    = 450;   // 黑炎飛行速度（px/s）
-const ITACHI_AMATERASU_DAMAGE   = 50;    // 天照命中傷害
-const ITACHI_AMATERASU_MARK_DMG = 120;   // 標記引爆傷害
+const ITACHI_AMATERASU_SPEED    = 600;   // 黑炎飛行速度（px/s）
+const ITACHI_AMATERASU_DAMAGE   = 70;    // 天照命中傷害
+const ITACHI_AMATERASU_NEXT_DAMAGE_BONUS = 50; // 天照：目標下次受到傷害固定增加50點
 const ITACHI_TSUKUYOMI_INTERVAL = 6.0;   // 月讀CD（秒）
 const ITACHI_TSUKUYOMI_PIN_DUR  = 2.0;   // 定身持續時間（秒）
-const ITACHI_CROW_HEAL          = 150;   // 烏鴉替身恢復血量
+const ITACHI_CROW_HEAL          = 200;   // 烏鴉替身恢復血量
 const ITACHI_SUSANOO_HP_THRESHOLD = 500; // 須佐能乎觸發血量
 const ITACHI_SUSANOO_DURATION   = 9.0;   // 須佐能乎持續時間（秒）
 const ITACHI_SUSANOO_DMG_REDUCE = 0.5;   // 須佐能乎減傷比例
@@ -258,7 +293,7 @@ const ITACHI_SUSANOO_BITE_INTERVAL = 0.3; // 刺擊CD（秒），避免擦身連
 const ITACHI_TSUKUYOMI_STAB_DAMAGE = ITACHI_SUSANOO_BITE_DAMAGE; // 月讀雙側刺擊沿用須佐每擊傷害
 const ITACHI_TSUKUYOMI_STAB_INTERVAL = ITACHI_SUSANOO_BITE_INTERVAL; // 月讀定身期間刺擊節奏
 const ITACHI_SUSANOO_BITE_COOLDOWN = 0.8;  // 近戰結束CD（秒）
-const ITACHI_SUSANOO_BITE_RANGE  = RADIUS * 2 + 40; // 須佐能乎近戰判定距離（px）
+const ITACHI_SUSANOO_BITE_RANGE  = RADIUS * 2 + 50; // 須佐能乎近戰判定距離（px）
 
 // 乙骨憂太常數
 const YUTA_CURSEWORD_INTERVAL    = 2.5;   // 咒言發射CD（秒）
@@ -285,14 +320,14 @@ const YUTA_RIKA_PASSIVE_CD_CUT   = 0.5;   // 里香在場時，乙骨非里香�
 
 // 工程師常數
 const ENGINEER_TURRET_INTERVAL    = 2.4;   // 召喚炮台間隔（秒）
-const ENGINEER_TURRET_LIFETIME    = 8.0;  // 炮台存在時間（秒）
+const ENGINEER_TURRET_LIFETIME    = 9.0;  // 炮台存在時間（秒）
 const ENGINEER_TURRET_FIRE_INTERVAL = 1.1; // 炮台開火間隔（秒）
-const ENGINEER_TURRET_BULLET_DAMAGE = 25;  // 炮台子彈傷害
+const ENGINEER_TURRET_BULLET_DAMAGE = 30;  // 炮台子彈傷害
 const ENGINEER_TURRET_BULLET_SPEED  = 480; // 炮台子彈飛行速度（px/s）
 const ENGINEER_MECH_TURRET_THRESHOLD = 6; // 累積幾個炮台後觸發機甲模式
 const ENGINEER_MECH_DURATION      = 15.0;  // 機甲模式持續時間（秒）
 const ENGINEER_MECH_DMG_REDUCE    = 0.20;  // 機甲模式減傷比例
-const ENGINEER_LASER_INTERVAL     = 1.2;   // 機甲模式雷射發射間隔（秒）
+const ENGINEER_LASER_INTERVAL     = 1.0;   // 機甲模式雷射發射間隔（秒）
 const ENGINEER_LASER_DAMAGE       = 50;    // 雷射傷害
 const ENGINEER_LASER_WIDTH        = 26;    // 雷射光束寬度（px）
 const ENGINEER_LASER_RANGE        = 900;   // 雷射長度（px，足以橫跨場地）
@@ -305,11 +340,11 @@ const ENGINEER_GRID_STUN_BUFFER   = 0.15;  // 每次重新施加暈眩的緩衝�
 
 
 // 砲爹常數
-const CANNON_MELEE_DAMAGE        = 20;    // 近戰拳頭傷害
+const CANNON_MELEE_DAMAGE        = 30;    // 近戰拳頭傷害
 const CANNON_MELEE_COOLDOWN      = 0.6;   // 近戰拳頭CD（秒）
 // 追蹤光球
 const CANNON_TRACK_COUNT         = 3;     // 追蹤光球數量
-const CANNON_TRACK_DAMAGE        = 40;    // 每顆追蹤光球傷害
+const CANNON_TRACK_DAMAGE        = 50;    // 每顆追蹤光球傷害
 const CANNON_TRACK_COOLDOWN      = 0.8;   // 使用完追蹤後的CD（秒）
 const CANNON_TRACK_SPEED         = 280;   // 追蹤光球飛行速度（px/s）
 const CANNON_TRACK_RADIUS        = 7;     // 追蹤光球半徑
@@ -317,8 +352,8 @@ const CANNON_TRACK_TURN_RATE     = 1.6;   // 追蹤轉向速率（弧度/秒）
 const CANNON_TRACK_SPREAD        = 0.45;  // 初始散射角度（弧度）
 const CANNON_TRACK_LIFESPAN      = 4.0;   // 追蹤光球存在時間（秒）
 // 光柱
-const CANNON_BEAM_DAMAGE         = 50;    // 光柱傷害
-const CANNON_BEAM_COOLDOWN       = 1.2;   // 光柱CD（秒）
+const CANNON_BEAM_DAMAGE         = 70;    // 光柱傷害
+const CANNON_BEAM_COOLDOWN       = 1.0;   // 光柱CD（秒）
 const CANNON_BEAM_WIDTH          = 22;    // 光柱寬度（px）
 const CANNON_BEAM_RANGE          = 900;   // 光柱長度（px）
 const CANNON_BEAM_TRAVEL_TIME    = 0.18;  // 光柱視覺＋判定持續時間（秒）
@@ -326,7 +361,7 @@ const CANNON_BEAM_TRAVEL_TIME    = 0.18;  // 光柱視覺＋判定持續時間�
 const CANNON_BLAST_CHARGE_TIME   = 0.3;   // 光砲蓄力時間（秒）
 const CANNON_BLAST_SHOT_TIME     = 0.2;   // 每次發射持續時間（秒）
 const CANNON_BLAST_SHOTS         = 3;     // 連射次數
-const CANNON_BLAST_DAMAGE        = 80;   // 每次發射傷害
+const CANNON_BLAST_DAMAGE        = 90;   // 每次發射傷害
 const CANNON_BLAST_HALFWIDTH     = 55;    // 光砲半寬（約乙骨純愛大砲的一半）
 const CANNON_BLAST_COOLDOWN      = 2.2;   // 光砲CD（秒）
 // 砲爹 vs 乙骨 專屬決鬥終結
@@ -411,7 +446,7 @@ const STAR_METEOR_WARNING_TIME  = 0.4;   // 落點預警時間（秒）
 // 帶土（宇智波帶土）常數
 const OBITO_FIREBALL_COOLDOWN    = 10.0;  // 火球CD（秒）
 const OBITO_FIREBALL_SPEED       = 300;   // 火球速度（px/s）
-const OBITO_FIREBALL_DAMAGE      = 60;    // 火球傷害
+const OBITO_FIREBALL_DAMAGE      = 80;    // 火球傷害
 const OBITO_FIREBALL_RADIUS      = 14;    // 火球半徑
 const OBITO_DASH_SPEED           = 700;   // 衝刺速度（px/s）
 const OBITO_DASH_DURATION        = 0.5;   // 衝刺持續時間（秒）
@@ -437,19 +472,21 @@ const OBITO_PHANTOM_DAMAGE       = 40;   // 假想子彈碰到對手傷害
 
 
 // 釣魚佬
-const FISHER_CAST_COOLDOWN   = 1.0;   // 釣魚CD
-const FISHER_CAST_TIME       = 0.3;   // 拋竿到邊緣耗時
+const FISHER_CAST_COOLDOWN   = 1.0;   // 基礎釣魚CD
+const FISHER_AIRFORCE_CD_REDUCTION = 0.2; // 每次空軍後永久減少的釣魚CD
+const FISHER_MIN_CAST_COOLDOWN = 0.1; // 防止空軍疊層後變成零間隔
+const FISHER_CAST_TIME       = 0.2;   // 拋竿到邊緣耗時
 const FISHER_BITE_TIME       = 0.2;  // 咬鉤停頓
 const FISHER_REEL_TIME       = 0.2;   // 收線耗時
 const FISHER_RESULT_WEIGHTS  = { fish: 30, shark: 8, airforce: 6, bossfish:4 , ocean: 2 };
 // 魚
 const FISHER_FISH_DMG        = 30;
-const FISHER_FISH_SPEED      = 440;
+const FISHER_FISH_SPEED      = 480;
 const FISHER_FISH_RED_DELAY  = 1.0;
 const FISHER_FISH_RED_DMG    = 50;
 // 鯊魚
 const FISHER_SHARK_DMG       = 70;
-const FISHER_SHARK_SPEED     = 600;
+const FISHER_SHARK_SPEED     = 620;
 const FISHER_SHARK_BLEED_DUR = 3.0;
 const FISHER_SHARK_BLEED_DPS = 70;    // 每0.1秒7傷害 = 70/s
 // 首領魚
@@ -457,7 +494,7 @@ const FISHER_BOSSFISH_COUNT  = 10;
 const FISHER_BOSSFISH_TOTAL  = 240;
 const FISHER_BOSSFISH_DMG    = FISHER_BOSSFISH_TOTAL / FISHER_BOSSFISH_COUNT;
 const FISHER_BOSSFISH_GAP    = 0.05;  // 每尾魚間隔
-const FISHER_BOSSFISH_SPEED  = 460;
+const FISHER_BOSSFISH_SPEED  = 480;
 // 大海
 const FISHER_OCEAN_WAVE_COUNT   = 8;
 const FISHER_OCEAN_WAVE_DMG     = 70;
@@ -470,10 +507,10 @@ const FISHER_OCEAN_DASH_SPEED   = 780;
 const FISHER_OCEAN_GRAB_HOLD    = 0.3;  // 勾住後揮甩停頓時間
 
 // 夏油條（咒靈操術）專屬常數 ────────────────
-const GETO_MAX_STOCK          = 100;   // 咒靈庫存上限
+const GETO_MAX_STOCK          = 150;   // 咒靈庫存上限
 const GETO_SPAWN_INTERVAL     = 1.0;   // 每隔幾秒消耗一隻庫存召喚小型咒靈
 const GETO_SPIRIT_HP          = 27;    // 小型咒靈血量
-const GETO_SPIRIT_DAMAGE      = 27;    // 小型咒靈碰觸傷害
+const GETO_SPIRIT_DAMAGE      = 30;    // 小型咒靈碰觸傷害
 const GETO_SPIRIT_SPEED       = 105;   // 小型咒靈追擊速度
 const GETO_SPIRIT_RADIUS      = 13;
 const GETO_SPIRIT_CONTACT_CD  = 1.0;   // 咒靈碰觸傷害的間隔
@@ -481,7 +518,7 @@ const GETO_SPIRIT_RETALIATE   = 27;     // 每次咬到敵人後承受少量反�
 const GETO_SPIRIT_LIFESPAN    = 14;    // 咒靈最長存活時間（避免場面爆滿）
 
 const GETO_SPECIAL_TRIGGER_RATIO = 0.5;   // 血量剩餘比例：觸發召喚特級咒靈
-const GETO_SPECIAL_HP            = 300;   // 特級咒靈血量
+const GETO_SPECIAL_HP            = 400;   // 特級咒靈血量
 const GETO_SPECIAL_SHIELD_RATIO  = 0.3;   // 護身：承擔夏油條所受傷害的比例
 const GETO_SPECIAL_FOLLOW_RADIUS = 55;    // 特級咒靈繞著夏油條的跟隨半徑
 const GETO_SPECIAL_RADIUS        = 27;
@@ -563,9 +600,9 @@ const JOSEPH_DASH_DAMAGE         = 50;    // 波紋疾走傷害
 const JOSEPH_DASH_STACK          = 1;     // 波紋疾走附加波紋層數
 const JOSEPH_SPRING_COOLDOWN     = 7.0;   // 彈簧拳CD
 const JOSEPH_SPRING_RANGE        = 350;   // 彈簧拳觸發距離（中距離，大於波紋疾走）
-const JOSEPH_SPRING_DAMAGE       = 70;    // 彈簧拳傷害
+const JOSEPH_SPRING_DAMAGE       = 80;    // 彈簧拳傷害
 const JOSEPH_SPRING_STACK        = 2;     // 彈簧拳附加波紋層數
-const JOSEPH_ULTIMATE_UNLOCK     = 30.0;  // 進入波紋呼吸法後，經過多久解鎖SYO
+const JOSEPH_ULTIMATE_UNLOCK     = 25.0;  // 進入波紋呼吸法後，經過多久解鎖SYO
 const JOSEPH_ULTIMATE_RANGE      = 140;   // SYO 第一拳觸發距離
 const JOSEPH_ULTIMATE_COOLDOWN   = 14.0;  // SYO 每次發動（不論命中與否）後的CD
 const JOSEPH_ULTIMATE_FIRST_DMG  = 20;    // SYO 第一拳傷害
@@ -586,8 +623,8 @@ const RIPPLE_BURST_DAMAGE        = 30;    // 波紋層數：爆裂傷害
 
 // 史蒂夫常數
 const STEVE_MAX_PHASE        = 4;     // 最高裝備階段
-const STEVE_GATHER_DURATION  = 1;   // 資源收集持續時間（秒）
-const STEVE_GATHER_COOLDOWN  = 4;   // 升級後，下次可再收集的CD（秒）
+const STEVE_GATHER_DURATION  = 0.5;   // 資源收集持續時間（秒）
+const STEVE_GATHER_COOLDOWN  = 3;   // 升級後，下次可再收集的CD（秒）
 const STEVE_SWORD_DMG   = [10, 15, 20, 25, 30];      // 各階段「劍」碰撞傷害（索引=階段）
 const STEVE_AXE_DMG     = [0, 100, 125, 150, 175];      // 各階段「斧」主動劈砍傷害
 const STEVE_AXE_CHARGE  = [0, 0.2, 0.2, 0.2, 0.1];  // 斧蓄力時間（秒）
@@ -613,8 +650,8 @@ const STEVE_ELYTRA_THRUST_DMG = 100; // 鞘翅第三擊：茅穿刺傷害
 // 妲己（九尾妖狐）
 const DAJI_TAIL_MAX          = 9;      // 尾巴上限，集滿觸發被動
 const DAJI_FIRE_INTERVAL     = 3.0;    // 鬼火（普攻）發射間隔
-const DAJI_FIRE_DAMAGE       = 40;     // 鬼火傷害
-const DAJI_FIRE_SPEED        = 200;    // 鬼火飛行速度
+const DAJI_FIRE_DAMAGE       = 50;     // 鬼火傷害
+const DAJI_FIRE_SPEED        = 250;    // 鬼火飛行速度
 const DAJI_FIRE_RADIUS       = 8;      // 鬼火判定半徑
 const DAJI_FIRE_TURN_RATE    = 2.4;    // 鬼火追蹤轉向速率（弧度/秒）
 const DAJI_FIRE_LIFESPAN     = 5.0;    // 鬼火存在時間（秒）
@@ -629,13 +666,13 @@ const DAJI_MELEE_STUN_ENH    = 1.0;    // 被動強化後的暈眩時間（秒�
 const DAJI_MELEE_KNOCKBACK   = 240;    // 強化普攻擊退力道
 const DAJI_MELEE_RANGE       = RADIUS * 2 + 4; // 魅惑近戰可攻擊距離（需大於球球碰撞分離距離 RADIUS*2，否則永遠碰不到）
 const DAJI_TAILSWING_DUR     = 0.35;   // 揮尾巴特效持續時間
-const DAJI_SKILL2_CD         = 9.0;    // 技能二CD
+const DAJI_SKILL2_CD         = 8.0;    // 技能二CD
 const DAJI_BALL_BASE_DMG     = 90;     // 法術球基礎傷害
 const DAJI_BALL_DMG_PER_TAIL = 10;     // 每條尾巴額外傷害
 const DAJI_BALL_MAX_DMG      = 180;    // 法術球最高傷害
 const DAJI_BALL_BASE_RADIUS  = 8;      // 法術球基礎半徑
 const DAJI_BALL_MAX_RADIUS   = 20;     // 法術球最大半徑（強化/滿尾巴）
-const DAJI_BALL_SPEED        = 300;    // 法術球飛行速度
+const DAJI_BALL_SPEED        = 360;    // 法術球飛行速度
 const DAJI_ENH_CHANNEL_TIME  = 1.5;    // 強化技能二：原地蓄力時間
 const DAJI_ENH_HEAL          = 100;    // 釋放強化技能時恢復生命值
 
@@ -665,9 +702,9 @@ const WUXING_TRANSFORM_HEAL     = 100; // 無形：每次變身回血量
 // ── Sans🦴 專屬常數 ──
 const SANS_MAX_HP             = 23;    // 被動：次數血條，固定血量23
 const SANS_BONE_INTERVAL      = 1.0;   // 普攻「骨頭」冷卻
-const SANS_BONE_DAMAGE        = 10;     // 骨頭每次觸發傷害
+const SANS_BONE_DAMAGE        = 20;     // 骨頭每次觸發傷害
 const SANS_BONE_TICK          = 0.1;   // 骨頭每0.1秒觸發一次
-const SANS_BONE_SPEED         = 400;   // 骨頭飛行速度
+const SANS_BONE_SPEED         = 300;   // 骨頭飛行速度
 const SANS_BONE_LIFESPAN      = 2.5;   // 骨頭存在秒數
 const SANS_WALL_INTERVAL      = 5.0;   // 技能一「骨牆」冷卻
 const SANS_WALL_DAMAGE        = 25;    // 骨牆每0.1秒傷害
@@ -699,13 +736,13 @@ const PUCCI_SNAKE_DASH_SPEED    = 900;  // 白蛇衝刺／歸位速度(px/s)
 const PUCCI_SNAKE_STAB_DAMAGE   = 60;   // 白蛇刺擊傷害
 const PUCCI_SNAKE_ATTACK_CD     = 3;    // 白蛇出擊冷卻
 const PUCCI_SNAKE_HIT_RANGE     = RADIUS + 14; // 白蛇刺擊命中判定距離
-const PUCCI_CHANT_IDLE_DELAY    = 2;    // 白蛇多久沒出擊，普奇才開始唸密語
-const PUCCI_CHANT_LINE_TIME     = 0.4;  // 密語每句所需時間
+const PUCCI_CHANT_IDLE_DELAY    = 1.5;    // 白蛇多久沒出擊，普奇才開始唸密語
+const PUCCI_CHANT_LINE_TIME     = 0.3;  // 密語每句所需時間
 const PUCCI_CHANT_LINES = ['螺旋階梯','獨角仙','廢棄街道','無花果塔','獨角仙','苦傷道','獨角仙','特異點','喬托','天使','繡球花','獨角仙','特異點','秘密皇帝'];
 const PUCCI_BABY_SPEED          = 90;   // 綠色嬰兒爬行速度
 const PUCCI_BABY_CATCH_RANGE    = RADIUS + 20; // 嬰兒觸碰普奇判定距離
 const PUCCI_MOON_RADIUS         = 110;  // 新月重力圈半徑
-const PUCCI_MOON_GRAVITY_CD     = 0.8;    // 新月重力甩動冷卻
+const PUCCI_MOON_GRAVITY_CD     = 0.7;    // 新月重力甩動冷卻
 const PUCCI_MOON_WALLCLING_DUR  = 2.5;  // 新月甩飛落地後，貼牆限制移動的持續秒數
 const PUCCI_MOON_WALLCLING_SLOW = 0.25; // 貼牆限制移動期間的速度倍率
 const PUCCI_GRAVITY_DMG_PER_PX  = 0.6;  // 新月重力甩牆：每移動1px的傷害（獨立於Sans的骨牆重力，不會觸發骨牆）
@@ -763,10 +800,10 @@ const BAIE_FX_ZAIE_RING_COUNT       = 3;
 const BAIE_FX_SLASH_TRAIL_COUNT     = 7;
 const BAIE_FX_METEOR_RAY_COUNT      = 12;
 // ══════ 紅石青金石專屬常數 ══════
-const RSQJS_MAX_HP           = 700;    // 各自獨立血量
+const RSQJS_MAX_HP           = 750;    // 各自獨立血量
 const RSQJS_BOMB_CD          = 3.0;    // 炸藥冷卻
-const RSQJS_BOMB_FUSE        = 1.6;    // 炸藥丟出到引爆的時間
-const RSQJS_BOMB_THROW_SPD   = 260;    // 炸藥飛出速度
+const RSQJS_BOMB_FUSE        = 1.4;    // 炸藥丟出到引爆的時間
+const RSQJS_BOMB_THROW_SPD   = 280;    // 炸藥飛出速度
 const RSQJS_BOMB_RADIUS      = 120;    // 爆炸最大範圍(px)
 const RSQJS_BOMB_MAX_DMG     = 180;    // 爆炸中心最高傷害（受「傷害」附魔加成）
 const RSQJS_BOMB_MIN_DMG     = 40;     // 爆炸邊緣最低傷害
@@ -776,7 +813,7 @@ const RSQJS_APPLE_DURATION   = 5.0;    // 附魔金蘋果效果持續時間
 const RSQJS_BOOK_CD          = 3.0;    // 附魔書丟出冷卻
 const RSQJS_BOOK_THROW_SPD   = 280;    // 附魔書飛行速度
 const RSQJS_BOOK_LIFE        = 8.0;    // 附魔書落地後存活時間（過期消失）
-const RSQJS_BOOK_PICKUP_R    = 30;     // 撿書判定半徑(px)
+const RSQJS_BOOK_PICKUP_R    = 35;     // 撿書判定半徑(px)
 const RSQJS_WATER_INTERVAL   = 7.0;    // 水攻施放間隔
 const RSQJS_WATER_DURATION   = 4.0;    // 水域存在時間
 const RSQJS_WATER_RADIUS     = 120;    // 水域半徑(px)
@@ -941,7 +978,7 @@ const MINATO_KUNAI_SPEED           = 2200;  // 苦無飛行速度（飛得很快
 const MINATO_SLASH_CHARGE_TIME     = 0.15;  // 丟出苦無後蓄力時間
 const MINATO_SLASH_SPEED           = 1600;  // 飛雷神斬衝刺速度
 const MINATO_SLASH_DASH_RANGE      = 200;   // 飛雷神斬衝刺最長距離
-const MINATO_SLASH_DAMAGE          = 60;    // 飛雷神斬單段傷害
+const MINATO_SLASH_DAMAGE          = 62;    // 飛雷神斬單段傷害
 const MINATO_SLASH_MAX_COMBO       = 5;     // 飛雷神斬最大連段次數
 const MINATO_SLASH_COOLDOWN        = 3;     // 飛雷神斬CD（連段全部結束後才開始倒數）
 const MINATO_STAGE2_KUNAI_REQ      = 12;    // 觸發飛雷神二段所需牆上苦無數
@@ -1254,7 +1291,7 @@ const KINJI_JACKPOT_HEAL_PER_SECOND   = 150; // 回血速率翻倍
 const KINJI_PACHINKO_BALL_COOLDOWN    = 0.8;
 const KINJI_PACHINKO_BALL_DAMAGE      = 20;
 const KINJI_PACHINKO_BALL_HEAL        = 80; // 始動口回血翻倍
-const KINJI_PACHINKO_BALL_SPEED       = 400;
+const KINJI_PACHINKO_BALL_SPEED       = 460;
 const KINJI_PACHINKO_BALL_RADIUS      = 7;
 const KINJI_PACHINKO_BALL_LIFETIME    = 18.0;
 // KINJI_DOMAIN_DURATION_LIMIT 已在抽獎常數區集中定義。
@@ -1329,8 +1366,8 @@ const EW_SKILL3_COOLDOWN = 15.0; // 爆裂黎明完成後冷卻
 
 // ══════ 魔彈射手・奧提斯（Otis）專屬常數 ══════
 const OTIS_BASE_DAMAGE                 = 70;   // 魔彈基礎傷害
-const OTIS_LOCK_INTERVAL               = 2.0;  // 每次攻擊／鎖定間隔 3 秒
-const OTIS_PORTAL_DELAY                = 2.0;  // 鎖定後幾秒在目標旁開門並射擊
+const OTIS_LOCK_INTERVAL               = 2.2;  // 每次攻擊／鎖定間隔 3 秒
+const OTIS_PORTAL_DELAY                = 2.2;  // 鎖定後幾秒在目標旁開門並射擊
 const OTIS_PORTAL_TARGET_OFFSET          = 88.0; // 傳送門與目標中心的固定距離
 const OTIS_PORTAL_LIFE                 = 0.5; // 傳送門視覺壽命
 const OTIS_BULLET_SPEED                = 900;  // 魔彈飛行速度（px/s）

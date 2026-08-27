@@ -19,7 +19,7 @@ const DEFAULT_BOSS_ARENA_SIZE = 400;
 // DRAGON_HP 與所有 DRAGON_* 天慧龍 Boss 常數均集中在本檔；character_constants.js 不含天慧龍 Boss 數值。
 // 【快速調整區】天慧龍 Boss 血量
 // 只要修改下一行的數字即可調整天慧龍總血量。
-const DRAGON_HP = 20000;
+const DRAGON_HP = 30000;
 
 const DRAGON_ARENA_SIZE = 550;
 const DRAGON_RADIUS_MULT = 2.0;
@@ -95,7 +95,7 @@ const DEFAULT_BOSS_RADIUS     = RADIUS * 1.5;
 // 詛咒之王・真祖（Boss版）專屬常數 —— 與上面「詛咒之王」原版數值互相獨立，
 // 招式邏輯共用（type仍是'cursed'），但數值可在此單獨調整，不會影響一般版角色。
 // 初始值先複製自原版，之後可依實戰單獨改動。
-const BOSS_CURSE_SLASH_INTERVAL    = 4.0;   // 解：斬痕發動間隔（秒）
+const BOSS_CURSE_SLASH_INTERVAL    = 3.0;   // 解：斬痕發動間隔（秒）
 const BOSS_CURSE_SLASH_DAMAGE      = 150;   // 解：斬痕傷害
 const BOSS_CURSE_SLASH_SLOW_FACTOR = 0.6;   // 解：緩速倍率（剩幾成速度）
 const BOSS_CURSE_SLASH_SLOW_DUR    = 3.0;   // 解：緩速持續時間（秒）
@@ -126,7 +126,7 @@ const BOSS_CURSE_KAMADO_ZONE_DPS      = 30;   // 竈：燃燒地面每秒灼燒�
 // 宿儺每一條血都使用這個獨立絕對值；第一條歸零時才會進入原身宿儺。
 // 普通角色 MAX_HP 改動不會連動 Boss。
 const BOSS_SUKUNA_MAHORAGA_SPAWN_RATIO  = 0.50; // 第一條血降至此比例時召喚魔虛羅
-const BOSS_SUKUNA_P2_DOMAIN_HP          = 600;  // 原身宿儺再次展開御廚子的觸發血量
+const BOSS_SUKUNA_P2_DOMAIN_HP          = 800;  // 原身宿儺再次展開御廚子的觸發血量
 const BOSS_SUKUNA_WORLD_SLASH_CHANT_TIME = 3.0;   // 「龍鱗／反發／成雙之流星」逐詞詠唱時間
 const BOSS_SUKUNA_WORLD_SLASH_BLACKOUT   = 0.45;  // 詠唱完成後的全屏黑幕時間
 const BOSS_SUKUNA_WORLD_SLASH_STRIKE     = 0.85;  // 黑幕後超大斬擊亮起時間
@@ -147,7 +147,7 @@ const BOSS_BATTLE_ITEM_DAMAGE            = 'damage';
 const BOSS_SHINBU_CLEAVE_COOLDOWN       = 5.0;  // 神武解CD
 const BOSS_SHINBU_CLEAVE_COUNT          = 8;    // 每輪隨機雷擊區塊數量
 const BOSS_SHINBU_CLEAVE_DAMAGE         = 50;   // 單一雷擊傷害
-const BOSS_SHINBU_CLEAVE_RADIUS         = 30;   // 雷擊圓形傷害區半徑
+const BOSS_SHINBU_CLEAVE_RADIUS         = 40;   // 雷擊圓形傷害區半徑
 const BOSS_SHINBU_CLEAVE_WARN_DUR       = 0.55; // 雷擊預警秒數
 const BOSS_SHINBU_CLEAVE_PARALYZE       = 0.4;  // 麻痺秒數；與元素大師電圖騰 EM_ELEC_ENEMY_PARALYZE 相同
 
@@ -162,12 +162,12 @@ const BOSS_SUKUNA_DRY_POWDER_INITIAL_DELAY  = 4.0;  // 第一條血開始後首�
 const BOSS_SUKUNA_DRY_POWDER_THROW_SPEED    = 360;  // 滅火器投擲速度（px/s）
 const BOSS_SUKUNA_DRY_POWDER_FUSE           = 0.5; // 飛行後爆開前的時間
 const BOSS_SUKUNA_DRY_POWDER_RADIUS         = 112;  // 乾粉區域半徑（px）
-const BOSS_SUKUNA_DRY_POWDER_DURATION       = 3.5;  // 乾粉區域持續時間（秒）
+const BOSS_SUKUNA_DRY_POWDER_DURATION       = 3.0;  // 乾粉區域持續時間（秒）
 const BOSS_SUKUNA_DRY_POWDER_BLAST_LIFE     = 0.65; // 爆開視覺持續時間（秒）
 
 // 魔虛羅：本體、法輪適應與退魔之劍。
 const MAHORAGA_RADIUS                   = RADIUS * 1.7;
-const MAHORAGA_MAX_HP                   = 1500;
+const MAHORAGA_MAX_HP                   = 1800;
 const MAHORAGA_WHEEL_ROTATE_TIME        = 30;
 const MAHORAGA_HIT_REDUCE_PER_ADAPT     = 1;    // 每次受傷使該圈法輪冷卻額外-1秒
 const MAHORAGA_ROTATE_HEAL              = 200;
@@ -185,7 +185,80 @@ const MAHORAGA_ATTACK_FX_RADIUS         = 32;
 const MAHORAGA_SWORD_LENGTH             = 92;   // 退魔之劍刺擊伸出長度（px）
 const MAHORAGA_SWORD_WIDTH              = 13;   // 退魔之劍劍身寬度（px）
 
-// Boss 專用戰鬥參數必須在所有 BOSS_CURSE_* 常數宣告後才建立，避免 TDZ 初始化錯誤。
+// ═══════ 幻影小隊／幻影將軍 Boss（雙階段＋領域決鬥） ═══════
+// 第一階段是三名各自可復活一次的 Boss 成員；第二階段由同一 Boss 球轉化為將軍。
+// 暫時隱藏公開入口，但保留完整程式與數值，日後改為 false 即可恢復。
+const PHANTOM_BOSS_HIDDEN = true;
+const PHANTOM_ARENA_SIZE                 = 500;
+const PHANTOM_DOMAIN_SIZE                = 380;
+const PHANTOM_SHIELD_HP                  = 2000;
+const PHANTOM_SHIELD_DAMAGE_REDUCE       = 0.25;
+const PHANTOM_SHIELD_BASH_DAMAGE         = 100;
+const PHANTOM_SHIELD_BASH_COOLDOWN       = 1.1;
+const PHANTOM_SHIELD_BASH_KNOCKBACK      = 360;
+const PHANTOM_SHIELD_INVULN              = 0.2;
+const PHANTOM_ARCHER_HP                  = 1500;
+const PHANTOM_ARCHER_VOLLEY_INTERVAL     = 2.5;
+const PHANTOM_ARCHER_BASE_ARROWS         = 6;
+const PHANTOM_ARCHER_EXTRA_ARROWS        = 2;
+const PHANTOM_ARCHER_ARROW_DAMAGE        = 100;
+const PHANTOM_ARCHER_ARROW_VULN          = 0.5;
+const PHANTOM_ARCHER_ARROW_VULN_DUR      = 2.0;
+const PHANTOM_ARCHER_DEATH_ARROWS        = 20;
+const PHANTOM_ARCHER_DEATH_ARROW_DAMAGE  = 75;
+const PHANTOM_CAVALRY_HP                 = 1000;
+const PHANTOM_CAVALRY_SPEED_MULT         = 2.5;
+const PHANTOM_CAVALRY_CHARGE_DAMAGE      = 100;
+const PHANTOM_CAVALRY_BLEED_DAMAGE       = 50;
+const PHANTOM_CAVALRY_COMBO_DAMAGE       = 200;
+const PHANTOM_CAVALRY_CHARGE_COOLDOWN    = 0.65;
+const PHANTOM_CAVALRY_COMBO_WINDOW       = 1.0;
+const PHANTOM_CAVALRY_REST_HITS          = 5;
+const PHANTOM_CAVALRY_REST_DURATION      = 3.0;
+const PHANTOM_CAVALRY_REST_HEAL          = 150;
+const PHANTOM_CAVALRY_REST_VULN          = 0.25;
+const PHANTOM_CAVALRY_DEATH_STUN         = 1.5;
+const PHANTOM_MEMBER_REVIVES             = 1;
+// 復活先進入 1.6 秒靈魂重組與無敵階段，避免只閃一下就完成。
+const PHANTOM_MEMBER_REVIVE_DELAY        = 1.6;
+const PHANTOM_MEMBER_REVIVE_VFX_DURATION  = 1.9;
+const PHANTOM_GENERAL_HP                 = 3600;
+const PHANTOM_GENERAL_DAMAGE_REDUCE      = 0.58;
+const PHANTOM_GENERAL_SPEED_MULT         = 2.0;
+// 將軍沿預設王駕路線巡行；路線只依場地尺寸，不讀取玩家座標。
+const PHANTOM_GENERAL_MARCH_SPEED       = 185;
+const PHANTOM_GENERAL_MARCH_INTERVAL    = 1.55;
+const PHANTOM_GENERAL_MARCH_PAUSE       = 0.12;
+const PHANTOM_GENERAL_CONTACT_DAMAGE     = 145;
+const PHANTOM_GENERAL_CONTACT_COOLDOWN   = 0.58;
+const PHANTOM_GENERAL_SLASH_COOLDOWN     = 4.2;
+const PHANTOM_GENERAL_SLASH_KNOCKBACK    = 380;
+const PHANTOM_GENERAL_SLASH_STUN         = 0.55;
+const PHANTOM_GENERAL_SLASH_FIRST_DAMAGE  = 140;
+const PHANTOM_GENERAL_SLASH_SECOND_DAMAGE = 330;
+const PHANTOM_GENERAL_SLASH_CHARGE       = 1.0;
+const PHANTOM_GENERAL_MISS_REST          = 5.0;
+const PHANTOM_GENERAL_MISS_HEAL          = 300;
+const PHANTOM_GENERAL_ARROW_INTERVAL     = 1.5;
+const PHANTOM_GENERAL_ARROW_COUNT        = 3;
+const PHANTOM_GENERAL_COMMAND_INTERVAL   = 3.25;
+const PHANTOM_GENERAL_COMMAND_CHARGE     = 0.62;
+const PHANTOM_GENERAL_ARROW_DAMAGE       = 135;
+const PHANTOM_GENERAL_ARROW_BLEED        = 70;
+const PHANTOM_GENERAL_ARROW_SPLIT_DAMAGE = 50;
+const PHANTOM_GENERAL_DOMAIN_THRESHOLD   = 1000;
+// 領域內維持 25% 減傷；將軍以進域前剩餘生命承接前半場輸出，不會重新灌滿。
+const PHANTOM_DOMAIN_GENERAL_REDUCE      = 0.25;
+const PHANTOM_DOMAIN_ENTRY_DURATION     = 2.0;
+const PHANTOM_DOMAIN_FIGHTER_REVIVE_TIME = 10.0;
+const PHANTOM_DOMAIN_FIGHTER_REVIVE_BONUS = 0.10;
+const PHANTOM_DOMAIN_FIGHTER_REVIVE_REDUCE = 1.0;
+const PHANTOM_FIGHT_SPIRIT_MAX           = 3;
+const PHANTOM_FIGHT_SPIRIT_CONTACT       = 1;
+const PHANTOM_FIGHT_SPIRIT_STORE_RATIO   = 0.5;
+const PHANTOM_FIGHT_SPIRIT_CONSUME       = 2;
+
+// Boss 專用戰鬥參數必須在所有 BOSS_CURSE_* 常數宣告後才建立，避免 TDZ 初始化錯誤.
 const BOSS_CURSE_STATS = {
   SLASH_INTERVAL: BOSS_CURSE_SLASH_INTERVAL, SLASH_DAMAGE: BOSS_CURSE_SLASH_DAMAGE,
   SLASH_SLOW_FACTOR: BOSS_CURSE_SLASH_SLOW_FACTOR, SLASH_SLOW_DUR: BOSS_CURSE_SLASH_SLOW_DUR,

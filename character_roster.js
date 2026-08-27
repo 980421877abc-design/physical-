@@ -83,8 +83,8 @@ tiger:['你那同情我的態度真是令人作嘔，這只顯得你很懦弱。
   {
   id: 'yi', emoji: '⚫', weapon: '⬜', name: '奕',
   desc: '​「天地為局，眾生為子。這一步，你待如何？」​驚才絕艷的曠世棋聖。在他眼中，世間萬物的運作、戰場的廝殺，都不過是縱橫十九道棋路線上的博弈。',
-  stats: ['本手', '圍斃', '運籌帷幄',],
-  skills: [`本手：放置黑棋於對手位置，每顆${YI_BLACK_DAMAGE}傷害，CD${YI_BLACK_INTERVAL}s。`, `圍斃：黑棋放滿${YI_BLACK_MAX}顆後於中心落白棋，引爆造成${YI_WHITE_DAMAGE}傷害。`, `「運籌帷幄」：血量降至${YI_ARENA_HP}時，於敵方四周設下領域封鎖退路。`],
+  stats: ['連星', '天下劫', '料敵先機', '取勢'],
+  skills: [`普攻「連星」：每${YI_BLACK_INTERVAL}s在最靠近敵人的格線交叉點落下兩枚棋，第二枚依上→右→下→左貼鄰；相鄰後永久激活，敵人碰到會沿既有連線引爆，每枚${YI_MINE_DAMAGE}傷害。`, `技能「天下劫」：奕生命低於600或進入戰場${YI_HEAVEN_FORCE_TIME}s未施放時觸發。奕獲得5枚「神之一手」每${YI_HEAVEN_PLACE_INTERVAL}s開始；先落中心棋，再每${YI_HEAVEN_STONE_INTERVAL}s依序落下四方附棋，附棋與中心相隔一格空交叉點，全部落完後還需等待${YI_STONE_ACTIVATION_DELAY}s才激活，敵人進入棋子爆炸範圍後每顆棋子引爆造成${YI_HEAVEN_DAMAGE}傷害，CD${YI_HEAVEN_COOLDOWN}s。`, `被動「料敵先機」：棋子激活時，連續直線上的每枚棋子使該棋子傷害+${Math.round(YI_LINK_DAMAGE_BONUS * 100)}%，最多${YI_LINK_MAX_STACKS}層。`, `被動「取勢」：奕造成傷害後，令敵人緩速${Math.round((1 - YI_ADVANTAGE_SLOW_FACTOR) * 100)}% ${YI_ADVANTAGE_SLOW_DURATION}s。`],
   color: '#e8e8e8', glowColor: 'rgba(232,232,232,0.6)', type: 'yi',
   winQuote: '神之一手！。',
   loseQuote: '我算漏了？。'
@@ -92,8 +92,8 @@ tiger:['你那同情我的態度真是令人作嘔，這只顯得你很懦弱。
   {
   id: 'gunner', emoji: '🔫', weapon: '💥', name: '無名槍手',
   desc: '​「在我的槍口前，每個人都只有一秒的時間後悔。」​游走在法律與罪惡邊緣的頂尖槍手。沒有人知道他的真名，只知道當他的皮靴馬刺聲響起，就代表死神的腳步近了。',
-  stats: [  '連射 8s', ' 閃光彈'],
-  skills: [`被動：每次撞牆裝彈${GUNNER_MAG_count}發，上限${GUNNER_MAG_SIZE}發。`, `主動：累積足夠子彈後停下連射，每發${GUNNER_BULLET_DAMAGE}傷害。`, `閃光彈：每${GUNNER_FLASH_INTERVAL}秒投擲一次，造成${GUNNER_FLASH_DAMAGE}範圍傷害，並凍結對手攻擊與技能冷卻 ${GUNNER_FLASH_COOLDOWN_FREEZE_DUR}秒。`],
+  stats: [  '連射', '額外裝填', '閃光彈'],
+  skills: [`被動：每次撞牆裝彈${GUNNER_MAG_count}發，上限${GUNNER_MAG_SIZE}發；額外：每${GUNNER_EXTRA_RELOAD_INTERVAL}s裝填${GUNNER_EXTRA_RELOAD_COUNT}發，仍受彈夾上限限制。`, `原本連射：累積足夠子彈後停下連射，每發${GUNNER_BULLET_DAMAGE}傷害。`, `原本閃光彈：每${GUNNER_FLASH_INTERVAL}s投擲，造成${GUNNER_FLASH_DAMAGE}範圍傷害並凍結攻擊與技能冷卻${GUNNER_FLASH_COOLDOWN_FREEZE_DUR}s；額外附加速度降至${Math.round(GUNNER_FLASH_SLOW_FACTOR * 100)}%，持續${GUNNER_FLASH_SLOW_DURATION}s。`],
   color: '#f0c84a', glowColor: 'rgba(184,134,11,0.6)', type: 'gunner',
   winQuote: '顆秒！！！！！！。',
   loseQuote: '……看來這次，慢了半拍。'
@@ -113,9 +113,9 @@ tiger:['你那同情我的態度真是令人作嘔，這只顯得你很懦弱。
   },
   {
   id: 'mage', emoji: '🎩', weapon: '🕊️', name: '魔術師',
-  desc: '神出鬼沒的舞台魔術師。定時丟出鴿子造成傷害，丟出後瞬間消失在場地另一處。每命中一定次數，下一顆鴿子附帶隨機「魔術技巧」！',
-  stats: ['鴿子', '瞬移','魔術技巧', ],
-  skills: ['鴿子：定時丟出鴿子，造成80傷害，CD1.25s，丟出後瞬移至場地另一處。', '技能：每命中3次後，下一顆鴿子附帶隨機魔術技巧——回血／反彈／追蹤／定身其一。'],
+  desc: '神出鬼沒的舞台魔術師。定時施展「無中生有」，隨機變出其他角色的投射物；所有變出的投射物都能承載魔術技巧。施放後瞬間消失到場地另一處。',
+  stats: ['無中生有', '瞬移', '魔術技巧'],
+  skills: [`無中生有：每${MAGE_DOVE_INTERVAL}s隨機發射神奇的物品。`, `魔術技巧：每命中${MAGE_TRICK_HIT_COUNT}次，下一發無中生有投射物附帶回血／反彈／追蹤／定身其一。`],
   color: '#9b59b6', glowColor: 'rgba(155,89,182,0.6)', type: 'mage',
   winQuote: '好戲開演！！！！。',
   loseQuote: '幻夢隨雲散去，魔術落幕。'
@@ -124,7 +124,7 @@ tiger:['你那同情我的態度真是令人作嘔，這只顯得你很懦弱。
   id: 'thunder', emoji: '⚡', weapon: '🌩️', name: '雷電法王',
   desc: '「凡人，見識過真正的『天罰』嗎？」​誕生於萬雷交加之夜的雷霆化身。他性格狂暴、傲慢，視世間萬物為導電的媒介。',
   stats: ['閃電柱', '麻痺', ],
-  skills: ['閃電柱：碰到牆壁時留下閃電柱，上限7柱。', '閃電：閃電柱間每1於不同牆面產生閃電CD1.8s，每道閃電造成20傷害。', '麻痺：被閃電擊中有15%機率麻痺，使敵人定身並中斷攻擊。'],
+  skills: ['閃電柱：碰到牆壁時留下閃電柱，上限8柱。', '閃電：閃電柱間每1於不同牆面產生閃電CD1.8s，每道閃電造成20傷害。', '麻痺：被閃電擊中有15%機率麻痺，使敵人定身並中斷攻擊。'],
   color: '#f1c40f', glowColor: 'rgba(241,196,15,0.6)', type: 'thunder',
   winQuote: '以雷霆擊碎黑暗！。',
   loseQuote: '……天罰，竟也降在了我自己身上。'
@@ -146,7 +146,7 @@ tiger:['你那同情我的態度真是令人作嘔，這只顯得你很懦弱。
   desc: '​「別隨便碰我，雜魚的弱者臭味會傳染的。」​咒術界名門「禪院家」的嫡子。擁有極致的天賦與高傲的血統，唯我獨尊，視弱者與女性如草芥。除了心中崇拜的那位「暴君」外，他不把任何人放在眼裡。',
   stats: ['投射法術', '凶星軌跡'],
   skills: [
-    `投射法術：預定好行動軌跡時沿途留下殘影分身，上限${NAOBITO_SHADOW_MAX}個；敵人碰到殘影造成${NAOBITO_SHADOW_DAMAGE}傷害，CD${NAOBITO_PATH_INTERVAL}s。`,
+    `投射法術：預定好行動軌跡時沿途留下殘影分身，上限${NAOBITO_SHADOW_MAX}個；直哉沿路徑移動時可穿透角色，碰到對手會使對手定身${NAOBITO_CONTACT_IMMOBILIZE_DURATION}s；敵人碰到殘影造成${NAOBITO_SHADOW_DAMAGE}傷害，CD${NAOBITO_PATH_INTERVAL}s。`,
     `「凶星軌跡」：累積${NAOBITO_KYOUSEI_THRESHOLD}個殘影時自動觸發，所有殘影與本體同時衝向敵人，造成${NAOBITO_KYOUSEI_PIERCE_DMG}+殘影${NAOBITO_KYOUSEI_SHADOW_DMG}×N傷害。`,
   ],
   color: '#e8e8f0', glowColor: 'rgba(220,220,255,0.6)', type: 'naoya',
@@ -160,8 +160,8 @@ oniichan: '能力比弟弟還差的哥哥沒有存在的意義吧',
   {
   id: 'itachi', emoji: '🐦‍⬛', weapon: '🔥', name: '宇治波鼬',
   desc: '​「無論村子有多麼黑暗，我都是木葉的宇智波鼬。」​背負著背叛者之名，隱匿於陰影中的孤高忍者。他將一切情感與光明埋葬在血色之夜，只為在暗處守護心愛的弟弟與村子的和平。',
-  stats: ['天照 50 / 引爆120', '月讀', '須佐能乎 減傷害50%', '烏鴉替身'],
-  skills: ['「天照」：發射黑炎並附加標記，命中50傷害，標記引爆改為造成120傷害CD2s。', '「月讀」：使敵人定身2sCD7s。', '「須佐能乎」：血量降至500時自動觸發，攻擊改為近戰50傷害並恢復30血，減傷害50%。', '替身：瀕死時化作烏鴉逃離並回復150血量，每場一次。'],
+  stats: [`天照 ${ITACHI_AMATERASU_DAMAGE}／下次傷害+${ITACHI_AMATERASU_NEXT_DAMAGE_BONUS}`, '月讀', '須佐能乎 減傷害50%', '烏鴉替身'],
+  skills: [`「天照」：發射黑炎，命中造成${ITACHI_AMATERASU_DAMAGE}傷害，並使目標下次受到的傷害固定增加${ITACHI_AMATERASU_NEXT_DAMAGE_BONUS}點，CD${ITACHI_AMATERASU_INTERVAL}s。`, `「月讀」：使敵人定身${ITACHI_TSUKUYOMI_PIN_DUR}sCD${ITACHI_TSUKUYOMI_INTERVAL}s。`, '「須佐能乎」：血量降至500時自動觸發，攻擊改為近戰50傷害並恢復30血，減傷害50%。', `替身：瀕死時化作烏鴉瞬移到戰場某處並回復${ITACHI_CROW_HEAL}血量，每場一次。`],
   color: '#8b0000', glowColor: 'rgba(139,0,0,0.6)', type: 'itachi',
   winQuote: '沉浸在幻術的海洋之中吧。',
   loseQuote: '原諒我，這是最後一次了。'
@@ -259,9 +259,9 @@ oniichan:'大哥，謝謝你'
   },
   {
   id: 'fisherman', emoji: '🎣', weapon: '🪝', name: '釣魚佬',
-  desc: '每隔一段時間向場地邊緣拋出魚鉤，依照釣上來的魚觸發效果，願者上鉤！',
-  stats: ['釣魚', '魚', '鯊魚', '首領魚', '大海'],
-  skills: ['釣魚：向場地邊緣拋出魚鉤釣魚（CD1.2秒）。', '魚：造成30點傷害，延遲1秒後再造成50點傷害','鯊魚：造成70傷害並附70點dot傷害','首領魚：連續丟出大量魚總共240點傷害','大海：由側邊連續出現7道海浪（每道70傷），並衝向對手甩到牆上','機率：魚: 30, 鯊魚: 8, 空軍: 6, 首領魚:4 , 大海: 2'],
+    desc: '每隔一段時間向場地邊緣拋出魚鉤，依照釣上來的魚觸發效果；空軍越多，後續釣魚越快，願者上鉤！',
+    stats: ['釣魚', '魚', '鯊魚', '首領魚', '大海', '空軍獎勵'],
+    skills: [`釣魚：向場地邊緣拋出魚鉤釣魚（基礎 CD ${FISHER_CAST_COOLDOWN.toFixed(1)} 秒）。`, '魚：造成30點傷害，延遲1秒後再造成50點傷害','鯊魚：造成70傷害並附70點dot傷害','首領魚：連續丟出大量魚總共240點傷害','大海：由側邊連續出現7道海浪（每道70傷），並衝向對手甩到牆上',`被動「空軍獎勵」：每次釣到空軍，後續釣魚冷卻減少 ${FISHER_AIRFORCE_CD_REDUCTION.toFixed(1)} 秒，可疊加至本場最低 ${FISHER_MIN_CAST_COOLDOWN.toFixed(1)} 秒，效果只持續本場戰鬥，戰鬥結束後重置。`,'機率：魚: 30, 鯊魚: 8, 空軍: 6, 首領魚:4 , 大海: 2'],
   color: '#4a90d9', glowColor: 'rgba(74,144,217,0.6)', type: 'fisherman',
   winQuote: ['只要相信海，海就會幫你。','聽海哭的聲音。','他說風雨中這點痛算什麼。'],
   loseQuote: '……這次，是我被釣走了。',
@@ -367,7 +367,7 @@ oniichan:'大哥，謝謝你'
     stats: ['完美閃避','骨牆','龍骨砲'],
     skills: [
       '被動「完美閃避」：血量固定為23點，無論實際傷害多少，每次受傷固定只扣1點，無視場地效果。',
-      '普攻「骨頭」：朝敵人射出一根骨頭，貫穿敵人，每0.1秒造成10點傷害，冷卻1秒。',
+      '普攻「骨頭」：朝敵人射出一根骨頭，貫穿敵人，每0.1秒造成20點傷害，冷卻1秒。',
       '技能一「骨牆」：隨機從地圖上/下/左/右其中一側生成一排骨頭（長度約邊長1/3），並平移至對面牆壁，碰到的敵人每0.1秒受到30點傷害，冷卻5秒。',
       '重力：每使用兩次骨牆，會在第二次發動時額外將敵人強制往上下左右其中一方向拖走，敵人因此撞牆時依移動距離受到傷害。',
       '技能二「龍骨砲」：從地圖外朝敵人方向射出一道大型光束，造成35點傷害，冷卻8秒。',
@@ -519,7 +519,7 @@ oniichan:'大哥，謝謝你'
       `「飛雷神二段」：牆上苦無累積${MINATO_STAGE2_KUNAI_REQ}把以上時觸發，額外丟出一把苦無後，在所有苦無間高速移動，每次移動對路途上的敵人造成${MINATO_STAGE2_HIT_DAMAGE}傷害，結束後收回所有苦無並進入${MINATO_PARRY_DURATION}秒「防反」狀態。`,
       `防反狀態：受到攻擊時無效該傷害，並瞬移到攻擊者身旁一腳踢出，造成${MINATO_PARRY_KICK_DAMAGE}傷害與擊退，之後解除防反。`,
       `「螺旋丸」：CD${MINATO_RASENGAN_COOLDOWN}s，衝向敵人造成${MINATO_RASENGAN_DAMAGE}傷害與擊退；若在防反狀態中發動，則改為瞬移到敵人身旁抓住敵人後轟出螺旋丸，造成${MINATO_RASENGAN_PARRY_DAMAGE}傷害並提前結束防反。發動螺旋丸時，飛雷神斬CD暫停倒數直到螺旋丸結束。`,
-      `【被動】「金色閃光」：受到攻擊時瞬移到場上隨機一把苦無位置，並額外朝敵人丟出一把苦無，CD${MINATO_PASSIVE_COOLDOWN}s。苦無本身沒有傷害，僅作為飛雷神的位移標記。`,
+      `被動「金色閃光」：受到攻擊時瞬移到場上隨機一把苦無位置，並額外朝敵人丟出一把苦無，CD${MINATO_PASSIVE_COOLDOWN}s。苦無本身沒有傷害，僅作為飛雷神的位移標記。`,
           ],
     color: '#f4d35e', glowColor: 'rgba(244,211,94,0.6)', type: 'minato',
     winQuote:['雖然是對手，但你還不賴。','多少了解金色閃光的由來了嗎？','背負火影之名！我不能輸！'],
@@ -649,7 +649,7 @@ vsQuotes: {
   {
     id: 'otis', emoji: '🔮', weapon: '🔫', name: '魔彈射手・奧提斯',image: 'image/otis.png',
 
-    desc: `「這枚神奇的子彈，能命中你指定的任何目標。」為了追求更極致、絕不落空的絕對力量，他選擇與深淵中的惡魔簽訂契約。惡魔給了他七發魔彈，前六發能隨心所欲擊中任何目標，在絕望與詛咒中，獵人迷失了自我，徘徊到這裡。`,
+    desc: `為了追求更極致、絕不落空的絕對力量，他選擇與深淵中的惡魔簽訂契約。惡魔給了他七發魔彈，前六發能隨心所欲擊中任何目標，在絕望與詛咒中，獵人迷失了自我，徘徊到這裡。`,
     stats: ['射擊開始', '必中', '致命的子彈', '七發循環'],
     skills: [
       `「射擊開始」：每${OTIS_LOCK_INTERVAL}秒進行一次攻擊／鎖定。鎖定期間不會提前生成傳送門，只顯示由${OTIS_FX_RETICLE_START_RADIUS}px收束至${OTIS_FX_RETICLE_END_RADIUS}px的準心；倒數完成的射擊瞬間才在目標外側${OTIS_PORTAL_TARGET_OFFSET}px生成固定尺寸深藍傳送門並射出魔彈。每7發後重新計數。`,
