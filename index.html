@@ -1948,18 +1948,26 @@ if (FIREBASE_CONFIG.databaseURL) {
   } catch (e) { console.warn('勝率榜初始化失敗', e); }
 }
 
-// 對戰結束時呼叫：把這場戰鬥裡每個角色的勝/敗各 +1 寫回雲端
+// 勝率榜「賽季」版本號：每次對角色做大幅度調整（大量加強/削弱），把這個字串改成新版本
+// （例如 'v2' -> 'v3'），舊賽季的勝敗數字會原封不動保留在雲端 charStats/v2 底下，
+// 不會被刪除，只是排行榜和統計改成只看新賽季 charStats/v3 之後累積的場次，
+// 避免舊數值繼續污染改版後的平衡判斷。若之後想找回舊賽季數據，直接查雲端
+// charStats/<舊版本號> 底下的路徑即可，資料仍在。
+const WINRATE_SEASON = 'v2';
+
+// 對戰結束時呼叫：把這場戰鬥裡每個角色的勝/敗各 +1 寫回雲端（寫入當前賽季底下）
 function recordCharacterResult(charId, won) {
   // 自組機器人屬於零件組裝玩法，不納入角色強度勝率統計。
   if (!winRateDB || !charId || charId === 'custom_assembled') return;
-  const ref = winRateDB.ref(`charStats/${charId}/${won ? 'wins' : 'losses'}`);
+  const ref = winRateDB.ref(`charStats/${WINRATE_SEASON}/${charId}/${won ? 'wins' : 'losses'}`);
   ref.transaction(cur => (cur || 0) + 1);
 }
 
 // 讀取所有角色的勝率榜，callback(rows) 其中 rows = [{id, wins, losses, total, rate}], 依勝率高→低排序
+// 只讀取當前賽季（WINRATE_SEASON）的資料，不會顯示舊賽季的殘留數字。
 function fetchWinRateBoard(callback) {
   if (!winRateDB) { callback([]); return; }
-  winRateDB.ref('charStats').once('value')
+  winRateDB.ref(`charStats/${WINRATE_SEASON}`).once('value')
     .then(snap => {
       const data = snap.val() || {};
       const rows = Object.keys(data).map(id => {
@@ -7574,10 +7582,6 @@ function dealDamage(target, dmg, options = {}) {
   if (flatAttacker && !bypassDefense && flatAttacker.otisDamagePenalty > 0) rawAmount = Math.max(0, rawAmount - flatAttacker.otisDamagePenalty);
   if (target.otisDamageTakenBonus > 0 && !bypassDefense) rawAmount += target.otisDamageTakenBonus;
   if (target.otisVulnStacks > 0 && !bypassDefense) rawAmount *= 1 + Math.min(OTIS_VULN_MAX_STACKS, target.otisVulnStacks) * OTIS_VULN_PER_STACK;
-  // Sans 被動「次數血條」：無論實際傷害多少，每次受傷固定只扣1點（真正的系統殺 bypassParry 除外）
-  if (target.char && target.char.type === 'sans' && !bypassDefense) {
-    rawAmount = Math.min(rawAmount, 1);
-  }
   // 夏油條被動「護身」：特級咒靈承擔夏油條所受30%傷害（直接分擔在特級咒靈血量上）
   // 注意：必須在「傷害封頂於目前血量」之前扣除護身部分，否則致命一擊永遠會被護身分走一小部分，
   // 導致 actual 永遠小於 target.hp，血量只會無限趨近於 0 卻永遠扣不完（卡血無法擊敗的bug）。
@@ -7625,6 +7629,12 @@ function dealDamage(target, dmg, options = {}) {
     }
   }
   rawAmount = consumeItachiNextDamageBonus(target, rawAmount, bypassDefense);
+  // Sans 被動「次數血條」：無論實際傷害多少（包含天照印記等後續疊加的固定加成），
+  // 每次受傷固定只扣1點（真正的系統殺 bypassParry 除外）。必須放在天照印記結算之後，
+  // 否則印記的+50會在夾值之後才疊加，讓Sans被動遭到繞過。
+  if (target.char && target.char.type === 'sans' && !bypassDefense) {
+    rawAmount = Math.min(rawAmount, 1);
+  }
   let actual = Math.min(target.hp, rawAmount);
   // 阿梅被動「懷錶」：本體血量即將到達開場抽取的數字時，從時間線消失並判定該玩家敗北。
   // 召喚阿梅以 ameliaWatchEnabled=false 建立，因此不會觸發同一被動。
