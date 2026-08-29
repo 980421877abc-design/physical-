@@ -10345,6 +10345,40 @@ function tick(now) {
     playHitSound('opm');
   }
 
+  // ── 沙盒重生：角色陣亡時若還有剩餘重生次數，用 makeBall 重新生成一顆全新的球 ──
+  // 特地用全新物件而不是把舊球血量補回去：呼吸法／元素奧義／爆裂黎明／天下劫／幻獸琥珀
+  // 這類「進場後累積XX秒才解鎖」的技能，計時欄位都是在 makeBall() 建立當下才初始化，
+  // 直接復活舊物件的話這些計時器（以及對應是否已解鎖的旗標）會維持死亡前的進度，
+  // 等於重生等於「無縫接續」而不是「重新登場」。改成整顆重建，就能讓這些技能
+  // 一律以「這次重生／進場」重新起算，行為統一成單純的進場時間。
+  // 放在淘汰判定（下面的 outcomeDeadMap）之前執行，讓新球在同一幀就有 hp>0，
+  // 不會被判定為「這隊已經團滅」而提早結束比賽。
+  if (sandboxMode) {
+    const respawnPairs = [];
+    for (const d of dead) {
+      if (d.hp > 0) continue;
+      const left = d.sandboxRespawnsLeft || 0;
+      if (left <= 0) continue;
+      // 拉回場地中央附近重生，避免卡在死亡當下的邊界、陷阱或熔岩等危險位置
+      const rx = W / 2 + (Math.random() - 0.5) * Math.min(80, W * 0.2);
+      const ry = H / 2 + (Math.random() - 0.5) * Math.min(80, H * 0.2);
+      const moveAngle = Math.random() * Math.PI * 2;
+      const fresh = makeBall(rx, ry, Math.cos(moveAngle) * BASE_SPEED, Math.sin(moveAngle) * BASE_SPEED, d.char, d.player, d.twinRole);
+      fresh.sandboxRespawnsLeft = left - 1;
+      if (d.customMaxHp != null) { fresh.customMaxHp = d.customMaxHp; fresh.hp = d.customMaxHp; }
+      fresh.invincibleTimer = Math.max(fresh.invincibleTimer || 0, 0.8);
+      respawnPairs.push({ old: d, fresh });
+      state.hitFlashes.push({ x: rx, y: ry, r: 60, alpha: 1, color: (d.char && d.char.color) || '#8fd6ff', t: 0.5 });
+      state.damageNumbers.push({ x: rx, y: ry - 60, value: '重生！', color: '#8fd6ff', life: 1.0, maxLife: 1.0, scale: 1.15 });
+    }
+    if (respawnPairs.length > 0) {
+      const oldSet = new Set(respawnPairs.map(p => p.old));
+      state.balls = state.balls.filter(b => !oldSet.has(b)).concat(respawnPairs.map(p => p.fresh));
+      // 死魂靈的餘息等「進場觸發」被動：重新掃描一次，幫剛重生、目前身邊沒有召喚物的維什戴爾補上。
+      if (respawnPairs.some(p => p.fresh.char && p.fresh.char.type === 'ew')) initializeEwForBattle();
+    }
+  }
+
   // 以隊伍是否還有任何存活球作為淘汰依據；雙生只死一顆時仍可繼續戰鬥。
   const outcomeDeadMap = new Map();
   for (const d of dead) {
@@ -32370,6 +32404,11 @@ function sandboxInitUI() {
     #sandbox-char-grid{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;max-width:720px;max-height:60vh;overflow-y:auto;padding:10px}
     .sb-char-btn{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:10px 6px;width:80px;cursor:pointer;color:#eee;text-align:center;font-size:0.68rem;line-height:1.3}
     .sb-char-btn:active{background:rgba(255,160,60,0.3)}
+    .sb-chip .sb-gear{background:none;border:none;color:#8fd6ff;cursor:pointer;font-size:0.9rem;padding:0 2px}
+    #sandbox-member-modal{display:none;position:fixed;inset:0;background:rgba(5,3,2,0.85);z-index:420;align-items:center;justify-content:center}
+    #sandbox-member-modal .sb-member-box{background:#17121a;border:1px solid rgba(255,255,255,0.15);border-radius:14px;padding:18px;width:min(300px,88vw);display:flex;flex-direction:column;gap:12px}
+    #sandbox-member-modal label{font-size:0.78rem;color:#ccc;display:flex;flex-direction:column;gap:4px}
+    #sandbox-member-modal input{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);color:#fff;border-radius:6px;padding:6px 8px;font-size:0.9rem}
     .sb-num{width:78px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.2);color:#fff;border-radius:6px;padding:4px 6px;font-size:0.9rem}
     #sandbox-hud{display:none;width:min(700px,96vw);flex-wrap:wrap;gap:6px;justify-content:center;padding:6px 0;box-sizing:border-box}
     .sb-hud-team{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.35);border-radius:10px;padding:4px 10px;font-size:0.7rem;min-width:110px;color:#eee}
@@ -32416,6 +32455,16 @@ function sandboxInitUI() {
       <div id="sandbox-char-grid"></div>
       <button class="sb-btn" id="sandbox-char-modal-close">關閉</button>
     </div>
+
+    <div id="sandbox-member-modal">
+      <div class="sb-member-box">
+        <div id="sandbox-member-modal-title" style="font-weight:700;font-size:1rem;text-align:center;color:#eee"></div>
+        <label>血量（留空＝使用預設值）<input type="number" id="sandbox-member-hp" min="1" step="1"></label>
+        <label>重生次數（0＝陣亡即淘汰）<input type="number" id="sandbox-member-respawns" min="0" step="1"></label>
+        <div id="sandbox-member-modal-note" style="font-size:0.68rem;color:#e0a05c;line-height:1.4;display:none"></div>
+        <button class="sb-btn primary" id="sandbox-member-modal-close">完成</button>
+      </div>
+    </div>
   `;
   document.body.appendChild(wrap);
 
@@ -32448,7 +32497,7 @@ function sandboxInitUI() {
       btn.onclick = () => {
         if (sandboxPickerTargetTeamId == null) return;
         const team = sandboxTeams.find(t => t.id === sandboxPickerTargetTeamId);
-        if (team) team.members.push({ id: ch.id, hp: null });
+        if (team) team.members.push({ id: ch.id, hp: null, respawns: 0 });
         sandboxRenderTeams();
       };
       charGrid.appendChild(btn);
@@ -32457,6 +32506,11 @@ function sandboxInitUI() {
 
   document.getElementById('sandbox-char-modal-close').onclick = () => {
     document.getElementById('sandbox-char-modal').style.display = 'none';
+  };
+  document.getElementById('sandbox-member-modal-close').onclick = () => {
+    sandboxCommitMemberSettings();
+    document.getElementById('sandbox-member-modal').style.display = 'none';
+    sandboxRenderTeams();
   };
   document.getElementById('sandbox-add-team-btn').onclick = () => {
     sandboxCreateTeam();
@@ -32493,14 +32547,10 @@ function sandboxRenderTeams() {
     const color = sandboxColorForIndex(ti);
     const chipsHTML = team.members.map((m, mi) => {
       const ch = getCharacterRoster().find(c => c.id === m.id);
-      const defaultHp = ch ? (ch.type === 'johnny' ? JOHNNY_MAX_HP : ch.type === 'sans' ? SANS_MAX_HP : MAX_HP) : MAX_HP;
-      const unit = ch && ch.type === 'sans' ? '格' : '血量';
-      const val = (m.hp != null) ? m.hp : '';
+      const respawnBadge = (m.respawns > 0) ? `<span style="opacity:0.75;font-size:0.68rem;color:#8fd6ff">🔁${m.respawns}</span>` : '';
       return `<span class="sb-chip">${ch ? charIconHTML(ch, '1em') + ' ' + ch.name : m.id}
-        <input type="number" class="sb-hp-input" data-ti="${ti}" data-mi="${mi}" min="1" step="1"
-          placeholder="${defaultHp}" value="${val}" title="自訂${unit}（留空＝預設 ${defaultHp}）"
-          style="width:52px;background:rgba(255,255,255,0.3);border:1px solid rgba(255,255,255,0.2);border-radius:6px;color:#eee;font-size:0.75rem;padding:2px 4px;margin-left:2px">
-        <span style="opacity:0.6;font-size:0.7rem">${unit}</span>
+        ${respawnBadge}
+        <button type="button" data-ti="${ti}" data-mi="${mi}" class="sb-gear" title="調整血量／重生次數">⚙️</button>
         <button data-ti="${ti}" data-mi="${mi}" class="sb-remove-member">✕</button></span>`;
     }).join('');
     teamEl.innerHTML = `
@@ -32535,11 +32585,10 @@ function sandboxRenderTeams() {
       sandboxRenderTeams();
     };
   });
-  container.querySelectorAll('.sb-hp-input').forEach(inp => {
-    inp.onchange = (e) => {
-      const ti = +e.target.dataset.ti, mi = +e.target.dataset.mi;
-      const v = parseInt(e.target.value, 10);
-      sandboxTeams[ti].members[mi].hp = (Number.isFinite(v) && v > 0) ? v : null;
+  container.querySelectorAll('.sb-gear').forEach(btn => {
+    btn.onclick = (e) => {
+      const ti = +e.currentTarget.dataset.ti, mi = +e.currentTarget.dataset.mi;
+      sandboxOpenMemberSettings(ti, mi);
     };
   });
   container.querySelectorAll('.sb-remove-member').forEach(btn => {
@@ -32549,6 +32598,49 @@ function sandboxRenderTeams() {
       sandboxRenderTeams();
     };
   });
+}
+
+// 目前正在用⚙️面板編輯哪個成員（{ti, mi}），關閉面板時用來把輸入值寫回 sandboxTeams
+let sandboxEditingMember = null;
+
+function sandboxOpenMemberSettings(ti, mi) {
+  const team = sandboxTeams[ti];
+  const m = team && team.members[mi];
+  if (!m) return;
+  const ch = getCharacterRoster().find(c => c.id === m.id);
+  sandboxEditingMember = { ti, mi };
+  const defaultHp = ch ? (ch.type === 'johnny' ? JOHNNY_MAX_HP : ch.type === 'sans' ? SANS_MAX_HP : MAX_HP) : MAX_HP;
+  const unit = ch && ch.type === 'sans' ? '格' : '血量';
+  document.getElementById('sandbox-member-modal-title').textContent = ch ? `${ch.name} 設定` : '角色設定';
+  const hpInput = document.getElementById('sandbox-member-hp');
+  hpInput.placeholder = `預設 ${defaultHp}（${unit}）`;
+  hpInput.value = (m.hp != null) ? m.hp : '';
+  const respawnInput = document.getElementById('sandbox-member-respawns');
+  respawnInput.value = m.respawns || 0;
+  const noteEl = document.getElementById('sandbox-member-modal-note');
+  const isSpecialMulti = ch && (ch.isTwin || ch.isQuad);
+  if (isSpecialMulti) {
+    respawnInput.disabled = true;
+    noteEl.style.display = 'block';
+    noteEl.textContent = '此角色由多顆球組成，暫不支援重生次數設定，陣亡後維持原本規則。';
+  } else {
+    respawnInput.disabled = false;
+    noteEl.style.display = 'none';
+  }
+  document.getElementById('sandbox-member-modal').style.display = 'flex';
+}
+
+function sandboxCommitMemberSettings() {
+  if (!sandboxEditingMember) return;
+  const { ti, mi } = sandboxEditingMember;
+  const m = sandboxTeams[ti] && sandboxTeams[ti].members[mi];
+  sandboxEditingMember = null;
+  if (!m) return;
+  const hpVal = parseInt(document.getElementById('sandbox-member-hp').value, 10);
+  m.hp = (Number.isFinite(hpVal) && hpVal > 0) ? hpVal : null;
+  const respawnInput = document.getElementById('sandbox-member-respawns');
+  const respawnVal = parseInt(respawnInput.value, 10);
+  m.respawns = (!respawnInput.disabled && Number.isFinite(respawnVal) && respawnVal > 0) ? respawnVal : 0;
 }
 
 // 開始（或重新開始）沙盒對戰：讀取目前的隊伍/場地設定並建立戰鬥
@@ -32660,6 +32752,9 @@ function sandboxStartBattle() {
       } else {
         const b = makeBall(px, py, vx, vy, ch, teamPlayer);
         applyCustomHp(b);
+        // 沙盒重生次數：只支援單顆球角色（雙生／四顆分身走上面各自的分支，不會進到這裡）
+        const respawnCount = parseInt(m.respawns, 10);
+        b.sandboxRespawnsLeft = (Number.isFinite(respawnCount) && respawnCount > 0) ? respawnCount : 0;
         allBalls.push(b);
       }
       if (!initialStats[teamPlayer]) initialStats[teamPlayer] = { totalDmg: 0, maxHit: 0, skillUses: 0 };
