@@ -687,6 +687,78 @@
     color: var(--border-glow);
   }
 
+  /* 角色分頁：角色介紹 / 海克斯科技（配置調整）*/
+  .char-page-tab {
+    font-family: inherit;
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+    padding: 4px 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.18);
+    background: rgba(255,255,255,0.04);
+    color: #ccc;
+    cursor: pointer;
+    transition: background var(--dur-fast), border-color var(--dur-fast), color var(--dur-fast);
+  }
+  .char-page-tab:hover { background: rgba(255,255,255,0.1); }
+  .char-page-tab.active {
+    background: linear-gradient(135deg, rgba(0,209,255,0.28), rgba(0,102,255,0.18));
+    border-color: #00d1ff;
+    color: #eafcff;
+  }
+  .char-page {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .hextech-page {
+    min-height: 140px;
+    padding: 10px 8px;
+    border-radius: 10px;
+    border: 1px solid rgba(0,209,255,0.35);
+    background: radial-gradient(ellipse at top, rgba(0,120,180,0.12), rgba(10,14,22,0.3));
+  }
+  .hextech-empty {
+    font-size: 0.62rem;
+    color: #889;
+    text-align: center;
+    padding: 24px 6px;
+    line-height: 1.6;
+  }
+  .hextech-toggle {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 7px 10px;
+    margin: 6px 0;
+    border-radius: 8px;
+    border: 1px solid rgba(0,209,255,0.3);
+    background: rgba(255,255,255,0.03);
+    color: #eee;
+    cursor: pointer;
+    transition: background var(--dur-fast), border-color var(--dur-fast);
+  }
+  .hextech-toggle .htitle {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+  .hextech-toggle .hdesc {
+    font-size: 0.6rem;
+    color: #9fb8c4;
+    line-height: 1.5;
+    margin-top: 3px;
+  }
+  .hextech-toggle.on {
+    background: linear-gradient(135deg, rgba(0,209,255,0.22), rgba(255,200,60,0.12));
+    border-color: #ffcf4d;
+  }
+  .hextech-toggle.on .htitle { color: #ffe08a; }
+  .hextech-toggle.on .htitle::before { content: '⬡ '; }
+  .hextech-toggle:not(.on) .htitle::before { content: '○ '; opacity: 0.5; }
+
   /* 開始按鈕：全站最大、最亮的按鈕 */
   .start-btn {
     margin-top: 0.6rem;
@@ -1603,72 +1675,108 @@
   <div class="select-row" id="select-row">
     <div class="player-slot">
       <div class="player-label">⚔ 玩家一</div>
-      <div class="carousel-wrap" id="p1-carousel">
-        <div class="carousel-viewport">
-          <div class="carousel-track" id="p1-track"></div>
-        </div>
-        <div class="carousel-arrows">
-          <button class="arrow-btn" data-player="p1" data-dir="-1">◀</button>
-          <div class="carousel-dots" id="p1-dots"></div>
-          <button class="arrow-btn" data-player="p1" data-dir="1">▶</button>
-        </div>
+      <div class="char-page-tabs" style="display:flex;gap:4px;justify-content:center;margin-bottom:6px;">
+        <button type="button" class="char-page-tab active" id="p1-tab-1" onclick="switchCharPage('p1',1)">角色介紹</button>
+        <button type="button" class="char-page-tab" id="p1-tab-2" onclick="switchCharPage('p1',2)">⬡ 海克斯科技</button>
       </div>
-      <div class="selected-label" id="p1-selected-label">請選擇角色</div>
-      <button class="random-btn" onclick="randomChar('p1')">🎲 隨機</button>
+      <div id="p1-page1" class="char-page">
+        <div class="carousel-wrap" id="p1-carousel">
+          <div class="carousel-viewport">
+            <div class="carousel-track" id="p1-track"></div>
+          </div>
+          <div class="carousel-arrows">
+            <button class="arrow-btn" data-player="p1" data-dir="-1">◀</button>
+            <div class="carousel-dots" id="p1-dots"></div>
+            <button class="arrow-btn" data-player="p1" data-dir="1">▶</button>
+          </div>
+        </div>
+        <div class="selected-label" id="p1-selected-label">請選擇角色</div>
+        <button class="random-btn" onclick="randomChar('p1')">🎲 隨機</button>
+      </div>
+      <div id="p1-page2" class="char-page hextech-page" style="display:none;">
+        <div class="char-variant-row" id="p1-variant-row"></div>
+      </div>
     </div>
 
     <div class="vs-divider">VS</div>
 
     <div class="player-slot">
       <div class="player-label">玩家二 ⚔</div>
-      <div class="carousel-wrap" id="p2-carousel">
-        <div class="carousel-viewport">
-          <div class="carousel-track" id="p2-track"></div>
-        </div>
-        <div class="carousel-arrows">
-          <button class="arrow-btn" data-player="p2" data-dir="-1">◀</button>
-          <div class="carousel-dots" id="p2-dots"></div>
-          <button class="arrow-btn" data-player="p2" data-dir="1">▶</button>
-        </div>
+      <div class="char-page-tabs" style="display:flex;gap:4px;justify-content:center;margin-bottom:6px;">
+        <button type="button" class="char-page-tab active" id="p2-tab-1" onclick="switchCharPage('p2',1)">角色介紹</button>
+        <button type="button" class="char-page-tab" id="p2-tab-2" onclick="switchCharPage('p2',2)">⬡ 海克斯科技</button>
       </div>
-      <div class="selected-label" id="p2-selected-label">請選擇角色</div>
-      <button class="random-btn" onclick="randomChar('p2')">🎲 隨機</button>
+      <div id="p2-page1" class="char-page">
+        <div class="carousel-wrap" id="p2-carousel">
+          <div class="carousel-viewport">
+            <div class="carousel-track" id="p2-track"></div>
+          </div>
+          <div class="carousel-arrows">
+            <button class="arrow-btn" data-player="p2" data-dir="-1">◀</button>
+            <div class="carousel-dots" id="p2-dots"></div>
+            <button class="arrow-btn" data-player="p2" data-dir="1">▶</button>
+          </div>
+        </div>
+        <div class="selected-label" id="p2-selected-label">請選擇角色</div>
+        <button class="random-btn" onclick="randomChar('p2')">🎲 隨機</button>
+      </div>
+      <div id="p2-page2" class="char-page hextech-page" style="display:none;">
+        <div class="char-variant-row" id="p2-variant-row"></div>
+      </div>
     </div>
 
     <div class="vs-divider" id="vs-divider-3" style="display:none">VS</div>
 
     <div class="player-slot" id="p3-slot" style="display:none">
       <div class="player-label">⚔ 玩家三</div>
-      <div class="carousel-wrap" id="p3-carousel">
-        <div class="carousel-viewport">
-          <div class="carousel-track" id="p3-track"></div>
-        </div>
-        <div class="carousel-arrows">
-          <button class="arrow-btn" data-player="p3" data-dir="-1">◀</button>
-          <div class="carousel-dots" id="p3-dots"></div>
-          <button class="arrow-btn" data-player="p3" data-dir="1">▶</button>
-        </div>
+      <div class="char-page-tabs" style="display:flex;gap:4px;justify-content:center;margin-bottom:6px;">
+        <button type="button" class="char-page-tab active" id="p3-tab-1" onclick="switchCharPage('p3',1)">角色介紹</button>
+        <button type="button" class="char-page-tab" id="p3-tab-2" onclick="switchCharPage('p3',2)">⬡ 海克斯科技</button>
       </div>
-      <div class="selected-label" id="p3-selected-label">請選擇角色</div>
-      <button class="random-btn" onclick="randomChar('p3')">🎲 隨機</button>
+      <div id="p3-page1" class="char-page">
+        <div class="carousel-wrap" id="p3-carousel">
+          <div class="carousel-viewport">
+            <div class="carousel-track" id="p3-track"></div>
+          </div>
+          <div class="carousel-arrows">
+            <button class="arrow-btn" data-player="p3" data-dir="-1">◀</button>
+            <div class="carousel-dots" id="p3-dots"></div>
+            <button class="arrow-btn" data-player="p3" data-dir="1">▶</button>
+          </div>
+        </div>
+        <div class="selected-label" id="p3-selected-label">請選擇角色</div>
+        <button class="random-btn" onclick="randomChar('p3')">🎲 隨機</button>
+      </div>
+      <div id="p3-page2" class="char-page hextech-page" style="display:none;">
+        <div class="char-variant-row" id="p3-variant-row"></div>
+      </div>
     </div>
 
     <div class="vs-divider" id="vs-divider-4" style="display:none">VS</div>
 
     <div class="player-slot" id="p4-slot" style="display:none">
       <div class="player-label">玩家四 ⚔</div>
-      <div class="carousel-wrap" id="p4-carousel">
-        <div class="carousel-viewport">
-          <div class="carousel-track" id="p4-track"></div>
-        </div>
-        <div class="carousel-arrows">
-          <button class="arrow-btn" data-player="p4" data-dir="-1">◀</button>
-          <div class="carousel-dots" id="p4-dots"></div>
-          <button class="arrow-btn" data-player="p4" data-dir="1">▶</button>
-        </div>
+      <div class="char-page-tabs" style="display:flex;gap:4px;justify-content:center;margin-bottom:6px;">
+        <button type="button" class="char-page-tab active" id="p4-tab-1" onclick="switchCharPage('p4',1)">角色介紹</button>
+        <button type="button" class="char-page-tab" id="p4-tab-2" onclick="switchCharPage('p4',2)">⬡ 海克斯科技</button>
       </div>
-      <div class="selected-label" id="p4-selected-label">請選擇角色</div>
-      <button class="random-btn" onclick="randomChar('p4')">🎲 隨機</button>
+      <div id="p4-page1" class="char-page">
+        <div class="carousel-wrap" id="p4-carousel">
+          <div class="carousel-viewport">
+            <div class="carousel-track" id="p4-track"></div>
+          </div>
+          <div class="carousel-arrows">
+            <button class="arrow-btn" data-player="p4" data-dir="-1">◀</button>
+            <div class="carousel-dots" id="p4-dots"></div>
+            <button class="arrow-btn" data-player="p4" data-dir="1">▶</button>
+          </div>
+        </div>
+        <div class="selected-label" id="p4-selected-label">請選擇角色</div>
+        <button class="random-btn" onclick="randomChar('p4')">🎲 隨機</button>
+      </div>
+      <div id="p4-page2" class="char-page hextech-page" style="display:none;">
+        <div class="char-variant-row" id="p4-variant-row"></div>
+      </div>
     </div>
   </div>
 
@@ -1702,7 +1810,7 @@
 <!-- ══ 勝率榜 MODAL ══ -->
 <div id="winrate-modal" style="display:none;position:fixed;inset:0;z-index:300;flex-direction:column;align-items:center;justify-content:center;gap:18px;font-family:sans-serif;">
   <div class="modal-head-row">
-    <div class="modal-head-title">🏆 角色勝率榜</div>
+    <div class="modal-head-title" id="winrate-modal-title">🏆 角色勝率榜</div>
     <button id="winrate-modal-close" class="modal-close-x">✕</button>
   </div>
   <div class="roster-scroll-area" style="flex:none;height:min(60vh,500px);max-width:min(92vw,420px)">
@@ -1925,7 +2033,13 @@ const FIREBASE_CONFIG = {
   databaseURL: "https://test-c6c79-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "test-c6c79"
 };
-
+// ── 勝率統計資料版本 ──
+// 想開新版本時，只改這一個字就好（例如改成 'v4'）
+// 目前結構：charStats/v1/（舊資料直接掛根）→ charStats/v2/ → charStats/v3/
+const WINRATE_DATA_VERSION = 'v3';
+const WINRATE_PATH_CHAR_STATS = 'charStats/' + WINRATE_DATA_VERSION;
+const WINRATE_PATH_MATCH_HISTORY = 'matchHistory/' + WINRATE_DATA_VERSION;
+  
 // ──────────────── 傷害數字開關 ────────────────
 let damageNumbersEnabled = localStorage.getItem('damageNumbersEnabled') !== '0'; // 預設開啟
 function setDamageNumbersEnabled(on) {
@@ -1948,26 +2062,72 @@ if (FIREBASE_CONFIG.databaseURL) {
   } catch (e) { console.warn('勝率榜初始化失敗', e); }
 }
 
-// 勝率榜「賽季」版本號：每次對角色做大幅度調整（大量加強/削弱），把這個字串改成新版本
-// （例如 'v2' -> 'v3'），舊賽季的勝敗數字會原封不動保留在雲端 charStats/v2 底下，
-// 不會被刪除，只是排行榜和統計改成只看新賽季 charStats/v3 之後累積的場次，
-// 避免舊數值繼續污染改版後的平衡判斷。若之後想找回舊賽季數據，直接查雲端
-// charStats/<舊版本號> 底下的路徑即可，資料仍在。
-const WINRATE_SEASON = 'v2';
-
-// 對戰結束時呼叫：把這場戰鬥裡每個角色的勝/敗各 +1 寫回雲端（寫入當前賽季底下）
-function recordCharacterResult(charId, won) {
+// 對戰結束時呼叫：把這場戰鬥裡每個角色的勝/敗各 +1 寫回雲端
+function recordCharacterResult(charId, won, variantIds = []) {
   // 自組機器人屬於零件組裝玩法，不納入角色強度勝率統計。
   if (!winRateDB || !charId || charId === 'custom_assembled') return;
-  const ref = winRateDB.ref(`charStats/${WINRATE_SEASON}/${charId}/${won ? 'wins' : 'losses'}`);
-  ref.transaction(cur => (cur || 0) + 1);
+  const resultKey = won ? 'wins' : 'losses';
+ winRateDB.ref(`${WINRATE_PATH_CHAR_STATS}/${charId}/${resultKey}`).transaction(cur => (cur || 0) + 1);
+
+  // 海克斯科技獨立統計：每個本場實際選用的配置各自 +1；
+  // 若完全沒選任何海克斯科技，則記到 __none__。
+  const ids = Array.isArray(variantIds) ? variantIds.filter(Boolean) : [];
+  const trackedIds = ids.length ? ids : ['__none__'];
+  trackedIds.forEach(variantId => {
+    winRateDB.ref(`${WINRATE_PATH_CHAR_STATS}/${charId}/variants/${variantId}/${resultKey}`)
+      .transaction(cur => (cur || 0) + 1);
+  });
+}
+
+// 讀取單一角色的海克斯科技勝率。
+// callback(rows) -> [{id, label, wins, losses, total, rate}]，未曾出場的配置也會保留。
+function fetchCharacterVariantStats(charId, callback) {
+  const ch = getCharacterRoster().find(c => c && c.id === charId);
+  const variants = Array.isArray(ch?.variants) ? ch.variants : [];
+  const baseRows = [
+    { id: '__none__', label: '無', wins: 0, losses: 0, total: 0, rate: 0 }
+  ];
+  variants.forEach(v => baseRows.push({
+    id: v.id, label: v.label || v.id, wins: 0, losses: 0, total: 0, rate: 0
+  }));
+  if (!winRateDB) { callback(baseRows); return; }
+  winRateDB.ref(`${WINRATE_PATH_CHAR_STATS}/${charId}/variants`).once('value')
+    .then(snap => {
+      const data = snap.val() || {};
+      const rows = baseRows.map(row => {
+        const d = data[row.id] || {};
+        const wins = Number(d.wins) || 0;
+        const losses = Number(d.losses) || 0;
+        const total = wins + losses;
+        return { ...row, wins, losses, total, rate: total > 0 ? wins / total : 0 };
+      });
+      // 有資料的海克斯科技優先，沒有資料的仍顯示為 0.0%，方便確認「沒帶」與各配置。
+      rows.sort((a, b) => b.total - a.total || a.id.localeCompare(b.id));
+      callback(rows);
+    })
+    .catch(e => {
+      console.warn('讀取海克斯科技勝率失敗', e);
+      callback(baseRows);
+    });
+}
+
+// 對戰結束時呼叫：記錄這兩個角色互相對位的勝/敗（雙向各寫一筆，查任一方都查得到）
+function recordMatchup(charA, charB, winnerCharId) {
+  if (!winRateDB || !charA || !charB || charA === 'custom_assembled' || charB === 'custom_assembled') return;
+  winRateDB.ref(`${WINRATE_PATH_CHAR_STATS}/${charA}/vs/${charB}/${winnerCharId === charA ? 'wins' : 'losses'}`).transaction(cur => (cur || 0) + 1);
+winRateDB.ref(`${WINRATE_PATH_CHAR_STATS}/${charB}/vs/${charA}/${winnerCharId === charB ? 'wins' : 'losses'}`).transaction(cur => (cur || 0) + 1);
+}
+
+// 對戰結束時呼叫：把這場戰鬥推進對戰紀錄清單（每場1v1一筆，供「最近對戰紀錄」查詢）
+function recordMatchHistory(charA, charB, winnerCharId) {
+  if (!winRateDB || !charA || !charB || charA === 'custom_assembled' || charB === 'custom_assembled') return;
+ winRateDB.ref(WINRATE_PATH_MATCH_HISTORY).push({ a: charA, b: charB, winner: winnerCharId, ts: Date.now() });
 }
 
 // 讀取所有角色的勝率榜，callback(rows) 其中 rows = [{id, wins, losses, total, rate}], 依勝率高→低排序
-// 只讀取當前賽季（WINRATE_SEASON）的資料，不會顯示舊賽季的殘留數字。
 function fetchWinRateBoard(callback) {
   if (!winRateDB) { callback([]); return; }
-  winRateDB.ref(`charStats/${WINRATE_SEASON}`).once('value')
+  winRateDB.ref(WINRATE_PATH_CHAR_STATS).once('value')
     .then(snap => {
       const data = snap.val() || {};
       const rows = Object.keys(data).map(id => {
@@ -1980,6 +2140,40 @@ function fetchWinRateBoard(callback) {
       callback(rows);
     })
     .catch(e => { console.warn('讀取勝率榜失敗', e); callback([]); });
+}
+
+// 讀取單一角色對每個對手的對位勝率，callback(rows) 其中 rows = [{oppId, wins, losses, total, rate}], 依勝率高→低排序
+function fetchCharacterMatchups(charId, callback) {
+  if (!winRateDB || !charId) { callback([]); return; }
+ winRateDB.ref(`${WINRATE_PATH_CHAR_STATS}/${charId}/vs`).once('value')
+    .then(snap => {
+      const data = snap.val() || {};
+      const rows = Object.keys(data).map(oppId => {
+        const wins = data[oppId].wins || 0;
+        const losses = data[oppId].losses || 0;
+        const total = wins + losses;
+        return { oppId, wins, losses, total, rate: total > 0 ? wins / total : 0 };
+      }).filter(r => r.total > 0);
+      rows.sort((a, b) => b.rate - a.rate || b.total - a.total);
+      callback(rows);
+    })
+    .catch(e => { console.warn('讀取對位勝率失敗', e); callback([]); });
+}
+
+// 讀取單一角色最近的對戰紀錄，callback(rows) 其中 rows = [{id, a, b, winner, ts}]，依時間新→舊排序，預設最多10場
+function fetchCharacterMatchHistory(charId, callback, limit = 10) {
+  if (!winRateDB || !charId) { callback([]); return; }
+  // 撈最近300筆全域紀錄後在前端篩出跟這個角色有關的場次；資料量大時可再改成專用索引。
+ winRateDB.ref(WINRATE_PATH_MATCH_HISTORY).orderByChild('ts').limitToLast(300).once('value')
+    .then(snap => {
+      const data = snap.val() || {};
+      const rows = Object.keys(data).map(id => ({ id, ...data[id] }))
+        .filter(r => r.a === charId || r.b === charId)
+        .sort((a, b) => b.ts - a.ts)
+        .slice(0, limit);
+      callback(rows);
+    })
+    .catch(e => { console.warn('讀取對戰紀錄失敗', e); callback([]); });
 }
 
 // ──────────────── AUDIO ────────────────
@@ -2624,7 +2818,7 @@ function getBallMaxHp(b) {
   // 舊版獨立夏油咒靈或特級代理仍保留明確 fallback。
   if (b.char && b.char.type === 'getoSpirit') return b.maxHp != null ? b.maxHp : GETO_SPIRIT_HP;
   if (b.char && b.char.type === 'getoSpecial') return b.maxHp != null ? b.maxHp : GETO_SPECIAL_HP;
-  return b.char.type === 'johnny' ? JOHNNY_MAX_HP : b.char.type === 'sans' ? SANS_MAX_HP : b.char.type === 'rsqjs' ? RSQJS_MAX_HP : b.char.type === 'momoi' ? MOMOI_MAX_HP : b.char.type === 'amelia' ? MAX_HP : MAX_HP;
+  return b.char.type === 'boundary' ? BOUNDARY_MAX_HP : b.char.type === 'johnny' ? JOHNNY_MAX_HP : b.char.type === 'sans' ? SANS_MAX_HP : b.char.type === 'rsqjs' ? RSQJS_MAX_HP : b.char.type === 'momoi' ? MOMOI_MAX_HP : b.char.type === 'amelia' ? MAX_HP : MAX_HP;
 }
 
 function dummySetOwnHp(fraction) {
@@ -2695,6 +2889,7 @@ const BASE_SPEED         = 140;
 // INTERNAL STATE：模式狀態（通常不需要修改）
 // ============================================================================
 let bossMode = false;                 // 是否正處於Boss模式
+
 let bossPicks = [];                  // 玩家依序挑選的出戰角色id；至少1名，不設固定人數上限
 let bossPickStep = 0;
 let bossLastBattleConfig = null; // 最近一次 Boss 挑戰的隊伍與 Boss 定義，供失敗／成功後「再戰一局」沿用
@@ -2711,9 +2906,9 @@ function curseC(ch, ball) {
 
 // ============================================================================
 </script>
-<script src="character_constants.js?v=yi-rework-v64-20260827-1"></script>
-<script src="boss_constants.js?v=phantom-domain-v43-20260827-1"></script>
-<script src="character_roster.js?v=yi-rework-v64-20260827-1"></script>
+<script src="character_constants.js?v=arena-split-20260911-1"></script>
+<script src="boss_constants.js?v=arena-split-20260911-1"></script>
+<script src="character_roster.js?v=arena-split-20260911-1"></script>
 
 <script>
 // ============================================================================
@@ -2897,6 +3092,14 @@ const AMELIA_CHARACTER_ID = 'amelia';
 function getCharacterRoster() {
   return (typeof CHARACTERS !== 'undefined' && Array.isArray(CHARACTERS)) ? CHARACTERS : [];
 }
+// 一般選角只使用真正的公開角色；組裝模式的暫時角色不可佔用一般清單位置。
+function getSelectableRoster() {
+  const seen = new Set();
+  return getCharacterRoster().filter(ch => {
+    if (!ch || !ch.id || ch.id === 'custom_assembled' || seen.has(ch.id)) return false;
+    seen.add(ch.id); return true;
+  });
+}
 
 function getCharacterForUI(ch, index = 0) {
   const raw = (ch && typeof ch === 'object') ? ch : {};
@@ -2993,7 +3196,7 @@ function updateStartBtnState() {
 }
 
 function buildCarousels() {
-  const roster = getCharacterRoster();
+  const roster = getSelectableRoster();
   ['p1', 'p2', 'p3', 'p4'].forEach(p => {
     const track = document.getElementById(`${p}-track`);
     const dotsEl = document.getElementById(`${p}-dots`);
@@ -3089,7 +3292,7 @@ function setupSwipe(player) {
 
 function goToSlide(player, index) {
   const cs = carouselState[player];
-  const roster = getCharacterRoster();
+  const roster = getSelectableRoster();
   const total = roster.length;
   if (!cs || total === 0) {
     showRosterDataWarning('角色清單沒有成功載入');
@@ -3105,7 +3308,7 @@ function goToSlide(player, index) {
 }
 
 function randomChar(player) {
-  const roster = getCharacterRoster();
+  const roster = getSelectableRoster();
   if (!roster.length) {
     showRosterDataWarning('角色清單沒有成功載入');
     return;
@@ -3140,8 +3343,71 @@ function selectChar(player, charId) {
       ? `✓ ${charIconHTML(getCharacterForUI(ch), '1em')} ${getCharacterForUI(ch).name}`
       : '請選擇角色';
   }
+  renderCharVariantRow(player, ch);
+  switchCharPage(player, 1); // 換角色時自動跳回「角色介紹」頁
 
   updateStartBtnState();
+}
+
+// ══════ 角色分頁：角色介紹 / 海克斯科技（賽前配置調整）══════
+function switchCharPage(player, pageNum) {
+  for (let n = 1; n <= 2; n++) {
+    const page = document.getElementById(`${player}-page${n}`);
+    const tab = document.getElementById(`${player}-tab-${n}`);
+    if (page) page.style.display = n === pageNum ? '' : 'none';
+    if (tab) tab.classList.toggle('active', n === pageNum);
+  }
+}
+
+// ══════ 角色配置切換（賽前決策：例如廚師切換成三刀流）══════
+const charVariantSelections = { p1: {}, p2: {}, p3: {}, p4: {} };
+function renderCharVariantRow(player, ch) {
+  const row = document.getElementById(`${player}-variant-row`);
+  if (!row) return;
+  row.innerHTML = '';
+  charVariantSelections[player] = {}; // 切換角色時重置配置選擇
+  if (!ch || !ch.variants || !ch.variants.length) {
+    const empty = document.createElement('div');
+    empty.className = 'hextech-empty';
+    empty.textContent = ch ? '這名角色目前沒有可調整的配置。' : '請先在「角色介紹」頁選擇角色。';
+    row.appendChild(empty);
+    return;
+  }
+  ch.variants.forEach(v => {
+    const toggle = document.createElement('button');
+    toggle.type = 'button';
+    toggle.className = 'hextech-toggle';
+    toggle.innerHTML = `<div class="htitle">${v.label}</div><div class="hdesc">${v.desc || ''}</div>`;
+    toggle.onclick = () => {
+      const wasOn = !!charVariantSelections[player][v.id];
+      // 海克斯科技為「單選」：同一名角色一次只能攜帶一個配置。
+      // 再點目前已選中的配置則取消選擇，允許回到「沒帶」。
+      charVariantSelections[player] = {};
+      row.querySelectorAll('.hextech-toggle').forEach(btn => btn.classList.remove('on'));
+      if (!wasOn) {
+        charVariantSelections[player][v.id] = true;
+        toggle.classList.add('on');
+      }
+    };
+    row.appendChild(toggle);
+  });
+}
+// 依玩家選擇的配置，套用到角色設定副本上（不動到原始 CHARACTERS 資料）
+function applyCharVariants(player, baseCh) {
+  if (!baseCh) return baseCh;
+  const cloned = { ...baseCh };
+  const selections = charVariantSelections[player] || {};
+  // 海克斯科技是單選配置；即使舊狀態／外部程式意外留下多個 true，也只套用第一個。
+  const variantIds = [];
+  if (Array.isArray(baseCh.variants)) {
+    const selected = baseCh.variants.find(v => !!selections[v.id]);
+    if (selected) {
+      variantIds.push(selected.id);
+      selected.apply(cloned);
+    }
+  }
+  cloned._variantIds = variantIds;
+  return cloned;
 }
 
 // 對戰人數選擇（彈窗，樣式與地圖選擇一致）
@@ -3195,8 +3461,14 @@ document.getElementById('mode-modal-close').addEventListener('click', () => {
 });
 
 function openWinRateBoard() {
+  renderWinRateOverview();
+}
+
+function renderWinRateOverview() {
   const listEl = document.getElementById('winrate-modal-list');
+  const titleEl = document.getElementById('winrate-modal-title');
   document.getElementById('winrate-modal').style.display = 'flex';
+  if (titleEl) titleEl.textContent = '🏆 角色勝率榜';
   if (!winRateDB) {
     listEl.innerHTML = `<div style="text-align:center;color:#888;font-size:0.85rem;padding:20px 0">尚未設定勝率榜服務，敬請期待。</div>`;
     setTimeout(() => window.updateWinRateThumb && window.updateWinRateThumb(), 30);
@@ -3220,12 +3492,102 @@ function openWinRateBoard() {
       const name = ch ? ch.name : '自組機器人';
       const icon = ch ? charIconHTML(ch, '1.3rem') : '🤖';
       const pct = (r.rate * 100).toFixed(1);
-      return `<div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:8px 12px">
+      return `<div class="winrate-row" data-char-id="${r.id}" style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:8px 12px;cursor:pointer">
         <div style="width:1.6rem;text-align:center;font-weight:800;color:${i < 3 ? '#ffd166' : '#888'}">${i + 1}</div>
         <div style="font-size:1.3rem">${icon}</div>
         <div style="flex:1;font-size:0.88rem;color:#eee;font-weight:600">${name}</div>
         <div style="text-align:right;font-size:0.85rem;color:#8fd6ff;font-weight:700">${pct}%</div>
         <div style="text-align:right;font-size:0.68rem;color:#888;min-width:70px">${r.wins}勝${r.losses}敗<br>共${r.total}場</div>
+        <div style="color:#666;font-size:0.8rem">›</div>
+      </div>`;
+    }).join('');
+    listEl.querySelectorAll('.winrate-row').forEach(row => {
+      row.addEventListener('click', () => openCharMatchupDetail(row.dataset.charId));
+    });
+    setTimeout(() => window.updateWinRateThumb && window.updateWinRateThumb(), 30);
+  });
+}
+
+// 單一角色詳情頁：對位排行（依勝率排序）＋ 最近對戰紀錄
+function openCharMatchupDetail(charId) {
+  const listEl = document.getElementById('winrate-modal-list');
+  const titleEl = document.getElementById('winrate-modal-title');
+  const ch = CHARACTERS.find(c => c.id === charId);
+  const name = ch ? ch.name : '未知角色';
+  const icon = ch ? charIconHTML(ch, '1.1em') : '🤖';
+  if (titleEl) titleEl.innerHTML = `${icon} ${name}`;
+  listEl.innerHTML = `
+    <button id="winrate-back-btn" style="align-self:flex-start;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);color:#ccc;border-radius:8px;padding:4px 10px;font-size:0.72rem;cursor:pointer;margin-bottom:4px">← 返回總覽</button>
+    <div style="font-size:0.68rem;color:#7fdcff;letter-spacing:0.1em;margin:4px 2px">海克斯科技勝率</div>
+    <div id="winrate-variant-list" style="display:flex;flex-direction:column;gap:6px;">讀取中...</div>
+    <div style="font-size:0.68rem;color:#888;letter-spacing:0.1em;margin:12px 2px 4px">對位排行（依勝率排序）</div>
+    <div id="winrate-matchup-list" style="display:flex;flex-direction:column;gap:6px;">讀取中...</div>
+    <div style="font-size:0.68rem;color:#888;letter-spacing:0.1em;margin:12px 2px 4px">最近對戰紀錄</div>
+    <div id="winrate-history-list" style="display:flex;flex-direction:column;gap:5px;">讀取中...</div>
+  `;
+  document.getElementById('winrate-back-btn').addEventListener('click', renderWinRateOverview);
+  setTimeout(() => window.updateWinRateThumb && window.updateWinRateThumb(), 30);
+
+  fetchCharacterVariantStats(charId, rows => {
+    const variantEl = document.getElementById('winrate-variant-list');
+    if (!variantEl) return;
+    variantEl.innerHTML = rows.map((r, i) => {
+      const pct = (r.rate * 100).toFixed(1);
+      const label = r.id === '__none__' ? '沒帶' : r.label;
+      const status = r.total > 0 ? `${r.wins}勝${r.losses}敗　共${r.total}場` : '尚無紀錄';
+      return `<div style="display:flex;align-items:center;gap:8px;background:rgba(0,180,255,0.05);border:1px solid rgba(0,209,255,0.16);border-radius:8px;padding:6px 10px">
+        <div style="width:1.3rem;text-align:center;font-weight:700;color:#7fdcff;font-size:0.78rem">${i + 1}</div>
+        <div style="flex:1;font-size:0.78rem;color:#eee;font-weight:600">${label}</div>
+        <div style="text-align:right;font-size:0.78rem;color:#8fd6ff;font-weight:700">${pct}%</div>
+        <div style="text-align:right;font-size:0.62rem;color:#888;min-width:76px">${status}</div>
+      </div>`;
+    }).join('');
+    setTimeout(() => window.updateWinRateThumb && window.updateWinRateThumb(), 30);
+  });
+
+  fetchCharacterMatchups(charId, rows => {
+    const matchupEl = document.getElementById('winrate-matchup-list');
+    if (!matchupEl) return;
+    if (rows.length === 0) {
+      matchupEl.innerHTML = `<div style="text-align:center;color:#888;font-size:0.78rem;padding:10px 0">還沒有對位紀錄。</div>`;
+      setTimeout(() => window.updateWinRateThumb && window.updateWinRateThumb(), 30);
+      return;
+    }
+    matchupEl.innerHTML = rows.map((r, i) => {
+      const oppCh = CHARACTERS.find(c => c.id === r.oppId);
+      const oppName = oppCh ? oppCh.name : r.oppId;
+      const oppIcon = oppCh ? charIconHTML(oppCh, '1.1rem') : '🤖';
+      const pct = (r.rate * 100).toFixed(1);
+      return `<div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:6px 10px">
+        <div style="width:1.3rem;text-align:center;font-weight:700;color:${i < 3 ? '#ffd166' : '#888'};font-size:0.78rem">${i + 1}</div>
+        <div style="font-size:1.1rem">${oppIcon}</div>
+        <div style="flex:1;font-size:0.78rem;color:#eee">vs ${oppName}</div>
+        <div style="text-align:right;font-size:0.78rem;color:#8fd6ff;font-weight:700">${pct}%</div>
+        <div style="text-align:right;font-size:0.62rem;color:#888;min-width:60px">${r.wins}勝${r.losses}敗</div>
+      </div>`;
+    }).join('');
+    setTimeout(() => window.updateWinRateThumb && window.updateWinRateThumb(), 30);
+  });
+
+  fetchCharacterMatchHistory(charId, rows => {
+    const historyEl = document.getElementById('winrate-history-list');
+    if (!historyEl) return;
+    if (rows.length === 0) {
+      historyEl.innerHTML = `<div style="text-align:center;color:#888;font-size:0.78rem;padding:10px 0">還沒有對戰紀錄。</div>`;
+      setTimeout(() => window.updateWinRateThumb && window.updateWinRateThumb(), 30);
+      return;
+    }
+    historyEl.innerHTML = rows.map(r => {
+      const oppId = r.a === charId ? r.b : r.a;
+      const oppCh = CHARACTERS.find(c => c.id === oppId);
+      const oppName = oppCh ? oppCh.name : oppId;
+      const won = r.winner === charId;
+      const d = new Date(r.ts);
+      const dateStr = `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+      return `<div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.03);border-radius:6px;padding:5px 10px">
+        <div style="font-size:0.68rem;font-weight:800;color:${won ? '#7be08a' : '#e87b7b'};min-width:28px">${won ? '勝' : '敗'}</div>
+        <div style="flex:1;font-size:0.72rem;color:#ccc">vs ${oppName}</div>
+        <div style="font-size:0.6rem;color:#777">${dateStr}</div>
       </div>`;
     }).join('');
     setTimeout(() => window.updateWinRateThumb && window.updateWinRateThumb(), 30);
@@ -3286,6 +3648,11 @@ document.getElementById('winrate-modal-close').addEventListener('click', () => {
 })();
 
 buildCarousels();
+// 預設選擇前兩名角色，避免使用者尚未滑動輪播時開始按鈕被停用。
+// 使用者仍可照常點擊其他角色切換選擇。
+const initialRoster = getSelectableRoster();
+if (initialRoster[0]) selectChar('p1', initialRoster[0].id);
+if (initialRoster[1]) selectChar('p2', initialRoster[1].id);
 refreshOpmLock();
 
 // ──────────────── ROSTER MODAL ────────────────
@@ -3854,8 +4221,9 @@ function runCustomDelayedAoeSkill(b, dt, ns, cfg) {
       const enemy = getNearestEnemyTo(b.x, b.y, b.player);
       if (enemy) {
         b.customExtra[timerKey] = cfg.interval;
-        b.customExtra[pendingKey] = { x: enemy.x, y: enemy.y, t: cfg.delay };
-        state.hitFlashes.push({ x: enemy.x, y: enemy.y, r: 16, alpha: 0.7, color: '#ff4444', t: cfg.delay });
+        const aimPoint = getConfusedAimPoint(b, enemy);
+        b.customExtra[pendingKey] = { x: aimPoint.x, y: aimPoint.y, t: cfg.delay };
+        state.hitFlashes.push({ x: aimPoint.x, y: aimPoint.y, r: 16, alpha: 0.7, color: '#ff4444', t: cfg.delay });
       }
     }
   }
@@ -4778,10 +5146,23 @@ const PROGRESS_HANDLERS = {
       barColor: b.vampireDashing ? '#ff44ff' : (b.vampireBiting ? '#aa00ff' : b.char.color)
     };
   },
-  gojo(b) {
-    if (b.gojoCharging) return { atFrac: Math.min(b.gojoChargeTimer / GOJO_CHARGE_TIME, 1), barColor: '#bf00ff' };
-    return { atFrac: Math.min(b.gojoTimer / GOJO_COOLDOWN, 1), barColor: b.gojoUnlocked ? '#bf00ff' : b.char.color };
-  },
+gojo(b) {
+  // 領域展開中：顯示剩餘持續時間
+  if (b.gojoDomainActive) {
+    return { atFrac: Math.max(0, Math.min(1, b.gojoDomainTimer / GOJO_DOMAIN_DURATION)), barColor: '#bf00ff' };
+  }
+  // 領域冷卻中：顯示 CD 進度
+  if (b.gojoDomainCooldown > 0) {
+    return { atFrac: 1 - Math.max(0, Math.min(1, b.gojoDomainCooldown / GOJO_DOMAIN_CD)), barColor: '#7a2cb8' };
+  }
+  // 平常：顯示無下限量條（0～10）
+  const inf = Math.max(0, Math.min(GOJO_INFINITY_MAX, b.gojoInfinity || 0));
+  return {
+    atFrac: inf / GOJO_INFINITY_MAX,
+    barColor: inf >= GOJO_INFINITY_MAX ? '#00cfff' : (inf >= 5 ? '#5fdcff' : '#3a8a9c')
+  };
+},
+
   cursed(b) {
     return {
       atFrac: b.curseSlashTimer != null ? 1 - (b.curseSlashTimer / curseC(b.char, b).SLASH_INTERVAL) : 0,
@@ -5265,6 +5646,7 @@ const STATUS_DEFINITIONS = Object.freeze({
   charm: { name: '魅惑', category: 'control', blocksMovement: true, blocksAttack: true },
   banish: { name: '放逐／異空間', category: 'control', blocksMovement: true, blocksAttack: true },
   mark: { name: '標記', category: 'debuff', blocksMovement: false, blocksAttack: false },
+    confusion: { name: '混亂', category: 'debuff', blocksMovement: false, blocksAttack: false },
 });
 
 function ensureStatusStore(target) {
@@ -5283,6 +5665,8 @@ function writeLegacyStatusField(target, id, remaining, entry = {}) {
     if (entry.strength != null) target.curseSlowFactor = entry.strength;
   } else if (id === 'cooldownFreeze') {
     target.cooldownFreezeTimer = value;
+  } else if (id === 'confusion') {
+    target.confusedTimer = value;
   }
 }
 
@@ -5293,6 +5677,8 @@ function clearLegacyStatusField(target, id) {
     target.curseSlowFactor = null;
   } else if (id === 'cooldownFreeze') {
     target.cooldownFreezeTimer = 0;
+  } else if (id === 'confusion') {
+    target.confusedTimer = 0;
   }
 }
 
@@ -5345,7 +5731,7 @@ function clearAllNegativeEffects(target) {
   target.statusEffects = Object.create(null);
   const zeroKeys = [
     'curseDotTimer','curseDotDmg','curseDotOwnerPlayer','curseSlowTimer',
-    'cooldownFreezeTimer','getoDotTimer','getoDotDmg','getoDotOwnerPlayer',
+    'cooldownFreezeTimer','confusedTimer','getoDotTimer','getoDotDmg','getoDotOwnerPlayer',
     'trapDotTimer','trapDotDps','trapDotOwnerPlayer','emBurnTimer','emBurnDps',
     'emBurnOwnerPlayer','emVulnTimer','emVulnPct','weakenTimer','weakenMult',
     'frozenByJosephTimer','thunderParalyzed','johnnyAct4DotTickTimer',
@@ -5486,7 +5872,7 @@ function makeBall(x, y, vx, vy, ch, player, twinRole) {
     x, y, vx, vy,
     statusEffects: Object.create(null), // 統一負面效果索引；舊欄位仍由相容層鏡像進來
     r: (ch && typeof ch.radius === 'number' && ch.radius > 0) ? ch.radius : RADIUS, // 角色專屬球體大小：未設定 radius 時沿用預設 RADIUS(=25)，行為與現在完全一致
-    hp: ch.type === 'johnny' ? JOHNNY_MAX_HP : ch.type === 'sans' ? SANS_MAX_HP : ch.type === 'rsqjs' ? RSQJS_MAX_HP : ch.type === 'momoi' ? MOMOI_MAX_HP : MAX_HP,
+    hp: ch.type === 'boundary' ? BOUNDARY_MAX_HP : ch.type === 'johnny' ? JOHNNY_MAX_HP : ch.type === 'sans' ? SANS_MAX_HP : ch.type === 'rsqjs' ? RSQJS_MAX_HP : ch.type === 'momoi' ? MOMOI_MAX_HP : MAX_HP,
     char: ch, player,
     isDummy: ch.type === 'dummy', // 木偶訓練模式：固定不動、不會反擊、血量永遠回滿
     twinRole: (ch.type === 'rsqjs' || ch.type === 'momoi') ? twinRole : null,  // rsqjs: 'stop'/'diamond'；momoi: 'momoi'(🍑)/'midori'(💚)
@@ -5577,14 +5963,39 @@ function makeBall(x, y, vx, vy, ch, player, twinRole) {
     ameliaDetectiveStacksByPlayer: Object.create(null),
     ameliaDetectiveFlash: 0,
     attackTimer: 0,
-    attackInterval: ch.type === 'chef' ? CHEF_ATTACK_INTERVAL : ch.type === 'yi' ? YI_BLACK_INTERVAL :
+    attackInterval: ch.type === 'boundary' ? BOUNDARY_ATTACK_INTERVAL : ch.type === 'chef' ? CHEF_ATTACK_INTERVAL : ch.type === 'yi' ? YI_BLACK_INTERVAL :
       ch.type === 'ew' ? EW_ATTACK_INTERVAL :
       ch.type === 'custom' ? (ch.parts.basic === 'a_chef' ? CUSTOM_BASIC_CHEF_INTERVAL : ch.parts.basic === 'a_gunner' ? CUSTOM_BASIC_GUNNER_INTERVAL : ch.parts.basic === 'a_smith' ? CUSTOM_SMITH_FORGE_INTERVAL : ch.parts.basic === 'a_yi' ? YI_BLACK_INTERVAL : CUSTOM_BASIC_DRUNK_INTERVAL) :
       ch.type === 'rsqjs' ? RSQJS_BOMB_CD :
       DRUNK_ATTACK_INTERVAL,
-    knives: ch.type === 'chef' ? KNIFE_MAX_COUNT : null,
+    knives: ch.type === 'chef' ? (ch.knifeMaxOverride || KNIFE_MAX_COUNT) : null,
+    knifeMax: ch.type === 'chef' ? (ch.knifeMaxOverride || KNIFE_MAX_COUNT) : null,
     knifeRecalling: false,   // 是否回收中
+    chefPressure: ch.type === 'chef' && ch.chefHexPressure ? 0 : null,
+    chefPressureReady: false,
+    chefPressureBurstPending: false,
+    chefSearTargets: ch.type === 'chef' && ch.chefHexSear ? new Map() : null,
+    chefSaltDamageBuffTimer: 0,
+    chefItemAttackSpeedBuffTimer: 0,
+    chefSaltDamageBuff: 0,
     drunkTimer: ch.type === 'drunk' ? randBetween(DRUNK_DIR_CHANGE_MIN, DRUNK_DIR_CHANGE_MAX) : null,
+    drunkMistTimer: ch.type === 'drunk' ? DRUNK_MIST_INTERVAL : null,
+    drunkIntoxTimer: ch.type === 'drunk' ? DRUNK_INTOX_INTERVAL : null,
+    drunkIntoxStacks: ch.type === 'drunk' ? 0 : null,
+    drunkIntoxActiveTimer: ch.type === 'drunk' ? 0 : null,
+    drunkPunchFxTimer: ch.type === 'drunk' ? 0 : null,
+    confusedTimer: 0,
+    boundaryCamouflage: ch.type === 'boundary' ? false : null,
+    boundaryPhaseTimer: ch.type === 'boundary' ? BOUNDARY_CAMOUFLAGE_NORMAL : null,
+    boundaryPhase: ch.type === 'boundary' ? 'normal' : null,
+    boundaryBlackHoleTimer: ch.type === 'boundary' ? BOUNDARY_BLACK_HOLE_INTERVAL : null,
+    boundaryWarpUsed: ch.type === 'boundary' ? false : null,
+    boundaryWarpActive: ch.type === 'boundary' ? false : null,
+    boundaryWarpTimer: ch.type === 'boundary' ? 0 : null,
+    boundaryWarpAngle: ch.type === 'boundary' ? 0 : null,
+    boundaryWarpHits: ch.type === 'boundary' ? new Map() : null,
+    boundaryRiftHits: new Set(),
+    boundaryPendingHole: false,
     opmPunched: ch.type === 'opm' ? false : null,
     opmCountdown: ch.type === 'opm' ? OPM_COUNTDOWN_START : null,
     opmWasColliding: ch.type === 'opm' ? false : null,
@@ -5638,15 +6049,26 @@ function makeBall(x, y, vx, vy, ch, player, twinRole) {
     vampireDashElapsed: ch.type === 'vampire' ? 0 : null,  // 衝刺已持續時間
     vampireBatTimer: ch.type === 'vampire' ? 0 : null,
     // 被暗夜領主鎖定而停止移動
-    gojoTimer: ch.type === 'gojo' ? 0 : null,
+   // ── GOJO 重做版欄位 ──
+gojoInfinity: ch.type === 'gojo' ? GOJO_INFINITY_MAX : null,
+gojoInfinityRegenTimer: ch.type === 'gojo' ? GOJO_INFINITY_REGEN_TIME : null,
+gojoAttackCount: ch.type === 'gojo' ? 0 : null,
+gojoFistCooldown: ch.type === 'gojo' ? 0 : null,
+gojoDomainActive: ch.type === 'gojo' ? false : null,
+gojoDomainTimer: ch.type === 'gojo' ? 0 : null,
+gojoDomainCooldown: ch.type === 'gojo' ? 0 : null,
+gojoDomainDamageTick: ch.type === 'gojo' ? 0 : null,
+gojoDomainSafeSet: ch.type === 'gojo' ? null : null,
+// 舊欄位保留（避免舊程式碼引用報錯；新邏輯不使用）
+gojoTimer: ch.type === 'gojo' ? 0 : null,
 gojoCooldown: ch.type === 'gojo' ? GOJO_COOLDOWN : null,
 gojoUnlocked: ch.type === 'gojo' ? false : null,
 gojoCharging: ch.type === 'gojo' ? false : null,
 gojoChargeTimer: ch.type === 'gojo' ? 0 : null,
 gojoHasTriggered: ch.type === 'gojo' ? false : null,
 gojoBalls: ch.type === 'gojo' ? [] : null,
-	gojoStoredProjectiles: ch.type === 'gojo' ? [] : null,
-	gojoChargingVisual: ch.type === 'gojo' ? false : null,
+gojoStoredProjectiles: ch.type === 'gojo' ? [] : null,
+gojoChargingVisual: ch.type === 'gojo' ? false : null,
     // 魔彈射手・奧提斯專屬狀態
     otisLockTimer: ch.type === 'otis' ? OTIS_LOCK_INTERVAL : null,
     otisShotNumber: ch.type === 'otis' ? 0 : null,
@@ -6327,8 +6749,9 @@ function startGameCore() {
     const base = id === DUMMY_CHARACTER.id ? DUMMY_CHARACTER : getCharacterRoster().find(c => c && c.id === id);
     const dupTotal = idCounts[id];
     idSeenSoFar[id] = (idSeenSoFar[id] || 0) + 1;
+    const variantApplied = applyCharVariants(`p${i + 1}`, base);
     return {
-      ...base,
+      ...variantApplied,
       color: base.type === 'dummy' ? base.color : colorForPlayer(i + 1, base.type),
       displayName: dupTotal > 1 ? base.name + ' ' + idSeenSoFar[id] : base.name
     };
@@ -6395,10 +6818,12 @@ function startGameCore() {
     return [makeBall(px, py, vx, vy, ch, i + 1)];
   });
 
+  const flatBalls = twinBallGroups.flat();
+
   state = {
     playerCount,
-    balls: twinBallGroups.flat(),
-    projectiles: [], otisMagicBullets: [], otisReticles: [], otisPortals: [], otisRifts: [], otisScreenPulse: 0, wallKnives: [], minatoKunai: [], minatoTeleportFX: [], hitFlashes: [], damageNumbers: [], batParticles: [], vampireBats: [], johnnyObserveFX: [], johnnyGoldenRectFX: [], slashMarks: [], traps: [], yiBlackStones: [], yiStoneBurstFX: [], yiInkAttackFX: [], opmFX: [], momoiFanFX: [], gojoKillFX: null, curseSliceKillFX: null, minatoKillFX: null, emTotems: [], emLightningFX: [], emLightningWarn: [], emGolems: [], emUltBanner: null, curseFireFX: [], curseFireBlasts: [], curseFireZones: [], bossDryPowderExtinguishers: [], bossDryPowderBlasts: [], bossDryPowderZones: [], curseSlashFX: [], elapsed: 0,
+    balls: flatBalls,
+    projectiles: [], otisMagicBullets: [], otisReticles: [], otisPortals: [], otisRifts: [], otisScreenPulse: 0, wallKnives: [], minatoKunai: [], minatoTeleportFX: [], hitFlashes: [], damageNumbers: [], batParticles: [], vampireBats: [], chefItems: [], johnnyObserveFX: [], johnnyGoldenRectFX: [], slashMarks: [], traps: [], yiBlackStones: [], yiStoneBurstFX: [], yiInkAttackFX: [], opmFX: [], momoiFanFX: [], gojoKillFX: null, curseSliceKillFX: null, minatoKillFX: null, emTotems: [], emLightningFX: [], emLightningWarn: [], emGolems: [], emUltBanner: null, curseFireFX: [], curseFireBlasts: [], curseFireZones: [], bossDryPowderExtinguishers: [], bossDryPowderBlasts: [], bossDryPowderZones: [], curseSlashFX: [], elapsed: 0,
     arena: selectedArena,
     bgColor: selectedBgColor,
     thunderPillars: [],
@@ -6857,8 +7282,10 @@ function updateAmeliaCombat(b, dt) {
     b.ameliaGroundPoundTarget = enemy;
     b.ameliaGroundPoundStartX = b.x;
       b.ameliaGroundPoundStartY = b.y;
-      b.ameliaGroundPoundAimX = Math.max(WALL + RADIUS, Math.min(W - WALL - RADIUS, enemy.x + randBetween(-22, 22)));
-      b.ameliaGroundPoundAimY = Math.max(WALL + RADIUS, Math.min(H - WALL - RADIUS, enemy.y + randBetween(-22, 22)));
+      const ameliaAimPoint = getConfusedAimPoint(b, enemy, 150);
+      b.ameliaGroundPoundAimX = Math.max(WALL + RADIUS, Math.min(W - WALL - RADIUS, ameliaAimPoint.x));
+      b.ameliaGroundPoundAimY = Math.max(WALL + RADIUS, Math.min(H - WALL - RADIUS, ameliaAimPoint.y));
+      b._confusionAimOverrides = 0; // 地面重擊已直接消耗偏移點，不留給下一顆投射物
       b.ameliaGroundPoundElapsed = 0;
       b.ameliaGroundPoundPhase = 'ascend';
       b.ameliaGroundPoundAltitude = 0;
@@ -7577,11 +8004,27 @@ function dealDamage(target, dmg, options = {}) {
       state.johnnyHorses.push(horse); target.johnnyHorseTarget = horse;
     }
   }
+  const chefAttacker = options.attackerBall;
+  if (!bypassDefense && chefAttacker && chefAttacker.char?.type === 'chef' &&
+      chefHasHex(chefAttacker.char, 'charred') && target && target.player !== chefAttacker.player &&
+      !options.chefPressureBurst) {
+    const map = chefAttacker.chefSearTargets || (chefAttacker.chefSearTargets = new Map());
+    const data = map.get(target);
+    const stacks = data ? Math.min(CHEF_SEAR_MAX_STACKS, data.stacks || 0) : 0;
+    if (stacks > 0) mul *= 1 + stacks * CHEF_SEAR_DAMAGE_PER_STACK;
+  }
+  if (!bypassDefense && chefAttacker && (chefAttacker.chefSaltDamageBuffTimer || 0) > 0) {
+    mul *= 1 + (chefAttacker.chefSaltDamageBuff || 0);
+  }
   let rawAmount = dmg * mul;
   const flatAttacker = options.attackerBall || (options.attackerPlayer != null && state ? state.balls.find(x => x.player === options.attackerPlayer) : null);
   if (flatAttacker && !bypassDefense && flatAttacker.otisDamagePenalty > 0) rawAmount = Math.max(0, rawAmount - flatAttacker.otisDamagePenalty);
   if (target.otisDamageTakenBonus > 0 && !bypassDefense) rawAmount += target.otisDamageTakenBonus;
   if (target.otisVulnStacks > 0 && !bypassDefense) rawAmount *= 1 + Math.min(OTIS_VULN_MAX_STACKS, target.otisVulnStacks) * OTIS_VULN_PER_STACK;
+  // Sans 被動「次數血條」：無論實際傷害多少，每次受傷固定只扣1點（真正的系統殺 bypassParry 除外）
+  if (target.char && target.char.type === 'sans' && !bypassDefense) {
+    rawAmount = Math.min(rawAmount, 1);
+  }
   // 夏油條被動「護身」：特級咒靈承擔夏油條所受30%傷害（直接分擔在特級咒靈血量上）
   // 注意：必須在「傷害封頂於目前血量」之前扣除護身部分，否則致命一擊永遠會被護身分走一小部分，
   // 導致 actual 永遠小於 target.hp，血量只會無限趨近於 0 卻永遠扣不完（卡血無法擊敗的bug）。
@@ -7629,13 +8072,36 @@ function dealDamage(target, dmg, options = {}) {
     }
   }
   rawAmount = consumeItachiNextDamageBonus(target, rawAmount, bypassDefense);
-  // Sans 被動「次數血條」：無論實際傷害多少（包含天照印記等後續疊加的固定加成），
-  // 每次受傷固定只扣1點（真正的系統殺 bypassParry 除外）。必須放在天照印記結算之後，
-  // 否則印記的+50會在夾值之後才疊加，讓Sans被動遭到繞過。
-  if (target.char && target.char.type === 'sans' && !bypassDefense) {
-    rawAmount = Math.min(rawAmount, 1);
-  }
   let actual = Math.min(target.hp, rawAmount);
+  if (target && target.char?.type === 'chef' && chefHasHex(target.char, 'pressure_cooker') &&
+      !options.chefPressureBurst && !bypassDefense && actual > 0) {
+    target.chefPressure = Math.min(CHEF_PRESSURE_MAX, (Number(target.chefPressure) || 0) + actual * CHEF_PRESSURE_PER_DAMAGE);
+    if (target.chefPressure >= CHEF_PRESSURE_MAX) {
+      target.chefPressure = CHEF_PRESSURE_MAX;
+      target.chefPressureReady = true;
+      target.chefPressureBurstPending = true;
+    }
+  }
+  if (chefAttacker && chefAttacker.char?.type === 'chef' &&
+      chefHasHex(chefAttacker.char, 'charred') && target && target.player !== chefAttacker.player &&
+      !options.chefPressureBurst && !bypassDefense && actual > 0) {
+    const map = chefAttacker.chefSearTargets || (chefAttacker.chefSearTargets = new Map());
+    const data = map.get(target) || { stacks: 0, timer: 0, decayTimer: CHEF_SEAR_DECAY_INTERVAL };
+    data.stacks = Math.min(CHEF_SEAR_MAX_STACKS, (data.stacks || 0) + 1);
+    data.timer = CHEF_SEAR_DECAY_DELAY;
+    data.decayTimer = CHEF_SEAR_DECAY_INTERVAL;
+    if (data.stacks >= CHEF_SEAR_MAX_STACKS) {
+      actual += CHEF_SEAR_BURST_DAMAGE;
+      data.stacks = CHEF_SEAR_WARM_STACKS;
+      data.timer = CHEF_SEAR_DECAY_DELAY;
+      if (state) {
+        state.hitFlashes.push({ x: target.x, y: target.y, r: 42, alpha: 1, color: '#ff7b39', t: 0.35 });
+        state.damageNumbers.push({ x: target.x, y: target.y - target.r - 18, value: '焦香爆發！', color: '#ff9f43', life: 0.7, maxLife: 0.7, scale: 0.82 });
+      }
+      playHitSound('opm');
+    }
+    map.set(target, data);
+  }
   // 阿梅被動「懷錶」：本體血量即將到達開場抽取的數字時，從時間線消失並判定該玩家敗北。
   // 召喚阿梅以 ameliaWatchEnabled=false 建立，因此不會觸發同一被動。
   if (target.char && target.char.type === 'amelia' && target.ameliaWatchEnabled && !target.ameliaWatchTriggered &&
@@ -7704,6 +8170,9 @@ function dealDamage(target, dmg, options = {}) {
     target.hp = Math.max(1, target.hp - actual);
   } else {
     target.hp = Math.max(0, target.hp - actual);
+  }
+  if (actual > 0 && chefAttacker && target && target.player !== chefAttacker.player) {
+    chefSpawnItemOnHit(chefAttacker, target);
   }
   // 奕被動「取勢」：只要奕的棋局真正造成傷害，目標就緩速 50% 持續 2 秒；每次命中刷新時間。
   const yiAttacker = options.attackerBall || (options.attackerPlayer != null && state
@@ -10064,7 +10533,19 @@ function triggerNanamiCine(big) {
   hitStopTimer = Math.max(hitStopTimer, blackDur);
 }
 
+// 超界者維度躍遷等技能牽涉大量互動分支，一旦觸發到未預期的例外，
+// 若不攔截會讓 requestAnimationFrame 遞迴鏈直接斷掉，導致整場遊戲「卡死暫停」。
+// 這裡包一層防護：任何一幀出錯都只記錄到 console 並繼續排下一幀，不讓單一例外拖垮整場對戰。
 function tick(now) {
+  try {
+    tickInner(now);
+  } catch (err) {
+    console.error('[遊戲迴圈例外，已略過此幀避免卡死]', err);
+    if (gameLoop) cancelAnimationFrame(gameLoop);
+    gameLoop = requestAnimationFrame(tick);
+  }
+}
+function tickInner(now) {
   const rawDt = Math.min((now - lastTime) / 1000, 0.05);
   lastTime = now;
   let dt = rawDt * gameSpeed;
@@ -10201,18 +10682,6 @@ function tick(now) {
     }
   }
 
-  // 無量空處特效更新（在 update 之外，避免被 early return 跳過）
-  if (state.gojoKillFX) {
-    const fx = state.gojoKillFX;
-    fx.life -= dt;
-    for (const l of fx.lines) l.dist += l.speed * dt;
-    if (fx.life <= 0) {
-      state.gojoKillFX = null;
-      const dead = state.balls.filter(b => b.hp <= 0);
-      scheduleRoundEnd(dead, 100);
-      return;
-    }
-  }
 
   // 砲爹 vs 乙骨 決鬥終結特效更新（在 update 之外，避免被 early return 跳過）
   if (state.cannonDuelFX) {
@@ -10345,40 +10814,6 @@ function tick(now) {
     playHitSound('opm');
   }
 
-  // ── 沙盒重生：角色陣亡時若還有剩餘重生次數，用 makeBall 重新生成一顆全新的球 ──
-  // 特地用全新物件而不是把舊球血量補回去：呼吸法／元素奧義／爆裂黎明／天下劫／幻獸琥珀
-  // 這類「進場後累積XX秒才解鎖」的技能，計時欄位都是在 makeBall() 建立當下才初始化，
-  // 直接復活舊物件的話這些計時器（以及對應是否已解鎖的旗標）會維持死亡前的進度，
-  // 等於重生等於「無縫接續」而不是「重新登場」。改成整顆重建，就能讓這些技能
-  // 一律以「這次重生／進場」重新起算，行為統一成單純的進場時間。
-  // 放在淘汰判定（下面的 outcomeDeadMap）之前執行，讓新球在同一幀就有 hp>0，
-  // 不會被判定為「這隊已經團滅」而提早結束比賽。
-  if (sandboxMode) {
-    const respawnPairs = [];
-    for (const d of dead) {
-      if (d.hp > 0) continue;
-      const left = d.sandboxRespawnsLeft || 0;
-      if (left <= 0) continue;
-      // 拉回場地中央附近重生，避免卡在死亡當下的邊界、陷阱或熔岩等危險位置
-      const rx = W / 2 + (Math.random() - 0.5) * Math.min(80, W * 0.2);
-      const ry = H / 2 + (Math.random() - 0.5) * Math.min(80, H * 0.2);
-      const moveAngle = Math.random() * Math.PI * 2;
-      const fresh = makeBall(rx, ry, Math.cos(moveAngle) * BASE_SPEED, Math.sin(moveAngle) * BASE_SPEED, d.char, d.player, d.twinRole);
-      fresh.sandboxRespawnsLeft = left - 1;
-      if (d.customMaxHp != null) { fresh.customMaxHp = d.customMaxHp; fresh.hp = d.customMaxHp; }
-      fresh.invincibleTimer = Math.max(fresh.invincibleTimer || 0, 0.8);
-      respawnPairs.push({ old: d, fresh });
-      state.hitFlashes.push({ x: rx, y: ry, r: 60, alpha: 1, color: (d.char && d.char.color) || '#8fd6ff', t: 0.5 });
-      state.damageNumbers.push({ x: rx, y: ry - 60, value: '重生！', color: '#8fd6ff', life: 1.0, maxLife: 1.0, scale: 1.15 });
-    }
-    if (respawnPairs.length > 0) {
-      const oldSet = new Set(respawnPairs.map(p => p.old));
-      state.balls = state.balls.filter(b => !oldSet.has(b)).concat(respawnPairs.map(p => p.fresh));
-      // 死魂靈的餘息等「進場觸發」被動：重新掃描一次，幫剛重生、目前身邊沒有召喚物的維什戴爾補上。
-      if (respawnPairs.some(p => p.fresh.char && p.fresh.char.type === 'ew')) initializeEwForBattle();
-    }
-  }
-
   // 以隊伍是否還有任何存活球作為淘汰依據；雙生只死一顆時仍可繼續戰鬥。
   const outcomeDeadMap = new Map();
   for (const d of dead) {
@@ -10475,35 +10910,11 @@ function tick(now) {
       return;
     }
 
-    // Gojo 擊殺：觸發無量空處
-    if (!state.gojoKillFX && !state.minatoKillFX) {
-      const killer = state.balls.find(b => b.hp > 0 && b.char.type === 'gojo');
-      if (killer) {
-        const lines = [];
-        for (let i = 0; i < 80; i++) {
-          const angle = Math.random() * Math.PI * 2;
-          lines.push({
-            angle, dist: 20 + Math.random() * 60,
-            speed: 180 + Math.random() * 400,
-            len: 30 + Math.random() * 120,
-            alpha: 0.4 + Math.random() * 0.6,
-            width: 0.5 + Math.random() * 1.5
-          });
-        }
-        state.gojoKillFX = { life: 3.2, maxLife: 3.2, lines };
-        // 凍結所有球：停止移動、無敵、停止攻擊
-        for (const b of state.balls) {
-          b.vx = 0; b.vy = 0;
-          b.invincible = true;
-          b.attackTimer = 0;
-        }
-      }
-    }
-    // 若有特效還在播就繼續跑
-    if (state.opmFX.length > 0 || state.gojoKillFX) {
-      gameLoop = requestAnimationFrame(tick);
-      return;
-    }
+ // 若有其他特效還在播就繼續跑
+if (state.opmFX.length > 0) {
+  gameLoop = requestAnimationFrame(tick);
+  return;
+}
     scheduleRoundEnd(outcomeDead, 300);
     return;
   }
@@ -11596,6 +12007,317 @@ function registerMageConjuredHit(projectile) {
   }
 }
 
+function drunkGainIntoxication(b) {
+  if (!b || !b.char.drunkHexHigh || b.drunkIntoxActiveTimer > 0) return;
+  b.drunkIntoxStacks = Math.min(DRUNK_INTOX_MAX, (b.drunkIntoxStacks || 0) + 1);
+  if (b.drunkIntoxStacks >= DRUNK_INTOX_MAX) {
+    b.drunkIntoxActiveTimer = DRUNK_INTOX_DURATION;
+    state.hitFlashes.push({ x:b.x, y:b.y, r:42, alpha:1, color:'#e6b84a', t:0.55 });
+  }
+}
+function drunkPunchCheck(b) {
+  let hit = null, hitDist = Infinity;
+  // 以酒鬼為中心，在統一醉拳半徑內找最近敵人；方向直接鎖定敵人。
+  for (const target of getEnemies(b)) {
+    if (!target || target.hp <= 0) continue;
+    const dist = Math.hypot(target.x - b.x, target.y - b.y) || 1;
+    if (dist <= DRUNK_PUNCH_RADIUS + getCombatRadius(target) && dist < hitDist) {
+      hit = target; hitDist = dist;
+    }
+  }
+  let nx = b.vx, ny = b.vy;
+  if (hit) { nx = hit.x - b.x; ny = hit.y - b.y; }
+  const nd = Math.hypot(nx, ny) || 1;
+  nx /= nd; ny /= nd;
+  const punchAngle = Math.atan2(ny, nx);
+  const travel = hit ? Math.min(DRUNK_PUNCH_DISTANCE, Math.max(18, hitDist - getCombatRadius(hit) * 0.35)) : DRUNK_PUNCH_DISTANCE;
+  const px = b.x + nx * travel, py = b.y + ny * travel;
+  b.drunkPunchFxTimer = 0.5;
+  b.drunkPunchFxAngle = punchAngle;
+  b.drunkPunchFxX = px; b.drunkPunchFxY = py;
+  b.x = Math.max(WALL + RADIUS, Math.min(W - WALL - RADIUS, b.x + nx * Math.min(18, travel)));
+  b.y = Math.max(WALL + RADIUS, Math.min(H - WALL - RADIUS, b.y + ny * Math.min(18, travel)));
+  // 光圈與實際判定共用 DRUNK_PUNCH_RADIUS。
+  state.hitFlashes.push({x:px,y:py,r:DRUNK_PUNCH_RADIUS,alpha:1.15,color:'#ffd45a',t:0.5});
+  state.hitFlashes.push({x:px,y:py,r:DRUNK_PUNCH_RADIUS * 0.3,alpha:1,color:'#fff3b0',t:0.28});
+  if (hit) {
+    dealDamage(hit, DRUNK_PUNCH_DAMAGE, { attackerPlayer:b.player, attackerBall:b });
+    hit.vx = (hit.vx || 0) + nx * DRUNK_PUNCH_KNOCKBACK;
+    hit.vy = (hit.vy || 0) + ny * DRUNK_PUNCH_KNOCKBACK;
+  }
+}
+function fireDrunkMist(b,target) {
+  const dx=target.x-b.x, dy=target.y-b.y, d=Math.hypot(dx,dy)||1;
+  return addProjectile(createProjectile({x:b.x+dx/d*(RADIUS+5),y:b.y+dy/d*(RADIUS+5),vx:dx/d*DRUNK_MIST_SPEED,vy:dy/d*DRUNK_MIST_SPEED,owner:b.player,ownerBall:b,type:'drunk_mist',angle:Math.atan2(dy,dx),damage:0,color:'#c99bff',r:DRUNK_MIST_RADIUS,life:DRUNK_MIST_DURATION}));
+}
+function chefHasHex(ch, id) {
+  return !!(ch && ch.type === 'chef' && Array.isArray(ch._variantIds) && ch._variantIds.includes(id));
+}
+
+function vampireHasHex(ch, id) {
+  return !!(ch && ch.type === 'vampire' && Array.isArray(ch._variantIds) && ch._variantIds.includes(id));
+}
+
+function spawnChefItem(x, y, ownerPlayer) {
+  if (!state) return;
+  state.chefItems = state.chefItems || [];
+  if (state.chefItems.length >= CHEF_ITEM_MAX) return;
+  const pool = [
+    { type: 'salt', emoji: '🧂', color: '#e8edf2' },
+    { type: 'pepper', emoji: '🌶️', color: '#ff5a4f' },
+    { type: 'butter', emoji: '🧈', color: '#ffd86b' }
+  ];
+  const item = pool[Math.floor(Math.random() * pool.length)];
+  const a = Math.random() * Math.PI * 2, r = 4 + Math.random() * 18;
+  state.chefItems.push({
+    ...item,
+    x: Math.max(WALL + 22, Math.min(W - WALL - 22, x + Math.cos(a) * r)),
+    y: Math.max(WALL + 22, Math.min(H - WALL - 22, y + Math.sin(a) * r)),
+    life: CHEF_ITEM_LIFETIME,
+    ownerPlayer
+  });
+}
+
+function chefSpawnItemOnHit(attacker, target) {
+  if (!attacker || !target || attacker.hp <= 0 || target.hp <= 0) return;
+  if (!chefHasHex(attacker.char, 'extra_salt') || Math.random() > CHEF_ITEM_SPAWN_CHANCE) return;
+  // 道具生成在攻擊者與目標的中點，但只有廚神自己能拾取。
+  spawnChefItem((attacker.x + target.x) * 0.5, (attacker.y + target.y) * 0.5, attacker.player);
+}
+
+function triggerChefPressureBurst(chef) {
+  if (!chef || chef.hp <= 0 || !chefHasHex(chef.char, 'pressure_cooker')) return false;
+  if (!chef.chefPressureReady || !chef.chefPressureBurstPending || (Number(chef.chefPressure) || 0) < CHEF_PRESSURE_MAX) return false;
+
+  // 先完全清除觸發狀態，再進入傷害流程。
+  // 這個函式只會在 updateChefHextech 的安全階段執行，避免 dealDamage() 內再次觸發自己。
+  chef.chefPressure = 0;
+  chef.chefPressureReady = false;
+  chef.chefPressureBurstPending = false;
+
+  const targets = getAllCombatTargets().filter(target => {
+    if (!target || target.hp <= 0 || target.player === chef.player) return false;
+    const dx = Number(target.x) - Number(chef.x);
+    const dy = Number(target.y) - Number(chef.y);
+    return Number.isFinite(dx) && Number.isFinite(dy) &&
+      Math.hypot(dx, dy) <= CHEF_PRESSURE_BLAST_RADIUS + getCombatRadius(target);
+  });
+
+  // 逐一處理，但任何單一目標的特殊被動都不會再把高壓鍋重新排入同一輪。
+  for (const target of targets) {
+    if (!target || target.hp <= 0) continue;
+    dealDamage(target, CHEF_PRESSURE_BLAST_DAMAGE, {
+      attackerBall: chef,
+      attackerPlayer: chef.player,
+      chefPressureBurst: true
+    });
+  }
+
+  if (state) {
+    state.hitFlashes.push({ x: chef.x, y: chef.y, r: CHEF_PRESSURE_BLAST_RADIUS * 0.8, alpha: 1, color: CHEF_PRESSURE_FLASH_COLOR, t: 0.4 });
+    state.hitFlashes.push({ x: chef.x, y: chef.y, r: CHEF_PRESSURE_BLAST_RADIUS * 0.42, alpha: 0.85, color: '#fff1c1', t: 0.22 });
+    state.damageNumbers.push({ x: chef.x, y: chef.y - chef.r - 16, value: '高壓鍋！', color: CHEF_PRESSURE_FLASH_COLOR, life: 0.7, maxLife: 0.7, scale: 0.9 });
+  }
+  playHitSound('opm');
+  return true;
+}
+
+function updateChefHextech(dt) {
+  if (!state || !state.balls || state.matchEnded) return;
+  state.chefItems = state.chefItems || [];
+
+  // 先處理上一輪已達滿壓的高壓鍋。只從「待處理」旗標觸發一次，避免在傷害結算途中重入。
+  const pressureChefs = state.balls.filter(b => b && b.hp > 0 && b.char?.type === 'chef' &&
+    chefHasHex(b.char, 'pressure_cooker') && b.chefPressureBurstPending);
+  for (const chef of pressureChefs) {
+    if (!state || state.matchEnded) break;
+    triggerChefPressureBurst(chef);
+  }
+
+  for (let i = state.chefItems.length - 1; i >= 0; i--) {
+    const item = state.chefItems[i];
+    if (!item) { state.chefItems.splice(i, 1); continue; }
+    item.life -= dt;
+    if (item.life <= 0) { state.chefItems.splice(i, 1); continue; }
+    let picked = false;
+    for (const b of state.balls) {
+      if (!b || b.hp <= 0 || Math.hypot(b.x - item.x, b.y - item.y) > b.r + CHEF_ITEM_PICKUP_RADIUS) continue;
+      // 調味道具是廚神專屬資源，敵方永遠不能拾取。
+      if (b.player !== item.ownerPlayer) continue;
+      if (item.type === 'salt') {
+        b.chefSaltDamageBuff = CHEF_ITEM_BUFF_DAMAGE;
+        b.chefSaltDamageBuffTimer = CHEF_ITEM_BUFF_DAMAGE_DURATION;
+      } else if (item.type === 'pepper') {
+        b.chefItemAttackSpeedBuffTimer = CHEF_ITEM_ATTACK_SPEED_DURATION;
+        // 立即保留目前計時進度，避免撿到辣椒後還要等完整一輪才感受到攻速提升。
+        b.attackTimer = Math.max(b.attackTimer || 0, b.attackInterval / CHEF_ITEM_ATTACK_SPEED_MULT);
+      } else {
+        const maxHp = getBallMaxHp(b);
+        b.hp = Math.min(maxHp, b.hp + CHEF_ITEM_HEAL);
+      }
+      state.hitFlashes.push({ x: item.x, y: item.y, r: 22, alpha: 0.8, color: item.color, t: 0.25 });
+      state.damageNumbers.push({
+        x: b.x, y: b.y - b.r - 10,
+        value: item.type === 'salt' ? '🧂 增傷' : item.type === 'pepper' ? '🌶️ 攻速提升' : '🧈 回復',
+        color: item.color, life: 0.7, maxLife: 0.7, scale: 0.72
+      });
+      picked = true;
+      break;
+    }
+    if (picked) state.chefItems.splice(i, 1);
+  }
+
+  for (const b of state.balls) {
+    if (!b || b.hp <= 0 || b.char?.type !== 'chef') continue;
+    if (b.chefSaltDamageBuffTimer > 0) {
+      b.chefSaltDamageBuffTimer = Math.max(0, b.chefSaltDamageBuffTimer - dt);
+      if (b.chefSaltDamageBuffTimer <= 0) b.chefSaltDamageBuff = 0;
+    }
+    if (b.chefItemAttackSpeedBuffTimer > 0) b.chefItemAttackSpeedBuffTimer = Math.max(0, b.chefItemAttackSpeedBuffTimer - dt);
+    if (chefHasHex(b.char, 'charred') && b.chefSearTargets) {
+      for (const [target, data] of b.chefSearTargets) {
+        if (!target || target.hp <= 0) { b.chefSearTargets.delete(target); continue; }
+        if (!data || typeof data !== 'object') { b.chefSearTargets.delete(target); continue; }
+        data.timer = Math.max(0, (Number(data.timer) || 0) - Math.max(0, Number(dt) || 0));
+        if (data.timer <= 0) {
+          data.decayTimer = Math.max(0, (data.decayTimer || CHEF_SEAR_DECAY_INTERVAL) - dt);
+          if (data.decayTimer <= 0) {
+            data.stacks = Math.max(0, (data.stacks || 0) - 1);
+            data.decayTimer = CHEF_SEAR_DECAY_INTERVAL;
+            if (data.stacks <= 0) b.chefSearTargets.delete(target);
+          }
+        }
+      }
+    }
+  }
+}
+
+function boundaryGetHoles() {
+  if (!state.boundaryBlackHoles) state.boundaryBlackHoles = [];
+  return state.boundaryBlackHoles;
+}
+function boundaryExplodeHole(hole) {
+  if (!hole) return;
+  state.hitFlashes.push({ x: hole.x, y: hole.y, r: BOUNDARY_BLACK_HOLE_BLAST_RADIUS, alpha: 1.15, color: '#b46cff', t: 0.5 });
+  for (const target of state.balls) {
+    if (!target || target.hp <= 0 || target.player === hole.ownerPlayer) continue;
+    if (Math.hypot(target.x - hole.x, target.y - hole.y) <= BOUNDARY_BLACK_HOLE_BLAST_RADIUS + (target.r || RADIUS)) {
+      dealDamage(target, BOUNDARY_BLACK_HOLE_BLAST_DAMAGE, { attackerPlayer: hole.ownerPlayer, attackerBall: hole.ownerBall });
+    }
+  }
+}
+function boundaryRandomHolePoint() {
+  const margin = BOUNDARY_BLACK_HOLE_EDGE_MARGIN + BOUNDARY_BLACK_HOLE_RADIUS;
+  const minX = WALL + margin, maxX = W - WALL - margin;
+  const minY = WALL + margin, maxY = H - WALL - margin;
+  return {
+    x: minX < maxX ? minX + Math.random() * (maxX - minX) : W / 2,
+    y: minY < maxY ? minY + Math.random() * (maxY - minY) : H / 2,
+  };
+}
+function boundaryPlaceHole(b) {
+  const holes = boundaryGetHoles();
+  // 一次重放：先讓這名超界者原本場上的黑洞全部引爆消失，再一次隨機灑落 3 個新的，全部遠離邊界。
+  const ownHoles = holes.filter(h => h.ownerPlayer === b.player);
+  for (const hole of ownHoles) boundaryExplodeHole(hole);
+  state.boundaryBlackHoles = holes.filter(h => h.ownerPlayer !== b.player);
+  const freshHoles = boundaryGetHoles();
+  const placed = [];
+  for (let i = 0; i < BOUNDARY_BLACK_HOLE_MAX; i++) {
+    let point = boundaryRandomHolePoint();
+    // 盡量避免新黑洞彼此重疊，最多重試幾次找出間距足夠的位置。
+    for (let attempt = 0; attempt < 6; attempt++) {
+      const tooClose = placed.some(p => Math.hypot(p.x - point.x, p.y - point.y) < BOUNDARY_BLACK_HOLE_RADIUS * 4);
+      if (!tooClose) break;
+      point = boundaryRandomHolePoint();
+    }
+    placed.push(point);
+    freshHoles.push({ x: point.x, y: point.y, r: BOUNDARY_BLACK_HOLE_RADIUS, ownerPlayer: b.player, ownerBall: b, born: state.elapsed || 0, id: Math.random() });
+    state.hitFlashes.push({ x: point.x, y: point.y, r: 24, alpha: 1, color: '#7bdcff', t: 0.4 });
+  }
+}
+function boundaryFireRift(b, origin = b, reflected = false) {
+  const holes = boundaryGetHoles();
+  let target = holes.filter(h => h.ownerPlayer === b.player).sort((a, c) => Math.hypot(a.x-b.x,a.y-b.y)-Math.hypot(c.x-b.x,c.y-b.y))[0];
+  if (!target) target = getNearestEnemyTo(b.x, b.y, b.player);
+  if (!target) return null;
+  const angle = Math.atan2(target.y - origin.y, target.x - origin.x);
+  return addProjectile({ x: origin.x, y: origin.y, vx: Math.cos(angle) * BOUNDARY_RIFT_SPEED, vy: Math.sin(angle) * BOUNDARY_RIFT_SPEED, owner: b.player, ownerBall: b, type: 'boundary_rift', damage: 0, r: 24, life: BOUNDARY_RIFT_LIFE, angle, boundaryReflected: reflected, boundaryPulseTimer: BOUNDARY_RIFT_PULSE_INTERVAL, boundaryPulseCount: 0, boundaryHitHoles: new Set() });
+  }
+function boundaryReflectAtHole(rift, hole) {
+  if (!rift || !hole || rift.boundaryReflected || rift.boundaryHitHoles?.has(hole)) return;
+  if (rift.boundaryHitHoles) rift.boundaryHitHoles.add(hole);
+  const b = rift.ownerBall;
+  if (!b) return;
+  for (const other of boundaryGetHoles()) {
+    if (other === hole) continue;
+    const angle = Math.atan2((getNearestEnemyTo(other.x, other.y, b.player)?.y ?? other.y) - other.y, (getNearestEnemyTo(other.x, other.y, b.player)?.x ?? other.x) - other.x);
+    addProjectile({ x: other.x, y: other.y, vx: Math.cos(angle)*BOUNDARY_RIFT_SPEED, vy: Math.sin(angle)*BOUNDARY_RIFT_SPEED, owner: b.player, ownerBall: b, type:'boundary_rift', damage:0, r:24, life:BOUNDARY_RIFT_LIFE, angle, boundaryReflected:true, boundaryPulseTimer:BOUNDARY_RIFT_PULSE_INTERVAL, boundaryPulseCount:0, boundaryHitHoles:new Set() });
+      }
+  state.hitFlashes.push({ x: hole.x, y: hole.y, r: 34, alpha: 1.2, color: '#e3b6ff', t: 0.45 });
+  state.hitFlashes.push({ x: hole.x, y: hole.y, r: 22, alpha: 1.0, color: '#ff45ff', t: 0.28 });
+}
+function boundaryPulseRift(p, dt) {
+  p.boundaryPulseTimer -= dt;
+  while (p.boundaryPulseTimer <= 0 && p.boundaryPulseCount < 12) {
+    p.boundaryPulseTimer += BOUNDARY_RIFT_PULSE_INTERVAL;
+    p.boundaryPulseCount++;
+    state.hitFlashes.push({ x:p.x, y:p.y, r:28, alpha:0.55, color:'#9feaff', t:0.18 });
+    state.boundaryShockwaves = state.boundaryShockwaves || [];
+    state.boundaryShockwaves.push({ x:p.x, y:p.y, age:0, life:0.32, maxR:42 });
+    for (const target of getAllCombatTargets()) {
+      if (!target || target.hp <= 0 || (target.player ?? target.ownerPlayer ?? target.owner) === p.owner) continue;
+      if (Math.hypot(target.x-p.x,target.y-p.y) <= (p.r || 12) + getCombatRadius(target)) dealDamage(target, BOUNDARY_RIFT_PULSE_DAMAGE, { attackerPlayer:p.owner, attackerBall:p.ownerBall });
+    }
+  }
+}
+function boundaryTriggerWarp(b) {
+  if (b.boundaryWarpUsed) return;
+  b.boundaryWarpUsed = true; b.boundaryWarpActive = true; b.boundaryWarpTimer = BOUNDARY_WARP_DURATION; b.boundaryWarpHits = new Map(); b.invincible = true;
+  b.boundaryWarpAngle = Math.atan2(b.vy || 0, b.vx || 1);
+  for (const hole of boundaryGetHoles().filter(h => h.ownerPlayer === b.player)) boundaryExplodeHole(hole);
+  state.boundaryBlackHoles = boundaryGetHoles().filter(h => h.ownerPlayer !== b.player);
+  state.hitFlashes.push({ x:b.x, y:b.y, r:50, alpha:1.2, color:'#8ee7ff', t:0.7 });
+}
+function boundaryUpdate(b, dt) {
+  if (!b || b.hp <= 0) return;
+  if (b.char?.type !== 'boundary') return;
+  if (!b.boundaryWarpUsed && (b.hp <= BOUNDARY_WARP_TRIGGER_HP || (state.elapsed || 0) >= BOUNDARY_WARP_TRIGGER_TIME)) boundaryTriggerWarp(b);
+  if (b.boundaryWarpActive) {
+    b.boundaryWarpTimer -= dt; b.invincible = true;
+    const target = getNearestEnemyTo(b.x,b.y,b.player);
+    if (target) { const d=Math.hypot(target.x-b.x,target.y-b.y)||1; const desired=Math.atan2(target.y-b.y,target.x-b.x); let turn=desired-(b.boundaryWarpAngle||0); while(turn>Math.PI) turn-=Math.PI*2; while(turn<-Math.PI) turn+=Math.PI*2; const maxTurn=BOUNDARY_WARP_TURN_RATE*dt; b.boundaryWarpAngle += Math.max(-maxTurn, Math.min(maxTurn, turn)); b.vx=Math.cos(b.boundaryWarpAngle)*BOUNDARY_WARP_SPEED; b.vy=Math.sin(b.boundaryWarpAngle)*BOUNDARY_WARP_SPEED;
+      // 維度躍遷：同一個敵人只要持續在攻擊範圍內，每隔 BOUNDARY_WARP_HIT_INTERVAL 秒就能再吃一次傷害，不再是一次性單擊。
+      const lastHit = b.boundaryWarpHits.get(target) ?? -Infinity;
+      if (d <= (b.r||RADIUS)+(target.r||RADIUS)+8 && (state.elapsed - lastHit) >= BOUNDARY_WARP_HIT_INTERVAL) {
+        b.boundaryWarpHits.set(target, state.elapsed);
+        dealDamage(target,BOUNDARY_WARP_DAMAGE,{attackerPlayer:b.player,attackerBall:b});
+      }
+    }
+    // 躍遷期間本來就無敵，迷彩狀態沒有意義，直接關閉避免殘留造成視覺與命中判定不一致。
+    b.ewCamouflaged = false; b.ewCamouflageSource = null;
+    if (b.boundaryWarpTimer <= 0) { b.boundaryWarpActive=false; b.invincible=false; }
+  } else {
+    b.boundaryPhaseTimer -= dt;
+    if (b.boundaryPhaseTimer <= 0) { b.boundaryCamouflage = !b.boundaryCamouflage; b.boundaryPhase = b.boundaryCamouflage ? 'camouflage' : 'normal'; b.boundaryPhaseTimer = b.boundaryCamouflage ? BOUNDARY_CAMOUFLAGE_DURATION : BOUNDARY_CAMOUFLAGE_NORMAL; }
+    // 套用 EW 死魂靈迷彩的同一套判定：迷彩中不可被鎖定、也不受一般傷害（沿用 isCamouflagedTarget / dealDamage 既有邏輯）。
+    b.ewCamouflaged = b.boundaryCamouflage;
+    b.ewCamouflageSource = b.boundaryCamouflage ? b : null;
+    b.boundaryBlackHoleTimer -= dt;
+    if (b.boundaryBlackHoleTimer <= 0) { b.boundaryBlackHoleTimer = BOUNDARY_BLACK_HOLE_INTERVAL; b.boundaryPendingHole = true; }
+  }
+}
+function updateBoundaryProjectiles(dt) {
+  if (state.boundaryShockwaves) {
+    for (const fx of state.boundaryShockwaves) fx.age += dt;
+    state.boundaryShockwaves = state.boundaryShockwaves.filter(fx => fx.age < fx.life);
+  }
+  for (const p of state.projectiles || []) if (p?.type === 'boundary_rift') {
+    boundaryPulseRift(p,dt);
+    for (const hole of boundaryGetHoles()) if (hole.ownerPlayer === p.owner && Math.hypot(p.x-hole.x,p.y-hole.y) <= (p.r||12)+hole.r) boundaryReflectAtHole(p,hole);
+  }
+}
+
 function update(dt) {
   // 時停啟動預判必須先於 Boss 與角色更新，避免冷卻剛好歸零時敵人先偷打一擊。
   primeDioWorldActivations(dt);
@@ -11625,6 +12347,8 @@ function update(dt) {
     if (state.nanamiWallShakeTimer < 0) state.nanamiWallShakeTimer = 0;
   }
 
+  updateChefHextech(dt);
+
   const [b0, b1] = state.balls; // Note: used only for ball-ball collision of opposing first balls
 
   // 飛雷神・亂斬演出播放中：只更新特效，跳過所有遊戲邏輯
@@ -11653,6 +12377,7 @@ function update(dt) {
     if (!b || b.hp <= 0) continue;
     tickStatusEffects(b, dt);
     syncLegacyStatusEffects(b);
+    boundaryUpdate(b, dt);
   }
   for (const summon of getTargetableSummons()) {
     if (!summon || summon.hp <= 0) continue;
@@ -11850,6 +12575,20 @@ function update(dt) {
       if (b.trail.length > 18) b.trail.shift();
     }
 
+    if (b.drunkPunchFxTimer > 0) b.drunkPunchFxTimer = Math.max(0, b.drunkPunchFxTimer - dt);
+    if (b.char.type === 'drunk' && b.char.drunkHexHigh) {
+      b.drunkIntoxTimer -= dt;
+      if (b.drunkIntoxTimer <= 0) { b.drunkIntoxTimer += DRUNK_INTOX_INTERVAL; drunkGainIntoxication(b); }
+      if (b.drunkIntoxActiveTimer > 0) b.drunkIntoxActiveTimer = Math.max(0, b.drunkIntoxActiveTimer - dt);
+    }
+    if (b.char.type === 'drunk' && b.char.drunkHexMist) {
+      b.drunkMistTimer -= dt;
+      if (b.drunkMistTimer <= 0) {
+        b.drunkMistTimer += DRUNK_MIST_INTERVAL;
+        const mistTarget = getNearestEnemyTo(b.x, b.y, b.player);
+        if (mistTarget) fireDrunkMist(b, mistTarget);
+      }
+    }
     // 酒鬼方向改變
     if (b.char.type === 'drunk' && b.drunkTimer !== null) {
       b.drunkTimer -= dt;
@@ -11857,6 +12596,7 @@ function update(dt) {
         const newAngle = Math.random() * Math.PI * 2;
         b.vx = Math.cos(newAngle) * BASE_SPEED;
         b.vy = Math.sin(newAngle) * BASE_SPEED;
+        if (b.char.drunkHexPunch) drunkPunchCheck(b);
         b.drunkTimer = randBetween(DRUNK_DIR_CHANGE_MIN, DRUNK_DIR_CHANGE_MAX);
         state.hitFlashes.push({ x: b.x, y: b.y, r: 30, alpha: 0.5, color: b.char.color, t: 0.3 });
       }
@@ -11920,15 +12660,17 @@ function update(dt) {
         }
       }
 
-      // 觸發衝刺
-      if (!b.vampireDashing && !b.vampireBiting && b.vampireDashTimer <= 0) {
-        b.vampireDashing = true;
-        b.vampireDashElapsed = 0;
-        b.vampireDashTimer = VAMPIRE_DASH_INTERVAL;
-        playHitSound('vampire_dash');
-        // 生成大量蝙蝠粒子
-        spawnBatParticles(b.x, b.y, b.char.color, 8);
-      }
+ // 觸發衝刺
+if (!b.vampireDashing && !b.vampireBiting && b.vampireDashTimer <= 0) {
+  b.vampireDashing = true;
+  b.vampireDashElapsed = 0;
+  const crimsonFeast = vampireHasHex(b.char, 'crimson_feast');
+  b.vampireDashTimer = VAMPIRE_DASH_INTERVAL + (crimsonFeast ? 4 : 0);
+  if (crimsonFeast) b.vampireCrimsonFeastReady = true;
+  playHitSound('vampire_dash');
+  // 生成大量蝙蝠粒子
+  spawnBatParticles(b.x, b.y, b.char.color, 8);
+}
     }
 
     // 暗夜領主：領主眷屬。蝙蝠平時環繞，鎖定敵人飛出攻擊後返回回血。
@@ -11964,18 +12706,25 @@ function update(dt) {
             if (t.frozenByVampire) { bat.state='return'; bat.target=null; continue; }
             const dx=t.x-bat.x, dy=t.y-bat.y, d=Math.hypot(dx,dy)||1;
             bat.x += dx/d * VAMPIRE_BAT_SPEED * dt; bat.y += dy/d * VAMPIRE_BAT_SPEED * dt;
-            if (!bat.hit && d < RADIUS + bat.r) {
-              dealDamage(t, VAMPIRE_BAT_DAMAGE, { attackerPlayer:b.player });
-              bat.hit=true; bat.state='return';
-              state.hitFlashes.push({x:t.x,y:t.y,r:18,alpha:0.8,color:'#7d2cff',t:0.22});
-              playHitSound('vampire_bite');
-            }
+           if (!bat.hit && d < RADIUS + bat.r) {
+  const bloodBat = vampireHasHex(b.char, 'blood_bat');
+  const batDmg = bloodBat ? VAMPIRE_BAT_DAMAGE * 0.5 : VAMPIRE_BAT_DAMAGE;
+  dealDamage(t, batDmg, { attackerPlayer:b.player });
+  bat.hit=true; bat.state='return';
+  state.hitFlashes.push({x:t.x,y:t.y,r:18,alpha:0.8,color:'#7d2cff',t:0.22});
+  playHitSound('vampire_bite');
+}
           } else if (bat.state === 'return') {
             const dx=b.x-bat.x, dy=b.y-bat.y, d=Math.hypot(dx,dy)||1;
             bat.x += dx/d * VAMPIRE_BAT_SPEED * 1.15 * dt; bat.y += dy/d * VAMPIRE_BAT_SPEED * 1.15 * dt;
-            if (d < RADIUS + 16) {
-              if (bat.hit) { b.hp=Math.min(getBallMaxHp(b), b.hp+VAMPIRE_BAT_HEAL); state.hitFlashes.push({x:b.x,y:b.y,r:18,alpha:0.7,color:'#b23cff',t:0.25}); }
-              bat.state='orbit'; bat.target=null; bat.hit=false;
+          if (d < RADIUS + 16) {
+  if (bat.hit) {
+    const bloodBat = vampireHasHex(b.char, 'blood_bat');
+    const batHeal = bloodBat ? VAMPIRE_BAT_HEAL * 2 : VAMPIRE_BAT_HEAL;
+    b.hp=Math.min(getBallMaxHp(b), b.hp+batHeal);
+    state.hitFlashes.push({x:b.x,y:b.y,r:18,alpha:0.7,color:'#b23cff',t:0.25});
+  }
+                bat.state='orbit'; bat.target=null; bat.hit=false;
             }
           }
         }
@@ -11987,11 +12736,12 @@ function update(dt) {
       b.vampireBiteTimer -= dt;
       if (b.vampireBiteTimer <= 0 && b.vampireBiteStep < VAMPIRE_BITE_COUNT) {
         // 執行本次咬擊（鎖定觸發當下抓住的敵人，而不是每次都重新找場上最近的敵人）
-        const enemy = (b.vampireBiteTarget && b.vampireBiteTarget.hp > 0) ? b.vampireBiteTarget : null;
-        if (enemy) {
-          dealDamage(enemy, VAMPIRE_BITE_DAMAGE, { attackerPlayer: b.player });
-          b.hp = Math.min(getBallMaxHp(b), b.hp + VAMPIRE_BITE_HEAL);
-          // 傷害特效
+       const enemy = (b.vampireBiteTarget && b.vampireBiteTarget.hp > 0) ? b.vampireBiteTarget : null;
+if (enemy) {
+  dealDamage(enemy, VAMPIRE_BITE_DAMAGE, { attackerPlayer: b.player });
+  const biteHealMul = b.vampireBiteHealMultiplier || 1;
+  b.hp = Math.min(getBallMaxHp(b), b.hp + VAMPIRE_BITE_HEAL * biteHealMul);
+            // 傷害特效
           state.hitFlashes.push({ x: enemy.x, y: enemy.y, r: 30, alpha: 1.0, color: '#ff0055', t: 0.3 });
           // 回血特效（在吸血鬼位置）
           state.hitFlashes.push({ x: b.x, y: b.y, r: 20, alpha: 0.8, color: '#aa00ff', t: 0.25 });
@@ -12148,7 +12898,8 @@ function update(dt) {
           b.customSkill1Timer = GUNNER_FLASH_INTERVAL;
           const enemy = getNearestEnemyTo(b.x, b.y, b.player);
           if (enemy) {
-            const angle = Math.atan2(enemy.y - b.y, enemy.x - b.x);
+            const aimPoint = getConfusedAimPoint(b, enemy);
+            const angle = Math.atan2(aimPoint.y - b.y, aimPoint.x - b.x);
             addProjectile({
               x: b.x, y: b.y,
               vx: Math.cos(angle) * GUNNER_FLASH_SPEED,
@@ -12611,6 +13362,10 @@ function update(dt) {
       b.x += b.vx * dt * speedMul;
       b.y += b.vy * dt * speedMul;
     }
+    if (b.char?.type === 'boundary' && b.boundaryPendingHole) {
+      b.boundaryPendingHole = false;
+      boundaryPlaceHole(b);
+    }
 
     // 邊界反彈（傳送門場地：不反彈，改為直接從對面牆傳送出來）
     let hitWall = false;
@@ -12629,6 +13384,10 @@ function update(dt) {
       if (b.x + b.r > W - WALL) { b.x = W - WALL - b.r; b.vx = -Math.abs(b.vx); hitWall = true; }
       if (b.y - b.r < WALL)     { b.y = WALL + b.r;     b.vy =  Math.abs(b.vy); hitWall = true; }
       if (b.y + b.r > H - WALL) { b.y = H - WALL - b.r; b.vy = -Math.abs(b.vy); hitWall = true; }
+    }
+    // 超界者維度躍遷：撞牆時同步更新躍遷朝向，避免下一幀又照原方向衝回同一面牆而卡在邊界上動彈不得。
+    if (hitWall && b.char?.type === 'boundary' && b.boundaryWarpActive) {
+      b.boundaryWarpAngle = Math.atan2(b.vy, b.vx);
     }
 
     // 障礙場地：正中央巨石碰撞（圓對圓反彈，巨石本身不會被推動）
@@ -12885,7 +13644,8 @@ function update(dt) {
     continue;
   }
   // 帶土虛影/轉移/空間/虛化階段：不觸發球球碰撞；被抓入空間的敵人也不參與；火球衝刺中也排除（避免抓人前被物理碰撞彈開）
-  if ((b0.char.type === 'obito' && (['ghost','teleporting','in_space','grabbing','returning'].includes(b0.obitoKamuiPhase) || b0.obitoFireballDashing || b0.obitoPhasing)) ||
+  if ((b0.char.type === 'boundary' && b0.boundaryWarpActive) || (b1.char.type === 'boundary' && b1.boundaryWarpActive) ||
+      (b0.char.type === 'obito' && (['ghost','teleporting','in_space','grabbing','returning'].includes(b0.obitoKamuiPhase) || b0.obitoFireballDashing || b0.obitoPhasing)) ||
       (b1.char.type === 'obito' && (['ghost','teleporting','in_space','grabbing','returning'].includes(b1.obitoKamuiPhase) || b1.obitoFireballDashing || b1.obitoPhasing)) ||
       b0.obitoInSpace || b1.obitoInSpace ||
       (b0.char.type === 'minato' && (b0.minatoStage2Active || (b0.minatoSlashPhase && b0.minatoSlashPhase !== 'idle') || (b0.minatoRasenganPhase === 'dashing' || b0.minatoRasenganPhase === 'grab'))) ||
@@ -12926,13 +13686,20 @@ function update(dt) {
       if (vamp.hp <= 0 || target.hp <= 0) continue;
       if (vamp.player === target.player) continue; // 同隊不觸發攻擊向技能
       if (vamp.char.type === 'vampire' && !vamp.vampireBiting && !target.frozenByVampire && vamp.vampireBiteCooldown <= 0 && !vamp.pucciDiscFrozen) {
-        // 停止衝刺並開始咬擊
-        vamp.vampireDashing = false;
-        vamp.vampireDashElapsed = 0;
-        vamp.vampireBiting = true;
-        vamp.vampireBiteStep = 0;
-        vamp.vampireBiteTimer = 0.05; // 幾乎立即第一擊
-        vamp.vampireBiteTarget = target; // 鎖定這次咬擊的對象，避免場上有多個對手時中途咬到別人
+  // 停止衝刺並開始咬擊
+  vamp.vampireDashing = false;
+  vamp.vampireDashElapsed = 0;
+  vamp.vampireBiting = true;
+  vamp.vampireBiteStep = 0;
+  vamp.vampireBiteTimer = 0.05; // 幾乎立即第一擊
+  vamp.vampireBiteTarget = target; // 鎖定這次咬擊的對象，避免場上有多個對手時中途咬到別人
+  // 猩紅盛宴：本次咬擊期間，每段回血翻倍
+  if (vamp.vampireCrimsonFeastReady) {
+    vamp.vampireBiteHealMultiplier = 2;
+    vamp.vampireCrimsonFeastReady = false;
+  } else {
+    vamp.vampireBiteHealMultiplier = 1;
+  }  
         // 凍結敵人
         target.frozenByVampire = true;
         target.frozenTimer = VAMPIRE_BITE_COUNT * VAMPIRE_BITE_INTERVAL + 0.5;
@@ -13219,6 +13986,9 @@ function update(dt) {
   for (const b of state.balls) {
     if (b.hp <= 0) continue; // 已死亡不再有任何行為
     if (b.char.type !== 'chef') continue;
+    const chefAttackInterval = b.chefItemAttackSpeedBuffTimer > 0
+      ? b.attackInterval / CHEF_ITEM_ATTACK_SPEED_MULT
+      : b.attackInterval;
     if (!b.knifeRecalling) continue; // 沒在回收中就跳過
     for (let i = state.wallKnives.length-1; i >= 0; i--) {
       const k = state.wallKnives[i];
@@ -13231,17 +14001,18 @@ function update(dt) {
       k.angle = Math.atan2(ddy, ddx);
       // 抵達 → 回收
       if (dd < RADIUS+15) {
-        b.knives = Math.min(b.knives+1, KNIFE_MAX_COUNT);
+        b.knives = Math.min(b.knives+1, b.knifeMax || KNIFE_MAX_COUNT);
         state.wallKnives.splice(i, 1);
         // 全部回來 → 解除回收狀態
         const left = state.wallKnives.filter(k2 => k2.ownerBall ? k2.ownerBall === b : k2.owner === b.player).length;
         if (left === 0) {
           b.knifeRecalling = false;
-          b.attackTimer = b.attackInterval; // 立即可攻擊
+          b.attackTimer = chefAttackInterval; // 立即可攻擊
         }
       }
     }
   }
+  updateBoundaryProjectiles(dt);
   // 攻擊計時
 for (let bi = 0; bi < state.balls.length; bi++) {
     const b = state.balls[bi], enemy = getNearestEnemyTo(b.x, b.y, b.player);
@@ -13252,6 +14023,9 @@ for (let bi = 0; bi < state.balls.length; bi++) {
       continue;
     }
     b.attackTimer += dt;
+    const chefAttackInterval = b.chefItemAttackSpeedBuffTimer > 0
+      ? b.attackInterval / CHEF_ITEM_ATTACK_SPEED_MULT
+      : b.attackInterval;
     if (b.char.type === 'opm' && b.opmCollisionCooldown > 0) b.opmCollisionCooldown -= dt;
     if (b.char.type === 'joseph' && b.josephContactCd > 0) b.josephContactCd -= dt;
     if (b.char.type === 'pucci' && b.pucciContactCd > 0) b.pucciContactCd -= dt;
@@ -13265,8 +14039,10 @@ for (let bi = 0; bi < state.balls.length; bi++) {
       }
     }
     // 閃光彈冷卻凍結已在本輪攻擊計時器入口處處理；不重設移動或攻擊狀態。
-    if (b.char.type === 'chef') {
-        if (!b.knifeRecalling && b.knives > 0 && b.attackTimer >= b.attackInterval) {
+    if (b.char.type === 'boundary') {
+      if (!b.boundaryWarpActive && b.attackTimer >= b.attackInterval) { b.attackTimer = 0; boundaryFireRift(b); }
+    } else if (b.char.type === 'chef') {
+        if (!b.knifeRecalling && b.knives > 0 && b.attackTimer >= chefAttackInterval) {
             // 麻痺：消耗一次攻擊機會
             if (b.thunderParalyzed > 0) {
               b.thunderParalyzed = 0;
@@ -13287,12 +14063,13 @@ for (let bi = 0; bi < state.balls.length; bi++) {
                 if (b.knives === 0) b.knifeRecalling = true;
               } else {
                 // 保留刀，等目標重新出現後再用下一個完整攻擊間隔重試。
-                b.attackTimer = b.attackInterval;
+                b.attackTimer = chefAttackInterval;
               }
             }
         }
     } else if (b.char.type === 'drunk') {
-        if (b.attackTimer >= b.attackInterval) {
+        const drunkAttackInterval = b.drunkIntoxActiveTimer > 0 ? Math.max(0.05, b.attackInterval - DRUNK_INTOX_ATTACK_REDUCE) : b.attackInterval;
+        if (b.attackTimer >= drunkAttackInterval) {
             if (b.thunderParalyzed > 0) {
               b.thunderParalyzed = 0;
               b.thunderStunTimer = 0.5; // 打斷定身 0.5 秒
@@ -13302,7 +14079,9 @@ for (let bi = 0; bi < state.balls.length; bi++) {
               b.attackTimer = 0;
               state.hitFlashes.push({ x: b.x, y: b.y, r: 20, alpha: 0.8, color: '#f1c40f', t: 0.4 });
             } else {
-              b.attackTimer = 0; fireProjectile(b, enemy, 'bottle');
+              b.attackTimer = 0;
+              const bottleSpeed = b.drunkIntoxActiveTimer > 0 ? BOTTLE_SPEED * DRUNK_INTOX_SPEED_MULT : BOTTLE_SPEED;
+              fireProjectile(b, enemy, 'bottle', BOTTLE_DAMAGE, bottleSpeed);
             }
         }
     } else if (b.char.type === 'ew') {
@@ -13627,185 +14406,465 @@ for (let bi = 0; bi < state.balls.length; bi++) {
       }
     }
   }
-// ── GOJO 術式更新 ──
-  for (let bi = 0; bi < state.balls.length; bi++) {
-    const b = state.balls[bi];
-    if (b.hp <= 0) continue;
-    const enemy = getNearestEnemyTo(b.x, b.y, b.player);
-    if (b.char.type !== 'gojo') continue;
-    if (!Array.isArray(b.gojoStoredProjectiles)) b.gojoStoredProjectiles = [];
-    if (!enemy) continue;
-    if ((state.dioWorldGlobalActive && b !== state.dioWorldCaster) || b.obitoInSpace || b.pucciDiscFrozen || isBallInBossDryPowderZone(b)) {
-      // 時停中：術式球仍可移動（已在投射物迴圈凍結），但不觸發新技能
-      continue;
+  // ── GOJO 重做版：主更新 ──
+for (const b of state.balls) {
+  if (b.hp <= 0 || b.char.type !== 'gojo') continue;
+  updateGojo(b, dt);
+}
+  // ══════════════════
+// 現代最強（Gojo）重做版：所有子函式
+// ══════════════════
+
+function updateGojo(b, dt) {
+  // 欄位防護
+  if (!Array.isArray(b.gojoStoredProjectiles)) b.gojoStoredProjectiles = [];
+  if (!Array.isArray(b.gojoBalls)) b.gojoBalls = [];
+  if (typeof b.gojoAttackCount !== 'number') b.gojoAttackCount = 0;
+  if (typeof b.gojoInfinity !== 'number') b.gojoInfinity = GOJO_INFINITY_MAX;
+  if (typeof b.gojoInfinityRegenTimer !== 'number') b.gojoInfinityRegenTimer = GOJO_INFINITY_REGEN_TIME;
+
+  // ── 六眼覺醒：只減 CD，僅觸發一次 ──
+  if (!b.gojoUnlocked && b.hp <= GOJO_HP_THRESHOLD) {
+    b.gojoUnlocked = true;
+    b.gojoHasTriggered = true;
+    state.hitFlashes.push({ x: b.x, y: b.y, r: 80, alpha: 1, color: '#bf00ff', t: 0.6 });
+    state.damageNumbers.push({ x: b.x, y: b.y - b.r - 20, value: '六眼覺醒', color: '#c77dff', life: 1.2, maxLife: 1.2, scale: 1.1 });
+    if (!state.standCryFX) state.standCryFX = [];
+    state.standCryFX.push({ text: '六眼覺醒', x: b.x, y: b.y, life: 1.6, maxLife: 1.6, color: '#bf00ff', player: b.player });
+    playHitSound('opm');
+  }
+
+  // ── 凍結：完全暫停 ──
+  const frozen = (state.dioWorldGlobalActive && b !== state.dioWorldCaster)
+    || b.obitoInSpace || b.pucciDiscFrozen || isBallInBossDryPowderZone(b)
+    || b.thunderParalyzed > 0 || b.thunderStunTimer > 0;
+  if (frozen) return;
+
+  // ── 無下限回復 ──
+  b.gojoInfinityRegenTimer -= dt;
+  if (b.gojoInfinityRegenTimer <= 0) {
+    b.gojoInfinityRegenTimer = GOJO_INFINITY_REGEN_TIME;
+    b.gojoInfinity = GOJO_INFINITY_MAX;
+    state.hitFlashes.push({ x: b.x, y: b.y, r: b.r + 14, alpha: 0.7, color: '#00cfff', t: 0.4 });
+  }
+
+  // ── 無下限：吸收敵方投射物 ──
+  updateGojoInfinity(b, dt);
+
+  // ── 蒼/赫/紫交替發射 ──
+  const enemy = getNearestEnemyTo(b.x, b.y, b.player);
+  if (enemy) {
+    b.gojoTimer += dt;
+    const cd = Math.max(0.3, GOJO_COOLDOWN - (b.gojoUnlocked ? GOJO_UNLOCK_CD_BONUS : 0));
+    if (b.gojoTimer >= cd) {
+      b.gojoTimer = 0;
+      fireGojoAttack(b, enemy);
+    }
+  }
+
+  // ── 蒼赫碰撞 → 無限制虛式紫 ──
+  checkGojoClash(b);
+
+  // ── 蒼拳（近戰，CD 不隨覺醒改變）──
+  if (b.gojoFistCooldown > 0) b.gojoFistCooldown -= dt;
+  if (b.gojoFistCooldown <= 0 && enemy) {
+    const d = Math.hypot(enemy.x - b.x, enemy.y - b.y);
+    if (d < b.r + (enemy.r || RADIUS) + GOJO_FIST_RANGE) {
+      b.gojoFistCooldown = GOJO_FIST_COOLDOWN;
+      dealDamage(enemy, GOJO_FIST_DAMAGE, { attackerPlayer: b.player });
+      const dx = b.x - enemy.x, dy = b.y - enemy.y;
+      const dd = Math.hypot(dx, dy) || 1;
+      enemy.vx += (dx / dd) * GOJO_FIST_PULL_FORCE;
+      enemy.vy += (dy / dd) * GOJO_FIST_PULL_FORCE;
+      state.hitFlashes.push({ x: enemy.x, y: enemy.y, r: 24, alpha: 0.9, color: '#5fdcff', t: 0.2 });
+      state.hitFlashes.push({ x: enemy.x, y: enemy.y, r: 14, alpha: 1, color: '#ffffff', t: 0.12 });
+      state.damageNumbers.push({ x: enemy.x, y: enemy.y - 26, value: `蒼拳 ${GOJO_FIST_DAMAGE}`, color: '#aaf0ff', life: 0.6, maxLife: 0.6, scale: 0.85 });
+      playHitSound('knife');
+    }
+  }
+
+  // ── 領域展開（開局就有，不需覺醒）──
+  updateGojoDomain(b, dt);
+
+  // ── 蒼/赫/紫球更新 ──
+  updateGojoBalls(b, dt);
+}
+
+// ─────────────────────────────────────────────
+// 無下限：緩速並吸收敵方投射物
+// ─────────────────────────────────────────────
+function updateGojoInfinity(b, dt) {
+  const R = GOJO_INFINITY_RADIUS;
+
+  // 需要掃的投射物陣列（都可能是敵方投射物）
+  const arrays = [
+    state.projectiles,
+    state.otisMagicBullets,
+    state.getoUltimateProjectiles,
+    state.tigerNovaNeedles,
+    state.oniichanSpikes,
+    state.fisherOceanWaves,
+  ].filter(a => Array.isArray(a));
+
+  for (const arr of arrays) {
+    for (let i = arr.length - 1; i >= 0; i--) {
+      const p = arr[i];
+      if (!p || p.gojoConsumed) continue;
+      const pOwner = p.owner ?? p.ownerPlayer;
+      if (pOwner == null || pOwner === b.player) continue;
+
+      const dx = p.x - b.x, dy = p.y - b.y;
+      const d = Math.hypot(dx, dy);
+      if (d > R + (p.r || 8)) continue;
+
+      // 首次進入範圍：消耗 1 點無下限
+      if (!p.gojoSlowing) {
+        if (b.gojoInfinity <= 0) continue;
+        b.gojoInfinity--;
+        p.gojoSlowing = true;
+        p.gojoOriginalVx = p.vx;
+        p.gojoOriginalVy = p.vy;
+        p.gojoOriginalDamage = p.damage;
+        p.gojoSlowElapsed = 0;
+        p.gojoLingerTimer = 0;
+        p.damage = 0; // 不造成傷害
+        state.hitFlashes.push({ x: p.x, y: p.y, r: 20, alpha: 0.8, color: '#00cfff', t: 0.3 });
+        state.damageNumbers.push({ x: b.x, y: b.y - b.r - 12, value: `無下限 ${b.gojoInfinity}`, color: '#5fdcff', life: 0.5, maxLife: 0.5, scale: 0.7 });
+      }
+
+      // 逐幀緩速
+      p.gojoSlowElapsed += dt;
+      const t = Math.min(1, p.gojoSlowElapsed / GOJO_INFINITY_SLOW_TIME);
+      const scale = 1 - t;
+      p.vx = (p.gojoOriginalVx || 0) * scale;
+      p.vy = (p.gojoOriginalVy || 0) * scale;
+
+      // 完全停止後，留 GOJO_INFINITY_LINGER 秒再移除
+      if (t >= 1) {
+        p.vx = 0;
+        p.vy = 0;
+        p.gojoLingerTimer += dt;
+        if (p.gojoLingerTimer >= GOJO_INFINITY_LINGER) {
+          gojoReleaseProjectileResources(p);
+          p.gojoConsumed = true;
+          arr.splice(i, 1);
+        }
+      }
+    }
+  }
+}
+
+// 釋放投射物時，歸還它原本佔用的資源（例如廚神的刀）
+function gojoReleaseProjectileResources(p) {
+  if (!p) return;
+  if (p.type === 'knife') {
+    const chefBall = p.ownerBall && p.ownerBall.char && p.ownerBall.char.type === 'chef' ? p.ownerBall : null;
+    if (chefBall && chefBall.hp > 0) {
+      chefBall.knives = Math.min((chefBall.knives || 0) + 1, chefBall.knifeMax || KNIFE_MAX_COUNT);
+      const wallLeft = state.wallKnives.filter(k => k.ownerBall ? k.ownerBall === chefBall : k.owner === chefBall.player).length;
+      if (chefBall.knives >= (chefBall.knifeMax || KNIFE_MAX_COUNT) && wallLeft === 0) {
+        chefBall.knifeRecalling = false;
+        chefBall.attackTimer = chefBall.attackInterval;
+      }
+    }
+  }
+}
+
+// ─────────────────────────────────────────────
+// 發射蒼 / 赫 / 紫（交替制：每 6 發蒼赫 → 1 發紫）
+// ─────────────────────────────────────────────
+function fireGojoAttack(b, enemy) {
+  let targetX = enemy.x;
+  let targetY = enemy.y;
+
+  let type;
+  if (b.gojoAttackCount >= GOJO_PURPLE_EVERY_N) {
+    type = 'purple';
+    b.gojoAttackCount = 0;
+  } else {
+    type = (b.gojoAttackCount % 2 === 0) ? 'blue' : 'red';
+    b.gojoAttackCount++;
+  }
+
+  // 赫：優先瞄準場上最近的自己的蒼球，讓蒼赫容易相撞
+  if (type === 'red') {
+    const blues = (b.gojoBalls || []).filter(bl => bl.active && bl.type === 'blue');
+    if (blues.length > 0) {
+      blues.sort((a, c) => Math.hypot(a.x - b.x, a.y - b.y) - Math.hypot(c.x - b.x, c.y - b.y));
+      targetX = blues[0].x;
+      targetY = blues[0].y;
+    }
+  }
+
+  const dx = targetX - b.x, dy = targetY - b.y;
+  const d = Math.hypot(dx, dy) || 1;
+  const nx = dx / d, ny = dy / d;
+    if (type === 'purple') {
+    b.gojoBalls.push({
+      x: b.x, y: b.y,
+      vx: nx * GOJO_PURPLE_SPEED * 60,
+      vy: ny * GOJO_PURPLE_SPEED * 60,
+      type: 'purple',
+      r: GOJO_PURPLE_RADIUS,
+      damage: GOJO_PURPLE_DAMAGE,
+      active: true,
+      life: GOJO_PURPLE_LIFESPAN,
+      hitTargets: new Set(),
+      trail: [],
+    });
+    state.hitFlashes.push({ x: b.x, y: b.y, r: 30, alpha: 0.9, color: '#bf00ff', t: 0.4 });
+    state.hitFlashes.push({ x: b.x, y: b.y, r: 16, alpha: 1, color: '#ffffff', t: 0.25 });
+    playHitSound('opm');
+  } else if (type === 'blue') {
+    b.gojoBalls.push({
+      x: b.x, y: b.y,
+      vx: nx * GOJO_BLUE_SPEED * 60 + (Math.random() - 0.5) * 30,
+      vy: ny * GOJO_BLUE_SPEED * 60 + (Math.random() - 0.5) * 30,
+      type: 'blue', r: GOJO_BLUE_RADIUS,
+      frameDmg: GOJO_BLUE_FRAMEDMG,
+      active: true, ringAngle: 0, life: GOJO_BLUE_LIFESPAN,
+      trail: [], storedCount: b.gojoStoredProjectiles.length,
+    });
+    playHitSound('vampire_bite');
+  } else {
+    b.gojoBalls.push({
+      x: b.x, y: b.y,
+      vx: nx * GOJO_RED_SPEED * 60 + (Math.random() - 0.5) * 30,
+      vy: ny * GOJO_RED_SPEED * 60 + (Math.random() - 0.5) * 30,
+      type: 'red', r: GOJO_BLUE_RADIUS,
+      damage: GOJO_RED_DAMAGE,
+      active: true,
+    });
+    releaseGojoStoredProjectiles(b, b.gojoStoredProjectiles);
+    playHitSound('knife');
+  }
+}
+
+// ─────────────────────────────────────────────
+// 蒼 + 赫碰撞 → 無限制虛式紫
+// ─────────────────────────────────────────────
+function checkGojoClash(b) {
+  if (!Array.isArray(b.gojoBalls)) return;
+  const blues = b.gojoBalls.filter(bl => bl.active && bl.type === 'blue');
+  const reds = b.gojoBalls.filter(bl => bl.active && bl.type === 'red');
+  for (const blue of blues) {
+    for (const red of reds) {
+      if (!blue.active || !red.active) continue;
+      const d = Math.hypot(blue.x - red.x, blue.y - red.y);
+      if (d < GOJO_CLASH_RADIUS) {
+        const cx = (blue.x + red.x) / 2;
+        const cy = (blue.y + red.y) / 2;
+        blue.active = false;
+        red.active = false;
+        gojoClashExplode(b, cx, cy);
+        return;
+      }
+    }
+  }
+}
+
+function gojoClashExplode(b, cx, cy) {
+  for (const t of getAllCombatTargets()) {
+    if (!t || t.hp <= 0) continue;
+    const d = Math.hypot(t.x - cx, t.y - cy);
+    if (d > GOJO_CLASH_AOE_RADIUS + (t.r || RADIUS)) continue;
+    const dmg = (t === b) ? GOJO_CLASH_DAMAGE * (1 - GOJO_CLASH_SELF_REDUCE) : GOJO_CLASH_DAMAGE;
+    dealDamage(t, dmg, { attackerPlayer: b.player });
+  }
+  state.hitFlashes.push({ x: cx, y: cy, r: GOJO_CLASH_AOE_RADIUS, alpha: 1.3, color: '#bf00ff', t: 0.6 });
+  state.hitFlashes.push({ x: cx, y: cy, r: GOJO_CLASH_AOE_RADIUS * 0.6, alpha: 1, color: '#ffffff', t: 0.4 });
+  state.opmFX.push({ type: 'ring', x: cx, y: cy, r: 20, maxR: GOJO_CLASH_AOE_RADIUS, life: 0.6, maxLife: 0.6, color: '#bf00ff', lineW: 5 });
+  state.opmFX.push({ type: 'ring', x: cx, y: cy, r: 10, maxR: GOJO_CLASH_AOE_RADIUS * 0.7, life: 0.4, maxLife: 0.4, color: '#ffffff', lineW: 3 });
+  state.opmFX.push({ type: 'shake', life: 0.35, maxLife: 0.35, intensity: 12 });
+  playHitSound('opm');
+}
+
+// ─────────────────────────────────────────────
+// 蒼/赫/紫球：移動、碰撞、領域追蹤
+// ─────────────────────────────────────────────
+function updateGojoBalls(b, dt) {
+  b.gojoBalls = b.gojoBalls.filter(bl => bl.active);
+  const enemy = getNearestEnemyTo(b.x, b.y, b.player);
+
+  for (const ball of b.gojoBalls) {
+    if (!ball.active) continue;
+
+    // 領域追蹤：所有 Gojo 球轉向最近敵人
+    if (b.gojoDomainActive && enemy) {
+      const desired = Math.atan2(enemy.y - ball.y, enemy.x - ball.x);
+      const cur = Math.atan2(ball.vy, ball.vx);
+      let diff = desired - cur;
+      while (diff > Math.PI) diff -= Math.PI * 2;
+      while (diff < -Math.PI) diff += Math.PI * 2;
+      const maxTurn = GOJO_DOMAIN_HOMING_TURN * dt;
+      const turn = Math.max(-maxTurn, Math.min(maxTurn, diff));
+      const newAng = cur + turn;
+      const spd = Math.hypot(ball.vx, ball.vy);
+      ball.vx = Math.cos(newAng) * spd;
+      ball.vy = Math.sin(newAng) * spd;
     }
 
-    // 血量觸發紫
-    if (!b.gojoHasTriggered && b.hp <= GOJO_HP_THRESHOLD)
-      {
-      b.gojoHasTriggered = true;
-      b.gojoCharging = true;
-      b.gojoChargeTimer = 0;
-      b.gojoUnlocked = true;
-    }
+    // 移動
+    ball.x += ball.vx * dt;
+    ball.y += ball.vy * dt;
 
- // 蓄力紫
-    if (b.gojoCharging) {
-      b.gojoChargingVisual = true;
-      b.gojoChargeTimer += dt;
-      if (b.gojoChargeTimer >= GOJO_CHARGE_TIME) {
-        b.gojoCharging = false;
-        b.gojoTimer = 0;
-        b.gojoChargingVisual = false;
-        const ddx = enemy.x - b.x, ddy = enemy.y - b.y;
-        const dd = Math.sqrt(ddx*ddx+ddy*ddy)||1;
-        b.gojoBalls.push({ x:b.x, y:b.y,
-          vx:(ddx/dd)*GOJO_PURPLE_SPEED, vy:(ddy/dd)*GOJO_PURPLE_SPEED,
-          type:'purple', r:GOJO_PURPLE_RADIUS, frameDmg:GOJO_PURPLE_FRAMEDMG,
-          active:true, stickTimer:0 });
-        playHitSound('opm');
+    // 軌跡
+    ball.trail = ball.trail || [];
+    ball.trail.push({ x: ball.x, y: ball.y });
+    if (ball.trail.length > 10) ball.trail.shift();
+
+    // 邊界
+    let hitWall = false;
+    if (ball.x - ball.r < 0) { ball.x = ball.r; ball.vx = -ball.vx; hitWall = true; }
+    if (ball.x + ball.r > W) { ball.x = W - ball.r; ball.vx = -ball.vx; hitWall = true; }
+    if (ball.y - ball.r < 0) { ball.y = ball.r; ball.vy = -ball.vy; hitWall = true; }
+    if (ball.y + ball.r > H) { ball.y = H - ball.r; ball.vy = -ball.vy; hitWall = true; }
+
+    // 障礙場地：中央巨石
+    if (state.arena === 'obstacle') {
+      const odx = ball.x - W / 2, ody = ball.y - H / 2;
+      const odist = Math.hypot(odx, ody) || 1;
+      const minDist = OBSTACLE_ARENA_RADIUS + ball.r;
+      if (odist < minDist) {
+        const onx = odx / odist, ony = ody / odist;
+        ball.x = W / 2 + onx * minDist;
+        ball.y = H / 2 + ony * minDist;
+        const dot = ball.vx * onx + ball.vy * ony;
+        ball.vx -= 2 * dot * onx;
+        ball.vy -= 2 * dot * ony;
+        hitWall = true;
       }
     }
 
-    // 技能CD → 發蒼/赫/紫
-    if (!b.gojoCharging) {
-      b.gojoTimer += dt;
-      if (b.gojoTimer >= b.gojoCooldown) {
-        b.gojoTimer = 0;
-        // 麻痺：跳過本次技能
-        if (b.thunderParalyzed > 0) {
-          b.thunderParalyzed = 0;
-          b.thunderStunTimer = 0.5; // 打斷定身 0.5 秒
-          b.vx = 0; b.vy = 0;
-          state.thunderStunFX = state.thunderStunFX || [];
-          state.thunderStunFX.push({ x: b.x, y: b.y, life: 0.5, maxLife: 0.5 });
-          state.hitFlashes.push({ x: b.x, y: b.y, r: 22, alpha: 0.8, color: '#f1c40f', t: 0.4 });
-          // skip attack
-        } else {
-        const ddx = enemy.x - b.x, ddy = enemy.y - b.y;
-        const dd = Math.sqrt(ddx*ddx+ddy*ddy)||1;
-        const roll = Math.random();
-        let sk;
-        if (b.gojoUnlocked && roll < GOJO_PURPLE_CHANCE) sk = 'purple';
-        else if (roll < (b.gojoUnlocked ? 0.53 : 0.50)) sk = 'blue';
-        else sk = 'red';
-        const spd = sk==='purple' ? GOJO_PURPLE_SPEED : sk==='blue' ? GOJO_BLUE_SPEED : GOJO_RED_SPEED;
-        const rad = sk==='purple' ? GOJO_PURPLE_RADIUS : GOJO_BLUE_RADIUS;
-        const dmg = sk==='red' ? GOJO_RED_DAMAGE : 0;
-        b.gojoBalls.push({ x:b.x, y:b.y,
-          vx:(ddx/dd)*spd+(Math.random()-0.5)*0.5,
-          vy:(ddy/dd)*spd+(Math.random()-0.5)*0.5,
-          type:sk, r:rad, damage:dmg,
-          frameDmg: sk==='blue' ? GOJO_BLUE_FRAMEDMG : sk==='purple' ? GOJO_PURPLE_FRAMEDMG : 0,
-          active:true, stickTimer:0,
-          ringAngle: 0,  // 蒼球光圈旋轉角度
-          trail: [],     // 飛行軌跡殘影
-          life: sk==='blue' ? GOJO_BLUE_LIFESPAN : undefined, // 蒼球存在時間
-          storedCount: b.gojoStoredProjectiles.length
-        });
-        // 赫發動時將蒼吸入的投射物重新釋放，並仍保留原本的赫球攻擊。
-        if (sk === 'red') releaseGojoStoredProjectiles(b, b.gojoStoredProjectiles);
-        playHitSound(sk==='red'?'knife':'vampire_bite');
-        } // end else (not paralyzed)
-      }
-    }
-  // 術式球移動與碰撞
-    b.gojoBalls = b.gojoBalls.filter(bl => bl.active);
-    for (const ball of b.gojoBalls) {
-      if (!ball.active) continue;
-      ball.x += ball.vx * dt * 60; ball.y += ball.vy * dt * 60;
-
-      // 飛行軌跡殘影（供繪製拖尾用）
-      ball.trail = ball.trail || [];
-      ball.trail.push({ x: ball.x, y: ball.y });
-      if (ball.trail.length > 10) ball.trail.shift();
-
-      // 旋轉光圈角度
-      if (ball.type === 'blue') ball.ringAngle = (ball.ringAngle || 0) + dt * 3.5;
-
-      // 蒼球存在時間倒數，時間到自動消散
-      if (ball.type === 'blue' && ball.life != null) {
+    if (ball.type === 'blue') {
+      ball.ringAngle = (ball.ringAngle || 0) + dt * 3.5;
+      if (ball.life != null) {
         ball.life -= dt;
         if (ball.life <= 0) { ball.active = false; continue; }
       }
-
-      // 每幀持續施力（引力/斥力）
       applyGojoForce(ball, state.balls, b);
-      // 蒼的無下限術式會牽引並吸入敵方投射物，存到五條自己的儲存庫。
       applyGojoProjectilePull(ball, state.projectiles, b.player, b.gojoStoredProjectiles);
       applyGojoProjectilePull(ball, state.getoUltimateProjectiles, b.player, b.gojoStoredProjectiles);
       ball.storedCount = b.gojoStoredProjectiles.length;
-
-      // 蒼球：對射程內敵人發射光線引力
-      if (ball.type === 'blue') {
-        for (const f of state.balls) {
-          if (f === b) continue; // 不對自己
-          const dx = f.x - ball.x, dy = f.y - ball.y;
-          const d = Math.sqrt(dx*dx+dy*dy) || 1;
-          if (d < GOJO_BLUE_RAY_RANGE) {
-            // 引力：把敵人往蒼球方向拉
-            const pull = GOJO_BLUE_RAY_FORCE * (1 - d / GOJO_BLUE_RAY_RANGE);
-            f.vx -= (dx/d) * pull;
-            f.vy -= (dy/d) * pull;
-          }
+      for (const f of state.balls) {
+        if (f === b) continue;
+        const dx = f.x - ball.x, dy = f.y - ball.y;
+        const dd = Math.sqrt(dx * dx + dy * dy) || 1;
+        if (dd < GOJO_BLUE_RAY_RANGE) {
+          const pull = GOJO_BLUE_RAY_FORCE * (1 - dd / GOJO_BLUE_RAY_RANGE);
+          f.vx -= (dx / dd) * pull;
+          f.vy -= (dy / dd) * pull;
         }
       }
-
-      // 碰邊界
-      let hitWall = false;
-      if (ball.x-ball.r < 0) { ball.x=ball.r; ball.vx*=-1; hitWall=true; }
-      if (ball.x+ball.r > W) { ball.x=W-ball.r; ball.vx*=-1; hitWall=true; }
-      if (ball.y-ball.r < 0) { ball.y=ball.r; ball.vy*=-1; hitWall=true; }
-      if (ball.y+ball.r > H) { ball.y=H-ball.r; ball.vy*=-1; hitWall=true; }
-
-      // 障礙場地：中央巨石跟外牆一樣要能實際擋住球，不然球會直接飛穿過去
-      if (state.arena === 'obstacle') {
-        const odx = ball.x - W / 2, ody = ball.y - H / 2;
-        const odist = Math.hypot(odx, ody) || 1;
-        const minDist = OBSTACLE_ARENA_RADIUS + ball.r;
-        if (odist < minDist) {
-          const onx = odx / odist, ony = ody / odist;
-          ball.x = W / 2 + onx * minDist;
-          ball.y = H / 2 + ony * minDist;
-          const dot = ball.vx * onx + ball.vy * ony;
-          ball.vx -= 2 * dot * onx;
-          ball.vy -= 2 * dot * ony;
-          hitWall = true;
-        }
-      }
-
-      if (hitWall && ball.type!=='purple' && ball.type!=='blue') { ball.active=false; continue; }
-      if (hitWall && ball.type==='blue') {
-        // 蒼球碰牆反彈，留下撞牆光閃
-        state.hitFlashes.push({ x: ball.x, y: ball.y, r: ball.r+10, alpha: 0.7, color: '#00cfff', t: 0.25 });
-      }
-
-      // 碰敵人
-      const ed = Math.sqrt((ball.x-enemy.x)**2+(ball.y-enemy.y)**2);
-      if (ed < ball.r + getCombatRadius(enemy)) {
-        if (ball.type==='purple' || ball.type==='blue') {
-          // 穿透飛行，經過時每幀扣血
+      if (enemy) {
+        const ed = Math.hypot(ball.x - enemy.x, ball.y - enemy.y);
+        if (ed < ball.r + getCombatRadius(enemy)) {
           dealDamage(enemy, ball.frameDmg, { attackerPlayer: b.player });
-          state.hitFlashes.push({ x:enemy.x, y:enemy.y, r:22, alpha:0.9,
-            color: ball.type==='blue' ? '#00cfff' : '#bf00ff', t:0.12 });
-        } else {
-          dealDamage(enemy, ball.damage, { attackerPlayer: b.player });
-          // 赫：命中瞬間把敵人撞飛（仿鍛造師劍擊擊退寫法：疊加速度 + 立即位移，確保視覺上立刻看得到）
-          const kdx = enemy.x - ball.x, kdy = enemy.y - ball.y;
-          const kd = Math.sqrt(kdx*kdx + kdy*kdy) || 1;
-          const knx = kdx / kd, kny = kdy / kd;
-          enemy.x += knx * 22;
-          enemy.y += kny * 22;
-          enemy.vx += knx * GOJO_RED_KNOCKBACK;
-          enemy.vy += kny * GOJO_RED_KNOCKBACK;
-          state.hitFlashes.push({ x:ball.x, y:ball.y, r:25, alpha:1,
-            color:'#ff4444', t:0.3 });
-          playHitSound('knife');
-          ball.active=false;
         }
       }
-    } // end for (const ball of b.gojoBalls)
-  } // end for (let bi gojo)
+    } else if (ball.type === 'red') {
+      if (hitWall) { ball.active = false; continue; }
+      if (enemy) {
+        const ed = Math.hypot(ball.x - enemy.x, ball.y - enemy.y);
+        if (ed < ball.r + getCombatRadius(enemy)) {
+          dealDamage(enemy, ball.damage, { attackerPlayer: b.player });
+          const kdx = enemy.x - ball.x, kdy = enemy.y - ball.y;
+          const kd = Math.hypot(kdx, kdy) || 1;
+          enemy.x += (kdx / kd) * 22;
+          enemy.y += (kdy / kd) * 22;
+          enemy.vx += (kdx / kd) * GOJO_RED_KNOCKBACK;
+          enemy.vy += (kdy / kd) * GOJO_RED_KNOCKBACK;
+          state.hitFlashes.push({ x: ball.x, y: ball.y, r: 25, alpha: 1, color: '#ff4444', t: 0.3 });
+          playHitSound('knife');
+          ball.active = false;
+        }
+      }
+    } else if (ball.type === 'purple') {
+      ball.hitTargets = ball.hitTargets || new Set();
+      ball.life -= dt;
+      if (ball.life <= 0 || hitWall) { ball.active = false; continue; }
+      for (const t of getAllCombatTargets()) {
+        if (!t || t.hp <= 0 || t.player === b.player) continue;
+        if (ball.hitTargets.has(t)) continue;
+        const ed = Math.hypot(ball.x - t.x, ball.y - t.y);
+        if (ed < ball.r + getCombatRadius(t)) {
+          ball.hitTargets.add(t);
+          dealDamage(t, ball.damage, { attackerPlayer: b.player });
+          state.hitFlashes.push({ x: t.x, y: t.y, r: 36, alpha: 1.2, color: '#bf00ff', t: 0.4 });
+          state.hitFlashes.push({ x: t.x, y: t.y, r: 18, alpha: 1, color: '#ffffff', t: 0.25 });
+          playHitSound('opm');
+        }
+      }
+    }
+  }
+}
+
+// ─────────────────────────────────────────────
+// 領域展開・無量空處
+// ─────────────────────────────────────────────
+function updateGojoDomain(b, dt) {
+  if (b.gojoDomainCooldown > 0) b.gojoDomainCooldown -= dt;
+
+  // 進行中
+  if (b.gojoDomainActive) {
+    b.gojoDomainTimer -= dt;
+    b.gojoDomainDamageTick = (b.gojoDomainDamageTick || 0) + dt;
+    if (b.gojoDomainDamageTick >= 1.0) {
+      b.gojoDomainDamageTick -= 1.0;
+      for (const t of getAllCombatTargets()) {
+        if (!t || t.hp <= 0 || t.player === b.player) continue;
+        const safeSet = b.gojoDomainSafeSet;
+        if (safeSet && safeSet.has(t)) continue;
+        const d = Math.hypot(t.x - b.x, t.y - b.y);
+        if (d <= GOJO_DOMAIN_SAFE_RADIUS + (t.r || RADIUS)) continue;
+        dealDamage(t, GOJO_DOMAIN_DPS, { attackerPlayer: b.player, continuousDamage: true });
+        state.hitFlashes.push({ x: t.x, y: t.y, r: 16, alpha: 0.6, color: '#bf00ff', t: 0.25 });
+      }
+    }
+    if (b.gojoDomainTimer <= 0) {
+      b.gojoDomainActive = false;
+      b.gojoDomainSafeSet = null;
+    }
+    return;
+  }
+
+  // 冷卻中
+  if (b.gojoDomainCooldown > 0) return;
+  // 血量需 >= 700
+  if (b.hp < GOJO_DOMAIN_HP_REQ) return;
+  // 必須有敵人
+  const hasEnemy = getAllCombatTargets().some(t => t && t.hp > 0 && t.player !== b.player);
+  if (!hasEnemy) return;
+
+  // ── 展開 ──
+  b.gojoDomainActive = true;
+  b.gojoDomainTimer = GOJO_DOMAIN_DURATION;
+  // 六眼覺醒後 CD -0.5 秒
+  const cdBase = GOJO_DOMAIN_CD - (b.gojoUnlocked ? GOJO_UNLOCK_CD_BONUS : 0);
+  b.gojoDomainCooldown = cdBase;
+  b.gojoDomainDamageTick = 0;
+  b.gojoDomainSafeSet = new Set();
+
+  for (const t of getAllCombatTargets()) {
+    if (!t || t.hp <= 0 || t.player === b.player) continue;
+    const d = Math.hypot(t.x - b.x, t.y - b.y);
+    if (d <= GOJO_DOMAIN_SAFE_RADIUS + (t.r || RADIUS)) {
+      b.gojoDomainSafeSet.add(t);
+    } else {
+      t.thunderParalyzed = Math.max(t.thunderParalyzed || 0, GOJO_DOMAIN_PARALYZE);
+      t.vx = 0;
+      t.vy = 0;
+    }
+  }
+
+  state.hitFlashes.push({ x: b.x, y: b.y, r: 120, alpha: 1.3, color: '#bf00ff', t: 0.8 });
+  state.hitFlashes.push({ x: b.x, y: b.y, r: 70, alpha: 1, color: '#ffffff', t: 0.5 });
+  state.opmFX.push({ type: 'ring', x: b.x, y: b.y, r: 30, maxR: Math.max(W, H) * 1.4, life: 0.9, maxLife: 0.9, color: '#bf00ff', lineW: 6 });
+  state.opmFX.push({ type: 'shake', life: 0.5, maxLife: 0.5, intensity: 16 });
+  if (!state.standCryFX) state.standCryFX = [];
+  state.standCryFX.push({ text: '領域展開・無量空處', x: b.x, y: b.y, life: 2.2, maxLife: 2.2, color: '#bf00ff', player: b.player });
+  playHitSound('opm');
+}
 
   // ── 奕邏輯：9×9 棋盤、雙棋落子、連星地雷與天下劫 ──
   for (let bi = 0; bi < state.balls.length; bi++) {
@@ -14041,7 +15100,8 @@ for (let bi = 0; bi < state.balls.length; bi++) {
       if (b.momoiBurstBulletTimer <= 0 && b.momoiBurstBulletsFired < 3) {
         const enemy = getNearestEnemyTo(b.x, b.y, b.player);
         if (enemy) {
-          const baseAngle = Math.atan2(enemy.y - b.y, enemy.x - b.x);
+          const aimPoint = getConfusedAimPoint(b, enemy);
+          const baseAngle = Math.atan2(aimPoint.y - b.y, aimPoint.x - b.x);
           const offsets = [-MOMOI_BURST_SPREAD, 0, MOMOI_BURST_SPREAD];
           const angle = baseAngle + offsets[b.momoiBurstBulletsFired];
           addProjectile({
@@ -14088,7 +15148,8 @@ for (let bi = 0; bi < state.balls.length; bi++) {
       if (enemy) {
         b.momoiSkillTimer = MOMOI_SKILL_CD;
         if (state && state.stats) state.stats[b.player].skillUses++;
-        const baseAngle = Math.atan2(enemy.y - b.y, enemy.x - b.x);
+        const aimPoint = getConfusedAimPoint(b, enemy);
+        const baseAngle = Math.atan2(aimPoint.y - b.y, aimPoint.x - b.x);
         const skillDmg = MOMOI_SKILL_DAMAGE + (twinPartnerAlive(b) ? MOMOI_SKILL_SYNERGY_BONUS : 0) + momoiDmgBonus;
         for (const foe of getEnemies(b)) {
           const ddx = foe.x - b.x, ddy = foe.y - b.y;
@@ -14134,7 +15195,8 @@ for (let bi = 0; bi < state.balls.length; bi++) {
       if (b.midoriAttackTimer <= 0) {
         const enemy = getNearestEnemyTo(b.x, b.y, b.player);
         if (enemy) {
-          const angle = Math.atan2(enemy.y - b.y, enemy.x - b.x);
+          const aimPoint = getConfusedAimPoint(b, enemy);
+          const angle = Math.atan2(aimPoint.y - b.y, aimPoint.x - b.x);
           addProjectile({
             x: b.x, y: b.y,
             vx: Math.cos(angle) * MIDORI_BULLET_SPEED, vy: Math.sin(angle) * MIDORI_BULLET_SPEED,
@@ -14175,7 +15237,8 @@ for (let bi = 0; bi < state.balls.length; bi++) {
       if (b.midoriSkillShotTimer <= 0 && b.midoriSkillShotsFired < MIDORI_SKILL_SHOTS) {
         const target = (b.midoriSkillTarget && b.midoriSkillTarget.hp > 0) ? b.midoriSkillTarget : getNearestEnemyTo(b.x, b.y, b.player);
         if (target) {
-          const angle = Math.atan2(target.y - b.y, target.x - b.x);
+          const aimPoint = getConfusedAimPoint(b, target);
+          const angle = Math.atan2(aimPoint.y - b.y, aimPoint.x - b.x);
           const dmg = MIDORI_SKILL_DAMAGE + (twinPartnerAlive(b) ? MIDORI_SKILL_SYNERGY_BONUS : 0);
           addProjectile({
             x: b.x, y: b.y,
@@ -14225,7 +15288,8 @@ for (let bi = 0; bi < state.balls.length; bi++) {
     b.vy = b.vy * (1 - dt * 18);
     b.customGunnerFireTimer -= dt;
     if (b.customGunnerFireTimer <= 0 && b.customGunnerAmmoFired < GUNNER_MAG_SIZE) {
-      const angle = Math.atan2(enemy.y - b.y, enemy.x - b.x);
+      const aimPoint = getConfusedAimPoint(b, enemy);
+      const angle = Math.atan2(aimPoint.y - b.y, aimPoint.x - b.x);
       const spread = (Math.random() - 0.5) * 0.15;
       // 若同時選了「蓄能裝彈」被動，消耗一層為這發子彈加成傷害
       let chargeMult = 1;
@@ -16197,7 +17261,8 @@ for (let bi = 0; bi < state.balls.length; bi++) {
         const count = 1 + (ench.split || 0) * RSQJS_ENCHANT_SPLIT_PER_LV;
         const volleyHits = new Set(); // 同一波丟出的炸藥共用：同一個目標只有第一顆算全額傷害
         for (let k = 0; k < count; k++) {
-          const ang = Math.atan2(enemy.y - b.y, enemy.x - b.x) + (k - (count - 1) / 2) * 0.35;
+          const aimPoint = getConfusedAimPoint(b, enemy);
+          const ang = Math.atan2(aimPoint.y - b.y, aimPoint.x - b.x) + (k - (count - 1) / 2) * 0.35;
           state.rsqjsBombs.push({
             x: b.x, y: b.y, owner: b.player,
             vx: Math.cos(ang) * RSQJS_BOMB_THROW_SPD, vy: Math.sin(ang) * RSQJS_BOMB_THROW_SPD,
@@ -17534,9 +18599,9 @@ waypoints.push({
           if (p.type === 'knife') {
             const chefBall = (p.ownerBall && p.ownerBall.char.type === 'chef') ? p.ownerBall : null;
             if (chefBall) {
-              chefBall.knives = Math.min(chefBall.knives + 1, KNIFE_MAX_COUNT);
+              chefBall.knives = Math.min(chefBall.knives + 1, chefBall.knifeMax || KNIFE_MAX_COUNT);
               const wallLeft = state.wallKnives.filter(k => k.ownerBall ? k.ownerBall === chefBall : k.owner === chefBall.player).length;
-              if (chefBall.knives >= KNIFE_MAX_COUNT && wallLeft === 0) {
+              if (chefBall.knives >= (chefBall.knifeMax || KNIFE_MAX_COUNT) && wallLeft === 0) {
                 chefBall.knifeRecalling = false;
                 chefBall.attackTimer = chefBall.attackInterval;
               }
@@ -17547,7 +18612,7 @@ waypoints.push({
       }
       if (p.mageSkipTarget === b && (p.mageSkipUntil || 0) > (state.elapsed || 0)) continue;
       const pd = Math.sqrt((p.x-b.x)**2 + (p.y-b.y)**2);
-      if (pd < getCombatRadius(b) + 10) {
+      if (pd < getCombatRadius(b) + (p.type === 'drunk_mist' ? (p.r || DRUNK_MIST_RADIUS) : 10)) {
         // 末代武士招架反彈
         if (b.char.type === 'samurai' && b.samuraiParrying &&
             p.owner !== b.player) {
@@ -17641,6 +18706,7 @@ waypoints.push({
             dealDamage(b, p.damage, { attackerPlayer: p.owner, attackerBall: p.ownerBall });
             state.hitFlashes.push({ x: b.x, y: b.y, r: 35, alpha: 1, color: '#9b59b6', t: 0.35 });
           } else if (origin === 'bottle') {
+          if (p.ownerBall && p.ownerBall.char && p.ownerBall.char.type === 'drunk') drunkGainIntoxication(p.ownerBall);
             dealDamage(b, p.damage, { attackerPlayer: p.owner, attackerBall: p.ownerBall });
             state.hitFlashes.push({ x: b.x, y: b.y, r: 30, alpha: 1, color: '#9b59b6', t: 0.3 });
             playHitSound('bottle');
@@ -17658,13 +18724,25 @@ waypoints.push({
           }
           break;
         }
-        if (p.type === 'knife') {
+        if (p.type === 'boundary_rift') {
+          continue;
+        } else if (p.type === 'drunk_mist') {
+          // 酒氣霧可穿透：同一團霧對每名敵人只套用一次混亂，命中後繼續飛行。
+          if (!p.hitTargets) p.hitTargets = new Set();
+          if (!p.hitTargets.has(b)) {
+            p.hitTargets.add(b);
+            applyStatus(b, { id:'confusion', duration:DRUNK_CONFUSION_DURATION, stackMode:'refreshMax', source:'drunk_mist' });
+            state.hitFlashes.push({x:b.x,y:b.y,r:DRUNK_MIST_RADIUS,alpha:1.15,color:'#c99bff',t:0.6});
+          }
+          continue;
+        } else if (p.type === 'knife') {
           if (!p.hitTargets) p.hitTargets = new Set();
           const projectileHitKey = b._isSummonTarget && b.char && b.char.type === 'getoSpecial'
             ? `getoSpecial:${b.ownerPlayer}` : b;
           if (!p.hitTargets.has(projectileHitKey)) {
             p.hitTargets.add(projectileHitKey);
-            dealDamage(b, p.damage, { attackerPlayer: p.owner });
+            // 傳入 attackerBall，讓焦香疊層與鹽多一點能取得真正的廚神。
+            dealDamage(b, p.damage, { attackerPlayer: p.owner, attackerBall: p.ownerBall });
             customRegisterRikaProjectileHit(p);
             state.hitFlashes.push({ x:b.x, y:b.y, r:35, alpha:1, color:'#ffcc00', t:0.35 });
             playHitSound('knife');
@@ -17851,7 +18929,8 @@ waypoints.push({
           state.projectiles.splice(i, 1);
           removed = true; break;
         } else {
-          dealDamage(b, p.damage, { attackerPlayer: p.owner });
+          if (p.type === 'bottle' && p.ownerBall && p.ownerBall.char && p.ownerBall.char.type === 'drunk') drunkGainIntoxication(p.ownerBall);
+          dealDamage(b, p.damage, { attackerPlayer: p.owner, attackerBall: p.ownerBall });
           customRegisterRikaProjectileHit(p);
           state.hitFlashes.push({ x:b.x, y:b.y, r:35, alpha:1, color:'#ffcc00', t:0.35 });
           playHitSound('bottle');
@@ -17865,7 +18944,10 @@ waypoints.push({
     if (removed) continue;
     if (i >= state.projectiles.length) continue;
     const hitWall = p.x < WALL || p.x > W-WALL || p.y < WALL || p.y > H-WALL;
-    if (hitWall) {
+    if (hitWall && p.type === 'boundary_rift') {
+      state.projectiles.splice(i, 1);
+      continue;
+    } else if (hitWall) {
       createJohnnyWoundForProjectile(p, p.x, p.y);
       if (p.type === 'ew_soul_bullet' && p.ewAttack) {
         resolveEwImpact(p, p.x, p.y);
@@ -21717,9 +22799,9 @@ function applyGojoProjectilePull(ball, projectiles, ownerPlayer, storage) {
     if (p.type === 'knife') {
       const chefBall = p.ownerBall && p.ownerBall.char && p.ownerBall.char.type === 'chef' ? p.ownerBall : null;
       if (chefBall) {
-        chefBall.knives = Math.min((chefBall.knives || 0) + 1, KNIFE_MAX_COUNT);
+        chefBall.knives = Math.min((chefBall.knives || 0) + 1, chefBall.knifeMax || KNIFE_MAX_COUNT);
         const wallLeft = state.wallKnives.filter(k => k.ownerBall ? k.ownerBall === chefBall : k.owner === chefBall.player).length;
-        if (chefBall.knives >= KNIFE_MAX_COUNT && wallLeft === 0) {
+        if (chefBall.knives >= (chefBall.knifeMax || KNIFE_MAX_COUNT) && wallLeft === 0) {
           chefBall.knifeRecalling = false;
           chefBall.attackTimer = chefBall.attackInterval;
         }
@@ -22010,6 +23092,22 @@ function drawSamuraiVFX() {
 // 特殊技能仍可額外掛上自有欄位，中央更新／碰撞流程會依 type 處理，不破壞既有角色機制。
 function addProjectile(projectile) {
   normalizeProjectile(projectile);
+  // 底層保險：所有帶 ownerBall 的投射物都在這裡統一套用混亂。
+  // 已經使用 getConfusedAimPoint() 的技能會消耗一個 override，避免重複偏移。
+  const confusedOwner = projectile && projectile.ownerBall;
+  if (confusedOwner && hasStatusEffect(confusedOwner, 'confusion') && projectile.type !== 'drunk_mist') {
+    if ((confusedOwner._confusionAimOverrides || 0) > 0) {
+      confusedOwner._confusionAimOverrides--;
+    } else {
+      const drift = randBetween(-1.35, 1.35);
+      const speed = Math.hypot(projectile.vx, projectile.vy);
+      const base = Math.atan2(projectile.vy, projectile.vx) + drift;
+      projectile.vx = Math.cos(base) * speed;
+      projectile.vy = Math.sin(base) * speed;
+      projectile.angle = base;
+      projectile.confusionApplied = true;
+    }
+  }
   state.projectiles.push(projectile);
   // 喬尼 Lesson 3：觀察到敵方投射物生成時增加熟悉度。
   if (state && state.balls && projectile.owner != null) {
@@ -22061,13 +23159,26 @@ function normalizeProjectile(p) {
   return p;
 }
 
+function getConfusedAimPoint(attacker, target, spread = 150) {
+  if (!hasStatusEffect(attacker, 'confusion')) return { x: target.x, y: target.y };
+  // 混亂不是只旋轉彈道，而是把瞄準游標移到敵人附近的錯誤位置。
+  const angle = Math.random() * Math.PI * 2;
+  const distance = randBetween(spread * 0.65, spread);
+  attacker._confusionAimOverrides = (attacker._confusionAimOverrides || 0) + 1;
+  return { x: target.x + Math.cos(angle) * distance, y: target.y + Math.sin(angle) * distance };
+}
+function getConfusedAimAngle(attacker, target, baseAngle) {
+  const point = getConfusedAimPoint(attacker, target);
+  return Math.atan2(point.y - attacker.y, point.x - attacker.x);
+}
 function fireProjectile(ball, enemy, type, dmgOverride, spdOverride) {
   // 敵方可能在本幀剛死亡或被移出目標清單；沒有目標時略過這次攻擊，
   // 避免 enemy.x 造成未捕捉例外，進而中斷 requestAnimationFrame 主迴圈。
   if (!ball || !enemy || !Number.isFinite(ball.x) || !Number.isFinite(ball.y) ||
       !Number.isFinite(enemy.x) || !Number.isFinite(enemy.y)) return null;
   if (state && state.stats && state.stats[ball.player]) state.stats[ball.player].skillUses++;
-  const dx = enemy.x - ball.x, dy = enemy.y - ball.y;
+  const aimPoint = getConfusedAimPoint(ball, enemy);
+  let dx = aimPoint.x - ball.x, dy = aimPoint.y - ball.y;
   const d = Math.sqrt(dx * dx + dy * dy) || 1;
   const nx = dx / d, ny = dy / d;
   const spd = spdOverride != null ? spdOverride : (type === 'knife' ? KNIFE_SPEED : BOTTLE_SPEED);
@@ -22555,6 +23666,16 @@ function drawEwCombatFX() {
     ctx.setLineDash([7, 5]); ctx.beginPath(); ctx.arc(b.x, b.y, EW_CAMOUFLAGE_RADIUS, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]);
     ctx.font = 'bold 11px sans-serif'; ctx.fillStyle = '#ffd4df'; ctx.textAlign = 'center';
     ctx.fillText(source ? '迷彩' : '', b.x, b.y + EW_CAMOUFLAGE_RADIUS + 14);
+    ctx.restore();
+  }
+  // 超界者迷彩：套用跟死魂靈同一套判定（ewCamouflaged），球體上方同樣直接顯示「迷彩」字樣。
+  for (const b of state.balls || []) {
+    if (!b || b.hp <= 0 || b.char.type !== 'boundary' || !b.ewCamouflaged) continue;
+    ctx.save();
+    ctx.globalAlpha = 0.85 + 0.1 * Math.sin(now * 8);
+    ctx.font = 'bold 12px sans-serif'; ctx.fillStyle = '#ffe9a8'; ctx.textAlign = 'center';
+    ctx.shadowColor = '#8ee7ff'; ctx.shadowBlur = 10;
+    ctx.fillText('迷彩', b.x, b.y - (b.r || RADIUS) - 12);
     ctx.restore();
   }
 }
@@ -25308,29 +26429,134 @@ drawKashimoReadability();
         drawGojoBlueBall(ball);
       } else if (ball.type==='red') {
         drawGojoRedBall(ball);
-      } else {
-        drawGojoTrail(ball, '191,0,255');
-        ctx.save();
-        const pulse = 0.7+0.3*Math.sin(Date.now()/150);
-        // 雙層旋轉光圈，呼應蒼／赫的環形視覺，強調「反轉術式」的至高感
-        const pang = (ball.ringAngle = (ball.ringAngle||0) + 0.05);
-        ctx.shadowColor='#bf00ff'; ctx.shadowBlur=22*pulse;
-        ctx.strokeStyle = `rgba(230,160,255,${0.8*pulse})`;
-        ctx.lineWidth = 2.5;
-        ctx.beginPath(); ctx.ellipse(ball.x, ball.y, ball.r*2.1, ball.r*0.7, pang, 0, Math.PI*2); ctx.stroke();
-        ctx.beginPath(); ctx.ellipse(ball.x, ball.y, ball.r*2.1, ball.r*0.7, pang + Math.PI/2, 0, Math.PI*2); ctx.stroke();
-        ctx.shadowBlur=30*pulse;
-        const pg = ctx.createRadialGradient(ball.x-2, ball.y-2, 1, ball.x, ball.y, ball.r);
-        pg.addColorStop(0, '#ffffff');
-        pg.addColorStop(0.4, '#e0b0ff');
-        pg.addColorStop(0.75, '#bf00ff');
-        pg.addColorStop(1, '#4a0066');
-        ctx.fillStyle=pg; ctx.globalAlpha=pulse;
-        ctx.beginPath(); ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI*2); ctx.fill();
-        ctx.restore();
-      }
+ } else if (ball.type === 'purple') {
+  // ── 新版「紫」：獨立穿透球 ──
+  const trail = ball.trail || [];
+  for (let i = 0; i < trail.length; i++) {
+    const t = trail[i];
+    const frac = (i + 1) / trail.length;
+    ctx.save();
+    ctx.globalAlpha = frac * 0.45;
+    ctx.beginPath();
+    ctx.arc(t.x, t.y, ball.r * frac * 0.85, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(191,0,255,${frac * 0.6})`;
+    ctx.shadowColor = '#bf00ff';
+    ctx.shadowBlur = 18 * frac;
+    ctx.fill();
+    ctx.restore();
+  }
+
+  ctx.save();
+  const pulse = 0.75 + 0.25 * Math.sin(Date.now() / 90);
+  const auraR = ball.r * (1.9 + pulse * 0.2);
+  const auraGrad = ctx.createRadialGradient(ball.x, ball.y, ball.r * 0.4, ball.x, ball.y, auraR);
+  auraGrad.addColorStop(0, 'rgba(230,160,255,0.55)');
+  auraGrad.addColorStop(0.5, 'rgba(191,0,255,0.28)');
+  auraGrad.addColorStop(1, 'rgba(75,0,102,0)');
+  ctx.beginPath();
+  ctx.arc(ball.x, ball.y, auraR, 0, Math.PI * 2);
+  ctx.fillStyle = auraGrad;
+  ctx.fill();
+
+  const spin = Date.now() / 200;
+  ctx.globalAlpha = 0.85;
+  ctx.strokeStyle = `rgba(230,160,255,${0.6 + pulse * 0.3})`;
+  ctx.lineWidth = 2.5;
+  ctx.shadowColor = '#bf00ff';
+  ctx.shadowBlur = 22 * pulse;
+  ctx.beginPath();
+  ctx.ellipse(ball.x, ball.y, ball.r * 1.9, ball.r * 0.7, spin, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.ellipse(ball.x, ball.y, ball.r * 1.9, ball.r * 0.7, spin + Math.PI / 2, 0, Math.PI * 2);
+  ctx.stroke();
+
+  ctx.globalAlpha = 1;
+  ctx.shadowBlur = 30 * pulse;
+  const coreGrad = ctx.createRadialGradient(ball.x - 3, ball.y - 3, 1, ball.x, ball.y, ball.r);
+  coreGrad.addColorStop(0, '#ffffff');
+  coreGrad.addColorStop(0.35, '#e0b0ff');
+  coreGrad.addColorStop(0.72, '#bf00ff');
+  coreGrad.addColorStop(1, '#4a0066');
+  ctx.fillStyle = coreGrad;
+  ctx.beginPath();
+  ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.globalAlpha = 0.7 * pulse;
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath();
+  ctx.arc(ball.x, ball.y, ball.r * 0.35, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.restore();
+      }     
     }
   }
+// ── GOJO 領域展開視覺（無量空處）──
+for (const b of state.balls) {
+  if (b.hp <= 0 || b.char.type !== 'gojo' || !b.gojoDomainActive) continue;
+  const prog = 1 - Math.max(0, b.gojoDomainTimer / GOJO_DOMAIN_DURATION);
+  const pulse = 0.5 + 0.5 * Math.sin(elapsed * 6);
+  ctx.save();
+
+  const fog = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, Math.max(W, H));
+  fog.addColorStop(0, 'rgba(191,0,255,0.22)');
+  fog.addColorStop(0.5, 'rgba(140,0,200,0.15)');
+  fog.addColorStop(1, 'rgba(60,0,100,0.28)');
+  ctx.fillStyle = fog;
+  ctx.fillRect(0, 0, W, H);
+
+  ctx.setLineDash([12, 8]);
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = `rgba(160,240,255,${0.7 + pulse * 0.3})`;
+  ctx.shadowColor = '#00cfff';
+  ctx.shadowBlur = 14;
+  ctx.beginPath();
+  ctx.arc(b.x, b.y, GOJO_DOMAIN_SAFE_RADIUS, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  const ringR = 30 + prog * Math.max(W, H) * 0.7;
+  ctx.globalAlpha = 0.5 * (1 - prog * 0.6);
+  ctx.strokeStyle = '#bf00ff';
+  ctx.lineWidth = 6;
+  ctx.shadowColor = '#bf00ff';
+  ctx.shadowBlur = 22;
+  ctx.beginPath();
+  ctx.arc(b.x, b.y, ringR, 0, Math.PI * 2);
+  ctx.stroke();
+
+  ctx.globalAlpha = 0.9;
+  ctx.font = 'bold 14px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#e0b0ff';
+  ctx.shadowColor = '#000';
+  ctx.shadowBlur = 4;
+  ctx.fillText(`無量空處 ${b.gojoDomainTimer.toFixed(1)}s`, b.x, b.y - b.r - 34);
+
+  ctx.restore();
+}
+
+// ── GOJO 無下限量條（球旁）──
+for (const b of state.balls) {
+  if (b.hp <= 0 || b.char.type !== 'gojo') continue;
+  const inf = Math.max(0, Math.min(GOJO_INFINITY_MAX, b.gojoInfinity || 0));
+  const ratio = inf / GOJO_INFINITY_MAX;
+  const barW = 44, barH = 5;
+  const barX = b.x - barW / 2;
+  const barY = b.y + b.r + 12;
+  ctx.save();
+  ctx.fillStyle = 'rgba(0,0,0,0.55)';
+  ctx.fillRect(barX, barY, barW, barH);
+  const color = ratio >= 1 ? '#00cfff' : (ratio > 0.5 ? '#5fdcff' : '#3a8a9c');
+  ctx.fillStyle = color;
+  ctx.shadowColor = color;
+  ctx.shadowBlur = 8;
+  ctx.fillRect(barX, barY, barW * ratio, barH);
+  ctx.restore();
+}
 
   // ── 繪製 組裝機器人「蒼」零件 的飛行引力球 ──
   for (const b of state.balls) {
@@ -25352,6 +26578,23 @@ drawKashimoReadability();
   // 奧提斯 E.G.O. 視覺層：深藍空間裂口、鎖定符文、魔彈殘痕與命中裂痕。
   drawOtisVisualFX();
 
+  // 超界者黑洞：獨立召喚物，不受傷害。
+  for (const hole of boundaryGetHoles()) {
+    const hp = 0.72 + 0.28 * Math.sin(elapsed * 7 + hole.id);
+    ctx.save(); ctx.translate(hole.x, hole.y); ctx.rotate(elapsed * 1.8);
+    ctx.shadowColor = '#a55cff'; ctx.shadowBlur = 18; ctx.fillStyle = 'rgba(15,5,35,0.9)';
+    ctx.beginPath(); ctx.arc(0,0,hole.r,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle = `rgba(189,125,255,${hp})`; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(0,0,hole.r+5,0,Math.PI*1.55); ctx.stroke();
+    ctx.strokeStyle = '#e7c8ff'; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(0,0,hole.r*0.55,0,Math.PI*2); ctx.stroke(); ctx.restore();
+  }
+  // 次元裂隙震盪波：每0.2秒從母盤位置放出一枚同型圓盤波。
+  for (const fx of (state.boundaryShockwaves || [])) {
+    const q = Math.max(0, Math.min(1, fx.age / fx.life));
+    const rr = 8 + q * fx.maxR;
+    ctx.save(); ctx.translate(fx.x, fx.y); ctx.globalAlpha = (1-q) * 0.88; ctx.shadowColor='#d93cff'; ctx.shadowBlur=16;
+    ctx.strokeStyle='#b92cff'; ctx.lineWidth=3.5; ctx.beginPath(); ctx.ellipse(0,0,rr*0.72,rr*1.28,0,0,Math.PI*2); ctx.stroke();
+    ctx.strokeStyle='#e7b7ff'; ctx.lineWidth=1.4; ctx.beginPath(); ctx.ellipse(0,0,rr*0.62*0.72,rr*0.62*1.28,0,0,Math.PI*2); ctx.stroke(); ctx.restore();
+  }
   // 投射物
   for (const p of state.projectiles) {
     ctx.save();
@@ -25683,6 +26926,39 @@ drawKashimoReadability();
       ctx.shadowBlur = 0;
       ctx.strokeStyle = p.color; ctx.lineWidth = 1.4;
       ctx.beginPath(); ctx.arc(-6, 0, 3, 0, Math.PI * 2); ctx.stroke();
+    } else if (p.type === 'boundary_rift') {
+      ctx.filter = 'none';
+      const pulse = 0.7 + 0.3 * Math.sin(elapsed * 18);
+      ctx.shadowColor = '#6d2cff'; ctx.shadowBlur = 18;
+      // 圖片風格的次元之握：一發較大的黑紫色圓盤母彈。
+      const rr = Math.max(22, p.r || 24), rx = rr * 0.72, ry = rr * 1.28;
+      ctx.fillStyle = 'rgba(4,1,14,0.96)'; ctx.strokeStyle = '#702cff'; ctx.lineWidth = 2.8;
+      ctx.beginPath();
+      for (let si=0; si<16; si++) { const a=si*Math.PI/8; const rad=(si%2?0.9:1.08); const x=Math.cos(a)*rx*rad, y=Math.sin(a)*ry*rad; if(!si) ctx.moveTo(x,y); else ctx.lineTo(x,y); }
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+      ctx.strokeStyle = `rgba(229,73,255,${0.75 + pulse*0.25})`; ctx.lineWidth = 3.2; ctx.shadowColor='#ff28ec'; ctx.shadowBlur=14;
+      ctx.beginPath(); ctx.ellipse(0,0,rx*0.58,ry*0.58,0,0,Math.PI*2); ctx.stroke();
+      ctx.fillStyle = '#d93cff'; ctx.beginPath(); ctx.ellipse(0,0,rx*0.26+pulse*2,ry*0.26+pulse*2,0,0,Math.PI*2); ctx.fill();
+      ctx.strokeStyle = '#b7f5ff'; ctx.lineWidth = 1.2; ctx.shadowBlur = 0;
+      for (let si=0; si<4; si++) { const a=si*Math.PI/2+elapsed*2; ctx.beginPath(); ctx.moveTo(Math.cos(a)*rx*0.35,Math.sin(a)*ry*0.35); ctx.lineTo(Math.cos(a)*rx*0.95,Math.sin(a)*ry*0.95); ctx.stroke(); }
+    } else if (p.type === 'drunk_mist') {
+      ctx.filter = 'none';
+      const pulse = 0.85 + 0.15 * Math.sin(elapsed * 7 + p.x * 0.01);
+      const fogR = (p.r || DRUNK_MIST_RADIUS);
+      const fog = ctx.createRadialGradient(0, 0, fogR * 0.12, 0, 0, fogR);
+      fog.addColorStop(0, `rgba(220,205,255,${0.30 + pulse * 0.16})`);
+      fog.addColorStop(0.55, 'rgba(178,145,230,0.24)');
+      fog.addColorStop(1, 'rgba(145,110,200,0)');
+      ctx.fillStyle = fog;
+      ctx.shadowColor = 'rgba(190,160,255,0.65)'; ctx.shadowBlur = 18;
+      ctx.beginPath(); ctx.arc(0, 0, fogR, 0, Math.PI * 2); ctx.fill();
+      ctx.shadowBlur = 0;
+      for (let fi = 0; fi < 5; fi++) {
+        const a = elapsed * (0.7 + fi * 0.08) + fi * 1.256;
+        const rr = fogR * (0.25 + (fi % 3) * 0.18);
+        ctx.fillStyle = `rgba(235,225,255,${0.16 + (fi % 2) * 0.08})`;
+        ctx.beginPath(); ctx.arc(Math.cos(a) * rr, Math.sin(a) * rr * 0.7, 4 + (fi % 2) * 2, 0, Math.PI * 2); ctx.fill();
+      }
     } else if (p.type === 'bottle') {
       ctx.filter = 'none';
       // 拖尾：飛行方向留下淡出的酒液噴濺線條（沿用 local +x = 飛行方向的座標系）
@@ -26853,6 +28129,33 @@ drawKashimoReadability();
       ctx.lineWidth = 2;
       ctx.globalAlpha = prog * 0.9;
       ctx.stroke();
+      ctx.restore();
+    }
+  }
+
+  // 🧂廚神「鹽多一點」調味道具：只由擁有者可拾取；繪製在角色與命中特效之間，確保場上看得到。
+  if (state.chefItems && state.chefItems.length) {
+    for (const item of state.chefItems) {
+      if (!item || item.life <= 0) continue;
+      const fade = Math.min(1, item.life / 0.7);
+      const pulse = 1 + Math.sin((elapsed || 0) * 7 + item.x * 0.03) * 0.08;
+      const size = 15 * pulse;
+      ctx.save();
+      ctx.globalAlpha = fade;
+      ctx.shadowColor = item.color || '#ffffff';
+      ctx.shadowBlur = 10;
+      ctx.beginPath();
+      ctx.arc(item.x, item.y, size + 4, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(20,20,20,0.72)';
+      ctx.fill();
+      ctx.strokeStyle = item.color || '#ffffff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+      ctx.font = `${Math.round(size * 1.45)}px sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(item.emoji, item.x, item.y + 1);
       ctx.restore();
     }
   }
@@ -28607,6 +29910,73 @@ drawKashimoReadability();
       }
     }
 
+    // 酒鬼「喝高了」：金色酩酊光環。
+    if (b.char?.type === 'drunk' && b.drunkIntoxActiveTimer > 0) {
+      const intoxPulse = 0.7 + 0.3 * Math.sin(elapsed * 12);
+      ctx.beginPath(); ctx.arc(b.x, b.y, RADIUS + 10 + intoxPulse * 4, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(255,205,65,${0.7 + intoxPulse * 0.25})`; ctx.lineWidth = 4; ctx.stroke();
+      ctx.font = 'bold 12px sans-serif'; ctx.textAlign = 'center'; ctx.fillStyle = '#ffe27a';
+      ctx.fillText('🥴 酩酊大醉', b.x, b.y - RADIUS - 22);
+    }
+    // 醉拳命中：以酒鬼為中心顯示短暫衝撞拳風。
+    if (b.char?.type === 'drunk' && b.drunkPunchFxTimer > 0) {
+      const punchProg = b.drunkPunchFxTimer / 0.5;
+      const ang = Number.isFinite(b.drunkPunchFxAngle) ? b.drunkPunchFxAngle : Math.atan2(b.vy, b.vx);
+      const fxX = Number.isFinite(b.drunkPunchFxX) ? b.drunkPunchFxX : b.x;
+      const fxY = Number.isFinite(b.drunkPunchFxY) ? b.drunkPunchFxY : b.y;
+      // 清楚表達「向前出拳」：由酒鬼本體延伸到命中點的手臂／拳風，再在前端畫小拳頭。
+      ctx.save(); ctx.globalAlpha = punchProg;
+      const dx = fxX - b.x, dy = fxY - b.y, fd = Math.hypot(dx, dy) || 1;
+      const ux = dx / fd, uy = dy / fd, pxn = -uy, pyn = ux;
+      ctx.strokeStyle = '#ffe27a'; ctx.lineCap = 'round';
+      ctx.lineWidth = 8;
+      ctx.beginPath(); ctx.moveTo(b.x + ux * RADIUS, b.y + uy * RADIUS); ctx.lineTo(fxX - ux * 13, fxY - uy * 13); ctx.stroke();
+      ctx.strokeStyle = '#fff4b0'; ctx.lineWidth = 2.5;
+      for (let li = -1; li <= 1; li++) {
+        ctx.beginPath(); ctx.moveTo(b.x + ux * (RADIUS + 5) + pxn * li * 8, b.y + uy * (RADIUS + 5) + pyn * li * 8); ctx.lineTo(fxX - ux * 18 + pxn * li * 13, fxY - uy * 18 + pyn * li * 13); ctx.stroke();
+      }
+      // 前端拳頭：掌心＋三個指節，固定位於攻擊方向的最前端。
+      ctx.fillStyle = '#ffc83d'; ctx.shadowColor = '#ff9d00'; ctx.shadowBlur = 14;
+      ctx.beginPath(); ctx.arc(fxX, fxY, 14, 0, Math.PI * 2); ctx.fill();
+      ctx.shadowBlur = 0; ctx.fillStyle = '#fff1a8';
+      for (let ki = -1; ki <= 1; ki++) { ctx.beginPath(); ctx.arc(fxX + pxn * ki * 6 - ux * 3, fxY + pyn * ki * 6 - uy * 3, 3, 0, Math.PI * 2); ctx.fill(); }
+      ctx.restore();
+      ctx.save(); ctx.globalAlpha = punchProg * 0.85; ctx.strokeStyle = '#ffe98a'; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.arc(fxX, fxY, DRUNK_PUNCH_RADIUS * (0.35 + (1 - punchProg) * 0.65), 0, Math.PI * 2); ctx.stroke();
+      ctx.restore();
+    }
+    // 混亂：紫色旋轉光環與明確文字提示。
+    if (hasStatusEffect(b, 'confusion')) {
+      const confusionPulse = 0.65 + 0.35 * Math.sin(elapsed * 15);
+      const confusionSpin = elapsed * 5.5;
+      // 三層反向旋轉干擾圈，讓混亂狀態在場上清楚可辨。
+      for (let ci = 0; ci < 3; ci++) {
+        const rr = RADIUS + 7 + ci * 6 + confusionPulse * 3;
+        const start = confusionSpin * (ci % 2 ? -1 : 1) + ci * 2.1;
+        ctx.beginPath(); ctx.arc(b.x, b.y, rr, start, start + Math.PI * (1.05 + ci * 0.18));
+        ctx.strokeStyle = ci === 1 ? `rgba(245,185,255,${0.9 + confusionPulse * 0.1})` : `rgba(155,85,255,${0.7 + confusionPulse * 0.25})`;
+        ctx.lineWidth = ci === 1 ? 3.5 : 2.2; ctx.stroke();
+      }
+      // 交錯的抖動干擾線與閃爍星點。
+      ctx.save(); ctx.translate(b.x, b.y); ctx.rotate(-confusionSpin * 0.7);
+      ctx.globalAlpha = 0.6 + confusionPulse * 0.35; ctx.strokeStyle = '#e9b8ff'; ctx.lineWidth = 1.5;
+      for (let li = 0; li < 4; li++) {
+        const la = li * Math.PI / 2 + 0.18 * Math.sin(elapsed * 20 + li);
+        ctx.beginPath(); ctx.moveTo(Math.cos(la) * (RADIUS + 3), Math.sin(la) * (RADIUS + 3)); ctx.lineTo(Math.cos(la) * (RADIUS + 21), Math.sin(la) * (RADIUS + 21)); ctx.stroke();
+      }
+      ctx.restore();
+      for (let si = 0; si < 4; si++) {
+        const sa = confusionSpin * (si % 2 ? -0.8 : 0.8) + si * Math.PI / 2;
+        const sx = b.x + Math.cos(sa) * (RADIUS + 15), sy = b.y + Math.sin(sa) * (RADIUS + 15);
+        ctx.fillStyle = `rgba(255,220,255,${0.55 + confusionPulse * 0.4})`;
+        ctx.beginPath(); ctx.arc(sx, sy, 2.5 + confusionPulse * 1.8, 0, Math.PI * 2); ctx.fill();
+      }
+      ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'center'; ctx.fillStyle = '#f0c9ff';
+      ctx.shadowColor = '#8b3dff'; ctx.shadowBlur = 10;
+      ctx.fillText(`⚠ 混亂 ${Math.ceil(getStatusEffect(b, 'confusion').remaining)}s ⚠`, b.x, b.y - RADIUS - 22);
+      ctx.shadowBlur = 0;
+    }
+
     // 被尖刺中毒：綠色虛線邊框
     if (b.trapDotTimer > 0) {
       ctx.beginPath(); ctx.arc(b.x, b.y, RADIUS + 6, 0, Math.PI * 2);
@@ -29327,6 +30697,24 @@ drawKashimoReadability();
       ctx.fillStyle = '#e5d8ff'; ctx.fillText(label, b.x, labelY); ctx.restore();
     }
 
+    // 廚神海克斯科技：場上調味道具
+    if (state.chefItems) {
+      for (const item of state.chefItems) {
+        if (!item || item.life <= 0) continue;
+        const pulse = 1 + Math.sin(elapsed * 7 + item.x * 0.02) * 0.08;
+        ctx.save();
+        ctx.translate(item.x, item.y);
+        ctx.globalAlpha = Math.min(1, item.life / 0.7);
+        ctx.shadowColor = item.color; ctx.shadowBlur = 16;
+        ctx.beginPath(); ctx.arc(0, 0, 14 * pulse, 0, Math.PI * 2);
+        ctx.fillStyle = `${item.color}55`; ctx.fill();
+        ctx.strokeStyle = '#fff4d6'; ctx.lineWidth = 2; ctx.stroke();
+        ctx.font = '18px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.shadowBlur = 4; ctx.fillText(item.emoji, 0, 1);
+        ctx.restore();
+      }
+    }
+
     // 角色圖示（emoji 或圖片）
     if (b.char.type === 'ew' && b.ewSkill3Active) drawEwHeavyBombard(ctx, b, elapsed);
     ctx.font = `${b.r*1.1}px serif`; ctx.textAlign='center'; ctx.textBaseline='middle';
@@ -29335,6 +30723,11 @@ drawKashimoReadability();
       drawCharIcon(ctx, { image: roleData.image, emoji: roleData.suffix }, b.x, b.y, b.r * 1.8);
     } else {
       drawCharIcon(ctx, b.char, b.x, b.y, b.r * 1.8);
+    }
+    if (b.char.type === 'boundary') {
+      ctx.save(); ctx.globalAlpha = b.boundaryCamouflage ? 0.32 : 0.9; ctx.strokeStyle = b.boundaryWarpActive ? '#e6fbff' : '#8ee7ff'; ctx.lineWidth = 2.5; ctx.shadowColor = '#67ddff'; ctx.shadowBlur = b.boundaryWarpActive ? 20 : 9;
+      ctx.beginPath(); ctx.arc(b.x,b.y,b.r+7+Math.sin(elapsed*8)*2,0,Math.PI*2); ctx.stroke();
+      ctx.restore();
     }
     // 阿梅放大鏡揮擊：用向前伸出的透鏡與弧形揮擊軌跡表現實際攻擊動作。
     if (b.char.type === 'amelia' && (b.ameliaMeleeTimer || 0) > AMELIA_MELEE_INTERVAL - AMELIA_MELEE_ANIMATION_TIME) {
@@ -29384,6 +30777,40 @@ drawKashimoReadability();
     if (b.char.type === 'chef') {
       ctx.font = '11px serif'; ctx.textAlign = 'left';
       for (let k = 0; k < b.knives; k++) ctx.fillText('🔪',b.x+RADIUS+4,b.y-6+k*13);
+
+      // 海克斯科技狀態直接顯示在球上，避免只看底部 HUD 才知道層數。
+      const hex = Array.isArray(b.char._variantIds) ? b.char._variantIds[0] : null;
+      let hexText = '';
+      let hexColor = '#ffe7a3';
+      if (hex === 'pressure_cooker') {
+        const pressure = Math.min(CHEF_PRESSURE_MAX, Math.max(0, Number(b.chefPressure) || 0));
+        hexText = `🍲${pressure.toFixed(0)}/${CHEF_PRESSURE_MAX}${b.chefPressureReady ? '⚠️' : ''}`;
+        hexColor = b.chefPressureReady ? '#ff9f43' : '#ffe7a3';
+      } else if (hex === 'charred') {
+        let maxSear = 0;
+        if (b.chefSearTargets) {
+          for (const data of b.chefSearTargets.values()) {
+            maxSear = Math.max(maxSear, Math.min(CHEF_SEAR_MAX_STACKS, Number(data?.stacks) || 0));
+          }
+        }
+        hexText = `🔥${maxSear}/${CHEF_SEAR_MAX_STACKS}`;
+        hexColor = maxSear >= CHEF_SEAR_MAX_STACKS ? '#ff7b39' : '#ffc078';
+      } else if (hex === 'extra_salt') {
+        const itemCount = state.chefItems ? state.chefItems.filter(it => it && it.ownerPlayer === b.player).length : 0;
+        const buffs = `${b.chefSaltDamageBuffTimer > 0 ? '🧂' : ''}${b.chefItemAttackSpeedBuffTimer > 0 ? '🌶️' : ''}`;
+        hexText = `🧂${itemCount}${buffs}`;
+        hexColor = '#e8edf2';
+      }
+      if (hexText) {
+        ctx.save();
+        ctx.font = 'bold 10px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        const labelY = b.y - b.r - 14;
+        const labelW = ctx.measureText(hexText).width + 8;
+        ctx.fillStyle = 'rgba(20,12,8,0.86)'; ctx.strokeStyle = hexColor; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.roundRect(b.x - labelW / 2, labelY - 8, labelW, 16, 5); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = hexColor; ctx.fillText(hexText, b.x, labelY);
+        ctx.restore();
+      }
     }
 
     // 娜娜明「情報解析」層數顯示：層數越高，藍色分析環越亮越粗，並在頭頂標示數字
@@ -29919,51 +31346,7 @@ drawKashimoReadability();
     }
   }
 
-  // ── 無量空處領域展開 ──
-  if (state.gojoKillFX) {
-    const fx = state.gojoKillFX;
-    const prog = 1 - fx.life / fx.maxLife; // 0→1
-    const cx = W / 2, cy = H / 2;
-
-    // 1. 虛無底色（藍黑漸層，逐漸覆蓋畫面）
-    const bgAlpha = Math.min(prog * 3, 0.92);
-    const bgGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(W, H));
-    bgGrad.addColorStop(0,   `rgba(0,40,80,${bgAlpha})`);
-    bgGrad.addColorStop(0.5, `rgba(0,10,40,${bgAlpha * 0.95})`);
-    bgGrad.addColorStop(1,   `rgba(0,0,10,${bgAlpha})`);
-    ctx.fillStyle = bgGrad;
-    ctx.fillRect(0, 0, W, H);
-
-    // 2. 速度線（從中心向外爆射）
-    ctx.save();
-    ctx.translate(cx, cy);
-    for (const l of fx.lines) {
-      const fadeIn  = Math.min(prog * 5, 1);
-      const fadeOut = fx.life < 0.6 ? fx.life / 0.6 : 1;
-      const a = l.alpha * fadeIn * fadeOut;
-      ctx.save();
-      ctx.rotate(l.angle);
-      ctx.beginPath();
-      ctx.moveTo(l.dist, 0);
-      ctx.lineTo(l.dist + l.len, 0);
-      ctx.strokeStyle = `rgba(100,200,255,${a})`;
-      ctx.lineWidth = l.width;
-      ctx.stroke();
-      ctx.restore();
-    }
-    ctx.restore();
-
-    // 3. 藍色光暈圓圈（中心擴散）
-    const ringR = 40 + prog * 220;
-    const ringA = Math.max(0, 0.6 - prog * 0.5);
-    const rg = ctx.createRadialGradient(cx, cy, ringR * 0.5, cx, cy, ringR);
-    rg.addColorStop(0, `rgba(100,210,255,${ringA})`);
-    rg.addColorStop(1, `rgba(0,80,160,0)`);
-    ctx.beginPath(); ctx.arc(cx, cy, ringR, 0, Math.PI * 2);
-    ctx.fillStyle = rg; ctx.fill();
-  }
-
-  // ── 波風水門「飛雷神・亂斬」擊殺演出 ──
+    // ── 波風水門「飛雷神・亂斬」擊殺演出 ──
   if (state.minatoKillFX) {
     const fx = state.minatoKillFX;
 
@@ -31547,6 +32930,11 @@ function updateHUD() {
   }
 
   function statusText(b) {
+    if (b.char.type === 'boundary') {
+      const holes = boundaryGetHoles().filter(h => h.ownerPlayer === b.player).length;
+      const phase = b.boundaryWarpActive ? `🌀躍遷 ${Math.max(0,b.boundaryWarpTimer).toFixed(1)}s` : (b.boundaryCamouflage ? '👁️‍🗨️迷彩' : '👁️‍🗨️一般');
+      return `${phase} 黑洞${holes}/3 裂隙${Math.max(0,b.attackTimer).toFixed(1)}s`;
+    }
     if (b.char.type === 'amelia') {
       // 時空旅人血量只繪製在召喚體旁邊；底部 HUD 不重複顯示血量，避免干擾主戰鬥資訊。
       const arrivalNotice = b.ameliaTimeTravelPending
@@ -31567,7 +32955,25 @@ function updateHUD() {
       }[b.fisherPhase] || '待機';
       return `🎣 ${fisherPhaseText}・空軍 ${fisherStacks} 層・釣魚 CD ${fisherCooldown.toFixed(1)}s`;
     } else if (b.char.type === 'chef') {
-      return `菜刀: ${'🔪'.repeat(b.knives)}${b.knives===0?'空手！':''}`;
+      const hex = Array.isArray(b.char._variantIds) ? b.char._variantIds[0] : null;
+      const hexLabel = ({ pressure_cooker:'🍲高壓鍋', charred:'🔥焦香', extra_salt:'🧂鹽多一點' })[hex] || '無海克斯';
+      let hexState = '';
+      if (hex === 'pressure_cooker') {
+        const p = Math.min(CHEF_PRESSURE_MAX, Math.max(0, Number(b.chefPressure) || 0));
+        hexState = ` 壓力${p.toFixed(0)}/${CHEF_PRESSURE_MAX}${b.chefPressureReady ? ' ⚠️滿壓' : ''}`;
+      } else if (hex === 'charred') {
+        let maxSear = 0;
+        if (b.chefSearTargets) {
+          for (const data of b.chefSearTargets.values()) {
+            maxSear = Math.max(maxSear, Math.min(CHEF_SEAR_MAX_STACKS, Number(data?.stacks) || 0));
+          }
+        }
+        hexState = ` 焦香最高${maxSear}/${CHEF_SEAR_MAX_STACKS}`;
+      } else if (hex === 'extra_salt') {
+        const itemCount = state.chefItems ? state.chefItems.filter(it => it.ownerPlayer === b.player).length : 0;
+        hexState = ` 道具${itemCount}個${b.chefSaltDamageBuffTimer > 0 ? ' 🧂增傷中' : ''}${b.chefItemAttackSpeedBuffTimer > 0 ? ' 🌶️攻速中' : ''}`;
+      }
+      return `菜刀: ${'🔪'.repeat(Math.max(0, b.knives || 0))}${b.knives===0?'空手！':''}　${hexLabel}${hexState}`;
     } else if (b.char.type === 'oniichan') {
       const cd = (t) => Math.max(0, t || 0) <= 0 ? '✓' : `${Math.ceil(t)}s`;
       const tideReady = b.hp >= ONIICHAN_TIDE_HP_THRESHOLD;
@@ -31705,7 +33111,10 @@ function updateHUD() {
       const cannonCd = Math.max(0, b.yutaRikaCannonTimer || 0).toFixed(1);
       return `👧 揮爪${clawLeft}s 大砲${cannonCd}s${bindCdStr}${clawWarnStr}`;
     } else if (b.char.type === 'drunk') {
-      return `🍺 轉向: ${b.drunkTimer ? b.drunkTimer.toFixed(1) : '-'}s`;
+      const hex = Array.isArray(b.char._variantIds) ? b.char._variantIds[0] : null;
+      const label = ({drunk_mist:'🍺酒氣',drunk_punch:'🥊醉拳',drunk_high:'🥴喝高了'})[hex] || '無海克斯';
+      const status = hex === 'drunk_mist' ? ` ${Math.max(0,b.drunkMistTimer||0).toFixed(1)}s` : hex === 'drunk_high' ? ` 醉意${b.drunkIntoxStacks||0}/${DRUNK_INTOX_MAX}${b.drunkIntoxActiveTimer>0 ? ` 酩酊${b.drunkIntoxActiveTimer.toFixed(1)}s` : ''}` : '';
+      return `${label}${status} 轉向: ${b.drunkTimer ? b.drunkTimer.toFixed(1) : '-'}s`;
     } else if (b.char.type === 'engineer') {
       const turretCount = state.turrets ? state.turrets.filter(t => t.owner === b.player).length : 0;
       const gridLeft = Math.max(0, b.engGridTimer || 0).toFixed(1);
@@ -31949,13 +33358,19 @@ function showResult(deadBalls) {
         recordedPlayers.add(b.player);
         // 無形變身後 b.char 會被換成當下變成的角色，真正身分要看 wuxingBaseChar 才不會記錯人
         const realCharId = b.wuxingBaseChar ? b.wuxingBaseChar.id : b.char.id;
-        perPlayerChar.push({ player: b.player, charId: realCharId });
+        const variantIds = Array.isArray(b.char._variantIds)
+          ? b.char._variantIds.slice()
+          : [];
+        perPlayerChar.push({ player: b.player, charId: realCharId, variantIds });
       });
       const distinctChars = new Set(perPlayerChar.map(p => p.charId));
       if (perPlayerChar.length === 2 && distinctChars.size > 1) {
         perPlayerChar.forEach(p => {
-          recordCharacterResult(p.charId, p.player === winner.player);
+          recordCharacterResult(p.charId, p.player === winner.player, p.variantIds);
         });
+        const winnerCharId = perPlayerChar.find(p => p.player === winner.player).charId;
+        recordMatchup(perPlayerChar[0].charId, perPlayerChar[1].charId, winnerCharId);
+        recordMatchHistory(perPlayerChar[0].charId, perPlayerChar[1].charId, winnerCharId);
       }
     }
     // 多人混戰時，loser 僅用於特定勝利台詞查詢，取最後一位倒下的對手
@@ -32367,7 +33782,7 @@ document.getElementById('assemble-btn')?.addEventListener('click', startAssemble
 // 目的是盡量降低對原本1v1~4人混戰邏輯造成的風險。
 // ══════════════════════════════════════════════════════════════════
 
-let sandboxMode = false;
+var sandboxMode = false; // 使用 var，確保開始流程在沙盒附加程式載入前也能安全讀取
 let sandboxTeams = [];
 let sandboxNextTeamId = 1;
 let sandboxPickerTargetTeamId = null;
@@ -32404,11 +33819,6 @@ function sandboxInitUI() {
     #sandbox-char-grid{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;max-width:720px;max-height:60vh;overflow-y:auto;padding:10px}
     .sb-char-btn{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:10px 6px;width:80px;cursor:pointer;color:#eee;text-align:center;font-size:0.68rem;line-height:1.3}
     .sb-char-btn:active{background:rgba(255,160,60,0.3)}
-    .sb-chip .sb-gear{background:none;border:none;color:#8fd6ff;cursor:pointer;font-size:0.9rem;padding:0 2px}
-    #sandbox-member-modal{display:none;position:fixed;inset:0;background:rgba(5,3,2,0.85);z-index:420;align-items:center;justify-content:center}
-    #sandbox-member-modal .sb-member-box{background:#17121a;border:1px solid rgba(255,255,255,0.15);border-radius:14px;padding:18px;width:min(300px,88vw);display:flex;flex-direction:column;gap:12px}
-    #sandbox-member-modal label{font-size:0.78rem;color:#ccc;display:flex;flex-direction:column;gap:4px}
-    #sandbox-member-modal input{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);color:#fff;border-radius:6px;padding:6px 8px;font-size:0.9rem}
     .sb-num{width:78px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.2);color:#fff;border-radius:6px;padding:4px 6px;font-size:0.9rem}
     #sandbox-hud{display:none;width:min(700px,96vw);flex-wrap:wrap;gap:6px;justify-content:center;padding:6px 0;box-sizing:border-box}
     .sb-hud-team{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.35);border-radius:10px;padding:4px 10px;font-size:0.7rem;min-width:110px;color:#eee}
@@ -32455,16 +33865,6 @@ function sandboxInitUI() {
       <div id="sandbox-char-grid"></div>
       <button class="sb-btn" id="sandbox-char-modal-close">關閉</button>
     </div>
-
-    <div id="sandbox-member-modal">
-      <div class="sb-member-box">
-        <div id="sandbox-member-modal-title" style="font-weight:700;font-size:1rem;text-align:center;color:#eee"></div>
-        <label>血量（留空＝使用預設值）<input type="number" id="sandbox-member-hp" min="1" step="1"></label>
-        <label>重生次數（0＝陣亡即淘汰）<input type="number" id="sandbox-member-respawns" min="0" step="1"></label>
-        <div id="sandbox-member-modal-note" style="font-size:0.68rem;color:#e0a05c;line-height:1.4;display:none"></div>
-        <button class="sb-btn primary" id="sandbox-member-modal-close">完成</button>
-      </div>
-    </div>
   `;
   document.body.appendChild(wrap);
 
@@ -32497,7 +33897,7 @@ function sandboxInitUI() {
       btn.onclick = () => {
         if (sandboxPickerTargetTeamId == null) return;
         const team = sandboxTeams.find(t => t.id === sandboxPickerTargetTeamId);
-        if (team) team.members.push({ id: ch.id, hp: null, respawns: 0 });
+        if (team) team.members.push({ id: ch.id, hp: null });
         sandboxRenderTeams();
       };
       charGrid.appendChild(btn);
@@ -32506,11 +33906,6 @@ function sandboxInitUI() {
 
   document.getElementById('sandbox-char-modal-close').onclick = () => {
     document.getElementById('sandbox-char-modal').style.display = 'none';
-  };
-  document.getElementById('sandbox-member-modal-close').onclick = () => {
-    sandboxCommitMemberSettings();
-    document.getElementById('sandbox-member-modal').style.display = 'none';
-    sandboxRenderTeams();
   };
   document.getElementById('sandbox-add-team-btn').onclick = () => {
     sandboxCreateTeam();
@@ -32547,10 +33942,14 @@ function sandboxRenderTeams() {
     const color = sandboxColorForIndex(ti);
     const chipsHTML = team.members.map((m, mi) => {
       const ch = getCharacterRoster().find(c => c.id === m.id);
-      const respawnBadge = (m.respawns > 0) ? `<span style="opacity:0.75;font-size:0.68rem;color:#8fd6ff">🔁${m.respawns}</span>` : '';
+      const defaultHp = ch ? (ch.type === 'johnny' ? JOHNNY_MAX_HP : ch.type === 'sans' ? SANS_MAX_HP : MAX_HP) : MAX_HP;
+      const unit = ch && ch.type === 'sans' ? '格' : '血量';
+      const val = (m.hp != null) ? m.hp : '';
       return `<span class="sb-chip">${ch ? charIconHTML(ch, '1em') + ' ' + ch.name : m.id}
-        ${respawnBadge}
-        <button type="button" data-ti="${ti}" data-mi="${mi}" class="sb-gear" title="調整血量／重生次數">⚙️</button>
+        <input type="number" class="sb-hp-input" data-ti="${ti}" data-mi="${mi}" min="1" step="1"
+          placeholder="${defaultHp}" value="${val}" title="自訂${unit}（留空＝預設 ${defaultHp}）"
+          style="width:52px;background:rgba(255,255,255,0.3);border:1px solid rgba(255,255,255,0.2);border-radius:6px;color:#eee;font-size:0.75rem;padding:2px 4px;margin-left:2px">
+        <span style="opacity:0.6;font-size:0.7rem">${unit}</span>
         <button data-ti="${ti}" data-mi="${mi}" class="sb-remove-member">✕</button></span>`;
     }).join('');
     teamEl.innerHTML = `
@@ -32585,10 +33984,11 @@ function sandboxRenderTeams() {
       sandboxRenderTeams();
     };
   });
-  container.querySelectorAll('.sb-gear').forEach(btn => {
-    btn.onclick = (e) => {
-      const ti = +e.currentTarget.dataset.ti, mi = +e.currentTarget.dataset.mi;
-      sandboxOpenMemberSettings(ti, mi);
+  container.querySelectorAll('.sb-hp-input').forEach(inp => {
+    inp.onchange = (e) => {
+      const ti = +e.target.dataset.ti, mi = +e.target.dataset.mi;
+      const v = parseInt(e.target.value, 10);
+      sandboxTeams[ti].members[mi].hp = (Number.isFinite(v) && v > 0) ? v : null;
     };
   });
   container.querySelectorAll('.sb-remove-member').forEach(btn => {
@@ -32598,49 +33998,6 @@ function sandboxRenderTeams() {
       sandboxRenderTeams();
     };
   });
-}
-
-// 目前正在用⚙️面板編輯哪個成員（{ti, mi}），關閉面板時用來把輸入值寫回 sandboxTeams
-let sandboxEditingMember = null;
-
-function sandboxOpenMemberSettings(ti, mi) {
-  const team = sandboxTeams[ti];
-  const m = team && team.members[mi];
-  if (!m) return;
-  const ch = getCharacterRoster().find(c => c.id === m.id);
-  sandboxEditingMember = { ti, mi };
-  const defaultHp = ch ? (ch.type === 'johnny' ? JOHNNY_MAX_HP : ch.type === 'sans' ? SANS_MAX_HP : MAX_HP) : MAX_HP;
-  const unit = ch && ch.type === 'sans' ? '格' : '血量';
-  document.getElementById('sandbox-member-modal-title').textContent = ch ? `${ch.name} 設定` : '角色設定';
-  const hpInput = document.getElementById('sandbox-member-hp');
-  hpInput.placeholder = `預設 ${defaultHp}（${unit}）`;
-  hpInput.value = (m.hp != null) ? m.hp : '';
-  const respawnInput = document.getElementById('sandbox-member-respawns');
-  respawnInput.value = m.respawns || 0;
-  const noteEl = document.getElementById('sandbox-member-modal-note');
-  const isSpecialMulti = ch && (ch.isTwin || ch.isQuad);
-  if (isSpecialMulti) {
-    respawnInput.disabled = true;
-    noteEl.style.display = 'block';
-    noteEl.textContent = '此角色由多顆球組成，暫不支援重生次數設定，陣亡後維持原本規則。';
-  } else {
-    respawnInput.disabled = false;
-    noteEl.style.display = 'none';
-  }
-  document.getElementById('sandbox-member-modal').style.display = 'flex';
-}
-
-function sandboxCommitMemberSettings() {
-  if (!sandboxEditingMember) return;
-  const { ti, mi } = sandboxEditingMember;
-  const m = sandboxTeams[ti] && sandboxTeams[ti].members[mi];
-  sandboxEditingMember = null;
-  if (!m) return;
-  const hpVal = parseInt(document.getElementById('sandbox-member-hp').value, 10);
-  m.hp = (Number.isFinite(hpVal) && hpVal > 0) ? hpVal : null;
-  const respawnInput = document.getElementById('sandbox-member-respawns');
-  const respawnVal = parseInt(respawnInput.value, 10);
-  m.respawns = (!respawnInput.disabled && Number.isFinite(respawnVal) && respawnVal > 0) ? respawnVal : 0;
 }
 
 // 開始（或重新開始）沙盒對戰：讀取目前的隊伍/場地設定並建立戰鬥
@@ -32752,9 +34109,6 @@ function sandboxStartBattle() {
       } else {
         const b = makeBall(px, py, vx, vy, ch, teamPlayer);
         applyCustomHp(b);
-        // 沙盒重生次數：只支援單顆球角色（雙生／四顆分身走上面各自的分支，不會進到這裡）
-        const respawnCount = parseInt(m.respawns, 10);
-        b.sandboxRespawnsLeft = (Number.isFinite(respawnCount) && respawnCount > 0) ? respawnCount : 0;
         allBalls.push(b);
       }
       if (!initialStats[teamPlayer]) initialStats[teamPlayer] = { totalDmg: 0, maxHit: 0, skillUses: 0 };
@@ -32765,7 +34119,7 @@ function sandboxStartBattle() {
   state = {
     playerCount: activeTeams.length,
     balls: allBalls,
-    projectiles: [], otisMagicBullets: [], otisReticles: [], otisPortals: [], otisRifts: [], otisScreenPulse: 0, wallKnives: [], minatoKunai: [], minatoTeleportFX: [], hitFlashes: [], damageNumbers: [], batParticles: [], slashMarks: [], traps: [], yiBlackStones: [], yiStoneBurstFX: [], yiInkAttackFX: [], opmFX: [], momoiFanFX: [], gojoKillFX: null, curseSliceKillFX: null, minatoKillFX: null, emTotems: [], emLightningFX: [], emLightningWarn: [], emGolems: [], emUltBanner: null, curseFireFX: [], curseFireBlasts: [], curseFireZones: [], bossDryPowderExtinguishers: [], bossDryPowderBlasts: [], bossDryPowderZones: [], curseSlashFX: [], elapsed: 0,
+    projectiles: [], otisMagicBullets: [], otisReticles: [], otisPortals: [], otisRifts: [], otisScreenPulse: 0, wallKnives: [], minatoKunai: [], minatoTeleportFX: [], hitFlashes: [], damageNumbers: [], batParticles: [], chefItems: [], slashMarks: [], traps: [], yiBlackStones: [], yiStoneBurstFX: [], yiInkAttackFX: [], opmFX: [], momoiFanFX: [], gojoKillFX: null, curseSliceKillFX: null, minatoKillFX: null, emTotems: [], emLightningFX: [], emLightningWarn: [], emGolems: [], emUltBanner: null, curseFireFX: [], curseFireBlasts: [], curseFireZones: [], bossDryPowderExtinguishers: [], bossDryPowderBlasts: [], bossDryPowderZones: [], curseSlashFX: [], elapsed: 0,
     arena: arenaId,
     bgColor: selectedBgColor,
     thunderPillars: [],
@@ -37534,7 +38888,7 @@ function launchBossBattle(teamIds, boss, requestedDefinition = null) {
   state = {
     playerCount: 2,
     balls: allBalls,
-    projectiles: [], otisMagicBullets: [], otisReticles: [], otisPortals: [], otisRifts: [], otisScreenPulse: 0, wallKnives: [], minatoKunai: [], minatoTeleportFX: [], hitFlashes: [], damageNumbers: [], batParticles: [], slashMarks: [], traps: [], yiBlackStones: [], yiStoneBurstFX: [], yiInkAttackFX: [], opmFX: [], momoiFanFX: [], gojoKillFX: null, curseSliceKillFX: null, minatoKillFX: null, emTotems: [], emLightningFX: [], emLightningWarn: [], emGolems: [], emUltBanner: null, curseFireFX: [], curseFireBlasts: [], curseFireZones: [], bossDryPowderExtinguishers: [], bossDryPowderBlasts: [], bossDryPowderZones: [], curseSlashFX: [], elapsed: 0,
+    projectiles: [], otisMagicBullets: [], otisReticles: [], otisPortals: [], otisRifts: [], otisScreenPulse: 0, wallKnives: [], minatoKunai: [], minatoTeleportFX: [], hitFlashes: [], damageNumbers: [], batParticles: [], chefItems: [], slashMarks: [], traps: [], yiBlackStones: [], yiStoneBurstFX: [], yiInkAttackFX: [], opmFX: [], momoiFanFX: [], gojoKillFX: null, curseSliceKillFX: null, minatoKillFX: null, emTotems: [], emLightningFX: [], emLightningWarn: [], emGolems: [], emUltBanner: null, curseFireFX: [], curseFireBlasts: [], curseFireZones: [], bossDryPowderExtinguishers: [], bossDryPowderBlasts: [], bossDryPowderZones: [], curseSlashFX: [], elapsed: 0,
     arena: 'normal',
     bgColor: selectedBgColor,
     thunderPillars: [], thunderStrikes: [], kashimoFields: [], kashimoTraps: [], kashimoLightningFX: [], kashimoDeerOrbs: [], kashimoAmberWaves: [], kashimoSparks: [], kashimoShockwaves: [], kashimoScreenFX: [], smithForgeParticles: [], steveMineDebris: [], summons: [], summonDeathFX: [], summonIdCounter: 1, ewAftershocks: [], ewExplosionFX: [], ewVfx: [], ameliaTimeTravelQueue: [],
@@ -39001,6 +40355,9 @@ function launchBossBattle(teamIds, boss, requestedDefinition = null) {
 })();
 
 </script>
-<script src="handbook_mode.js?v=handbook-split-20260827-1"></script>
+<script src="handbook_mode.js?v=arena-split-20260911-1"></script>
+<script src="special.js"></script>
+<script src="gojo.js"></script>
+<script src="gojo_bgm.js"></script>
 </body>
 </html>

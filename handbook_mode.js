@@ -334,3 +334,4 @@ function backToSelectFromHandbook() {
   document.getElementById('select-screen').style.display = 'flex';
   updateStartBtnState();
 }
+

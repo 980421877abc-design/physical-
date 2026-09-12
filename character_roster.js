@@ -4,6 +4,7 @@
 
 // CHARACTER ROSTER：一般角色名單（依目前角色順序排列）
 // ============================================================================
+
 const CHARACTERS = [
   {
     id: 'chef', emoji: '👨‍🍳', weapon: '🔪', name: '地獄廚神',
@@ -12,7 +13,17 @@ const CHARACTERS = [
     skills: [`飛刀：投擲菜刀穿透敵方，造成${KNIFE_DAMAGE}傷害，CD${CHEF_ATTACK_INTERVAL}s。`, `特性：手持雙刀（上限${KNIFE_MAX_COUNT}把），刀要回收才能再次丟擲`],
     color: '#e84545', glowColor: 'rgba(232,69,69,0.6)', type: 'chef',
   winQuote: '這肉生的我還聽到他在叫呢。',
-  loseQuote: '……看來，火候還是差了一點。'
+  loseQuote: '……看來，火候還是差了一點。',
+  variants: [
+    { id: 'triple_knife', label: '三刀流', desc: `刀刃持有上限提升為3把（原本${KNIFE_MAX_COUNT}把），可以同時在場上維持更多把刀`,
+      apply: (ch) => { ch.knifeMaxOverride = 3; } },
+    { id: 'pressure_cooker', label: '高壓鍋', desc: `受到傷害會累積「壓力」。滿${CHEF_PRESSURE_MAX}層自動釋放高溫蒸汽，造成範圍傷害。`,
+      apply: (ch) => { ch.chefHexPressure = true; } },
+    { id: 'charred', label: '焦香', desc: `持續攻擊同一名敵人會疊加「焦香」，最多${CHEF_SEAR_MAX_STACKS}層；滿層時爆發並重置，短時間內可快速重新疊層。`,
+      apply: (ch) => { ch.chefHexSear = true; } },
+    { id: 'extra_salt', label: '鹽多一點', desc: `攻擊命中時有機率在攻擊者與目標之間生成調味道具。只有廚神自己可以拾取；鹽增傷、辣椒提升攻速、奶油回血。`,
+      apply: (ch) => { ch.chefHexItems = true; } }
+  ]
   },
   {
     id: 'drunk', emoji: '🍺', weapon: '🍾', name: '酒鬼',
@@ -20,6 +31,11 @@ const CHARACTERS = [
     stats: ['拋酒', '喝茫'],
     skills: [`拋酒：投擲酒瓶，造成${BOTTLE_DAMAGE}傷害，CD${DRUNK_ATTACK_INTERVAL}s。`, '喝茫：軌跡飄忽不定，移動方向隨機改變。'],
     color: '#7b4cca', glowColor: 'rgba(123,76,202,0.6)', type: 'drunk',
+    variants: [
+      { id: 'drunk_mist', label: '酒氣', desc: `每${DRUNK_MIST_INTERVAL}秒朝敵人吐酒氣霧，命中後混亂${DRUNK_CONFUSION_DURATION}秒。`, apply: ch => { ch.drunkHexMist = true; } },
+      { id: 'drunk_punch', label: '醉拳', desc: `喝茫轉向時沿目前方向衝撞，命中造成${DRUNK_PUNCH_DAMAGE}傷害。`, apply: ch => { ch.drunkHexPunch = true; } },
+      { id: 'drunk_high', label: '喝高了', desc: `每${DRUNK_INTOX_INTERVAL}秒及酒瓶命中增加醉意，10層後酩酊大醉${DRUNK_INTOX_DURATION}秒。`, apply: ch => { ch.drunkHexHigh = true; } }
+    ],
   winQuote: '阿爸了beer?',
   loseQuote: '我是誰我在哪？。'
   },
@@ -39,13 +55,30 @@ const CHARACTERS = [
     skills: [`咬擊：碰到敵人時鎖定撕咬，造成${VAMPIRE_BITE_DAMAGE}傷害×${VAMPIRE_BITE_COUNT}段並吸血${VAMPIRE_BITE_HEAL}×${VAMPIRE_BITE_COUNT}，敵人被咬期間無法移動。`, `蝙蝠狂襲：高速衝向敵人，CD${VAMPIRE_DASH_INTERVAL}秒。`, `領主眷屬：身旁圍繞蝙蝠，會自動追縱敵人並吸血`],
     color: '#8b1a8b', glowColor: 'rgba(139,26,139,0.6)', type: 'vampire',
   winQuote: '我跨越過時代，如獸般的姿態。',
-  loseQuote: '……鮮血先流盡了。'
+  loseQuote: '……鮮血先流盡了。',
+  variants: [
+    { id: 'crimson_feast', label: '猩紅盛宴',
+      desc: '使用蝙蝠狂襲後，下一次咬擊每段回血量翻倍；但蝙蝠狂襲冷卻 +4 秒。',
+      apply: (ch) => { ch.vampireCrimsonFeast = true; } },
+    { id: 'blood_bat', label: '血蝠',
+      desc: '領主眷屬造成傷害時，回血量翻倍；但領主眷屬傷害降低 50%。',
+      apply: (ch) => { ch.vampireBloodBat = true; } }
+  ]
   },
   {
   id: 'gojo', emoji: '😎', weapon: '🔵', name: '現代最強',
   desc: '​「放心吧，因為我是最強的。」​戰場上最令人絕望的對手。可一旦他拉下眼罩，迎來的便是敵人的末日。他能使用「無下限術式」將對手玩弄於股掌之間。',
   stats: ['蒼', '赫', '紫', ],
-  skills: [`順轉「蒼」：帶引力的術式，可穿透並吸走${GOJO_BLUE_PROJECTILE_PULL_RANGE}px內的敵方投射物，最多儲存${GOJO_BLUE_PROJECTILE_CAPTURE_MAX}顆，並造成持續傷害。CD${GOJO_COOLDOWN}s`, `反轉「赫」：帶斥力的術式，造成${GOJO_RED_DAMAGE}傷害，並釋放蒼所儲存的投射物；釋放出的投射物會追蹤敵人${GOJO_RED_STORED_HOMING_DURATION}秒，CD${GOJO_COOLDOWN}s。`, `大招「虛式紫」：血量降至${GOJO_HP_THRESHOLD}後蓄力${GOJO_CHARGE_TIME}秒釋放，對碰到的敵人造成${GOJO_PURPLE_FRAMEDMG}傷害/幀。`],
+skills: [
+  `被動「無下限」：身邊 ${GOJO_INFINITY_RADIUS}px 內出現敵方投射物時，消耗 1 點無下限量條讓其逐漸停下並消失（不造成傷害）。量條上限 ${GOJO_INFINITY_MAX}，每 ${GOJO_INFINITY_REGEN_TIME} 秒補滿。`,
+  `順轉「蒼」：發射引力球，穿透敵人持續造成 ${GOJO_BLUE_FRAMEDMG} 傷害/幀，吸引範圍內敵方投射物最多儲存 ${GOJO_BLUE_PROJECTILE_CAPTURE_MAX} 顆。`,
+  `反轉「赫」：發射斥力球，命中造成 ${GOJO_RED_DAMAGE} 傷害並強力擊退，同時釋放蒼儲存的投射物。`,
+  `蒼／赫交替發射，每 ${GOJO_COOLDOWN} 秒一發；每發射 ${GOJO_PURPLE_EVERY_N} 發後，下一發改為發射穿透紫球（${GOJO_PURPLE_DAMAGE} 傷害）。`,
+  `蒼與赫在場上碰撞時，於碰撞點產生 ${GOJO_CLASH_DAMAGE} 傷害的大範圍爆炸（無限制虛式紫，對五條悟自身減免 ${Math.round(GOJO_CLASH_SELF_REDUCE * 100)}%）。`,
+  `「蒼拳」：近身 ${GOJO_FIST_RANGE}px 內主動出拳，造成 ${GOJO_FIST_DAMAGE} 傷害並將敵人拉向自己，CD ${GOJO_FIST_COOLDOWN} 秒。`,
+  `「領域展開・無量空處」：血量 ≥ ${GOJO_DOMAIN_HP_REQ} 時發動，全場敵人麻痺 ${GOJO_DOMAIN_PARALYZE} 秒並每秒受到 ${GOJO_DOMAIN_DPS} 傷害；站在五條悟 ${GOJO_DOMAIN_SAFE_RADIUS}px 內的敵人不受影響。持續 ${GOJO_DOMAIN_DURATION} 秒，CD ${GOJO_DOMAIN_CD} 秒。`,
+  `被動「六眼覺醒」：血量 ≤ ${GOJO_HP_THRESHOLD} 時，所有技能 CD 減少 ${GOJO_UNLOCK_CD_BONUS} 秒。`
+],
   color: '#00cfff', glowColor: 'rgba(0,207,255,0.6)', type: 'gojo',
   winQuote: '沒錯，是五條贏了。',
   loseQuote: '沒能讓你感到盡興真是抱歉。',
@@ -662,4 +695,17 @@ vsQuotes: {
     winQuote: '這枚神奇的子彈，能命中你指定的任何目標。',
     loseQuote: '我很清楚。如果這子彈有窮盡的一天，最后一顆子彈只會將我貫穿。'
   },
+  {
+    id: 'boundary', emoji: '👁️‍🗨️', weapon: '🌀', name: '超界者',
+    desc: '自由穿梭在不同维度的高维生物，在黑洞與裂隙之間改寫戰場位置。',
+    stats: ['次元之握', '維度穿梭'],
+        skills: [
+      `「次元之握」：每 ${BOUNDARY_ATTACK_INTERVAL}s 向敵人投擲可穿透一切單位與障礙的次元裂隙，持續 ${BOUNDARY_RIFT_LIFE}s，每 ${BOUNDARY_RIFT_PULSE_INTERVAL}s 對路徑上所有敵人造成 ${BOUNDARY_RIFT_PULSE_DAMAGE} 點震盪傷害。`,
+      `「黑洞折射」：每 ${BOUNDARY_BLACK_HOLE_INTERVAL}s 在場上隨機生成 ${BOUNDARY_BLACK_HOLE_MAX} 個黑洞（遠離邊界 ${BOUNDARY_BLACK_HOLE_EDGE_MARGIN}px 以上）。當次元裂隙命中黑洞，其他黑洞會同步噴射出一道同樣的裂隙，朝各自方向擴散；黑洞被引爆時對範圍內敵人造成 ${BOUNDARY_BLACK_HOLE_BLAST_DAMAGE} 傷害。`,
+      `「維度躍遷」：生命值降至 ${BOUNDARY_WARP_TRIGGER_HP} 或開局後 ${BOUNDARY_WARP_TRIGGER_TIME}s 自動觸發一次，持續 ${BOUNDARY_WARP_DURATION}s。期間以 ${BOUNDARY_WARP_SPEED}px/s 高速追擊同一敵人，每 ${BOUNDARY_WARP_HIT_INTERVAL}s 對其造成 ${BOUNDARY_WARP_DAMAGE} 傷害。`,
+      `「迷彩」：每 ${BOUNDARY_CAMOUFLAGE_DURATION}s 迷彩 / ${BOUNDARY_CAMOUFLAGE_NORMAL}s 一般交替切換。迷彩期間無法被敵方索敵鎖定，但仍可被範圍傷害命中。`
+    ],
+    color: '#8ee7ff', glowColor: 'rgba(142,231,255,0.75)', type: 'boundary',
+    winQuote: '時間在我眼裡就像一張沙盤。', loseQuote: '這個維度……拒絕了我。'
+  }
 ];
