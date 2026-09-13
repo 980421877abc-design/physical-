@@ -39,8 +39,8 @@
     if (typeof window.sandboxRenderTeams !== 'function') return;
     hookedRenderTeams = window.sandboxRenderTeams;
     window.sandboxRenderTeams = function () {
-      if (Array.isArray(window.sandboxTeams)) {
-        window.sandboxTeams.forEach(t => (t.members || []).forEach(ensureMemberFields));
+      if (Array.isArray(sandboxTeams)) {
+        sandboxTeams.forEach(t => (t.members || []).forEach(ensureMemberFields));
       }
       hookedRenderTeams();
       enhanceTeamUI();
@@ -52,7 +52,7 @@
   function enhanceTeamUI() {
     const container = document.getElementById('sandbox-teams');
     if (!container) return;
-    const teams = window.sandboxTeams;
+    const teams = sandboxTeams;
     if (!Array.isArray(teams)) return;
 
     teams.forEach((team, ti) => {
@@ -229,7 +229,7 @@
     if (typeof state === 'undefined' || !state || !state.balls) return;
     if (typeof sandboxMode === 'undefined' || !sandboxMode) return;
 
-    const teams = window.sandboxTeams || [];
+    const teams = sandboxTeams || [];
 
     for (const ball of state.balls) {
       if (!ball || !ball.char) continue;
