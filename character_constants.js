@@ -1568,9 +1568,8 @@ const CUSTOM_PARTS = {
     { id: 'a_drunk',  name: '拋酒', emoji: '🍾', from: '酒鬼',   desc: `每 ${CUSTOM_BASIC_DRUNK_INTERVAL}s 投擲酒瓶，造成 ${BOTTLE_DAMAGE} 傷害。` },
     { id: 'a_gunner', name: '連射', emoji: '💥', from: '無名槍手', desc: `撞牆裝彈，每次+${GUNNER_MAG_count}發（上限${GUNNER_MAG_SIZE}發）；彈滿後停下連射，每發${GUNNER_BULLET_DAMAGE}傷害並擊退。` },
     { id: 'a_smith', name: '鍛造', emoji: '🔨', from: '鍛造師', desc: `每 ${CUSTOM_SMITH_FORGE_INTERVAL}s 鍛造一次近身武器，對近距離敵人造成 ${CUSTOM_SMITH_FORGE_DAMAGE} 傷害並擊退。` },
-    { id: 'a_yi', name: '本手／圍斃', emoji: '⚫', from: '奕', desc: `普攻週期在最近敵人腳下放置黑棋，造成${YI_BLACK_DAMAGE}傷害；累積${YI_BLACK_MAX}顆後發白旗，黑棋齊飛引爆。` },
-  ],
-  skill1: [
+   ],
+	  skill1: [
     { id: 's1_vampire', name: '蝙蝠狂襲', emoji: '🦇', from: '暗夜領主', desc: `每 ${CUSTOM_SKILL1_VAMPIRE_INTERVAL}s 高速衝向最近的敵人，造成 ${CUSTOM_SKILL1_VAMPIRE_DAMAGE} 撞擊傷害。` },
     { id: 's1_trapper', name: '鎖鏈',     emoji: '⛓️', from: '陷阱大師', desc: `每 ${CUSTOM_SKILL1_TRAPPER_INTERVAL}s 對最近敵人射出鎖鏈，將其拉向自己並造成 ${CUSTOM_SKILL1_TRAPPER_DAMAGE} 傷害。` },
     { id: 's1_gunner',  name: '閃光彈',   emoji: '💡', from: '無名槍手', desc: `每 ${GUNNER_FLASH_INTERVAL}s 對最近敵人投擲閃光彈，造成 ${GUNNER_FLASH_DAMAGE} 範圍傷害並凍結其攻擊與技能冷卻。` },
