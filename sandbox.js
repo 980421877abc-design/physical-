@@ -1,7 +1,8 @@
 /* ============================================================================
- * sandbox.js v4 — 沙盒擴充（事件委託版）
- * 不依賴 sandboxTeams / sandboxRenderTeams hook
- * 配置存在 chip 的 dataset 上，完全自給自足
+ * sandbox.js v5 — 沙盒擴充（致命傷攔截重生 + 傷害倍率）
+ * - 齒輪面板：每個角色旁 ⚙️，點開可調傷害倍率、重生次數
+ * - 傷害倍率：在 dealDamage 前乘算
+ * - 重生：致命傷發生時直接攔截、原地滿血復活，不觸發死亡
  * ============================================================================ */
 (() => {
   'use strict';
@@ -141,7 +142,7 @@
     });
   }
 
-  // ───────── 開戰時套用配置 ─────────
+  // ───────── 開戰時收集 chip 配置 ─────────
   function collectBattleConfigs() {
     const map = new Map();
     const container = document.getElementById('sandbox-teams');
@@ -154,13 +155,13 @@
         const charId = getChipCharId(chip);
         if (!charId) return;
         const cfg = readChipCfg(chip);
-        const key = player + ':' + charId;
-        if (map.has(key)) {
+        const baseKey = player + ':' + charId;
+        if (map.has(baseKey)) {
           let idx = 2;
-          while (map.has(key + ':' + idx)) idx++;
-          map.set(key + ':' + idx, cfg);
+          while (map.has(baseKey + ':' + idx)) idx++;
+          map.set(baseKey + ':' + idx, cfg);
         } else {
-          map.set(key, cfg);
+          map.set(baseKey, cfg);
         }
       });
     });
@@ -198,7 +199,7 @@
     console.log('[sandbox_extras] sandboxStartBattle hooked');
   }
 
-  // ───────── 傷害倍率 ─────────
+  // ───────── 傷害倍率 + 致命傷攔截（重生） ─────────
   function tryHookDealDamage() {
     if (typeof window.dealDamage !== 'function') return;
     if (tryHookDealDamage._hooked) return;
@@ -206,6 +207,8 @@
     const orig = window.dealDamage;
     window.dealDamage = function (target, dmg, options) {
       const opts = options || {};
+
+      // 1. 傷害倍率
       let attacker = opts.attackerBall;
       if (!attacker && opts.attackerPlayer != null && typeof state !== 'undefined' && state && state.balls) {
         attacker = state.balls.find(b => b && b.player === opts.attackerPlayer && b.hp > 0);
@@ -213,36 +216,34 @@
       if (attacker && attacker.sandboxDamageMult && attacker.sandboxDamageMult !== 1.0) {
         dmg = dmg * attacker.sandboxDamageMult;
       }
+
+      // 2. 致命傷攔截：若這一擊會殺死目標且還有重生次數，先復活
+      if (target && target.char && !opts.codeKill && !opts.bypassParry && !opts.otisSureHit) {
+        const revives = target.sandboxRevivesLeft || 0;
+        if (revives > 0 && target.hp > 0 && target.hp - dmg <= 0) {
+          target.sandboxRevivesLeft = revives - 1;
+          const effMax = (typeof getBallMaxHp === 'function') ? getBallMaxHp(target) : 1000;
+          target.hp = effMax;
+          const Wv = (typeof W !== 'undefined') ? W : 350;
+          const Hv = (typeof H !== 'undefined') ? H : 350;
+          target.vx = (Math.random() - 0.5) * 200;
+          target.vy = (Math.random() - 0.5) * 200;
+          target.x = 40 + Math.random() * (Wv - 80);
+          target.y = 40 + Math.random() * (Hv - 80);
+          if (state.hitFlashes) {
+            state.hitFlashes.push({ x: target.x, y: target.y, r: 60, alpha: 1.2, color: '#9ef09e', t: 0.6 });
+          }
+          if (state.damageNumbers) {
+            state.damageNumbers.push({ x: target.x, y: target.y - 40, value: '重生（剩 ' + target.sandboxRevivesLeft + '）', color: '#9ef09e', life: 1.2, maxLife: 1.2, scale: 1.1 });
+          }
+          if (typeof playHitSound === 'function') playHitSound('vampire_dash');
+          return 0;
+        }
+      }
+
       return orig.call(this, target, dmg, options);
     };
     console.log('[sandbox_extras] dealDamage hooked');
-  }
-
-  // ───────── 重生 ─────────
-  const deadHandled = new WeakSet();
-  function checkRevives() {
-    if (typeof state === 'undefined' || !state || !state.balls) return;
-    if (typeof sandboxMode === 'undefined' || !sandboxMode) return;
-    const Wv = (typeof W !== 'undefined') ? W : 350;
-    const Hv = (typeof H !== 'undefined') ? H : 350;
-    for (const ball of state.balls) {
-      if (!ball || !ball.char) continue;
-      if (ball.hp > 0) { deadHandled.delete(ball); continue; }
-      if (deadHandled.has(ball)) continue;
-      const revives = ball.sandboxRevivesLeft || 0;
-      if (revives <= 0) continue;
-      deadHandled.add(ball);
-      ball.sandboxRevivesLeft = revives - 1;
-      const effMax = (typeof getBallMaxHp === 'function') ? getBallMaxHp(ball) : 1000;
-      ball.hp = effMax;
-      ball.vx = (Math.random() - 0.5) * 200;
-      ball.vy = (Math.random() - 0.5) * 200;
-      ball.x = 40 + Math.random() * (Wv - 80);
-      ball.y = 40 + Math.random() * (Hv - 80);
-      if (state.hitFlashes) state.hitFlashes.push({ x: ball.x, y: ball.y, r: 60, alpha: 1.2, color: '#9ef09e', t: 0.6 });
-      if (state.damageNumbers) state.damageNumbers.push({ x: ball.x, y: ball.y - 40, value: '重生（剩 ' + ball.sandboxRevivesLeft + '）', color: '#9ef09e', life: 1.2, maxLife: 1.2, scale: 1.1 });
-      if (typeof playHitSound === 'function') playHitSound('vampire_dash');
-    }
   }
 
   // ───────── 主循環 ─────────
@@ -263,7 +264,6 @@
     function loop(t) {
       tryHookStartBattle();
       tryHookDealDamage();
-      checkRevives();
       if (t - lastScan > 400) {
         lastScan = t;
         scanAndAddGears();
@@ -271,7 +271,7 @@
       requestAnimationFrame(loop);
     }
     requestAnimationFrame(loop);
-    console.log('[sandbox_extras] 已載入');
+    console.log('[sandbox_extras] v5 已載入');
   }
 
   if (document.readyState === 'loading') {
