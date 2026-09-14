@@ -49,9 +49,9 @@ const OPM_WALL_REDUCE          = 0.5; // 撞牆時減少的怒氣值倒數秒數
 // ── 被動「無下限」 ──
 const GOJO_INFINITY_MAX          = 8;    // 無下限量條上限
 const GOJO_INFINITY_RADIUS       = 70;    // 偵測投射物半徑（px）
-const GOJO_INFINITY_REGEN_TIME   = 12.0;   // 每 8 秒補滿一次
+const GOJO_INFINITY_REGEN_TIME   = 10.0;   // 每 8 秒補滿一次
 const GOJO_INFINITY_SLOW_TIME    = 0.3;   // 投射物從原速減到 0 的時間（秒）
-const GOJO_INFINITY_LINGER       = 0.2;   // 停止後多久消失（秒）
+const GOJO_INFINITY_LINGER       = 0.1;   // 停止後多久消失（秒）
 
 // ── 蒼／赫交替發射 ──
 const GOJO_COOLDOWN              = 2.0;   // 基礎發射間隔（秒）
@@ -73,18 +73,18 @@ const GOJO_BLUE_PROJECTILE_CAPTURE_MAX = 8;
 // ── 赫（斥力球）──
 const GOJO_RED_DAMAGE            = 120;
 const GOJO_RED_KNOCKBACK         = 320;
-const GOJO_RED_SPEED             = 6;
-const GOJO_RED_STORED_HOMING_TURN = 5.5;
+const GOJO_RED_SPEED             = 8;
+const GOJO_RED_STORED_HOMING_TURN = 7;
 const GOJO_RED_STORED_HOMING_DURATION = 4.0;
 
 // ── 紫（穿透高傷球）──
 const GOJO_PURPLE_DAMAGE         = 250;   // 命中單一敵人傷害
-const GOJO_PURPLE_SPEED          = 12.0;  // 極快（*60 → 720px/s）
-const GOJO_PURPLE_RADIUS         = 18;
+const GOJO_PURPLE_SPEED          = 20.0;  // 極快（*60 → 720px/s）
+const GOJO_PURPLE_RADIUS         = 25;
 const GOJO_PURPLE_LIFESPAN       = 1.2;   // 存在時間（秒）
 // 紫不再反彈、不再吸附、不再反射，穿透路徑上所有敵人（同一敵人只打一次）
 const GOJO_PURPLE_EVERY_N        = 6;     // 每發射 6 發蒼/赫後，下一發為紫（僅六眼覺醒後）
-const GOJO_DOMAIN_HOMING_TURN    = 3.0;   // 領域展開期間，蒼/赫球的追蹤轉向速率（rad/s）
+const GOJO_DOMAIN_HOMING_TURN    = 5.0;   // 領域展開期間，蒼/赫球的追蹤轉向速率（rad/s）
 
 // ── 無限制虛式紫（蒼+赫碰撞）──
 const GOJO_CLASH_RADIUS          = 50;    // 蒼赫距離 < 此值 → 觸發爆炸
@@ -94,7 +94,7 @@ const GOJO_CLASH_SELF_REDUCE     = 0.8;   // 對 Gojo 自己的減傷比例（�
 
 // ── 蒼拳（近戰）──
 const GOJO_FIST_RANGE            = 60;    // 觸發距離（px）
-const GOJO_FIST_DAMAGE           = 20;
+const GOJO_FIST_DAMAGE           = 30;
 const GOJO_FIST_COOLDOWN         = 0.8;
 const GOJO_FIST_PULL_FORCE       = 250;   // 引力（拉向 Gojo）
 
@@ -102,7 +102,7 @@ const GOJO_FIST_PULL_FORCE       = 250;   // 引力（拉向 Gojo）
 const GOJO_DOMAIN_HP_REQ         = 700;   // 血量 >= 此值才能展開
 const GOJO_DOMAIN_DURATION       = 3.0;   // 持續秒數
 const GOJO_DOMAIN_CD             = 10.0;  // 冷卻秒數
-const GOJO_DOMAIN_SAFE_RADIUS    = 60;   // 展開時站在 Gojo 此範圍內免疫
+const GOJO_DOMAIN_SAFE_RADIUS    = 50;   // 展開時站在 Gojo 此範圍內免疫
 const GOJO_DOMAIN_DPS            = 30;    // 每秒傷害（只對「不安全」的敵人）
 const GOJO_DOMAIN_PARALYZE       = 3.0;   // 展開瞬間麻痺持續時間
 
@@ -604,7 +604,7 @@ const SAKIKO_ORGAN_DAMAGE        = 13;    // 🎺管風琴模式：音符基礎�
 const SAKIKO_ORGAN_INTERVAL      = 0.45;  // 管風琴模式：發射間隔（攻速大幅提升）
 const SAKIKO_ORGAN_SPEED         = 290;   // 管風琴模式：音符移動速度（較快）
 const SAKIKO_NOTE_RADIUS         = 7;     // 音符判定半徑
-const SAKIKO_NOTE_TURN_RATE      = 3.0;   // 音符追蹤轉向速率（弧度/秒）
+const SAKIKO_NOTE_TURN_RATE      = 5.0;   // 音符追蹤轉向速率（弧度/秒）
 const SAKIKO_NOTE_LIFESPAN       = 6.0;   // 音符最長存在時間（秒）
 
 const SAKIKO_FEVER_MAX           = 450;   // Fever值上限
