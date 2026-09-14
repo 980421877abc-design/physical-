@@ -65,7 +65,7 @@ const GOJO_BLUE_RADIUS           = 13;
 const GOJO_BLUE_RING_R           = 32;
 const GOJO_BLUE_RAY_RANGE        = 100;
 const GOJO_BLUE_RAY_FORCE        = 10;
-const GOJO_BLUE_LIFESPAN         = 2.0;
+const GOJO_BLUE_LIFESPAN         = 2.5;
 const GOJO_BLUE_PROJECTILE_PULL_RANGE = 250;
 const GOJO_BLUE_PROJECTILE_PULL_FORCE = 8;
 const GOJO_BLUE_PROJECTILE_CAPTURE_MAX = 8;
@@ -73,7 +73,7 @@ const GOJO_BLUE_PROJECTILE_CAPTURE_MAX = 8;
 // ── 赫（斥力球）──
 const GOJO_RED_DAMAGE            = 120;
 const GOJO_RED_KNOCKBACK         = 320;
-const GOJO_RED_SPEED             = 4.5;
+const GOJO_RED_SPEED             = 6;
 const GOJO_RED_STORED_HOMING_TURN = 5.5;
 const GOJO_RED_STORED_HOMING_DURATION = 4.0;
 
@@ -87,10 +87,10 @@ const GOJO_PURPLE_EVERY_N        = 6;     // 每發射 6 發蒼/赫後，下一�
 const GOJO_DOMAIN_HOMING_TURN    = 3.0;   // 領域展開期間，蒼/赫球的追蹤轉向速率（rad/s）
 
 // ── 無限制虛式紫（蒼+赫碰撞）──
-const GOJO_CLASH_RADIUS          = 40;    // 蒼赫距離 < 此值 → 觸發爆炸
+const GOJO_CLASH_RADIUS          = 50;    // 蒼赫距離 < 此值 → 觸發爆炸
 const GOJO_CLASH_DAMAGE          = 200;   // 爆炸傷害
-const GOJO_CLASH_AOE_RADIUS      = 180;   // 爆炸範圍半徑（px）—— 想更大就調大這個
-const GOJO_CLASH_SELF_REDUCE     = 0.7;   // 對 Gojo 自己的減傷比例（減 70%）
+const GOJO_CLASH_AOE_RADIUS      = 200;   // 爆炸範圍半徑（px）—— 想更大就調大這個
+const GOJO_CLASH_SELF_REDUCE     = 0.8;   // 對 Gojo 自己的減傷比例（減 70%）
 
 // ── 蒼拳（近戰）──
 const GOJO_FIST_RANGE            = 60;    // 觸發距離（px）
