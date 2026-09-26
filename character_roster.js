@@ -126,10 +126,18 @@ tiger:['你那同情我的態度真是令人作嘔，這只顯得你很懦弱。
   id: 'gunner', emoji: '🔫', weapon: '💥', name: '無名槍手',
   desc: '​「在我的槍口前，每個人都只有一秒的時間後悔。」​游走在法律與罪惡邊緣的頂尖槍手。沒有人知道他的真名，只知道當他的皮靴馬刺聲響起，就代表死神的腳步近了。',
   stats: [  '連射', '額外裝填', '閃光彈'],
-  skills: [`被動：每次撞牆裝彈${GUNNER_MAG_count}發，上限${GUNNER_MAG_SIZE}發；額外：每${GUNNER_EXTRA_RELOAD_INTERVAL}s裝填${GUNNER_EXTRA_RELOAD_COUNT}發，仍受彈夾上限限制。`, `原本連射：累積足夠子彈後停下連射，每發${GUNNER_BULLET_DAMAGE}傷害。`, `原本閃光彈：每${GUNNER_FLASH_INTERVAL}s投擲，造成${GUNNER_FLASH_DAMAGE}範圍傷害並凍結攻擊與技能冷卻${GUNNER_FLASH_COOLDOWN_FREEZE_DUR}s；額外附加速度降至${Math.round(GUNNER_FLASH_SLOW_FACTOR * 100)}%，持續${GUNNER_FLASH_SLOW_DURATION}s。`],
+  skills: [`被動：每次撞牆裝彈${GUNNER_MAG_count}發，上限${GUNNER_MAG_SIZE}發；額外：每${GUNNER_EXTRA_RELOAD_INTERVAL}s裝填${GUNNER_EXTRA_RELOAD_COUNT}發，仍受彈夾上限限制。`, `原本連射：累積足夠子彈後停下連射，每發${GUNNER_BULLET_DAMAGE}傷害。`, `閃光彈：每${GUNNER_FLASH_INTERVAL}s投擲，造成${GUNNER_FLASH_DAMAGE}範圍傷害並凍結攻擊與技能冷卻${GUNNER_FLASH_COOLDOWN_FREEZE_DUR}s；額外附加速度降至${Math.round(GUNNER_FLASH_SLOW_FACTOR * 100)}%，持續${GUNNER_FLASH_SLOW_DURATION}s。`,`轉槍：6 發子彈打完的瞬間，原地轉槍 ${GUNNER_SPIN_DURATION}s，期間消除半徑內所有敵方投射物（球半徑 ×${GUNNER_SPIN_RADIUS_MULT}）。`],
   color: '#f0c84a', glowColor: 'rgba(184,134,11,0.6)', type: 'gunner',
   winQuote: '顆秒！！！！！！。',
-  loseQuote: '……看來這次，慢了半拍。'
+  loseQuote: '……看來這次，慢了半拍。',
+      variants: [
+    { id: 'gunner_bounty', label: '🎯 賞金標誌',
+      desc: `每 ${GUNNER_BOUNTY_CD}s 對最近敵人掛上「賞金標誌」，持續 ${GUNNER_BOUNTY_DURATION}s。槍手子彈會略微追蹤身上有自己標誌的敵人。`,
+      apply: (ch) => {} },
+    { id: 'gunner_split', label: '💥 分裂彈',
+      desc: `子彈撞牆後不再消失，改為向四周散開 ${GUNNER_SPLIT_COUNT} 顆小子彈（每顆傷害為原傷的 ${Math.round(GUNNER_SPLIT_DAMAGE_RATIO*100)}%，小子彈不再分裂）。`,
+      apply: (ch) => {} }
+  ]
   },
   {
   id: 'samurai', emoji: '⚔️', weapon: '⚔️', name: '末代武士',
@@ -724,5 +732,19 @@ vsQuotes: {
     color: '#ffa6c9', glowColor: 'rgba(255,166,201,0.7)', type: 'sakura',
     winQuote: '在綻放的櫻花中，靜靜的睡去吧。',
     loseQuote: '櫻花…還不能在此刻凋零……'
+  },
+  {
+    id: 'boshi', emoji: '📡', weapon: '⚡', name: '博士',
+    desc: '我懷疑我們活在遊戲世界裡，電磁與量子的操控者。身旁環繞高能電球，因意外的實驗失誤，來到這裡。',
+    stats: ['磁暴電湧', '高能電球', '電磁場裝置', '量子躍遷器'],
+    skills: [
+      `被動「磁暴電湧」：攻擊時 ${Math.round(BOSHI_CRIT_CHANCE*100)}% 機率爆擊，傷害 ×${BOSHI_CRIT_MULT}；觸發爆擊時額外降下閃電造成 ${BOSHI_CRIT_LIGHTNING_DMG} 傷並麻痺 ${BOSHI_CRIT_LIGHTNING_PARA}s。`,
+      `被動「高能電球」：進場時自身環繞 ${BOSHI_ORB_COUNT} 顆電球與 ${BOSHI_SHIELD_MAX} 層護盾。每顆電球每 ${BOSHI_ORB_LASER_INTERVAL}s 對敵人發射雷射造成 ${BOSHI_ORB_LASER_DAMAGE} 傷害；受到攻擊時消耗一層護盾，該次傷害減免 ${Math.round(BOSHI_SHIELD_REDUCE*100)}%。`,
+      `技能「電磁場裝置」：朝敵人方向丟出一個電磁場（半徑 ${BOSHI_EM_FIELD_RADIUS}px），持續 ${BOSHI_EM_FIELD_DURATION}s、CD ${BOSHI_EM_FIELD_CD}s。敵人投射物觸碰到電磁場邊緣時被消除；敵人進入場內每秒受到 ${BOSHI_EM_FIELD_DPS} 傷（不爆擊）。博士每次進入自己的電磁場或量子領域，額外獲得 1 層護盾。`,
+      `技能「量子躍遷器」：朝敵人方向瞬移，創造寬 ${BOSHI_QUANTUM_HALF_WIDTH*2}px、長貫穿場地的矩形量子領域。生成時領域內的敵人麻痺 ${BOSHI_QUANTUM_STUN}s 並清除場內所有敵方投射物；領域持續 ${BOSHI_QUANTUM_DURATION}s，每秒由領域起點牆向終點牆釋放脈衝，脈衝傷害為博士與隊友在領域內造成傷害的 ${Math.round(BOSHI_QUANTUM_PULSE_RATIO*100)}%。開場冷卻 CD ${BOSHI_QUANTUM_CD}s。`
+    ],
+    color: '#4fd6ff', glowColor: 'rgba(79,214,255,0.7)', type: 'boshi',
+    winQuote: '魔法也是能量,遵循能量守恆定律。',
+    loseQuote: '參數錯誤,量子效應再次失去平衡。'
   }
 ];

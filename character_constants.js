@@ -94,7 +94,7 @@ const GOJO_CLASH_SELF_REDUCE     = 0.8;   // 對 Gojo 自己的減傷比例（�
 
 // ── 蒼拳（近戰）──
 const GOJO_FIST_RANGE            = 60;    // 觸發距離（px）
-const GOJO_FIST_DAMAGE           = 30;
+const GOJO_FIST_DAMAGE           = 25;
 const GOJO_FIST_COOLDOWN         = 0.8;
 const GOJO_FIST_PULL_FORCE       = 250;   // 引力（拉向 Gojo）
 
@@ -193,7 +193,7 @@ const YI_LINK_MAX_STACKS    = 3;     // 料敵先機最多三層
 const YI_ADVANTAGE_SLOW_FACTOR = 0.5; // 取勢：敵人速度降至50%
 const YI_ADVANTAGE_SLOW_DURATION = 2.0;
 const YI_HEAVEN_COUNT        = 5;    // 天下劫每次五枚神之一手
-const YI_HEAVEN_DAMAGE       = 70;   // 神之一手範圍爆炸傷害
+const YI_HEAVEN_DAMAGE       = 60...;   // 神之一手範圍爆炸傷害
 const YI_HEAVEN_RADIUS       = 55;   // 神之一手引爆範圍
 const YI_HEAVEN_ARM_OFFSET   = 2;    // 中心到四方附棋的棋盤步數；中間保留一格空交叉點
 const YI_HEAVEN_STONE_INTERVAL = 0.18; // 同一組內，中心棋與四方附棋的逐顆落子間隔
@@ -232,6 +232,12 @@ const GUNNER_FLASH_SLOW_DURATION = 2.0; // 閃光彈額外緩速持續時間（�
 const GUNNER_EXTRA_RELOAD_INTERVAL = 2.5; // 額外裝填週期（秒）
 const GUNNER_EXTRA_RELOAD_COUNT = 2;       // 每次額外裝填子彈數
 const GUNNER_FLASH_SPEED       = 480;   // 閃光彈飛行速度（px/s）
+// ══════════════ 無名槍手本體技能：轉槍 ══════════════
+const GUNNER_SPIN_DURATION       = 0.6;   // 轉槍持續時間（秒）
+const GUNNER_SPIN_RADIUS_MULT    = 2.0;   // 消除投射物半徑 = 球半徑 × 此值
+const GUNNER_SPIN_ROTATE_SPEED   = 26;    // 視覺旋轉速度（弧度/秒）
+const GUNNER_SPIN_FLASH_INTERVAL = 0.08;  // 轉槍期間粒子噴射間隔
+const GUNNER_SPIN_CLEAR_PARTICLE = 5;     // 每次消除投射物噴出的火花數
 //武士常數
 
 const SAMURAI_PARRY_INTERVAL   = 2.0;  // 招架CD（秒）
@@ -633,7 +639,7 @@ const JOSEPH_CONTACT_DMG_BASE    = 5;     // 未開啟波紋呼吸法，碰觸�
 const JOSEPH_CONTACT_CD          = 0.45;  // 碰觸觸發CD（避免同一次貼身重複計算）
 const JOSEPH_HP_REGEN_INTERVAL   = 1.0;   // 波紋呼吸法：定時回血間隔
 const JOSEPH_HP_REGEN_AMOUNT     = 10;     // 定時回血量
-const JOSEPH_HP_REGEN_ON_HIT     = 35;     // 每次造成傷害，額外回血量
+const JOSEPH_HP_REGEN_ON_HIT     = 30;     // 每次造成傷害，額外回血量
 const JOSEPH_DASH_COOLDOWN       = 4.0;   // 波紋疾走CD
 const JOSEPH_DASH_RANGE          = 170;   // 波紋疾走觸發距離
 const JOSEPH_DASH_DAMAGE         = 50;    // 波紋疾走傷害
@@ -704,7 +710,7 @@ const DAJI_MELEE_DMG         = 60;    // 強化普攻（一般）傷害
 const DAJI_MELEE_DMG_ENH     = 100;    // 強化普攻（被動強化後）傷害
 const DAJI_MELEE_STUN_ENH    = 1.0;    // 被動強化後的暈眩時間（秒）
 const DAJI_MELEE_KNOCKBACK   = 240;    // 強化普攻擊退力道
-const DAJI_MELEE_RANGE       = RADIUS * 2 + 4; // 魅惑近戰可攻擊距離（需大於球球碰撞分離距離 RADIUS*2，否則永遠碰不到）
+const DAJI_MELEE_RANGE       = RADIUS * 2 + 10; // 魅惑近戰可攻擊距離（需大於球球碰撞分離距離 RADIUS*2，否則永遠碰不到）
 const DAJI_TAILSWING_DUR     = 0.35;   // 揮尾巴特效持續時間
 const DAJI_SKILL2_CD         = 8.0;    // 技能二CD
 const DAJI_BALL_BASE_DMG     = 90;     // 法術球基礎傷害
@@ -820,7 +826,7 @@ const BAIE_KINDLING_ON_HIT_DEAL  = 1;  // 造成傷害＋1火種
 const BAIE_KINDLING_ON_HIT_TAKEN = 1;  // 受到傷害＋1火種
 const BAIE_KINDLING_ON_COLLIDE   = 2;  // 碰撞到對方＋2火種
 const BAIE_KINDLING_ON_EXIT      = 3;  // 退出愛上雷神＋3火種
-const BAIE_LOVE_HP_BONUS      = 0.5;   // 愛上雷神：血量上限+
+const BAIE_LOVE_HP_BONUS      = 0.4;   // 愛上雷神：血量上限+
 const BAIE_LOVE_DURATION      = 8;     // 愛上雷神持續秒數（原作為回合制，此為即時戰鬥版本自訂時長）
 const BAIE_LOVE_MIN_INTERVAL  = 9;    // 愛上雷神最短再次觸發間隔（秒）
 const BAIE_ZAIE_DURATION      = 1;     // 灾厄•弑魂焚诏：原地不動秒數
@@ -1462,8 +1468,8 @@ const BOUNDARY_BLACK_HOLE_MAX = 3;
 const BOUNDARY_BLACK_HOLE_RADIUS = 18;
 const BOUNDARY_BLACK_HOLE_BLAST_RADIUS = 50;
 const BOUNDARY_BLACK_HOLE_BLAST_DAMAGE = 50;
-const BOUNDARY_CAMOUFLAGE_NORMAL = 1.8;
-const BOUNDARY_CAMOUFLAGE_DURATION = 1.2;
+const BOUNDARY_CAMOUFLAGE_NORMAL = 2.0;
+const BOUNDARY_CAMOUFLAGE_DURATION = 1.0;
 const BOUNDARY_WARP_TRIGGER_HP = 400;
 const BOUNDARY_WARP_TRIGGER_TIME = 20;
 const BOUNDARY_WARP_DURATION = 6;
@@ -1496,7 +1502,7 @@ const SAKURA_YAE_RECHARGE_PER_PETAL = 0.2;
 
 // 普攻「花刃」
 const SAKURA_BASIC_DAMAGE   = 50;
-const SAKURA_BASIC_INTERVAL = 0.8;
+const SAKURA_BASIC_INTERVAL = 1.0;
 const SAKURA_BASIC_SPEED    = 520;
 
 // 技能一「落櫻繽紛」
@@ -1516,6 +1522,46 @@ const SAKURA_FULL_BLOOM_CD                 = 10.0;
 const SAKURA_FULL_BLOOM_SPEED_MULT         = 2.0;
 const SAKURA_FULL_BLOOM_TICK_INTERVAL      = 0.2;
 const SAKURA_FULL_BLOOM_DURATION_PER_PETAL = 0.2;
+// ============================================================================
+// 博士📡 專屬常數
+// ============================================================================
+
+// 被動「磁暴電湧」：20% 爆擊，1.5 倍傷害，觸發時額外降下閃電
+const BOSHI_CRIT_CHANCE         = 0.20;
+const BOSHI_CRIT_MULT           = 1.5;
+const BOSHI_CRIT_LIGHTNING_DMG  = 30;
+const BOSHI_CRIT_LIGHTNING_PARA = 0.2;
+
+// 被動「高能電球」：4 顆電球環繞，每 2 秒齊射雷射
+const BOSHI_ORB_COUNT           = 4;
+const BOSHI_ORB_RADIUS          = 42;
+const BOSHI_ORB_LASER_INTERVAL  = 2.0;
+const BOSHI_ORB_LASER_DAMAGE    = 25;
+const BOSHI_ORB_LASER_SPEED     = 600;
+const BOSHI_ORB_LASER_LIFE      = 1.5;
+const BOSHI_ORB_ROTATE_SPEED    = 1.2;
+
+// 被動「護盾」：最多 3 層，受到攻擊消耗一層減傷 20%
+const BOSHI_SHIELD_MAX          = 3;
+const BOSHI_SHIELD_REDUCE       = 0.20;
+
+// 技能一「電磁場裝置」
+const BOSHI_EM_FIELD_RADIUS     = 75;
+const BOSHI_EM_FIELD_DURATION   = 3.0;
+const BOSHI_EM_FIELD_CD         = 7.0;
+const BOSHI_EM_FIELD_THROW_SPEED= 400;
+const BOSHI_EM_FIELD_MAX_DIST   = 220;
+const BOSHI_EM_FIELD_DPS        = 20;
+const BOSHI_EM_FIELD_RING_TOL   = 12;
+
+// 技能二「量子躍遷器」
+const BOSHI_QUANTUM_CD          = 8.0;
+const BOSHI_QUANTUM_STUN        = 1.0;
+const BOSHI_QUANTUM_DURATION    = 5.0;
+const BOSHI_QUANTUM_HALF_WIDTH  = 60;   // 單邊寬度（總寬 = 2 × 此值 = 2 × 球半徑）
+const BOSHI_QUANTUM_PULSE_CD    = 1.0;
+const BOSHI_QUANTUM_PULSE_RATIO = 0.20;
+const BOSHI_QUANTUM_PULSE_DMG_CAP = 500; // 單次脈衝傷害上限，避免爆炸性堆疊
 
 
 const MIN_SPEED          = 100;   // 最低移動速度（技能停止中除外）
@@ -1697,4 +1743,18 @@ const DRUNK_INTOX_MAX = 10;
 const DRUNK_INTOX_DURATION = 10.0;
 const DRUNK_INTOX_ATTACK_REDUCE = 0.3;
 const DRUNK_INTOX_SPEED_MULT = 1.35;
+// ══════════════ 無名槍手海克斯科技 ══════════════
 
+// 🎯 賞金標誌
+const GUNNER_BOUNTY_CD          = 6.0;    // 掛標誌間隔（秒）
+const GUNNER_BOUNTY_OPENING_CD  = 6.0;    // 開局冷卻（秒）：開場不會馬上掛出第一個標誌，可與 GUNNER_BOUNTY_CD 分開調整
+const GUNNER_BOUNTY_DURATION    = 3.0;    // 標誌持續（秒）
+const GUNNER_BOUNTY_HOMING_TURN = 2.0;    // 子彈追蹤轉向速率（弧度/秒）
+const GUNNER_BOUNTY_MARK_R      = 28;     // 標誌視覺半徑（px）
+
+// 💥 分裂彈
+const GUNNER_SPLIT_COUNT        = 8;      // 散開子彈數
+const GUNNER_SPLIT_DAMAGE_RATIO = 0.5;   // 每顆傷害比（對原傷）
+const GUNNER_SPLIT_SPEED        = 500;    // 小子彈速度（px/s）
+const GUNNER_SPLIT_LIFE         = 1.2;    // 小子彈存活（秒）
+const GUNNER_SPLIT_RADIUS       = 8;      // 小子彈半徑（px）
