@@ -76,29 +76,10 @@
   // ══════════════════════════════════════════════════════════
   // 反投射物清單
   // ══════════════════════════════════════════════════════════
-  function projArrays() {
-    const s=$S(); if (!s) return [];
-    const L=[], push=a=>{ if(Array.isArray(a)) L.push(a); };
-    push(s.projectiles); push(s.otisMagicBullets); push(s.getoUltimateProjectiles);
-    push(s.tigerNovaNeedles); push(s.oniichanSpikes); push(s.fisherOceanWaves);
-    push(s.starSmallStars);
-    for (const b of (s.balls||[])) {
-      if (!b) continue;
-      push(b.sansBones); push(b.emBullets);
-    }
-    return L;
-  }
-  const pOwner = p => p?.owner ?? p?.ownerBall?.player ?? null;
+  // 投射物清單與清除全部交給 projectile_registry.js（廚神的刀會自動掉地上等回收，不會蒸發）
+  const pOwner = p => window.ProjectileRegistry.ownerOf(p);
   function clearProj(fn) {
-    let n=0;
-    for (const a of projArrays()) {
-      if (!Array.isArray(a)) continue;
-      for (let i=a.length-1; i>=0; i--) {
-        const p=a[i]; if (!p) continue;
-        if (fn(p, pOwner(p))) { if (typeof p.active==='boolean') p.active=false; a.splice(i,1); n++; }
-      }
-    }
-    return n;
+    return window.ProjectileRegistry.clear((p, o) => fn(p, o), { mode: 'drop' });
   }
 
   // ══════════════════════════════════════════════════════════

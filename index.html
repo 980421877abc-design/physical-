@@ -2718,7 +2718,8 @@ const MODES = [
   { special: 'wheel', emoji: '🔁', name: '車輪戰', desc: '3v3接力。' },
   { special: 'sandbox', emoji: '🧪', name: '沙盒模式', desc: '不限隊伍與人數，自訂場地大小與地圖。' },
   { special: 'dummy', emoji: '🎯', name: '木偶訓練', desc: '木偶站在場地正中央，不會反擊，即時顯示總傷害與秒傷。' },
-  { special: 'boss', emoji: '👹', name: 'Boss模式', desc: '組隊挑戰巨型首領。' }
+  { special: 'boss', emoji: '👹', name: 'Boss模式', desc: '組隊挑戰巨型首領。' },
+  { special: 'brawl', emoji: '🥊', name: '小球格鬥', desc: '手操 1V1 即時格鬥，對手是電腦。' }
 ];
 
 // ══════════════ 木偶訓練模式 ══════════════
@@ -3410,6 +3411,20 @@ function applyCharVariants(player, baseCh) {
   return cloned;
 }
 
+// 小球格鬥：用全螢幕 iframe 載入獨立頁面 ball_fighter.html（與本體完全隔離，不共用任何全域）
+function openBrawl() {
+  if (document.getElementById('brawl-overlay')) return;
+  const o = document.createElement('div');
+  o.id = 'brawl-overlay';
+  o.style.cssText = 'position:fixed;inset:0;z-index:2000;background:#0b1020;';
+  o.innerHTML = '<iframe src="ball_fighter.html" style="position:absolute;inset:0;width:100%;height:100%;border:0"></iframe>' +
+    '<button id="brawl-close" type="button" style="position:absolute;left:50%;bottom:calc(10px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:44px;height:44px;border-radius:50%;border:2px solid #e8c25a;background:rgba(10,16,34,.85);color:#fff;font-size:20px;z-index:1">✕</button>';
+  document.body.appendChild(o);
+  const fr = o.querySelector('iframe');
+  fr.addEventListener('load', () => { try { fr.contentWindow.focus(); } catch (_) {} });
+  o.querySelector('#brawl-close').onclick = () => o.remove();
+}
+
 // 對戰人數選擇（彈窗，樣式與地圖選擇一致）
 function renderModeModal() {
   const grid = document.getElementById('mode-modal-grid');
@@ -3447,6 +3462,7 @@ function renderModeModal() {
       if (m.special === 'sandbox') { sandboxOpenSetup(); return; }
       if (m.special === 'dummy') { startDummyPractice(); return; }
       if (m.special === 'boss') { startBossMode(); return; }
+      if (m.special === 'brawl') { openBrawl(); return; }
       setPlayerMode(m.count);
     };
     grid.appendChild(card);
@@ -4719,9 +4735,8 @@ function runGojoDualSkill(b, dt) {
     // 引力場：把自己（蒼球本身）對周圍角色施力
     applyGojoForce(ball, state.balls, b);
     // 蒼的無下限術式會牽引並吸入敵方投射物，存到零件版五條自己的儲存庫。
-    applyGojoProjectilePull(ball, state.projectiles, b.player, storedProjectiles);
-    applyGojoProjectilePull(ball, state.getoUltimateProjectiles, b.player, storedProjectiles);
-    ball.storedCount = storedProjectiles.length;
+    ProjectileRegistry.arrays({ only: ['projectiles'] }).forEach(e => applyGojoProjectilePull(ball, e.arr, b.player, storedProjectiles));
+        ball.storedCount = storedProjectiles.length;
     // 光線引力：射程內敵人被持續拉向蒼球
     for (const f of state.balls) {
       if (f === b) continue;
@@ -14499,22 +14514,8 @@ function updateGojoInfinity(b, dt) {
   const R = GOJO_INFINITY_RADIUS;
 
   // 需要掃的投射物陣列（都可能是敵方投射物）
-  const arrays = [
-    state.projectiles,
-    state.otisMagicBullets,
-    state.getoUltimateProjectiles,
-    state.tigerNovaNeedles,
-    state.oniichanSpikes,
-    state.fisherOceanWaves,
-    state.starSmallStars,
-  ].filter(a => Array.isArray(a));
-
-  // 掛在角色身上的投射物陣列：骨頭、魔法子彈
-  for (const owner of state.balls) {
-    if (!owner) continue;
-    if (Array.isArray(owner.sansBones)) arrays.push(owner.sansBones);
-    if (Array.isArray(owner.emBullets)) arrays.push(owner.emBullets);
-  }
+  // 投射物清單統一由 projectile_registry.js 提供
+  const arrays = ProjectileRegistry.arrays().map(e => e.arr);
 
   for (const arr of arrays) {
     for (let i = arr.length - 1; i >= 0; i--) {
@@ -14566,18 +14567,7 @@ function updateGojoInfinity(b, dt) {
 
 // 釋放投射物時，歸還它原本佔用的資源（例如廚神的刀）
 function gojoReleaseProjectileResources(p) {
-  if (!p) return;
-  if (p.type === 'knife') {
-    const chefBall = p.ownerBall && p.ownerBall.char && p.ownerBall.char.type === 'chef' ? p.ownerBall : null;
-    if (chefBall && chefBall.hp > 0) {
-      chefBall.knives = Math.min((chefBall.knives || 0) + 1, chefBall.knifeMax || KNIFE_MAX_COUNT);
-      const wallLeft = state.wallKnives.filter(k => k.ownerBall ? k.ownerBall === chefBall : k.owner === chefBall.player).length;
-      if (chefBall.knives >= (chefBall.knifeMax || KNIFE_MAX_COUNT) && wallLeft === 0) {
-        chefBall.knifeRecalling = false;
-        chefBall.attackTimer = chefBall.attackInterval;
-      }
-    }
-  }
+  ProjectileRegistry.recycle(p, 'refund'); // 廚神的刀回手；非廚神的刀不處理
 }
 
 // ─────────────────────────────────────────────
@@ -14753,9 +14743,8 @@ function updateGojoBalls(b, dt) {
         if (ball.life <= 0) { ball.active = false; continue; }
       }
       applyGojoForce(ball, state.balls, b);
-      applyGojoProjectilePull(ball, state.projectiles, b.player, b.gojoStoredProjectiles);
-      applyGojoProjectilePull(ball, state.getoUltimateProjectiles, b.player, b.gojoStoredProjectiles);
-      ball.storedCount = b.gojoStoredProjectiles.length;
+      ProjectileRegistry.arrays({ only: ['projectiles'] }).forEach(e => applyGojoProjectilePull(ball, e.arr, b.player, b.gojoStoredProjectiles));
+            ball.storedCount = b.gojoStoredProjectiles.length;
       for (const f of state.balls) {
         if (f === b) continue;
         const dx = f.x - ball.x, dy = f.y - ball.y;
@@ -18616,17 +18605,7 @@ waypoints.push({
             playHitSound('vampire_bite');
           }
           // 若被吸收的是刀，歸還廚師的刀數
-          if (p.type === 'knife') {
-            const chefBall = (p.ownerBall && p.ownerBall.char.type === 'chef') ? p.ownerBall : null;
-            if (chefBall) {
-              chefBall.knives = Math.min(chefBall.knives + 1, chefBall.knifeMax || KNIFE_MAX_COUNT);
-              const wallLeft = state.wallKnives.filter(k => k.ownerBall ? k.ownerBall === chefBall : k.owner === chefBall.player).length;
-              if (chefBall.knives >= (chefBall.knifeMax || KNIFE_MAX_COUNT) && wallLeft === 0) {
-                chefBall.knifeRecalling = false;
-                chefBall.attackTimer = chefBall.attackInterval;
-              }
-            }
-          }
+          ProjectileRegistry.recycle(p, 'refund');
           state.projectiles.splice(i, 1); removed = true; break;
         }
       }
@@ -19550,37 +19529,19 @@ waypoints.push({
           foe.pucciGravityOwnerPlayer = b.player;
           state.hitFlashes.push({ x: foe.x, y: foe.y, r: 26, alpha: 0.9, color: '#c9d6ff', t: 0.4 });
         }
-        // 敵方投射物進入重力圈：直接扭轉飛行方向（上下左右隨機），速度大小不變
-        if (state.projectiles) {
-          for (const p of state.projectiles) {
-            if (!p || p.owner === b.player) continue;
-            if (Math.hypot(p.x - b.x, p.y - b.y) > PUCCI_MOON_RADIUS) continue;
-            const spd = Math.hypot(p.vx, p.vy) || 0;
-            if (spd <= 0) continue;
-            const dirs = ['up', 'down', 'left', 'right'];
-            const dir = dirs[Math.floor(Math.random() * 4)];
-            const gx = (dir === 'left') ? -1 : (dir === 'right') ? 1 : 0;
-            const gy = (dir === 'up') ? -1 : (dir === 'down') ? 1 : 0;
-            p.vx = gx * spd; p.vy = gy * spd;
-            p.angle = Math.atan2(p.vy, p.vx);
-            state.hitFlashes.push({ x: p.x, y: p.y, r: 16, alpha: 0.8, color: '#c9d6ff', t: 0.3 });
-          }
-        }
-        // 夏油奧義使用獨立陣列，因此在這裡同步套用新月的重力改向，不合併陣列。
-        if (state.getoUltimateProjectiles) {
-          for (const p of state.getoUltimateProjectiles) {
-            if (!p || p.owner === b.player) continue;
-            if (Math.hypot(p.x - b.x, p.y - b.y) > PUCCI_MOON_RADIUS) continue;
-            const spd = Math.hypot(p.vx, p.vy) || 0;
-            if (spd <= 0) continue;
-            const dirs = ['up', 'down', 'left', 'right'];
-            const dir = dirs[Math.floor(Math.random() * 4)];
-            const gx = (dir === 'left') ? -1 : (dir === 'right') ? 1 : 0;
-            const gy = (dir === 'up') ? -1 : (dir === 'down') ? 1 : 0;
-            p.vx = gx * spd; p.vy = gy * spd;
-            state.hitFlashes.push({ x: p.x, y: p.y, r: 18, alpha: 0.8, color: '#c9d6ff', t: 0.3 });
-          }
-        }
+        // 敵方投射物進入重力圈：直接扭轉飛行方向（上下左右隨機），速度大小不變。
+        // 清單統一走 ProjectileRegistry（與 Gojo／博士／槍手同一標準）。
+        ProjectileRegistry.forEachHostile(b.player, (p) => {
+          if (Math.hypot(p.x - b.x, p.y - b.y) > PUCCI_MOON_RADIUS) return;
+          const spd = Math.hypot(p.vx, p.vy) || 0;
+          if (spd <= 0) return;
+          const dir = ['up', 'down', 'left', 'right'][Math.floor(Math.random() * 4)];
+          const gx = (dir === 'left') ? -1 : (dir === 'right') ? 1 : 0;
+          const gy = (dir === 'up') ? -1 : (dir === 'down') ? 1 : 0;
+          p.vx = gx * spd; p.vy = gy * spd;
+          if ('angle' in p) p.angle = Math.atan2(p.vy, p.vx);
+          state.hitFlashes.push({ x: p.x, y: p.y, r: 16, alpha: 0.8, color: '#c9d6ff', t: 0.3 });
+        });
       }
 
       // 新月降臨一段時間後，場地正中央生成🚀
@@ -22817,17 +22778,7 @@ function applyGojoProjectilePull(ball, projectiles, ownerPlayer, storage) {
       sourceWasReflected: !!p.reflected
     });
     // 飛刀被蒼收走後視為已回到廚神手中；赫釋放的是五條重新接管的副本。
-    if (p.type === 'knife') {
-      const chefBall = p.ownerBall && p.ownerBall.char && p.ownerBall.char.type === 'chef' ? p.ownerBall : null;
-      if (chefBall) {
-        chefBall.knives = Math.min((chefBall.knives || 0) + 1, chefBall.knifeMax || KNIFE_MAX_COUNT);
-        const wallLeft = state.wallKnives.filter(k => k.ownerBall ? k.ownerBall === chefBall : k.owner === chefBall.player).length;
-        if (chefBall.knives >= (chefBall.knifeMax || KNIFE_MAX_COUNT) && wallLeft === 0) {
-          chefBall.knifeRecalling = false;
-          chefBall.attackTimer = chefBall.attackInterval;
-        }
-      }
-    }
+    ProjectileRegistry.recycle(p, 'refund');
     projectiles.splice(i, 1);
     state.hitFlashes.push({ x: ball.x, y: ball.y, r: 24, alpha: 1.1, color: '#b8f5ff', t: 0.3 });
     state.hitFlashes.push({ x: ball.x, y: ball.y, r: 12, alpha: 0.9, color: '#ffffff', t: 0.18 });
@@ -40376,6 +40327,7 @@ function launchBossBattle(teamIds, boss, requestedDefinition = null) {
 })();
 
 </script>
+<script src="projectile_registry.js"></script>
 <script src="handbook_mode.js?v=arena-split-20260911-1"></script>
 <script src="special.js"></script>
 <script src="gojo.js"></script>

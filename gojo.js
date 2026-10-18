@@ -258,14 +258,7 @@
   const seenSlowingProjectiles = new WeakSet();
   function detectInfinityConsume() {
     if (!state || !state.balls) return;
-    const arrays = [
-      state.projectiles,
-      state.otisMagicBullets,
-      state.getoUltimateProjectiles,
-      state.tigerNovaNeedles,
-      state.oniichanSpikes,
-      state.fisherOceanWaves
-    ].filter(function (a) { return Array.isArray(a); });
+    const arrays = window.ProjectileRegistry.arrays().map(function (e) { return e.arr; });
     for (const arr of arrays) {
       for (const p of arr) {
         if (p && p.gojoSlowing && !seenSlowingProjectiles.has(p)) {
